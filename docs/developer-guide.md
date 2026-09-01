@@ -27,6 +27,7 @@ upgrade, or break.
 | `story.html` | Scroll-driven data story. Steps (left) drive a sticky layered visual (right) via IntersectionObserver (guarded — no IO means step 0 stays active). Every figure is derived from the data at render time — the hero product is `pyramax` falling back to the first `market` product, the headline gap is computed from its `journey`, so the narrative self-updates. Count-up respects `prefers-reduced-motion`. |
 | `widget.html` | Embeddable one-row product tracker for partner sites (`?product=<id or name>`). Dependency-free; reads the same data file. |
 | `data/products.js` | The data contract: `window.LAUNCH_DATA = { …strict JSON… }`. The only file analysts touch; **feeds all three pages**. |
+| `assets/report-issue.js` | The **Report an issue / contact** front end (DEV-04): floating pill, footer link and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. No backend yet; see §9c. |
 | `data/world-map.js` | Generated geometry: `window.LAUNCH_MAP = { w, h, countries: { ISO3: { n, d } } }`. Natural Earth 110m, public domain. Committed output — regenerate with `scripts/build-map.js`, never hand-edit. |
 | `history/` | Dated snapshots of the data file, bot-committed by `publish.yml` on every data change. Append-only; the raw material for future trend charts and playback. |
 | `feed.xml` | RSS 2.0 feed of changelog entries, bot-rebuilt by `publish.yml`. |
@@ -203,6 +204,7 @@ No test framework by design; two layers instead:
   "as of" playback.
 - **Embeddable widget** (implemented): `widget.html?product=<id or name>` —
   one-row tracker for partner sites; keep it dependency-free and tiny.
+- **"Report an issue" form** (implemented, front end only): `assets/report-issue.js` — see §9c for the backend seam.
 - **Analytics**: add the chosen provider's script tag in `index.html` only for
   the production host (consider a hostname guard so localhost/preview isn't
   counted). Prefer a cookieless option (e.g. Plausible) to avoid consent
@@ -234,6 +236,50 @@ Widget indices are position-based — keep the sidebar's control order stable
 (source radio first, then the Configuration expander's multiselect → sliders →
 toggle) or update the tests. `launch_data.py` has no Streamlit imports, so its
 loaders/builders are testable with plain `python -c`.
+
+## 9c. The "Report an issue" form (DEV-04)
+
+`assets/report-issue.js` is the whole feature: one dependency-free file that
+injects its own styles, the floating **Report an issue** pill and the modal
+dialog. Every dashboard page includes it with a single line before end of file
+(`<script src="assets/report-issue.js" defer></script>`) and carries a matching
+footer link. Nothing else in the pages knows about it, so it can be dropped or
+replaced wholesale.
+
+Openers, all equivalent: the pill · any `[data-report-issue]` element (the
+footer link) · any link to `#report-issue` · `#report-issue` in the URL on load
+(so a correction request is shareable as a link) · `LAUNCH_REPORT_ISSUE.open()`.
+A trigger may carry `data-product="<id>"` to preselect the medicine — that is
+the hook for a per-row "report an issue with this product" link, with no change
+to the component. The product dropdown is built from `LAUNCH_DATA.products` at
+open time, so it never drifts from the board.
+
+**There is no backend.** The static-site architecture (§1) has nowhere to POST
+to, so the form validates, then reports success from the browser: the report is
+kept in `LAUNCH_REPORT_ISSUE.submitted` and logged to the console, and a
+reference id is shown to the reporter. **Nothing is sent anywhere** — say so to
+anyone demoing the prototype to real country teams.
+
+Wiring a real endpoint (DEV-04b) is a one-function change: replace the body of
+`submitIssueReport()` at the top of the file with a `fetch()` (or override
+`LAUNCH_REPORT_ISSUE.submit` at runtime). It receives
+
+```js
+{ type, productId, productName, message, name, email, organisation,
+  page: { url, path, title },
+  data: { lastUpdated, dataStatus },   // which data version the reporter saw
+  submittedAt, userAgent }
+```
+
+and must resolve to `{ ok: true, ref: "<reference>" }` or throw — the dialog
+already renders the pending, success and failure states around it. Candidate
+back ends, cheapest first: a form-relay service (Formspree/Basin), a GitHub
+issue via a small serverless function, or RBM's own intake once the site moves
+off Pages. Whichever is chosen, keep the reference id: reporters quote it.
+
+The `unitaid/` edition picks the form up automatically — the builder rewrites
+`src="assets/` to `src="../assets/`, and the component is themed entirely
+through the design tokens, so it inherits the brand skin with no extra rules.
 
 ## 10. Design options (temporary, during client review)
 
