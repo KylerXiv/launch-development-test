@@ -95,6 +95,9 @@ for (const p of PAGES) {
   html = html.replace(/(<meta name="viewport"[^>]*>)/, `$1\n${FONTS}`);
   // data files live one level up
   html = html.replace(/src="data\//g, 'src="../data/');
+  // ...and so do shared front-end assets (report-issue.js). Must run BEFORE
+  // LOGOBAR is appended — that one really does live in unitaid/assets/.
+  html = html.replace(/src="assets\//g, 'src="../assets/');
   // inside the themed folder, the brand-preview link becomes the way back
   html = html.replace(
     '<a href="unitaid/index.html" style="color:var(--accent)">Unitaid brand preview</a>',
