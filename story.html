@@ -12,7 +12,10 @@
     --warn: #B87500; --warn-soft: #FBF0DA;
     --crit: #C0392B; --crit-soft: #FAE7E4;
     --idle: #9AA8B1; --idle-soft: #EEF1F3;
-    --map1: #B7D3DD; --map2: #5E97AC; --map3: #14657E;
+    --map1: #5490A6; --map2: #055D76; --map3: #002A38;
+    --map-nodata: #FFFFFF; --map-border: #A8B5BD; --map-texture: rgba(255,255,255,.55);
+    /* map roles — components use these; --mapN are the ramp primitives */
+    --map-registered: var(--map1); --map-guidelines: var(--map2); --map-mft: var(--map3);
     --shadow: 0 1px 2px rgba(22,48,63,.06), 0 4px 16px rgba(22,48,63,.07);
   }
   @media (prefers-color-scheme: dark) {
@@ -24,7 +27,8 @@
       --warn: #E0A63C; --warn-soft: #3A2E14;
       --crit: #E06A5C; --crit-soft: #40201C;
       --idle: #647883; --idle-soft: #22333C;
-      --map1: #2B4E5C; --map2: #3E7A91; --map3: #4FA8C3;
+      --map1: #3A8298; --map2: #5EB7D2; --map3: #C6F0FF;
+      --map-nodata: #17252E; --map-border: #395964; --map-texture: rgba(16,27,34,.55);
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
     }
   }
@@ -36,7 +40,8 @@
     --warn: #E0A63C; --warn-soft: #3A2E14;
     --crit: #E06A5C; --crit-soft: #40201C;
     --idle: #647883; --idle-soft: #22333C;
-    --map1: #2B4E5C; --map2: #3E7A91; --map3: #4FA8C3;
+    --map1: #3A8298; --map2: #5EB7D2; --map3: #C6F0FF;
+      --map-nodata: #17252E; --map-border: #395964; --map-texture: rgba(16,27,34,.55);
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
   }
   * { box-sizing: border-box; }
@@ -137,10 +142,12 @@
   /* map */
   .storymap { position: relative; }
   .storymap svg { width: 100%; height: auto; background: var(--surface-2); border-radius: 10px; display: block; }
-  .storymap path { fill: var(--surface); stroke: var(--line); stroke-width: .6; }
-  .storymap path.lvl-registered { fill: var(--map1); }
-  .storymap path.lvl-guidelines { fill: var(--map2); }
-  .storymap path.lvl-mft { fill: var(--map3); }
+  .storymap path { fill: var(--map-nodata); stroke: var(--map-border); stroke-width: .6; }
+  /* level 1 flat, levels 2-3 hatched, so the escalation reads without colour */
+  .storymap path.lvl-registered { fill: var(--map-registered); }
+  .storymap path.lvl-guidelines { fill: url(#story-tex-guidelines); stroke: var(--map-nodata); stroke-width: .5; }
+  .storymap path.lvl-mft { fill: url(#story-tex-mft); stroke: var(--map-nodata); stroke-width: .5; }
+  .storymap path.lvl-registered { stroke: var(--map-nodata); stroke-width: .5; }
   .storymap .ovl { position: absolute; top: 10px; left: 10px; background: var(--warn-soft); color: var(--warn);
     border: 1px solid var(--warn); border-radius: 8px; padding: 5px 10px; font-size: 11.5px; font-weight: 650; max-width: 380px; }
 
@@ -353,14 +360,14 @@
   if (window.LAUNCH_MAP) {
     const M = window.LAUNCH_MAP;
     const byIso = {}; heroCountries.forEach(e => byIso[e.iso3] = e.level);
-    mapHtml = `<div class="storymap"><svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="Country access map">` +
+    mapHtml = `<div class="storymap"><svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="Country access map"><defs><pattern id="story-tex-guidelines" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)"><rect width="5" height="5" fill="var(--map-guidelines)"></rect><line x1="0" y1="0" x2="0" y2="5" stroke="var(--map-texture)" stroke-width="1.7"></line></pattern><pattern id="story-tex-mft" patternUnits="userSpaceOnUse" width="4.2" height="4.2" patternTransform="rotate(45)"><rect width="4.2" height="4.2" fill="var(--map-mft)"></rect><line x1="0" y1="0" x2="0" y2="4.2" stroke="var(--map-texture)" stroke-width="1.5"></line><line x1="0" y1="0" x2="4.2" y2="0" stroke="var(--map-texture)" stroke-width="1.5"></line></pattern></defs>` +
       Object.entries(M.countries).map(([iso, c]) =>
         `<path class="${byIso[iso] ? "lvl-" + byIso[iso] : ""}" d="${c.d}"></path>`).join("") +
       `</svg>` + (hero.detail.countries && hero.detail.countries.status !== "verified"
         ? `<div class="ovl">ILLUSTRATIVE — pending verified country survey</div>` : "") + `</div>`;
   }
   L.push(`<div class="layer" data-viz="map"><div class="panel">${mapHtml}
-    <div class="biglbl" style="margin-top:12px">${esc(hero.name)}: registered (light) → in national guidelines (medium) → in MFT plans (dark).</div>
+    <div class="biglbl" style="margin-top:12px">${esc(hero.name)}: registered (solid) → in national guidelines (hatched) → in MFT plans (cross-hatched).</div>
   </div></div>`);
 
   // next arrivals — cure-rate headline only when the figure is present in the data

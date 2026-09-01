@@ -23,9 +23,16 @@
     --crit-soft: #FAE7E4;
     --idle: #9AA8B1;
     --idle-soft: #EEF1F3;
-    --map1: #B7D3DD;
-    --map2: #5E97AC;
-    --map3: #14657E;
+    --map1: #00929F;
+    --map2: #3A559C;
+    --map3: #5C245F;
+    --map-nodata: #FFFFFF;
+    --map-border: #8299A2;
+    /* map roles — components reference these; the --mapN steps above are the
+       ramp primitives each edition re-skins. */
+    --map-registered: var(--map1);
+    --map-guidelines: var(--map2);
+    --map-mft: var(--map3);
     --shadow: 0 1px 2px rgba(22,48,63,.06), 0 4px 16px rgba(22,48,63,.07);
   }
   @media (prefers-color-scheme: dark) {
@@ -48,9 +55,11 @@
       --crit-soft: #40201C;
       --idle: #647883;
       --idle-soft: #22333C;
-      --map1: #2B4E5C;
-      --map2: #3E7A91;
-      --map3: #4FA8C3;
+      --map1: #0C8691;
+      --map2: #82A0E8;
+      --map3: #F4B8F4;
+      --map-nodata: #17252E;
+      --map-border: #577179;
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
     }
   }
@@ -73,9 +82,11 @@
     --crit-soft: #40201C;
     --idle: #647883;
     --idle-soft: #22333C;
-    --map1: #2B4E5C;
-    --map2: #3E7A91;
-    --map3: #4FA8C3;
+    --map1: #0C8691;
+    --map2: #82A0E8;
+    --map3: #F4B8F4;
+    --map-nodata: #17252E;
+    --map-border: #577179;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
   }
   * { box-sizing: border-box; }
@@ -138,7 +149,12 @@
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
-  .pathnode img { width: 46px; height: 46px; }
+  .pathnode svg { width: 30px; height: 30px; display: block; margin: 0 auto; color: var(--accent); }
+  .pathnode .pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent-soft); border: 1px solid var(--line);
+  }
   .pathnode span { display: block; font-size: 11px; line-height: 1.25; color: var(--ink-2); margin-top: 5px; padding: 0 3px; }
   .patharrow { flex: none; color: var(--ink-3); font-size: 15px; margin-top: 15px; user-select: none; }
 
@@ -149,13 +165,26 @@
     box-shadow: var(--shadow); overflow: hidden;
   }
   .product.future { opacity: .78; }
-  .prow {
-    display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center;
-    padding: 18px 20px; cursor: pointer; width: 100%;
+  /* The row is a plain grid, not a button: the eight stage markers are real
+     buttons now, and HTML forbids interactive content inside a button. The
+     product toggle is the identity block on the left; the track is its sibling. */
+  .prow { display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; padding: 18px 20px; }
+  .pbtn {
+    display: block; width: 100%; padding: 0; cursor: pointer;
     background: none; border: 0; text-align: left; color: inherit; font: inherit;
+    border-radius: 8px;
   }
-  .prow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 14px; }
+  .pbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  /* the toggle no longer covers the whole row, so it needs to look like a toggle */
+  .pid .name { display: flex; align-items: baseline; gap: 7px; }
+  .pid .chev {
+    flex: none; font-size: 11px; color: var(--ink-3); transition: transform .15s ease;
+    display: inline-block;
+  }
+  .product.open .pid .chev { transform: rotate(90deg); color: var(--accent); }
+  .pbtn:hover .pid .chev { color: var(--accent); }
   .pid .name { font-size: 16.5px; font-weight: 700; letter-spacing: -.005em; }
+  .pid .name .txt { min-width: 0; }
   .pid .inn { color: var(--ink-2); font-size: 13px; margin-top: 1px; }
   .pid .mfr { color: var(--ink-3); font-size: 12.5px; margin-top: 2px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -178,13 +207,124 @@
   .stage.cur .lbl { color: var(--ink); font-weight: 650; }
 
   /* illustrated stage marker: journey icon + status badge overlay */
-  .stage .smark { position: relative; display: inline-flex; margin: 0 4px; cursor: help; border-radius: 50%; }
+  .stage .smark {
+    position: relative; flex: none; margin: 0 4px; cursor: pointer;
+    width: 42px; height: 42px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--idle-soft); color: var(--idle); border: 1px solid transparent;
+    padding: 0; font: inherit; -webkit-appearance: none; appearance: none;
+    transition: box-shadow .12s ease, transform .12s ease;
+  }
+  .stage .smark:hover { transform: translateY(-1px); }
+  .stage .smark[aria-expanded="true"] { box-shadow: 0 0 0 3px var(--accent); }
   .stage .smark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .stage .sicon { width: 42px; height: 42px; display: block; }
-  .stage.s-idle .sicon { filter: grayscale(1); opacity: .35; }
-  .stage .smark .dot { position: absolute; right: -4px; bottom: -2px; width: 16px; height: 16px; font-size: 9.5px; box-shadow: 0 0 0 2px var(--surface); cursor: help; }
+  .stage .sicon { width: 26px; height: 26px; display: block; }
+  .stage.s-done .smark { background: var(--good-soft); color: var(--good); }
+  .stage.s-prog .smark { background: var(--warn-soft); color: var(--warn); }
+  .stage.s-late .smark { background: var(--crit-soft); color: var(--crit); }
+  .stage.s-idle .smark { background: none; border: 1px dashed var(--line); opacity: .55; }
+  .stage .smark .dot { position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; font-size: 9.5px; box-shadow: 0 0 0 2px var(--surface); cursor: help; }
   .stage.s-idle .smark .dot { display: none; }
   .stage.cur .smark { box-shadow: 0 0 0 4px var(--accent-soft); }
+  /* ---------- gate drill-down (cell tier) ----------
+     A sibling of .prow inside the product card, so it spans the card. Kept
+     independent of .detail: "why is this stuck" and "what is this medicine"
+     are different questions, and nesting one inside the other slows the
+     common case. */
+  .gatepanel {
+    margin: 0 20px 4px; padding: 14px 16px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-left: 3px solid var(--accent); border-radius: 10px;
+  }
+  .gatepanel[hidden] { display: none; }
+  .gatepanel.late { border-left-color: var(--crit); }
+  .gp-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+  .gp-head .gp-stage { font-size: 15px; font-weight: 700; }
+  .gp-head .gp-close {
+    margin-left: auto; background: none; border: 0; padding: 3px 8px; cursor: pointer;
+    font: inherit; font-size: 12px; color: var(--ink-2); border-radius: 6px;
+  }
+  .gp-head .gp-close:hover { background: var(--surface); color: var(--ink); }
+  .gp-pill {
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: 2.5px 9px; border-radius: 999px; white-space: nowrap;
+  }
+  .gp-pill.done { background: var(--good-soft); color: var(--good); }
+  .gp-pill.prog { background: var(--warn-soft); color: var(--warn); }
+  .gp-pill.late { background: var(--crit-soft); color: var(--crit); }
+  .gp-pill.idle { background: var(--idle-soft); color: var(--ink-3); }
+  .gp-note { margin: 9px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); max-width: 78ch; }
+  .gp-why {
+    margin-top: 10px; padding: 9px 12px; border-radius: 8px;
+    background: var(--crit-soft); color: var(--crit);
+    font-size: 13px; font-weight: 600; line-height: 1.45;
+  }
+  .gp-grid {
+    margin-top: 12px; display: grid; gap: 8px 22px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  }
+  .gp-kv { display: flex; flex-direction: column; gap: 1px; font-size: 13px; }
+  .gp-kv dt { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .gp-kv dd { margin: 0; color: var(--ink-2); }
+  .gp-elapsed { color: var(--crit); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .gp-countries { margin-top: 11px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); }
+  .gp-countries .key { display: inline-flex; align-items: center; gap: 6px; }
+  .gp-countries .n { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .gp-prov { margin-top: 11px; padding-top: 9px; border-top: 1px dashed var(--line); font-size: 11.5px; color: var(--ink-3); }
+
+  /* ---------- gate tier: the pathway strip becomes the control ---------- */
+  .pathnode {
+    background: none; border: 0; font: inherit; color: inherit; cursor: pointer;
+    padding: 2px 0 4px; border-radius: 9px;
+  }
+  .pathnode:hover .pill { border-color: var(--accent); }
+  .pathnode:hover .plabel { color: var(--ink); }
+  .pathnode:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pathnode .pill { transition: border-color .12s ease, box-shadow .12s ease; }
+  .pathnode[aria-expanded="true"] .pill { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .pathnode[aria-expanded="true"] .plabel { color: var(--accent); font-weight: 700; }
+  .pathnode .cnt {
+    display: block; margin-top: 3px; font-size: 10.5px; font-weight: 700;
+    color: var(--crit); font-variant-numeric: tabular-nums;
+  }
+
+  .gatewrap {
+    margin: -12px 0 22px; padding: 16px 18px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 3px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow);
+  }
+  .gatewrap[hidden] { display: none; }
+  .gw-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+  .gw-head h3 { margin: 0; font-size: 16px; font-weight: 700; }
+  .gw-head .gw-sum { font-size: 13px; color: var(--ink-2); }
+  .gw-head .gw-sum b { color: var(--crit); font-variant-numeric: tabular-nums; }
+  .gw-head .gp-close {
+    margin-left: auto; background: none; border: 0; padding: 3px 8px; cursor: pointer;
+    font: inherit; font-size: 12px; color: var(--ink-2); border-radius: 6px;
+  }
+  .gw-head .gp-close:hover { background: var(--surface-2); color: var(--ink); }
+  .gw-list { margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1px; }
+  .gw-list li {
+    display: grid; grid-template-columns: 150px 118px 1fr auto; gap: 12px; align-items: baseline;
+    padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px;
+  }
+  .gw-list li > span:nth-child(2) { white-space: nowrap; }
+  .gw-list li.is-late { background: var(--crit-soft); border-radius: 6px; padding-left: 8px; padding-right: 8px; }
+  .gw-list .gw-name { font-weight: 700; }
+  .gw-list .gw-note { color: var(--ink-2); line-height: 1.45; }
+  .gw-jump {
+    background: none; border: 1px solid var(--line); border-radius: 999px;
+    padding: 3px 11px; font: inherit; font-size: 11.5px; color: var(--accent);
+    cursor: pointer; white-space: nowrap;
+  }
+  .gw-jump:hover { border-color: var(--accent); background: var(--accent-soft); }
+  @media (max-width: 760px) {
+    .gw-list li { grid-template-columns: 1fr; gap: 3px; }
+    .gatepanel { margin: 0 14px 4px; }
+  }
+
+  /* the panel carries the flag for the current gate; don't say it twice */
+  .product.gate-flag .flagnote { display: none; }
   .flagnote {
     margin: 10px 20px 0 290px; font-size: 12.5px; color: var(--crit);
     display: flex; gap: 7px; align-items: baseline;
@@ -200,6 +340,18 @@
   #tip b { display: block; margin-bottom: 2px; }
   #tip .trow { display: flex; gap: 8px; justify-content: space-between; }
   #tip .trow span:first-child { opacity: .7; }
+  /* country readout: every stage listed, ticked up to the one reached */
+  #tip .tlvl { display: flex; align-items: center; gap: 7px; margin-top: 3px; }
+  #tip .tlvl .tmark { width: 9px; flex: none; font-weight: 800; text-align: center; }
+  #tip .tlvl.off { opacity: .45; }
+  #tip .tlvl .mapsw { width: 11px; height: 11px; }
+  /* the tooltip inverts between themes (ink ground, page-coloured text), so the
+     hairline is drawn from currentColor rather than a fixed white */
+  #tip .tprod { position: relative; margin-top: 6px; padding-top: 6px; font-size: 11.5px; opacity: .72; }
+  #tip .tprod::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: currentColor; opacity: .3;
+  }
 
   /* ---------- detail panel ---------- */
   .detail { display: none; border-top: 1px solid var(--line); background: var(--surface-2); padding: 20px; }
@@ -294,22 +446,52 @@
 
   .mapwrap { position: relative; overflow-x: auto; }
   .mapwrap svg { display: block; width: 100%; min-width: 640px; height: auto; background: var(--surface-2); border-radius: 10px; }
-  .mapwrap path { fill: var(--surface); stroke: var(--line); stroke-width: .6; }
-  .mapwrap path.lvl-registered { fill: var(--map1); }
-  .mapwrap path.lvl-guidelines { fill: var(--map2); }
-  .mapwrap path.lvl-mft { fill: var(--map3); }
-  .mapwrap path.haslvl { cursor: help; }
+  .mapwrap path { fill: var(--map-nodata); stroke: var(--map-border); stroke-width: .75; cursor: help; }
+  /* One hue per stage, 60 deg apart, each clearing 3:1 against the no-data fill
+     and the ocean, and all three clear of the status ramp (green / amber / red)
+     so a colour never reads as good-or-bad. Lightness still descends across the
+     three, so the order survives greyscale and print. */
+  .mapwrap path.lvl-registered { fill: var(--map-registered); }
+  .mapwrap path.lvl-guidelines { fill: var(--map-guidelines); }
+  .mapwrap path.lvl-mft { fill: var(--map-mft); }
+  /* a country with data is outlined in the no-data ground, so neighbours at the
+     same level stay separable */
+  .mapwrap path.haslvl { stroke: var(--map-nodata); stroke-width: .7; }
+  /* Chrome's default focus ring is an `outline`, and an outline on an SVG path is
+     drawn around its BOUNDING BOX — a meaningless rectangle over an irregular
+     country, in the browser's blue rather than ours. Indicate the shape itself,
+     from the map's own tokens. */
+  .mapwrap path:focus { outline: none; }
+  .mapwrap path:focus-visible {
+    outline: none;
+    stroke: var(--map-nodata); stroke-width: 2.6; stroke-linejoin: round;
+    /* the ring itself is the no-data ground, which in light theme matches the
+       no-data countries next door — so the accent halo defines the outer edge */
+    filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 1.5px var(--accent));
+  }
   .map-overlay {
-    position: absolute; top: 10px; left: 10px; z-index: 2; max-width: 400px;
-    background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn);
-    border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 650; line-height: 1.4;
+    margin-top: 10px; background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn);
+    border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 650; line-height: 1.45;
   }
   .map-empty {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-size: 13.5px; color: var(--ink-3); text-align: center; padding: 20px;
+    pointer-events: none;   /* it is a message, never a hit target */
   }
+  /* `display: flex` above is an author rule and so outranks the browser's
+     [hidden] { display: none }. Without this the box stays laid out over the
+     whole map, invisible, and swallows every country hover. */
+  .map-empty[hidden] { display: none; }
   .map-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: 12.5px; color: var(--ink-2); }
-  .map-legend .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid var(--line); }
+  /* one swatch definition, shared by the legend, the country tooltip and the
+     gate panel's counts, so none of them can drift from the map */
+  .mapsw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; border: 1px solid var(--map-border); }
+  .mapsw.registered { background: var(--map-registered); }
+  .mapsw.guidelines { background: var(--map-guidelines); }
+  .mapsw.mft { background: var(--map-mft); }
+  .mapsw.none { background: var(--map-nodata); }
+  .map-legend .ct { font-variant-numeric: tabular-nums; font-weight: 650; color: var(--ink); }
+  .map-legend .ct.zero { color: var(--ink-3); font-weight: 400; }
 
   .timing-axis { position: relative; height: 18px; margin-left: 150px; }
   .timing-axis span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -342,7 +524,10 @@
     body { background: #fff; }
     .product .detail { display: block !important; }
     .product { break-inside: avoid; box-shadow: none; }
-    .dl-btn, #tip { display: none !important; }
+    .dl-btn, #tip, .gp-close, .gw-jump { display: none !important; }
+    /* an open drill-down carries the analysis — keep it in the PDF */
+    .gatepanel[hidden], .gatewrap[hidden] { display: none !important; }
+    .gatepanel, .gatewrap { break-inside: avoid; box-shadow: none; }
     .updates, .glossary-panel { display: block; }
     .updates[open] summary, .glossary-panel[open] summary { list-style: none; }
   }
@@ -356,7 +541,8 @@
     .strip { padding: 10px 14px; }
     .pathway { padding: 12px 12px 10px; }
     .pathnode { min-width: 72px; }
-    .pathnode img { width: 38px; height: 38px; }
+    .pathnode .pill { width: 38px; height: 38px; }
+    .pathnode svg { width: 25px; height: 25px; }
     .dl-btn { margin-left: 0; }
     .detail { padding: 14px; }
     .timing-axis { margin-left: 110px; }
@@ -393,25 +579,27 @@
       <span class="key"><span class="dot done" aria-hidden="true">✓</span> Complete</span>
       <span class="key"><span class="dot prog" aria-hidden="true">›</span> In progress</span>
       <span class="key"><span class="dot late" aria-hidden="true">!</span> Delayed / bottleneck</span>
-      <span class="key"><img src="assets/journey-icons/04-who-prequalification.svg" alt="" aria-hidden="true" style="width:18px;height:18px;filter:grayscale(1);opacity:.4;vertical-align:-4px"> Not started (icon grayed)</span>
+      <span class="key"><span class="dot idle" aria-hidden="true"></span> Not started (stage glyph dimmed, no badge)</span>
     </div>
     <button class="dl-btn" id="dl-csv" type="button">Download CSV</button>
   </div>
 
-  <div class="pathway" id="pathway" role="img" aria-label="The eight-stage access pathway, from research and development to in-country delivery" hidden></div>
+  <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway — choose a gate to see every medicine at it" hidden></div>
+  <div class="gatewrap" id="gatewrap" hidden></div>
 
   <div class="board" id="board"></div>
 
   <section class="viz" id="mapsec" hidden>
     <h2>Country access map</h2>
-    <p class="viznote" id="mapnote">Where the selected medicine is registered, in national guidelines, and in MFT plans.</p>
+    <p class="viznote" id="mapnote">Each country is shaded by the furthest stage it has reached — a country counted in MFT plans is registered too. Counts are of the countries drawn on this map.</p>
     <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
     <div class="mapwrap" id="mapwrap"></div>
+    <div class="map-overlay" id="map-overlay" hidden></div>
     <div class="map-legend">
-      <span class="key"><span class="sw" style="background:var(--map1)"></span> Registered</span>
-      <span class="key"><span class="sw" style="background:var(--map2)"></span> In national guidelines</span>
-      <span class="key"><span class="sw" style="background:var(--map3)"></span> In MFT plans</span>
-      <span class="key"><span class="sw" style="background:var(--surface)"></span> No data</span>
+      <span class="key"><span class="mapsw registered"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
+      <span class="key"><span class="mapsw guidelines"></span> In national guidelines <span class="ct" id="mapct-guidelines">–</span></span>
+      <span class="key"><span class="mapsw mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
+      <span class="key"><span class="mapsw none"></span> No data <span class="ct" id="mapct-none">–</span></span>
     </div>
   </section>
 
@@ -446,6 +634,7 @@
 
 <script src="data/products.js"></script>
 <script src="data/world-map.js"></script>
+<script src="assets/journey-icons/icons.js"></script>
 <script>
 (function () {
   const board = document.getElementById("board");
@@ -463,13 +652,12 @@
   const PRODUCTS = DATA.products;
   const ICON = { done: "✓", prog: "›", late: "!", idle: "" };
   const LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
-  // illustrated journey icons, one per stage, in stage order (assets/journey-icons/)
-  const STAGE_ICONS = [
-    "01-rnd-clinical", "02-regulatory-approval", "03-who-guidelines", "04-who-prequalification",
-    "05-country-registration", "06-national-policy", "07-procurement", "08-in-country-delivery"
-  ];
-  const stageIconImg = (i, cls) =>
-    STAGE_ICONS[i] ? `<img class="${cls}" src="assets/journey-icons/${STAGE_ICONS[i]}.svg" alt="" aria-hidden="true">` : "";
+  // Illustrated stage glyphs (assets/journey-icons/icons.js), one per stage in
+  // stage order. Injected once as a sprite; each marker references it by <use>,
+  // so the glyph inherits its marker's status colour and the page theme.
+  const JI = window.LaunchJourneyIcons;
+  if (JI) document.body.insertAdjacentHTML("afterbegin", JI.sprite());
+  const stageIconImg = (i, cls) => JI ? JI.use(i, cls) : "";
 
   // header + banner from meta
   const dt = new Date(DATA.meta.lastUpdated + "T00:00:00");
@@ -545,9 +733,16 @@
   // pathway legend strip: the eight stages as illustrated badges
   const pathway = document.getElementById("pathway");
   pathway.hidden = false;
-  pathway.innerHTML = STAGES.map((s, i) =>
-    `<div class="pathnode">${stageIconImg(i, "")}<span>${esc(s)}</span></div>`
-  ).join(`<span class="patharrow" aria-hidden="true">→</span>`);
+  // The strip is the only element on the page that owns all eight gates, so it
+  // is the entry point for the systemic question: who is stuck at this gate?
+  const lateAt = i => tracked.filter(p => p.stages[i].status === "late").length;
+  pathway.innerHTML = STAGES.map((s, i) => {
+    const n = lateAt(i);
+    return `<button class="pathnode" type="button" aria-expanded="false" aria-controls="gatewrap"
+      data-gate="${i}" aria-label="${esc(s)} — show every medicine at this gate${n ? ", " + n + " delayed" : ""}">` +
+      `<span class="pill">${stageIconImg(i, "")}</span><span class="plabel">${esc(s)}</span>` +
+      (n ? `<span class="cnt">${n} delayed</span>` : "") + `</button>`;
+  }).join(`<span class="patharrow" aria-hidden="true">→</span>`);
 
   tracked.forEach(p => {
     const stagesHtml = p.stages.map((st, i) => {
@@ -557,12 +752,14 @@
         <div class="stage ${i === p.currentStage ? "cur" : ""} s-${st.status}">
           <div class="row">
             <div class="bar pre ${preDone ? "done-bar" : ""}"></div>
-            <span class="smark" tabindex="0" role="img"
+            <button class="smark" type="button"
+              aria-expanded="false" aria-controls="${esc(p.id)}-gate"
               aria-label="${esc(STAGES[i])}: ${LABEL[st.status]}. ${esc(st.note)}"
-              data-stage="${esc(STAGES[i])}" data-status="${st.status}"
+              data-stage="${esc(STAGES[i])}" data-stagei="${i}" data-pid="${esc(p.id)}"
+              data-status="${st.status}"
               data-note="${esc(st.note)}" data-date="${esc(st.date)}"
               data-next="${esc(st.next)}" data-nextdate="${esc(st.nextDate)}"
-              data-asof="${esc(st.asOf)}">${stageIconImg(i, "sicon")}<span class="dot ${st.status}" aria-hidden="true">${ICON[st.status]}</span></span>
+              data-asof="${esc(st.asOf)}">${stageIconImg(i, "sicon")}<span class="dot ${st.status}" aria-hidden="true">${ICON[st.status]}</span></button>
             <div class="bar post ${postDone ? "done-bar" : ""}"></div>
           </div>
           <div class="lbl">${esc(STAGES[i])}</div>
@@ -619,17 +816,20 @@
 
     const node = el(`
       <section class="product" id="${esc(p.id)}">
-        <button class="prow" aria-expanded="false" aria-controls="${esc(p.id)}-detail">
-          <div class="pid">
-            <div class="name">${esc(p.name)}</div>
-            <div class="inn">${esc(p.inn)}</div>
-            <div class="mfr">${esc(p.manufacturer)}</div>
-            <div class="chips">
-              <span class="chip ${p.class === "pipeline" ? "pipeline" : ""}">${esc(p.classLabel)}</span>
+        <div class="prow">
+          <button class="pbtn" aria-expanded="false" aria-controls="${esc(p.id)}-detail">
+            <div class="pid">
+              <div class="name"><span class="chev" aria-hidden="true">▸</span><span class="txt">${esc(p.name)}</span></div>
+              <div class="inn">${esc(p.inn)}</div>
+              <div class="mfr">${esc(p.manufacturer)}</div>
+              <div class="chips">
+                <span class="chip ${p.class === "pipeline" ? "pipeline" : ""}">${esc(p.classLabel)}</span>
+              </div>
             </div>
-          </div>
+          </button>
           <div class="trackbox"><div class="track">${stagesHtml}</div></div>
-        </button>
+        </div>
+        <div class="gatepanel" id="${esc(p.id)}-gate" hidden></div>
         ${p.flag ? `<div class="flagnote">${esc(p.flag)}</div>` : ""}
         <div style="height:14px"></div>
         <div class="detail" id="${esc(p.id)}-detail">
@@ -714,13 +914,176 @@
   });
 
   // expand/collapse
-  document.querySelectorAll(".prow[aria-controls]").forEach(btn => {
-    btn.addEventListener("click", e => {
-      if (e.target.closest(".smark")) return; // stage markers are for tooltips
+  document.querySelectorAll(".pbtn[aria-controls]").forEach(btn => {
+    btn.addEventListener("click", () => {
       const prod = btn.closest(".product");
       const open = prod.classList.toggle("open");
       btn.setAttribute("aria-expanded", open ? "true" : "false");
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Gate drill-down. gatePanelHTML is a pure renderer: (product, stageIndex) in,
+  // markup out, no knowledge of where it is mounted — so the cell tier, the gate
+  // tier and any future host share one function.
+  // ---------------------------------------------------------------------------
+
+  // Elapsed time is only honest where the data actually supports it. detail.journey
+  // is a product-level list of access milestones, NOT one entry per stage, so a
+  // per-stage duration would be invented. We report it only for the product's
+  // current gate, when its journey ends in an undated gate preceded by a dated
+  // one — and we name the milestone we counted from.
+  const nowYear = parseInt(DATA.meta.lastUpdated.slice(0, 4), 10);
+  function stalledSince(p, i) {
+    if (i !== p.currentStage) return null;
+    const j = p.detail.journey;
+    if (!Array.isArray(j) || j.length < 2) return null;
+    if (j[j.length - 1].year !== "TBC") return null;
+    const last = [...j].reverse().find(g => Number.isInteger(g.year));
+    if (!last) return null;
+    const yrs = nowYear - last.year;
+    if (yrs < 1) return null;
+    return { yrs, label: last.label, year: last.year, pending: j[j.length - 1].label };
+  }
+
+  function gatePanelHTML(p, i) {
+    const st = p.stages[i];
+    const el2 = stalledSince(p, i);
+    const isCur = i === p.currentStage;
+
+    const kv = [];
+    if (st.date) kv.push(["Recorded", esc(st.date)]);
+    if (st.next) kv.push(["Next step", esc(st.next)]);
+    if (st.nextDate) kv.push(["Expected", esc(st.nextDate)]);
+    if (el2) kv.push(["Pending since", `<span class="gp-elapsed">${el2.yrs} yr${el2.yrs === 1 ? "" : "s"}</span> — ${esc(el2.label)} (${el2.year})`]);
+
+    // Adoption requirements belong to the national-policy gate specifically;
+    // the country survey speaks to registration and policy adoption.
+    const reqs = (i === 5 && Array.isArray(p.detail.adoption) && p.detail.adoption.length)
+      ? `<div class="gp-kv"><dt>What adoption needs</dt><dd>${p.detail.adoption.map(esc).join(" · ")}</dd></div>` : "";
+
+    let countries = "";
+    if ((i === 4 || i === 5) && p.detail.countries && Array.isArray(p.detail.countries.list)) {
+      const c = { registered: 0, guidelines: 0, mft: 0 };
+      p.detail.countries.list.forEach(e => { if (e.level in c) c[e.level]++; });
+      countries = `<div class="gp-countries">` +
+        `<span class="key"><span class="mapsw registered"></span>Registered <span class="n">${c.registered}</span></span>` +
+        `<span class="key"><span class="mapsw guidelines"></span>In national guidelines <span class="n">${c.guidelines}</span></span>` +
+        `<span class="key"><span class="mapsw mft"></span>In MFT plans <span class="n">${c.mft}</span></span>` +
+        `</div>`;
+    }
+
+    const prov = [
+      st.source ? "Source: " + esc(st.source) : "",
+      st.asOf ? "verified " + esc(st.asOf) : "",
+      (i === 4 || i === 5) && p.detail.countries && p.detail.countries.status !== "verified"
+        ? "country survey is " + esc(p.detail.countries.status) : ""
+    ].filter(Boolean).join(" · ");
+
+    return `
+      <div class="gp-head">
+        <span class="gp-stage">${esc(STAGES[i])}</span>
+        <span class="gp-pill ${st.status}">${LABEL[st.status]}</span>
+        <button class="gp-close" type="button" data-close="cell">Close</button>
+      </div>
+      ${st.note ? `<p class="gp-note">${esc(st.note)}</p>` : ""}
+      ${isCur && p.flag ? `<div class="gp-why">${esc(p.flag)}</div>` : ""}
+      ${kv.length || reqs ? `<div class="gp-grid">${kv.map(([k, v]) => `<div class="gp-kv"><dt>${k}</dt><dd>${v}</dd></div>`).join("")}${reqs}</div>` : ""}
+      ${countries}
+      ${prov ? `<div class="gp-prov">${prov}</div>` : ""}`;
+  }
+
+  // ---- invariants: one cell panel and one gate panel open, board-wide -------
+  let openCell = null;   // the .smark whose panel is showing
+  let openGate = null;   // the .pathnode whose panel is showing
+
+  function closeCell() {
+    if (!openCell) return;
+    const panel = document.getElementById(openCell.dataset.pid + "-gate");
+    panel.hidden = true; panel.innerHTML = "";
+    openCell.closest(".product").classList.remove("gate-flag");
+    openCell.setAttribute("aria-expanded", "false");
+    openCell = null;
+  }
+  function openCellPanel(mark) {
+    const p = tracked.find(x => x.id === mark.dataset.pid);
+    const i = +mark.dataset.stagei;
+    if (!p) return;
+    closeCell();
+    const panel = document.getElementById(p.id + "-gate");
+    panel.innerHTML = gatePanelHTML(p, i);
+    panel.classList.toggle("late", p.stages[i].status === "late");
+    panel.hidden = false;
+    // the panel restates p.flag for the current gate, so suppress the row's copy
+    mark.closest(".product").classList.toggle("gate-flag", i === p.currentStage && !!p.flag);
+    mark.setAttribute("aria-expanded", "true");
+    openCell = mark;
+    hideTip();                       // the tooltip must not fight its own panel
+  }
+
+  document.querySelectorAll(".smark[data-stagei]").forEach(mark => {
+    mark.addEventListener("click", () => {
+      if (openCell === mark) { closeCell(); return; }
+      openCellPanel(mark);
+    });
+  });
+
+  function closeGate() {
+    if (!openGate) return;
+    const wrap = document.getElementById("gatewrap");
+    wrap.hidden = true; wrap.innerHTML = "";
+    openGate.setAttribute("aria-expanded", "false");
+    openGate = null;
+  }
+  function openGatePanel(btn) {
+    const i = +btn.dataset.gate;
+    closeGate();
+    const rows = tracked.map(p => {
+      const st = p.stages[i];
+      return `<li class="${st.status === "late" ? "is-late" : ""}">
+        <span class="gw-name">${esc(p.name)}</span>
+        <span><span class="gp-pill ${st.status}">${LABEL[st.status]}</span></span>
+        <span class="gw-note">${esc(st.note || "—")}</span>
+        <span><button class="gw-jump" type="button" data-jump="${esc(p.id)}" data-jumpi="${i}">Open in row</button></span>
+      </li>`;
+    }).join("");
+    const n = tracked.filter(p => p.stages[i].status === "late").length;
+    const wrap = document.getElementById("gatewrap");
+    wrap.innerHTML = `
+      <div class="gw-head">
+        <h3>${esc(STAGES[i])}</h3>
+        <span class="gw-sum">${n ? `<b>${n}</b> of ${tracked.length} medicines delayed at this gate` : `no medicine is delayed at this gate`}</span>
+        <button class="gp-close" type="button" data-close="gate">Close</button>
+      </div>
+      <ul class="gw-list">${rows}</ul>`;
+    wrap.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+    openGate = btn;
+  }
+
+  document.querySelectorAll(".pathnode[data-gate]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (openGate === btn) { closeGate(); return; }
+      openGatePanel(btn);
+    });
+  });
+
+  // close buttons + "open in row" jump, delegated so re-rendered markup keeps working
+  document.addEventListener("click", e => {
+    const c = e.target.closest("[data-close]");
+    if (c) { c.dataset.close === "gate" ? closeGate() : closeCell(); return; }
+    const j = e.target.closest("[data-jump]");
+    if (j) {
+      const mark = document.querySelector(
+        `.smark[data-pid="${j.dataset.jump}"][data-stagei="${j.dataset.jumpi}"]`);
+      if (mark) { openCellPanel(mark); mark.scrollIntoView({ block: "center", behavior: "smooth" }); mark.focus(); }
+    }
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    if (openCell) { const m = openCell; closeCell(); m.focus(); }
+    else if (openGate) { const b = openGate; closeGate(); b.focus(); }
   });
 
   // tooltip
@@ -737,6 +1100,15 @@
     tip.style.left = x + "px";
     tip.style.top = y + "px";
   }
+  // anchored to a point rather than an element, for the map
+  function showTipAtPoint(cx, cy, html) {
+    tip.innerHTML = html;
+    tip.style.display = "block";
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(cx - tw / 2, window.innerWidth - tw - 8)) + "px";
+    const above = cy - th - 14;
+    tip.style.top = (above < 8 ? cy + 18 : above) + "px";
+  }
   function hideTip() { tip.style.display = "none"; }
   function showStageTip(dot) {
     const rows = [];
@@ -748,11 +1120,14 @@
     showTipAt(dot, `<b>${esc(dot.dataset.stage)} — ${LABEL[dot.dataset.status]}</b>${rows.join("")}`);
   }
   document.querySelectorAll(".stage .smark").forEach(dot => {
-    dot.addEventListener("mouseenter", () => showStageTip(dot));
-    dot.addEventListener("focus", () => showStageTip(dot));
+    // The tooltip is the fast peek; the panel is the full read. Once a marker's
+    // own panel is open the tooltip stands down, so the two never say the same
+    // thing over the top of each other.
+    const peek = () => { if (dot.getAttribute("aria-expanded") !== "true") showStageTip(dot); };
+    dot.addEventListener("mouseenter", peek);
+    dot.addEventListener("focus", peek);
     dot.addEventListener("mouseleave", hideTip);
     dot.addEventListener("blur", hideTip);
-    dot.addEventListener("click", e => e.stopPropagation());
   });
 
   // glossary: definitions panel + inline dotted-underline terms
@@ -770,6 +1145,10 @@
         acceptNode(n) {
           const parent = n.parentElement;
           if (!parent || parent.closest(".gloss")) return NodeFilter.FILTER_REJECT;
+          // Glossary terms become focusable spans. Inside the product toggle that
+          // would nest interactive content in a button — the exact thing the row
+          // split removes. The same terms are still glossed in the detail panel.
+          if (parent.closest(".pbtn, .smark")) return NodeFilter.FILTER_REJECT;
           return NodeFilter.FILTER_ACCEPT;
         }
       });
@@ -808,7 +1187,8 @@
   }
 
   // ---- country access map ----
-  const LEVEL_LABEL = { registered: "Registered", guidelines: "In national guidelines", mft: "In MFT plans" };
+  const LEVEL_LABEL = { registered: "Registered", guidelines: "In national guidelines",
+                        mft: "In MFT plans", none: "No data" };
   if (window.LAUNCH_MAP) {
     const mapsec = document.getElementById("mapsec");
     mapsec.hidden = false;
@@ -817,22 +1197,46 @@
     const paths = Object.entries(M.countries).map(([iso3, c]) =>
       `<path data-iso3="${iso3}" data-name="${esc(c.n)}" d="${c.d}"></path>`).join("");
     wrap.innerHTML = `<svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="World map of country access">${paths}</svg>
-      <div class="map-overlay" id="map-overlay" hidden></div>
       <div class="map-empty" id="map-empty" hidden></div>`;
 
+    let mapProduct = "", mapStatus = "";
     const tabs = document.getElementById("maptabs");
     tabs.innerHTML = tracked.map((p, i) =>
       `<button class="tab" role="tab" data-id="${esc(p.id)}" aria-selected="false">${esc(p.name)}</button>`).join("");
 
     function selectMap(id) {
       const p = tracked.find(x => x.id === id);
+      mapProduct = p.name;
+      mapStatus = p.detail.countries ? p.detail.countries.status : "";
       tabs.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.id === id ? "true" : "false"));
       const byIso = {};
       (p.detail.countries ? p.detail.countries.list : []).forEach(e => byIso[e.iso3] = e.level);
+      // legend counts, derived from the same list the map is painted from so
+      // the two can never disagree
+      const counts = { registered: 0, guidelines: 0, mft: 0 };
+      Object.values(byIso).forEach(l => { if (l in counts) counts[l]++; });
+      const withData = counts.registered + counts.guidelines + counts.mft;
+      ["registered", "guidelines", "mft"].forEach(k => {
+        const el = document.getElementById("mapct-" + k);
+        if (el) { el.textContent = counts[k]; el.classList.toggle("zero", !counts[k]); }
+      });
+      const none = document.getElementById("mapct-none");
+      if (none) {
+        const tot = Object.keys(M.countries).length;
+        none.textContent = tot - withData;
+        none.classList.toggle("zero", withData === tot);
+      }
       wrap.querySelectorAll("path").forEach(el => {
         const lvl = byIso[el.dataset.iso3];
         el.setAttribute("class", lvl ? "lvl-" + lvl + " haslvl" : "");
-        if (lvl) el.setAttribute("tabindex", "0"); else el.removeAttribute("tabindex");
+        if (lvl) {
+          el.setAttribute("tabindex", "0");
+        } else {
+          el.removeAttribute("tabindex");
+          // switching medicine can take a country's data away; a focus ring left
+          // on a now-unfocusable "No data" country is what you saw around China
+          if (document.activeElement === el) { el.blur(); wrap.focus?.(); }
+        }
         el.dataset.lvl = lvl || "";
       });
       const overlay = document.getElementById("map-overlay");
@@ -854,10 +1258,32 @@
     // default to the first product that has country data
     selectMap((tracked.find(p => p.detail.countries) || tracked[0]).id);
 
+    // Every country reports its stage on hover — including "No data", which is a
+    // finding in its own right. Large countries would put a bbox-centred tooltip
+    // a long way from the cursor, so the map tracks the pointer instead.
+    // Levels are cumulative — a country in MFT plans is registered and in national
+    // guidelines too — so the tooltip lists all three and ticks up to the furthest
+    // reached, rather than naming one stage and leaving the rest to inference.
+    const LEVEL_ORDER = ["registered", "guidelines", "mft"];
+    const countryTip = el => {
+      const rank = LEVEL_ORDER.indexOf(el.dataset.lvl);
+      const foot = mapProduct
+        ? `<div class="tprod">${esc(mapProduct)}${mapStatus ? " · " + esc(mapStatus) + " data" : ""}</div>`
+        : "";
+      const rows = rank < 0
+        ? `<div class="tlvl"><span class="tmark">–</span><span class="mapsw none"></span>${LEVEL_LABEL.none}</div>`
+        : LEVEL_ORDER.map((k, i) => {
+            const on = i <= rank;
+            return `<div class="tlvl${on ? "" : " off"}"><span class="tmark">${on ? "✓" : "·"}</span>` +
+              `<span class="mapsw ${k}"></span>${LEVEL_LABEL[k]}</div>`;
+          }).join("");
+      return `<b>${esc(el.dataset.name)}</b>${rows}${foot}`;
+    };
     wrap.querySelectorAll("path").forEach(el => {
-      const show = () => { if (el.dataset.lvl) showTipAt(el, `<b>${esc(el.dataset.name)}</b>${LEVEL_LABEL[el.dataset.lvl]}`); };
-      el.addEventListener("mouseenter", show);
-      el.addEventListener("focus", show);
+      const track = e => showTipAtPoint(e.clientX, e.clientY, countryTip(el));
+      el.addEventListener("mouseenter", track);
+      el.addEventListener("mousemove", track);
+      el.addEventListener("focus", () => showTipAt(el, countryTip(el)));  // keyboard: no cursor
       el.addEventListener("mouseleave", hideTip);
       el.addEventListener("blur", hideTip);
     });

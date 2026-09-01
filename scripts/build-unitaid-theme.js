@@ -36,7 +36,11 @@ const TOKENS = `
   --warn: #FF451A; --warn-soft: #FFE9E4;
   --crit: #CC0033; --crit-soft: #FAE0E7;
   --idle: #8A93B8; --idle-soft: #EEF1F7;
-  --map1: #75D8F7; --map2: #0066FF; --map3: #212E92;
+  /* Map ramp derived on the brand blue hue (260.9°) so every level clears 3:1
+     against the no-data fill and the ocean — the light brand cyan #75D8F7 sat
+     at 1.63:1 and was invisible. Level 3 is the brand navy exactly. */
+  --map1: #357DFD; --map2: #0053D4; --map3: #212E92;
+  --map-nodata: #FFFFFF; --map-border: #A1B2E4; --map-texture: rgba(255,255,255,.55);
   --band: #212E92; --band-ink: #FFFFFF; --band-ink-2: #75D8F7;
   --cat-newclass: #0066FF; --cat-tact: #212E92; --cat-market: #00C77D; --cat-prevention: #FF451A;
   --shadow: 0 1px 2px rgba(33,46,146,.08), 0 4px 16px rgba(33,46,146,.08);`;
@@ -95,6 +99,13 @@ for (const p of PAGES) {
   html = html.replace(/(<meta name="viewport"[^>]*>)/, `$1\n${FONTS}`);
   // data files live one level up
   html = html.replace(/src="data\//g, 'src="../data/');
+  // the journey icon set lives one level up; unitaid/assets/ holds only the logo
+  html = html.replace(/src="assets\/journey-icons\//g, 'src="../assets/journey-icons/');
+  // this edition doesn't build the illustrated journey page — drop the dead link,
+  // taking whichever adjacent separator the nav uses (·, or none in story.html)
+  html = html.replace(/<a href="illustrated-journey-dashboard\.html"[^>]*>Illustrated journey<\/a>\s*·\s*/g, "");
+  html = html.replace(/\s*·\s*<a href="illustrated-journey-dashboard\.html"[^>]*>Illustrated journey<\/a>/g, "");
+  html = html.replace(/\n\s*<a href="illustrated-journey-dashboard\.html"[^>]*>Illustrated journey<\/a>/g, "");
   // inside the themed folder, the brand-preview link becomes the way back
   html = html.replace(
     '<a href="unitaid/index.html" style="color:var(--accent)">Unitaid brand preview</a>',

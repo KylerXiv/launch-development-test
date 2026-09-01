@@ -27,9 +27,17 @@
     --crit-soft: #FAE7E4;
     --idle: #9AA89F;
     --idle-soft: #EEF1EC;
-    --map1: #BFDCCB;
-    --map2: #5FA083;
-    --map3: #0E6B4F;
+    --map1: #52937A;
+    --map2: #006247;
+    --map3: #002D1F;
+    --map-nodata: #FFFFFF;
+    --map-border: #AAB6AD;
+    --map-texture: rgba(255,255,255,.55);
+    /* map roles — components reference these; the --mapN steps above are the
+       ramp primitives each edition re-skins. */
+    --map-registered: var(--map1);
+    --map-guidelines: var(--map2);
+    --map-mft: var(--map3);
     --shadow: 0 1px 2px rgba(23,36,31,.06), 0 4px 16px rgba(23,36,31,.07);
   }
   * { box-sizing: border-box; }
@@ -175,15 +183,34 @@
   .tabbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .mapwrap { position: relative; overflow-x: auto; }
   .mapwrap svg { display: block; width: 100%; min-width: 640px; height: auto; background: var(--surface-2); border-radius: 10px; }
-  .mapwrap path { fill: var(--surface); stroke: var(--line); stroke-width: .6; }
-  .mapwrap path.lvl-registered { fill: var(--map1); }
-  .mapwrap path.lvl-guidelines { fill: var(--map2); }
-  .mapwrap path.lvl-mft { fill: var(--map3); }
-  .mapwrap path.haslvl { cursor: help; }
+  .mapwrap path { fill: var(--map-nodata); stroke: var(--map-border); stroke-width: .6; }
+  /* Level 1 is a flat fill; levels 2 and 3 add a hatch so the escalation reads
+     without colour — three sequential steps cannot all sit 3:1 apart inside the
+     available luminance range, so texture carries level identity. */
+  .mapwrap path.lvl-registered { fill: var(--map-registered); }
+  .mapwrap path.lvl-guidelines { fill: url(#map-tex-guidelines); }
+  .mapwrap path.lvl-mft { fill: url(#map-tex-mft); }
+  /* a country with data is outlined in the no-data ground, so neighbours at the
+     same level stay separable */
+  .mapwrap path.haslvl { cursor: help; stroke: var(--map-nodata); stroke-width: .5; }
   .map-overlay { position: absolute; top: 10px; left: 10px; z-index: 2; max-width: 400px; background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 650; line-height: 1.4; }
   .map-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 13.5px; color: var(--ink-3); text-align: center; padding: 20px; }
   .map-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: 12.5px; color: var(--ink-2); }
-  .map-legend .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid var(--line); }
+  .map-legend .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid var(--map-border); }
+  /* legend swatches mirror the map's hatch, from the same tokens */
+  .map-legend .sw.tex-guidelines {
+    background:
+      repeating-linear-gradient(45deg, var(--map-texture) 0 1.2px, transparent 1.2px 4px),
+      var(--map-guidelines);
+  }
+  .map-legend .sw.tex-mft {
+    background:
+      repeating-linear-gradient(45deg, var(--map-texture) 0 1.2px, transparent 1.2px 3.4px),
+      repeating-linear-gradient(-45deg, var(--map-texture) 0 1.2px, transparent 1.2px 3.4px),
+      var(--map-mft);
+  }
+  .map-legend .ct { font-variant-numeric: tabular-nums; font-weight: 650; color: var(--ink); }
+  .map-legend .ct.zero { color: var(--ink-3); font-weight: 400; }
   .timing-axis { position: relative; height: 18px; margin-left: 150px; }
   .timing-axis span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
   .trow2 { display: flex; align-items: center; margin: 10px 0; }
@@ -241,8 +268,7 @@
     <div class="meta">
       <b>To be hosted by the RBM Partnership to End Malaria</b><br>
       <span id="updated"></span><span id="meta-note"></span><br>
-      <a href="index.html">Journey board (A)</a> · <a href="pipeline.html">Pipeline poster</a> ·
-      <a href="story.html">Data story</a>
+      <a href="index.html">Journey board (A)</a> · <a href="pipeline.html">Pipeline poster</a> · <a href="story.html">Data story</a>
     </div>
   </div>
 </div>
@@ -274,14 +300,14 @@
 
   <section class="viz" id="mapsec" hidden>
     <h2>Country access map</h2>
-    <p class="viznote">Where the selected medicine is registered, in national guidelines, and in MFT plans.</p>
+    <p class="viznote">Each country is shaded by the furthest stage it has reached — a country counted in MFT plans is registered too. Counts are of the countries drawn on this map.</p>
     <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
     <div class="mapwrap" id="mapwrap"></div>
     <div class="map-legend">
-      <span class="key"><span class="sw" style="background:var(--map1)"></span> Registered</span>
-      <span class="key"><span class="sw" style="background:var(--map2)"></span> In national guidelines</span>
-      <span class="key"><span class="sw" style="background:var(--map3)"></span> In MFT plans</span>
-      <span class="key"><span class="sw" style="background:var(--surface)"></span> No data</span>
+      <span class="key"><span class="sw" style="background:var(--map-registered)"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
+      <span class="key"><span class="sw tex-guidelines"></span> In national guidelines <span class="ct" id="mapct-guidelines">–</span></span>
+      <span class="key"><span class="sw tex-mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
+      <span class="key"><span class="sw" style="background:var(--map-nodata)"></span> No data <span class="ct" id="mapct-none">–</span></span>
     </div>
   </section>
 
@@ -542,7 +568,17 @@
     document.getElementById("mapsec").hidden = false;
     const wrap = document.getElementById("mapwrap");
     const M = window.LAUNCH_MAP;
-    wrap.innerHTML = `<svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="World map of country access">` +
+    wrap.innerHTML = `<svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="World map of country access"><defs>
+        <pattern id="map-tex-guidelines" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+          <rect width="5" height="5" fill="var(--map-guidelines)"></rect>
+          <line x1="0" y1="0" x2="0" y2="5" stroke="var(--map-texture)" stroke-width="1.7"></line>
+        </pattern>
+        <pattern id="map-tex-mft" patternUnits="userSpaceOnUse" width="4.2" height="4.2" patternTransform="rotate(45)">
+          <rect width="4.2" height="4.2" fill="var(--map-mft)"></rect>
+          <line x1="0" y1="0" x2="0" y2="4.2" stroke="var(--map-texture)" stroke-width="1.5"></line>
+          <line x1="0" y1="0" x2="4.2" y2="0" stroke="var(--map-texture)" stroke-width="1.5"></line>
+        </pattern>
+      </defs>` +
       Object.entries(M.countries).map(([iso3, c]) =>
         `<path data-iso3="${iso3}" data-name="${esc(c.n)}" d="${c.d}"></path>`).join("") +
       `</svg><div class="map-overlay" id="map-overlay" hidden></div><div class="map-empty" id="map-empty" hidden></div>`;
@@ -556,6 +592,21 @@
       tabs.querySelectorAll(".tabbtn").forEach(t => t.setAttribute("aria-selected", t.dataset.id === id ? "true" : "false"));
       const byIso = {};
       (p.detail.countries ? p.detail.countries.list : []).forEach(e => byIso[e.iso3] = e.level);
+      // legend counts, derived from the same list the map is painted from so
+      // the two can never disagree
+      const counts = { registered: 0, guidelines: 0, mft: 0 };
+      Object.values(byIso).forEach(l => { if (l in counts) counts[l]++; });
+      const withData = counts.registered + counts.guidelines + counts.mft;
+      ["registered", "guidelines", "mft"].forEach(k => {
+        const el = document.getElementById("mapct-" + k);
+        if (el) { el.textContent = counts[k]; el.classList.toggle("zero", !counts[k]); }
+      });
+      const none = document.getElementById("mapct-none");
+      if (none) {
+        const tot = Object.keys(M.countries).length;
+        none.textContent = tot - withData;
+        none.classList.toggle("zero", withData === tot);
+      }
       wrap.querySelectorAll("path").forEach(el => {
         const lvl = byIso[el.dataset.iso3];
         el.setAttribute("class", lvl ? "lvl-" + lvl + " haslvl" : "");

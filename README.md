@@ -5,14 +5,16 @@
 Three design options are live for client review, running off the same data:
 
 - **Option A — journey board** (default, `index.html`): one row per medicine, its
-  full pathway left to right. Emphasises each product's story.
+  full pathway left to right, each gate shown as its own stage glyph inked in
+  the status colour with a status badge in the corner. Emphasises each product's
+  story.
 - **Option B — comparison matrix** ([`option-b.html`](https://kochrisdev.github.io/launch-transparency-dashboard/option-b.html)):
   stages as rows, medicines as columns. Emphasises cross-product comparison at
   each gate. Distinct visual identity (deep green, serif display, dark header band).
 - **Illustrated journey** ([`illustrated-journey-dashboard.html`](https://kochrisdev.github.io/launch-transparency-dashboard/illustrated-journey-dashboard.html)):
-  Option A with the illustrated stage badges (`assets/journey-icons/`) — an
-  eight-stage pathway legend strip and per-product stage icons with status
-  corner badges (grayed icon = not started).
+  Option A plus an eight-stage pathway legend strip naming every glyph, and
+  larger stage markers. Since Option A now carries the same glyphs, this view
+  differs from it only by that legend strip and marker size.
 
 The pages cross-link in their headers. Both include the country access map,
 the pathway timing chart, CSV download and the Recent updates panel; glossary
@@ -87,6 +89,9 @@ controls the on-page banner.
 | `data/products.js` | **The only file that changes in routine updates** — feeds both design options. Strict JSON wrapped in `window.LAUNCH_DATA =`. |
 | `widget.html` | Embeddable single-product tracker for partner sites (`?product=aspy` etc.). |
 | `data/world-map.js` | Generated map geometry (Natural Earth, public domain) — rerun `scripts/build-map.js` to regenerate. |
+| `assets/journey-icons/icons.js` | **The journey icon set** — the eight stage glyphs, one monoline system on a 24×24 grid, stroked in `currentColor` so each takes its status colour and follows the light/dark theme. Loaded by the dashboards; the single source of truth for the geometry. |
+| `assets/journey-icons/*.svg`, `png/` | **Generated** standalone icons + the eight-stage strip, for docs and decks — rerun `scripts/build-journey-icons.js` after editing `icons.js`. |
+| `scripts/build-journey-icons.js` | Rebuilds the standalone icon SVGs, `journey-strip.svg` and the PNG fallbacks from `icons.js` (PNGs need Chrome; skipped without it). |
 | `history/` | Automatic dated snapshots of the data file (bot-committed on every data change) — the raw material for future trend charts and playback. |
 | `feed.xml` | RSS feed of dashboard updates, rebuilt automatically from the changelog. |
 | `scripts/validate-data.js` | Data validator — run after every data edit. |
