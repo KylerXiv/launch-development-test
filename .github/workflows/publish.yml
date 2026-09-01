@@ -1,0 +1,65 @@
+name: Snapshot history and rebuild feed
+
+# Runs only when the data file changes on main. The bot commit it produces
+# touches history/, feed.xml and the two generated ontology exports
+# (launch-data.jsonld, launch-history.jsonld), which do NOT match this path
+# filter, so it cannot retrigger itself.
+on:
+  push:
+    branches: [main]
+    paths: ["data/products.js"]
+
+permissions:
+  contents: write
+
+# One bot push at a time — a queued run rebases on the previous one's commit
+# instead of failing non-fast-forward.
+concurrency:
+  group: bot-push-main
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate data
+        run: node scripts/validate-data.js
+      - name: Snapshot data file into history/
+        run: |
+          # Parse the JSON body (not a whitespace-sensitive regex) so a legal
+          # reformat can't break extraction.
+          DATE=$(node -e "
+            const raw = require('fs').readFileSync('data/products.js','utf8');
+            const m = raw.match(/^window\.LAUNCH_DATA\s*=\s*/m);
+            console.log(JSON.parse(raw.slice(m.index + m[0].length).replace(/;?\s*\$/, '')).meta.lastUpdated);
+          ")
+          mkdir -p history
+          TARGET="history/products-$DATE.js"
+          # History is append-only: never silently overwrite a prior snapshot.
+          if [ -f "$TARGET" ] && ! cmp -s data/products.js "$TARGET"; then
+            echo "::error::$TARGET already exists with different content — bump meta.lastUpdated before pushing data edits."
+            exit 1
+          fi
+          cp data/products.js "$TARGET"
+          echo "Snapshot: $TARGET"
+      - name: Rebuild RSS feed
+        run: node scripts/make-feed.js
+      - name: Rebuild linked-data export
+        run: node scripts/build-ontology.js
+      - name: Rebuild temporal history graph
+        run: node scripts/build-history-graph.js
+      - name: Commit snapshot, feed and linked-data export
+        run: |
+          git config user.name "launch-dashboard-bot"
+          git config user.email "actions@github.com"
+          git add history feed.xml ontology/launch-data.jsonld ontology/launch-history.jsonld
+          if git diff --cached --quiet; then
+            echo "Nothing new to commit."
+          else
+            git commit -m "chore: history snapshot + feed + linked-data rebuild [bot]"
+            git push
+          fi

@@ -1,0 +1,30 @@
+name: Validate dashboard data
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate data file
+        run: node scripts/validate-data.js
+      - name: Validate synthetic dataset
+        run: node scripts/validate-data.js data/products.synthetic.js
+      - name: Build single-file preview (smoke test)
+        run: node scripts/make-preview.js
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: SHACL governance shapes (both datasets, fresh projections)
+        run: |
+          pip install --quiet pyshacl
+          node scripts/build-ontology.js data/products.js /tmp/real.jsonld
+          node scripts/build-ontology.js data/products.synthetic.js /tmp/synthetic.jsonld
+          node scripts/build-history-graph.js /tmp/history.jsonld
+          python scripts/check-shapes.py /tmp/real.jsonld /tmp/synthetic.jsonld /tmp/history.jsonld
