@@ -49,9 +49,16 @@ for (const p of PAGES) {
   // the synthetic dataset, then everything else in data/, live one level up
   html = html.replace(/src="data\/products\.js"/g, 'src="../data/products.synthetic.js"');
   html = html.replace(/src="data\//g, 'src="../data/');
+  // the journey icon set lives one level up too
+  html = html.replace(/src="assets\/journey-icons\//g, 'src="../assets/journey-icons/');
   // drop the Unitaid brand-preview link (and its separator) — that edition
   // runs on real data and doesn't belong in the synthetic navigation
   html = html.replace(/\s*·\s*<a href="unitaid\/[^"]*"[^>]*>Unitaid brand preview<\/a>/g, "");
+  // this edition doesn't build the illustrated journey page — drop the dead link,
+  // taking whichever adjacent separator the nav uses (·, or none in story.html)
+  html = html.replace(/<a href="illustrated-journey-dashboard\.html"[^>]*>Illustrated journey<\/a>\s*·\s*/g, "");
+  html = html.replace(/\s*·\s*<a href="illustrated-journey-dashboard\.html"[^>]*>Illustrated journey<\/a>/g, "");
+  html = html.replace(/\n\s*<a href="illustrated-journey-dashboard\.html"[^>]*>Illustrated journey<\/a>/g, "");
   if (p.strip) html = html.replace(/<\/style>/, "</style>" + STRIP);
   fs.writeFileSync(path.join(outDir, p.out), html);
   console.log(`synthetic/${p.out} <- ${p.src}`);

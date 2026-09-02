@@ -11,7 +11,7 @@ const root = path.join(__dirname, "..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 
 let out = html;
-for (const rel of ["data/products.js", "data/world-map.js"]) {
+for (const rel of ["data/products.js", "data/world-map.js", "assets/journey-icons/icons.js"]) {
   const tag = `<script src="${rel}"></script>`;
   if (!out.includes(tag)) {
     console.error(`ERROR: could not find ${tag} in index.html`);
