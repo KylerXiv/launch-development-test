@@ -99,8 +99,10 @@ for (const p of PAGES) {
   html = html.replace(/(<meta name="viewport"[^>]*>)/, `$1\n${FONTS}`);
   // data files live one level up
   html = html.replace(/src="data\//g, 'src="../data/');
-  // the journey icon set lives one level up; unitaid/assets/ holds only the logo
-  html = html.replace(/src="assets\/journey-icons\//g, 'src="../assets/journey-icons/');
+  // the journey icon set and shared front-end assets (report-issue.js) live
+  // one level up; unitaid/assets/ holds only the logo. Must run BEFORE
+  // LOGOBAR is appended — that one really does live in unitaid/assets/.
+  html = html.replace(/src="assets\//g, 'src="../assets/');
   // this edition doesn't build the illustrated journey page — drop the dead link,
   // taking whichever adjacent separator the nav uses (·, or none in story.html)
   html = html.replace(/<a href="illustrated-journey-dashboard\.html"[^>]*>Illustrated journey<\/a>\s*·\s*/g, "");
