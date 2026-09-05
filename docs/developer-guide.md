@@ -206,18 +206,34 @@ No test framework by design; two layers instead:
   `sourcing/README.md`), validated by a `validate-data.js` pass that runs only
   on the default invocation. Study sites are placed with the equirectangular
   transform reproduced inline from `scripts/build-map.js` — no projection
-  library, no tiles. The drug auto-binds to the tracked product (ASPY,
-  DHA–PPQ) and falls back to artemether-lumefantrine for products WHO has no
-  studies for; four drugs are listed by default with a "show all" toggle,
-  because 11 of the 17 drugs with data cover fewer than five countries and a
-  single dot is not a map. **The two layers keep separate tooltips and separate
-  provenance lines on purpose**: the access layer is illustrative for most
-  countries while the resistance values are published WHO results, so the page
-  must not invite a reader to combine them until the country survey is
-  verified. Country values are aggregated from site-level studies by the rule
-  in `meta.rule`, which is printed under the map — if that rule changes, the
-  sentence on the page changes with it. `index.html`, `option-b.html` and
-  `story.html` are deliberately untouched.
+  library, no tiles.
+  - **Nothing is filtered.** All five *Plasmodium* species and studies of every
+    size are shipped. Only rows WHO publishes with no usable value (a literal
+    `NaN`) or no coordinates are dropped, and the normalizer counts them aloud.
+  - **One dot per country × drug × species**, because the basemap has no zoom:
+    Myanmar occupies 26×54 px, so its 35 study sites cannot be drawn separately
+    (plotting every study unfiltered would put 84% of dots on top of another).
+    The dot is the most recent study year, **patient-weighted** across that
+    year's sites so one small study cannot decide a country's colour, and
+    positioned at the patient-weighted centroid of those sites.
+  - **Click a dot** for every study behind it — a sortable panel below the map
+    (site, region, year, patients, failure %, linked source). That is where the
+    site-level detail lives instead of zoom.
+  - **Species and drug are not independent**: chloroquine has no falciparum
+    studies at all, so pairings with no data are *disabled* in the species
+    select with their country counts shown. An empty map must never be
+    readable as "no resistance here".
+  - `studies[]` is stored as rows against `fields[]` with the repetitive
+    columns held as indices into `dict[]` — that halves the committed file
+    (373 KB → 183 KB), which matters because it is regenerated whole on every
+    WHO extract.
+  - **The two layers keep separate tooltips and separate provenance lines on
+    purpose**: the access layer is illustrative for most countries while the
+    resistance values are published WHO results, so the page must not invite a
+    reader to combine them until the country survey is verified. The
+    aggregation rule in `meta.rule` is printed under the map — if the rule
+    changes, the sentence on the page changes with it. `index.html`,
+    `option-b.html` and `story.html` are deliberately untouched.
 - **History snapshots + RSS feed** (implemented): `.github/workflows/publish.yml`
   runs only on `data/products.js` changes, commits `history/products-<date>.js`
   and a rebuilt `feed.xml` as a bot. It cannot retrigger itself (path filter).
