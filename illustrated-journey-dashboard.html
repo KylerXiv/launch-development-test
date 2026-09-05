@@ -504,6 +504,13 @@
   .res-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-top: 8px; font-size: 12.5px; color: var(--ink-2); }
   .res-legend .res-t { font-weight: 650; color: var(--ink); }
   .res-legend .resdot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; margin-right: 5px; vertical-align: -1px; }
+  /* The "no country access yet" message is centred over the map only while the
+     map really is empty. Once the resistance overlay draws dots the map is no
+     longer blank, so the message drops to a line beneath it rather than sitting
+     on top of the data (and asserting something that is no longer true).
+     Deliberately does not set `display`, so .map-empty[hidden] still wins. */
+  .map-empty.demoted { position: static; inset: auto; justify-content: flex-start;
+                       text-align: left; padding: 8px 2px 0; }
   .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 8px 0 0; max-width: 92ch; }
   .resdot.b1, .mapwrap circle.b1 { background: #FDCFA6; fill: #FDCFA6; }
   .resdot.b2, .mapwrap circle.b2 { background: #FB9A50; fill: #FB9A50; }
@@ -619,7 +626,6 @@
         <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
       </fieldset>
       <label class="res-pick">Drug <select id="res-drug" aria-label="Select drug for the resistance overlay"></select></label>
-      <label class="res-pick"><input type="checkbox" id="res-all"> Show all drugs</label>
     </div>
     <div class="mapwrap" id="mapwrap"></div>
     <div class="map-overlay" id="map-overlay" hidden></div>
@@ -1329,15 +1335,20 @@
       return [...new Set(Object.keys(RES).filter((k) => k !== "meta")
         .flatMap((l) => Object.keys(RES[l] || {})))].sort();
     }
+    // Every drug is one click away; the grouping is information, not a filter.
+    // The four in the first group are the ones tied to tracked products (plus
+    // the reference ACT) — the other thirteen are mostly thin, 11 of them
+    // covering fewer than five countries.
     function fillDrugList(keep) {
       const sel = document.getElementById("res-drug");
       const every = allDrugs();
-      const list = document.getElementById("res-all").checked
-        ? every
-        : CURATED.filter((d) => every.includes(d));
-      sel.innerHTML = list.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
-      if (keep && list.includes(keep)) sel.value = keep;
-      else if (list.includes(FALLBACK_DRUG)) sel.value = FALLBACK_DRUG;
+      const portfolio = CURATED.filter((d) => every.includes(d));
+      const others = every.filter((d) => !portfolio.includes(d));
+      const opts = (list) => list.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+      sel.innerHTML =
+        (portfolio.length ? `<optgroup label="Portfolio &amp; reference">${opts(portfolio)}</optgroup>` : "") +
+        (others.length ? `<optgroup label="Other antimalarials">${opts(others)}</optgroup>` : "");
+      sel.value = keep && every.includes(keep) ? keep : FALLBACK_DRUG;
       return sel.value;
     }
     function bindDrug(productId) {
@@ -1345,10 +1356,6 @@
       const sel = document.getElementById("res-drug");
       const want = PRODUCT_DRUG[productId];
       const every = allDrugs();
-      // a tracked product's own drug may sit outside the curated list only if
-      // the curation is edited later — open the full list rather than lie
-      if (want && every.includes(want) && !CURATED.includes(want))
-        document.getElementById("res-all").checked = true;
       fillDrugList(want && every.includes(want) ? want : FALLBACK_DRUG);
       sel.dataset.bound = want && every.includes(want) ? "own" : "fallback";
       drawResistance();
@@ -1372,7 +1379,12 @@
       const checked = document.querySelector('input[name="reslayer"]:checked');
       const layer = checked ? checked.value : "off";
       const drug = sel.value;
-      if (layer === "off" || !drug) { legend.hidden = true; note.hidden = true; return; }
+      if (layer === "off" || !drug) {
+        legend.hidden = true; note.hidden = true;
+        const em = document.getElementById("map-empty");
+        if (em) em.classList.remove("demoted");   // map is blank again — recentre
+        return;
+      }
 
       const cells = (RES[layer] || {})[drug] || {};
       const all = Object.keys(cells);
@@ -1404,6 +1416,11 @@
         g.appendChild(c);
       });
 
+      // the map is no longer blank once dots are on it — move the access
+      // empty-state out of the way rather than letting it sit over the data
+      const emptyMsg = document.getElementById("map-empty");
+      if (emptyMsg) emptyMsg.classList.toggle("demoted", isos.length > 0);
+
       legend.hidden = !isos.length;
       const m = RES.meta || {};
       const bits = [];
@@ -1427,10 +1444,6 @@
     document.querySelectorAll('input[name="reslayer"]').forEach((r) =>
       r.addEventListener("change", drawResistance));
     document.getElementById("res-drug").addEventListener("change", drawResistance);
-    document.getElementById("res-all").addEventListener("change", () => {
-      fillDrugList(document.getElementById("res-drug").value);
-      drawResistance();
-    });
 
     tabs.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => selectMap(t.dataset.id)));
     // default to the first product that has country data
