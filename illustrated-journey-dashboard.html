@@ -492,6 +492,25 @@
   .mapsw.none { background: var(--map-nodata); }
   .map-legend .ct { font-variant-numeric: tabular-nums; font-weight: 650; color: var(--ink); }
   .map-legend .ct.zero { color: var(--ink-3); font-weight: 400; }
+  /* Resistance overlay — a second, independent dimension over the same
+     geography. Band fills mirror the WHO Malaria Threat Map bands and are
+     fixed; the halo stroke picks up the basemap colour so dots stay legible
+     against both the light and dark map. */
+  .res-controls { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; margin: 2px 0 10px; font-size: 12.5px; color: var(--ink-2); }
+  .res-controls fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+  .res-controls legend { float: left; padding: 0 10px 0 0; font-weight: 650; color: var(--ink); }
+  .res-controls label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+  .res-controls select { font: inherit; padding: 2px 6px; max-width: 15em; }
+  .res-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-top: 8px; font-size: 12.5px; color: var(--ink-2); }
+  .res-legend .res-t { font-weight: 650; color: var(--ink); }
+  .res-legend .resdot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; margin-right: 5px; vertical-align: -1px; }
+  .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 8px 0 0; max-width: 92ch; }
+  .resdot.b1, .mapwrap circle.b1 { background: #FDCFA6; fill: #FDCFA6; }
+  .resdot.b2, .mapwrap circle.b2 { background: #FB9A50; fill: #FB9A50; }
+  .resdot.b3, .mapwrap circle.b3 { background: #EF5F13; fill: #EF5F13; }
+  .resdot.b4, .mapwrap circle.b4 { background: #C21807; fill: #C21807; }
+  .mapwrap circle.res-dot { stroke: var(--map-nodata, #FFFFFF); stroke-width: 1; cursor: help; }
+  .mapwrap circle.res-dot:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
   .timing-axis { position: relative; height: 18px; margin-left: 150px; }
   .timing-axis span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -593,6 +612,15 @@
     <h2>Country access map</h2>
     <p class="viznote" id="mapnote">Each country is shaded by the furthest stage it has reached — a country counted in MFT plans is registered too. Counts are of the countries drawn on this map.</p>
     <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
+    <div class="res-controls" id="res-controls" hidden>
+      <fieldset class="res-layer">
+        <legend>Resistance overlay</legend>
+        <label><input type="radio" name="reslayer" value="off" checked> Off</label>
+        <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
+      </fieldset>
+      <label class="res-pick">Drug <select id="res-drug" aria-label="Select drug for the resistance overlay"></select></label>
+      <label class="res-pick"><input type="checkbox" id="res-all"> Show all drugs</label>
+    </div>
     <div class="mapwrap" id="mapwrap"></div>
     <div class="map-overlay" id="map-overlay" hidden></div>
     <div class="map-legend">
@@ -601,6 +629,14 @@
       <span class="key"><span class="mapsw mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
       <span class="key"><span class="mapsw none"></span> No data <span class="ct" id="mapct-none">–</span></span>
     </div>
+    <div class="res-legend" id="res-legend" hidden>
+      <span class="res-t">Treatment failure</span>
+      <span class="key"><span class="resdot b1"></span>&lt; 5%</span>
+      <span class="key"><span class="resdot b2"></span>5–10%</span>
+      <span class="key"><span class="resdot b3"></span>10–20%</span>
+      <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
+    </div>
+    <p class="res-note" id="res-note" hidden></p>
   </section>
 
   <section class="viz" id="timingsec" hidden>
@@ -635,6 +671,7 @@
 
 <script src="data/products.js"></script>
 <script src="data/world-map.js"></script>
+<script src="data/resistance.js"></script>
 <script src="assets/journey-icons/icons.js"></script>
 <script>
 (function () {
@@ -1254,7 +1291,147 @@
         overlay.hidden = c.status === "verified";
         overlay.textContent = (c.status === "illustrative" ? "ILLUSTRATIVE — " : "DRAFT — ") + c.note;
       }
+      bindDrug(id);
     }
+
+    // ---- resistance overlay (WHO Malaria Threat Maps) ----------------------
+    // A second, independent dimension over the same geography: the fill
+    // describes the PRODUCT's access, these dots describe the PARASITE. They
+    // ride different visual channels, and each keeps its own provenance line —
+    // the access layer is illustrative for most countries while these are
+    // published WHO study results. The two readings are deliberately NOT
+    // merged on the page until the country survey is verified.
+    const RES = window.LAUNCH_RESISTANCE;
+    // Equirectangular projection reproduced from scripts/build-map.js: the
+    // basemap is fitted to lon -120..155 / lat -40..42, so placing a study site
+    // is a linear transform — no projection library needed.
+    const LON0 = -120, LON1 = 155, LAT0 = -40, LAT1 = 42;
+    const PK = Math.min(M.w / (LON1 - LON0), M.h / (LAT1 - LAT0));
+    const PY0 = (M.h - (LAT1 - LAT0) * PK) / 2;
+    const PX = (lon) => (lon - LON0) * PK;
+    const PY = (lat) => (LAT1 - lat) * PK + PY0;
+    const BANDS = [{ lt: 5, cls: "b1" }, { lt: 10, cls: "b2" }, { lt: 20, cls: "b3" }, { lt: Infinity, cls: "b4" }];
+    const bandOf = (v) => (BANDS.find((b) => v < b.lt) || BANDS[3]).cls;
+    // Products WHO tracks a matching drug for; everything else (pipeline
+    // products, prevention tools) falls back to the reference ACT.
+    const PRODUCT_DRUG = { pyramax: "Artesunate-pyronaridine", dhappq: "Dihydroartemisinin-piperaquine" };
+    const FALLBACK_DRUG = "Artemether-lumefantrine";
+    // Shown by default. Of the 17 drugs with data, 11 cover fewer than five
+    // countries and seven cover exactly one — a single dot on a world map is
+    // not a map. These four carry 81% of the values and include all three
+    // drugs that appear in MFT plans, so the MFT rung of the ladder above
+    // stays coherent. "Show all drugs" opens the full list for analysts.
+    const CURATED = ["Artemether-lumefantrine", "Dihydroartemisinin-piperaquine",
+                     "Artesunate-amodiaquine", "Artesunate-pyronaridine"];
+
+    function allDrugs() {
+      if (!RES) return [];
+      return [...new Set(Object.keys(RES).filter((k) => k !== "meta")
+        .flatMap((l) => Object.keys(RES[l] || {})))].sort();
+    }
+    function fillDrugList(keep) {
+      const sel = document.getElementById("res-drug");
+      const every = allDrugs();
+      const list = document.getElementById("res-all").checked
+        ? every
+        : CURATED.filter((d) => every.includes(d));
+      sel.innerHTML = list.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+      if (keep && list.includes(keep)) sel.value = keep;
+      else if (list.includes(FALLBACK_DRUG)) sel.value = FALLBACK_DRUG;
+      return sel.value;
+    }
+    function bindDrug(productId) {
+      if (!RES) return;
+      const sel = document.getElementById("res-drug");
+      const want = PRODUCT_DRUG[productId];
+      const every = allDrugs();
+      // a tracked product's own drug may sit outside the curated list only if
+      // the curation is edited later — open the full list rather than lie
+      if (want && every.includes(want) && !CURATED.includes(want))
+        document.getElementById("res-all").checked = true;
+      fillDrugList(want && every.includes(want) ? want : FALLBACK_DRUG);
+      sel.dataset.bound = want && every.includes(want) ? "own" : "fallback";
+      drawResistance();
+    }
+
+    function drawResistance() {
+      if (!RES) return;
+      document.getElementById("res-controls").hidden = false;
+      const legend = document.getElementById("res-legend");
+      const note = document.getElementById("res-note");
+      const sel = document.getElementById("res-drug");
+      const svg = wrap.querySelector("svg");
+      let g = svg.querySelector("g.res-layer");
+      if (!g) {
+        g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("class", "res-layer");
+        svg.appendChild(g);                    // after the paths, so dots sit on top
+      }
+      while (g.firstChild) g.removeChild(g.firstChild);
+
+      const checked = document.querySelector('input[name="reslayer"]:checked');
+      const layer = checked ? checked.value : "off";
+      const drug = sel.value;
+      if (layer === "off" || !drug) { legend.hidden = true; note.hidden = true; return; }
+
+      const cells = (RES[layer] || {})[drug] || {};
+      const all = Object.keys(cells);
+      const isos = all.filter((i) => i in M.countries);
+      isos.forEach((iso) => {
+        const e = cells[iso];
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.setAttribute("class", "res-dot " + bandOf(e.v));
+        c.setAttribute("cx", PX(e.lon).toFixed(1));
+        c.setAttribute("cy", PY(e.lat).toFixed(1));
+        c.setAttribute("r", "4.4");
+        c.setAttribute("tabindex", "0");
+        // Same tooltip grammar as the country cards: a title, label/value rows,
+        // and a dimmed footer naming the study site. Kept separate from the
+        // country tooltip so the access claim and the resistance claim are
+        // never read as one statement.
+        const place = [e.site, e.region].filter(Boolean).join(", ");
+        const html = `<b>${esc(M.countries[iso].n)}</b>` +
+          `<div class="trow"><span>Treatment failure</span><span>${e.v}%</span></div>` +
+          `<div class="trow"><span>Study year</span><span>${e.year}</span></div>` +
+          `<div class="trow"><span>Patients</span><span>${e.n}</span></div>` +
+          `<div class="tprod">${esc(place)} · ${esc(drug)}</div>`;
+        const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
+        c.addEventListener("mouseenter", track);
+        c.addEventListener("mousemove", track);
+        c.addEventListener("focus", () => showTipAt(c, html));   // keyboard: no cursor
+        c.addEventListener("mouseleave", hideTip);
+        c.addEventListener("blur", hideTip);
+        g.appendChild(c);
+      });
+
+      legend.hidden = !isos.length;
+      const m = RES.meta || {};
+      const bits = [];
+      if (!isos.length) {
+        bits.push(`No WHO study results for ${drug}.`);
+      } else {
+        bits.push(`${isos.length} ${isos.length === 1 ? "country" : "countries"} with WHO study results for ${drug}.`);
+        if (sel.dataset.bound === "fallback")
+          bits.push(`${mapProduct} has no efficacy studies of its own; ${FALLBACK_DRUG} is shown as the reference treatment.`);
+        if (all.length > isos.length)
+          bits.push(`${all.length - isos.length} further ${all.length - isos.length === 1 ? "country is" : "countries are"} not drawn on this basemap.`);
+        bits.push(m.rule || "");
+      }
+      // Provenance for THIS layer only — separate from the access layer's
+      // ILLUSTRATIVE banner above, which describes entirely different data.
+      bits.push(`Source: ${m.source || "WHO"} (extract ${m.extract || "n/a"}${m.whoLastDataUpdate ? ", WHO last updated " + m.whoLastDataUpdate : ""}). Country values are aggregated from site-level studies, not WHO's own country figures.`);
+      note.textContent = bits.filter(Boolean).join(" ");
+      note.hidden = false;
+    }
+
+    document.querySelectorAll('input[name="reslayer"]').forEach((r) =>
+      r.addEventListener("change", drawResistance));
+    document.getElementById("res-drug").addEventListener("change", drawResistance);
+    document.getElementById("res-all").addEventListener("change", () => {
+      fillDrugList(document.getElementById("res-drug").value);
+      drawResistance();
+    });
+
     tabs.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => selectMap(t.dataset.id)));
     // default to the first product that has country data
     selectMap((tracked.find(p => p.detail.countries) || tracked[0]).id);
