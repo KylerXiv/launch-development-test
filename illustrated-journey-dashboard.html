@@ -511,6 +511,22 @@
      Deliberately does not set `display`, so .map-empty[hidden] still wins. */
   .map-empty.demoted { position: static; inset: auto; justify-content: flex-start;
                        text-align: left; padding: 8px 2px 0; }
+  /* click-through panel: every study behind a country dot. Lives below the map
+     so it can hold Myanmar's 108 rows without covering anything. */
+  .res-panel { margin-top: 12px; border: 1px solid var(--map-border); border-radius: 10px; background: var(--surface-2); }
+  .res-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 10px 12px 6px; }
+  .res-panel-head h3 { margin: 0; font-size: 13.5px; }
+  .res-close { font: inherit; font-size: 12px; background: none; border: 1px solid var(--map-border);
+               border-radius: 6px; padding: 2px 10px; cursor: pointer; color: var(--ink-2); }
+  .res-panel-scroll { max-height: 340px; overflow: auto; padding: 0 12px 12px; }
+  .res-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .res-table th, .res-table td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--map-border); vertical-align: top; }
+  .res-table th { position: sticky; top: 0; background: var(--surface-2); font-weight: 650; cursor: pointer; white-space: nowrap; }
+  .res-table th[aria-sort="ascending"]::after { content: " \2191"; }
+  .res-table th[aria-sort="descending"]::after { content: " \2193"; }
+  .res-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .res-table tr.small td { opacity: .65; }
+  .res-table .yr { font-variant-numeric: tabular-nums; }
   .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 8px 0 0; max-width: 92ch; }
   .resdot.b1, .mapwrap circle.b1 { background: #FDCFA6; fill: #FDCFA6; }
   .resdot.b2, .mapwrap circle.b2 { background: #FB9A50; fill: #FB9A50; }
@@ -626,6 +642,7 @@
         <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
       </fieldset>
       <label class="res-pick">Drug <select id="res-drug" aria-label="Select drug for the resistance overlay"></select></label>
+      <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
     </div>
     <div class="mapwrap" id="mapwrap"></div>
     <div class="map-overlay" id="map-overlay" hidden></div>
@@ -643,6 +660,13 @@
       <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
     </div>
     <p class="res-note" id="res-note" hidden></p>
+    <div class="res-panel" id="res-panel" hidden>
+      <div class="res-panel-head">
+        <h3 id="res-panel-title"></h3>
+        <button type="button" class="res-close" id="res-close" aria-label="Close study list">Close</button>
+      </div>
+      <div class="res-panel-scroll"><table class="res-table" id="res-table"></table></div>
+    </div>
   </section>
 
   <section class="viz" id="timingsec" hidden>
@@ -1303,14 +1327,14 @@
     // ---- resistance overlay (WHO Malaria Threat Maps) ----------------------
     // A second, independent dimension over the same geography: the fill
     // describes the PRODUCT's access, these dots describe the PARASITE. They
-    // ride different visual channels, and each keeps its own provenance line —
-    // the access layer is illustrative for most countries while these are
+    // ride different visual channels, and each keeps its own provenance — the
+    // access layer is illustrative for most countries, while these are
     // published WHO study results. The two readings are deliberately NOT
     // merged on the page until the country survey is verified.
     const RES = window.LAUNCH_RESISTANCE;
     // Equirectangular projection reproduced from scripts/build-map.js: the
-    // basemap is fitted to lon -120..155 / lat -40..42, so placing a study site
-    // is a linear transform — no projection library needed.
+    // basemap is fitted to lon -120..155 / lat -40..42, so placing a study is
+    // a linear transform — no projection library needed.
     const LON0 = -120, LON1 = 155, LAT0 = -40, LAT1 = 42;
     const PK = Math.min(M.w / (LON1 - LON0), M.h / (LAT1 - LAT0));
     const PY0 = (M.h - (LAT1 - LAT0) * PK) / 2;
@@ -1318,47 +1342,160 @@
     const PY = (lat) => (LAT1 - lat) * PK + PY0;
     const BANDS = [{ lt: 5, cls: "b1" }, { lt: 10, cls: "b2" }, { lt: 20, cls: "b3" }, { lt: Infinity, cls: "b4" }];
     const bandOf = (v) => (BANDS.find((b) => v < b.lt) || BANDS[3]).cls;
-    // Products WHO tracks a matching drug for; everything else (pipeline
-    // products, prevention tools) falls back to the reference ACT.
     const PRODUCT_DRUG = { pyramax: "Artesunate-pyronaridine", dhappq: "Dihydroartemisinin-piperaquine" };
     const FALLBACK_DRUG = "Artemether-lumefantrine";
-    // Shown by default. Of the 17 drugs with data, 11 cover fewer than five
-    // countries and seven cover exactly one — a single dot on a world map is
-    // not a map. These four carry 81% of the values and include all three
-    // drugs that appear in MFT plans, so the MFT rung of the ladder above
-    // stays coherent. "Show all drugs" opens the full list for analysts.
-    const CURATED = ["Artemether-lumefantrine", "Dihydroartemisinin-piperaquine",
-                     "Artesunate-amodiaquine", "Artesunate-pyronaridine"];
+    const FALLBACK_SPECIES = "P. falciparum";
+    const LAYER = "treatmentFailure";
 
-    function allDrugs() {
-      if (!RES) return [];
-      return [...new Set(Object.keys(RES).filter((k) => k !== "meta")
-        .flatMap((l) => Object.keys(RES[l] || {})))].sort();
-    }
+    // studies are stored as rows against RES.fields, with the repetitive
+    // columns (drug, species, country, source, citation) held as indices into
+    // RES.dict — decoded only for the rows a panel actually shows
+    const AT = {};
+    if (RES) RES.fields.forEach((f, i) => { AT[f] = i; });
+    const codeOf = (field, value) => RES.dict[field].indexOf(value);
+    const decode = (row) => {
+      const o = {};
+      RES.fields.forEach((f, i) => { o[f] = RES.coded.indexOf(f) >= 0 ? RES.dict[f][row[i]] : row[i]; });
+      return o;
+    };
+
+    const cellsFor = (drug, species) => ((RES[LAYER] || {})[drug] || {})[species] || {};
+    // countries a pairing would actually paint — the basemap does not draw
+    // every country WHO covers, so this counts what the reader will see
+    const drawnCount = (drug, species) => {
+      const c = cellsFor(drug, species);
+      return Object.keys(c).filter((i) => i in M.countries).length;
+    };
+    const allDrugs = () => (RES ? Object.keys(RES[LAYER] || {}) : []);
+    const speciesFor = (drug) => Object.keys((RES[LAYER] || {})[drug] || {});
+    const allSpecies = () => {
+      const set = new Set();
+      allDrugs().forEach((d) => speciesFor(d).forEach((s) => set.add(s)));
+      return [...set].sort();
+    };
+    const drugCoverage = (drug) => {
+      const set = new Set();
+      speciesFor(drug).forEach((sp) => Object.keys(cellsFor(drug, sp))
+        .forEach((i) => { if (i in M.countries) set.add(i); }));
+      return set.size;
+    };
+
     // Every drug is one click away; the grouping is information, not a filter.
-    // The four in the first group are the ones tied to tracked products (plus
-    // the reference ACT) — the other thirteen are mostly thin, 11 of them
-    // covering fewer than five countries.
+    // The first group is exactly the drugs behind tracked products, so it stays
+    // in step with PRODUCT_DRUG rather than repeating it as a second list.
+    // Both groups run most-studied first, which sinks the one-country entries.
     function fillDrugList(keep) {
       const sel = document.getElementById("res-drug");
+      const tracked = new Set(Object.values(PRODUCT_DRUG));
+      const byCoverage = (a, b) => drugCoverage(b) - drugCoverage(a) || a.localeCompare(b);
       const every = allDrugs();
-      const portfolio = CURATED.filter((d) => every.includes(d));
-      const others = every.filter((d) => !portfolio.includes(d));
-      const opts = (list) => list.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+      const mine = every.filter((d) => tracked.has(d)).sort(byCoverage);
+      const rest = every.filter((d) => !tracked.has(d)).sort(byCoverage);
+      const opts = (list) => list.map((d) => {
+        const n = drugCoverage(d);
+        return `<option value="${esc(d)}">${esc(d)} (${n} ${n === 1 ? "country" : "countries"})</option>`;
+      }).join("");
       sel.innerHTML =
-        (portfolio.length ? `<optgroup label="Portfolio &amp; reference">${opts(portfolio)}</optgroup>` : "") +
-        (others.length ? `<optgroup label="Other antimalarials">${opts(others)}</optgroup>` : "");
-      sel.value = keep && every.includes(keep) ? keep : FALLBACK_DRUG;
+        (mine.length ? `<optgroup label="Tracked products">${opts(mine)}</optgroup>` : "") +
+        (rest.length ? `<optgroup label="Other antimalarials">${opts(rest)}</optgroup>` : "");
+      sel.value = keep && every.indexOf(keep) >= 0 ? keep : FALLBACK_DRUG;
       return sel.value;
     }
+
+    // Species and drug are not independent: chloroquine has no P. falciparum
+    // studies at all (that resistance is decades old), and most ACTs have
+    // little vivax data because they are not the vivax treatment. Pairings with
+    // nothing behind them are DISABLED rather than merely empty, so a blank map
+    // can never be misread as "no resistance here".
+    function fillSpeciesList(drug, keep) {
+      const sel = document.getElementById("res-species");
+      const list = allSpecies();
+      sel.innerHTML = list.map((sp) => {
+        const n = drawnCount(drug, sp);
+        return `<option value="${esc(sp)}"${n ? "" : " disabled"}>` +
+               `${esc(sp)} (${n} ${n === 1 ? "country" : "countries"})</option>`;
+      }).join("");
+      const usable = list.filter((sp) => drawnCount(drug, sp) > 0);
+      sel.value = keep && usable.indexOf(keep) >= 0 ? keep
+        : usable.indexOf(FALLBACK_SPECIES) >= 0 ? FALLBACK_SPECIES
+        : (usable[0] || "");
+      sel.disabled = usable.length < 2;
+      return sel.value;
+    }
+
     function bindDrug(productId) {
       if (!RES) return;
       const sel = document.getElementById("res-drug");
       const want = PRODUCT_DRUG[productId];
       const every = allDrugs();
-      fillDrugList(want && every.includes(want) ? want : FALLBACK_DRUG);
-      sel.dataset.bound = want && every.includes(want) ? "own" : "fallback";
+      const drug = fillDrugList(want && every.indexOf(want) >= 0 ? want : FALLBACK_DRUG);
+      sel.dataset.bound = want && every.indexOf(want) >= 0 ? "own" : "fallback";
+      fillSpeciesList(drug, document.getElementById("res-species").value);
+      closePanel();
       drawResistance();
+    }
+
+    // ---- click-through: every study behind one country dot ------------------
+    let panelSort = { col: "year", dir: -1 };
+    let panelRows = [], panelTitle = "";
+
+    function closePanel() {
+      const p = document.getElementById("res-panel");
+      if (p) { p.hidden = true; panelRows = []; }
+    }
+
+    function openPanel(iso3, drug, species) {
+      const di = codeOf("drug", drug), si = codeOf("species", species), ci = AT.iso3;
+      panelRows = RES.studies
+        .filter((r) => r[ci] === iso3 && r[AT.drug] === di && r[AT.species] === si)
+        .map(decode);
+      panelTitle = `${M.countries[iso3] ? M.countries[iso3].n : iso3} · ${drug} · ${species}`;
+      panelSort = { col: "year", dir: -1 };
+      renderPanel();
+    }
+
+    function renderPanel() {
+      const panel = document.getElementById("res-panel");
+      const table = document.getElementById("res-table");
+      if (!panelRows.length) { panel.hidden = true; return; }
+      const COLS = [
+        { k: "year",   t: "Year",     num: true },
+        { k: "site",   t: "Site" },
+        { k: "region", t: "Region" },
+        { k: "n",      t: "Patients", num: true },
+        { k: "v",      t: "Failure",  num: true },
+        { k: "source", t: "Study" }
+      ];
+      const dir = panelSort.dir, key = panelSort.col;
+      const sorted = panelRows.slice().sort((a, b) => {
+        const x = a[key], y = b[key];
+        if (x === y) return 0;
+        if (x === null || x === "") return 1;          // blanks last, either direction
+        if (y === null || y === "") return -1;
+        return (typeof x === "number" ? x - y : String(x).localeCompare(String(y))) * dir;
+      });
+      const small = RES.meta.smallStudy || 20;
+      table.innerHTML =
+        "<thead><tr>" + COLS.map((c) =>
+          `<th data-k="${c.k}" scope="col"${c.k === key ? ` aria-sort="${dir === 1 ? "ascending" : "descending"}"` : ""}>${esc(c.t)}</th>`
+        ).join("") + "</tr></thead><tbody>" +
+        sorted.map((r) => {
+          const cite = r.citation
+            ? `<a href="${esc(r.citation)}" target="_blank" rel="noopener">${esc(r.source || "study")}</a>`
+            : esc(r.source || "—");
+          return `<tr${Number.isInteger(r.n) && r.n < small ? ' class="small"' : ""}>` +
+            `<td class="yr">${r.year}</td><td>${esc(r.site || "—")}</td><td>${esc(r.region || "—")}</td>` +
+            `<td class="num">${r.n === null ? "—" : r.n}</td><td class="num">${r.v}%</td><td>${cite}</td></tr>`;
+        }).join("") + "</tbody>";
+      table.querySelectorAll("th").forEach((th) => th.addEventListener("click", () => {
+        const k = th.dataset.k;
+        panelSort = { col: k, dir: panelSort.col === k ? -panelSort.dir : (k === "year" || k === "n" || k === "v" ? -1 : 1) };
+        renderPanel();
+      }));
+      const n = panelRows.length;
+      document.getElementById("res-panel-title").textContent =
+        `${panelTitle} — ${n} ${n === 1 ? "study" : "studies"}`;
+      panel.hidden = false;
     }
 
     function drawResistance() {
@@ -1367,6 +1504,7 @@
       const legend = document.getElementById("res-legend");
       const note = document.getElementById("res-note");
       const sel = document.getElementById("res-drug");
+      const spSel = document.getElementById("res-species");
       const svg = wrap.querySelector("svg");
       let g = svg.querySelector("g.res-layer");
       if (!g) {
@@ -1377,16 +1515,17 @@
       while (g.firstChild) g.removeChild(g.firstChild);
 
       const checked = document.querySelector('input[name="reslayer"]:checked');
-      const layer = checked ? checked.value : "off";
-      const drug = sel.value;
-      if (layer === "off" || !drug) {
+      const on = checked && checked.value !== "off";
+      const drug = sel.value, species = spSel.value;
+      if (!on || !drug || !species) {
         legend.hidden = true; note.hidden = true;
+        closePanel();
         const em = document.getElementById("map-empty");
         if (em) em.classList.remove("demoted");   // map is blank again — recentre
         return;
       }
 
-      const cells = (RES[layer] || {})[drug] || {};
+      const cells = cellsFor(drug, species);
       const all = Object.keys(cells);
       const isos = all.filter((i) => i in M.countries);
       isos.forEach((iso) => {
@@ -1397,22 +1536,28 @@
         c.setAttribute("cy", PY(e.lat).toFixed(1));
         c.setAttribute("r", "4.4");
         c.setAttribute("tabindex", "0");
+        c.setAttribute("role", "button");
         // Same tooltip grammar as the country cards: a title, label/value rows,
-        // and a dimmed footer naming the study site. Kept separate from the
-        // country tooltip so the access claim and the resistance claim are
-        // never read as one statement.
-        const place = [e.site, e.region].filter(Boolean).join(", ");
+        // and a dimmed footer. Kept separate from the country tooltip so the
+        // access claim and the resistance claim are never read as one statement.
+        const where = e.sites > 1
+          ? `${e.sites} sites · ${e.n} patients`
+          : [e.site, e.region].filter(Boolean).join(", ") || `${e.n} patients`;
         const html = `<b>${esc(M.countries[iso].n)}</b>` +
           `<div class="trow"><span>Treatment failure</span><span>${e.v}%</span></div>` +
           `<div class="trow"><span>Study year</span><span>${e.year}</span></div>` +
-          `<div class="trow"><span>Patients</span><span>${e.n}</span></div>` +
-          `<div class="tprod">${esc(place)} · ${esc(drug)}</div>`;
+          `<div class="trow"><span>${e.sites > 1 ? "Patients (all sites)" : "Patients"}</span><span>${e.n || "—"}</span></div>` +
+          `<div class="tprod">${esc(where)} · ${esc(drug)}<br>Click for every study</div>`;
         const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
         c.addEventListener("mouseenter", track);
         c.addEventListener("mousemove", track);
         c.addEventListener("focus", () => showTipAt(c, html));   // keyboard: no cursor
         c.addEventListener("mouseleave", hideTip);
         c.addEventListener("blur", hideTip);
+        c.addEventListener("click", () => openPanel(iso, drug, species));
+        c.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); openPanel(iso, drug, species); }
+        });
         g.appendChild(c);
       });
 
@@ -1425,9 +1570,9 @@
       const m = RES.meta || {};
       const bits = [];
       if (!isos.length) {
-        bits.push(`No WHO study results for ${drug}.`);
+        bits.push(`No WHO study results for ${drug} against ${species}.`);
       } else {
-        bits.push(`${isos.length} ${isos.length === 1 ? "country" : "countries"} with WHO study results for ${drug}.`);
+        bits.push(`${isos.length} ${isos.length === 1 ? "country" : "countries"} with WHO study results for ${drug} against ${species}.`);
         if (sel.dataset.bound === "fallback")
           bits.push(`${mapProduct} has no efficacy studies of its own; ${FALLBACK_DRUG} is shown as the reference treatment.`);
         if (all.length > isos.length)
@@ -1442,8 +1587,17 @@
     }
 
     document.querySelectorAll('input[name="reslayer"]').forEach((r) =>
-      r.addEventListener("change", drawResistance));
-    document.getElementById("res-drug").addEventListener("change", drawResistance);
+      r.addEventListener("change", () => { closePanel(); drawResistance(); }));
+    document.getElementById("res-drug").addEventListener("change", () => {
+      fillSpeciesList(document.getElementById("res-drug").value,
+                      document.getElementById("res-species").value);
+      closePanel();
+      drawResistance();
+    });
+    document.getElementById("res-species").addEventListener("change", () => {
+      closePanel(); drawResistance();
+    });
+    document.getElementById("res-close").addEventListener("click", closePanel);
 
     tabs.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => selectMap(t.dataset.id)));
     // default to the first product that has country data
