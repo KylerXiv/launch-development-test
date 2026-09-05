@@ -1380,24 +1380,20 @@
       return set.size;
     };
 
-    // Every drug is one click away; the grouping is information, not a filter.
-    // The first group is exactly the drugs behind tracked products, so it stays
-    // in step with PRODUCT_DRUG rather than repeating it as a second list.
-    // Both groups run most-studied first, which sinks the one-country entries.
+    // One plain A–Z list — every drug is one click away and every entry reads
+    // the same. The country count earns its place more here than it did under
+    // the old coverage sort: 11 of the 17 drugs cover fewer than five countries
+    // and alphabetical order scatters them through the list rather than sinking
+    // them, so the count is the only warning that an entry paints one or two
+    // dots. Which drugs belong to tracked products is carried by PRODUCT_DRUG
+    // and the auto-bind below, not by the ordering.
     function fillDrugList(keep) {
       const sel = document.getElementById("res-drug");
-      const tracked = new Set(Object.values(PRODUCT_DRUG));
-      const byCoverage = (a, b) => drugCoverage(b) - drugCoverage(a) || a.localeCompare(b);
-      const every = allDrugs();
-      const mine = every.filter((d) => tracked.has(d)).sort(byCoverage);
-      const rest = every.filter((d) => !tracked.has(d)).sort(byCoverage);
-      const opts = (list) => list.map((d) => {
+      const every = allDrugs().slice().sort((a, b) => a.localeCompare(b));
+      sel.innerHTML = every.map((d) => {
         const n = drugCoverage(d);
         return `<option value="${esc(d)}">${esc(d)} (${n} ${n === 1 ? "country" : "countries"})</option>`;
       }).join("");
-      sel.innerHTML =
-        (mine.length ? `<optgroup label="Tracked products">${opts(mine)}</optgroup>` : "") +
-        (rest.length ? `<optgroup label="Other antimalarials">${opts(rest)}</optgroup>` : "");
       sel.value = keep && every.indexOf(keep) >= 0 ? keep : FALLBACK_DRUG;
       return sel.value;
     }

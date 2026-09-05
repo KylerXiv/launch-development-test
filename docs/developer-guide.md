@@ -223,6 +223,10 @@ No test framework by design; two layers instead:
     studies at all, so pairings with no data are *disabled* in the species
     select with their country counts shown. An empty map must never be
     readable as "no resistance here".
+  - **The drug select is one flat A–Z list**, each option labelled with the
+    number of countries it will actually paint — 17 of the 26 drugs cover fewer
+    than five countries and 11 cover exactly one, and alphabetical order
+    scatters those through the list rather than sinking them.
   - `studies[]` is stored as rows against `fields[]` with the repetitive
     columns held as indices into `dict[]` — that halves the committed file
     (373 KB → 183 KB), which matters because it is regenerated whole on every

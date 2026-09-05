@@ -153,11 +153,22 @@ So species options with no data for the selected drug are **disabled**, with
 country counts shown. An empty map must never be readable as "no resistance
 here" when it really means "nobody uses this drug for this parasite".
 
-**D8 — Drug list: two optgroups, counts, sorted by coverage.** "Tracked
-products" (derived from `PRODUCT_DRUG`, so there's no second list to drift) and
-"Other antimalarials". Every option is labelled with the number of countries it
-will actually paint, because 11 of the 17 drugs cover fewer than five countries
-and 7 cover exactly one. A "show all" checkbox was tried and removed.
+**D8 — Drug list: one flat A–Z list with country counts.** 26 drugs, plain
+alphabetical, every entry formatted identically. Two earlier versions were
+tried and rejected: a curated four-drug list with a "show all" checkbox (an
+unnecessary control), then two optgroups ("Tracked products" / "Other
+antimalarials") sorted by coverage. Alphabetical won for predictability.
+
+The **counts stay** and matter more under this ordering than the last one: of
+the 26 drugs, **17 cover fewer than five countries and 11 cover exactly one**.
+Coverage sorting used to sink those to the bottom; A–Z scatters them through
+the list, so the count is now the only warning that an entry will paint a
+single dot. Counts are *drawn* countries, not raw rows — artemether-lumefantrine
+reads 58, and the note under the map explains any that the basemap omits.
+
+Tracked products get **no marker** in the label. Which drug belongs to the
+selected product is carried by `PRODUCT_DRUG` and the auto-bind, plus the
+product tabs above the map and the note below it.
 
 **D9 — Dictionary encoding.** `studies[]` is stored as rows against `fields[]`
 with the repetitive columns (`country`, `drug`, `species`, `source`,
