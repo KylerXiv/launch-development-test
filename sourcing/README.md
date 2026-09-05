@@ -24,6 +24,7 @@ provenance carried over.
 | `node scripts/fetch-regulatory.js` | WHO PQ medicines + vector-control lists (CSV export; WHO terms) and EMA EU-M4all/Art. 58 opinions table (xlsx, regenerated nightly; attribute EMA) | Monthly | `staging/regulatory_events.csv` (malaria FPPs, all VC products, all EU-M4all opinions — portfolio products matched to `productId`) and `reports/regulatory-watch-<date>.md` diffing new listings, delistings and opinion changes. |
 | `node scripts/fetch-nafdac.js` | **NAFDAC Greenbook** — Nigeria's public medicines register (Laravel/DataTables JSON endpoint; plain HTTP by necessity — the host's HTTPS hangs after handshake, checked 2026-08-23) | Monthly | `staging/nafdac_registrations.csv` (portfolio registrations, `iso3=NGA`: reg. no., composition, form, applicant, approval/expiry dates, Active/Inactive status) and `reports/nafdac-watch-<date>.md` diffing new registrations and status/expiry changes. The template for other NRA registers. |
 | `node scripts/fetch-tmda.js` | **TMDA IMIS2** — Tanzania's public register of medicines (Angular SPA's JSON backend: common-name lookup → paged search per candidate ingredient) | Monthly | `staging/tmda_registrations.csv` (portfolio registrations, `iso3=TZA`: certificate no., brand, active ingredient, manufacturer, issue/expiry dates, status) and `reports/tmda-watch-<date>.md`. Second NRA register, same pattern as NAFDAC. |
+| `node scripts/normalize-resistance.js [file]` | **WHO Malaria Threat Maps** — antimalarial drug efficacy and resistance; input is a **manually exported** therapeutic-efficacy sheet (see below) | On WHO release (roughly annual) | `staging/resistance_tes.csv` (one row per country × drug surviving the filters, with the site the value came from) and `data/resistance.js` — `window.LAUNCH_RESISTANCE`, read by the resistance overlay on `illustrated-journey-dashboard.html`. Raw extract kept under `raw/mtm/`. |
 | `node scripts/normalize-pqr.js <file>` | Global Fund **PQR** Transaction Summary — input is a **manually downloaded** Tableau crosstab (see below) | Quarterly | `staging/procurement_transactions.csv` — scoped to the malaria-relevant market (anti-malaria medicine + vector-control categories, plus any portfolio match; the ~99k-row full crosstab is mostly ARV/TB), all columns passed through, headers camelCased, portfolio `productId` prepended. Full crosstab kept gzipped under `raw/pqr/`. |
 
 **The PQR manual step** (~2 minutes; scripted export is confirmed blocked by
@@ -35,6 +36,26 @@ the server's WAF — do not attempt to automate it, see the plan's Category E):
    **CSV** → Download.
 3. Run `node scripts/normalize-pqr.js <downloaded file>` — it auto-detects
    Tableau's UTF-16/TSV quirks and any column layout.
+
+**The WHO Malaria Threat Map manual step** (~2 minutes; WHO serves `.xlsx` and
+this repo has no dependency that can read it, so the CSV export is the
+reproducible input that CI and teammates run against):
+
+1. Open the [Malaria Threat Maps](https://apps.who.int/malaria/maps/threats/) →
+   **DATA DOWNLOAD**.
+2. Theme **Antimalarial drug efficacy and resistance** → **Therapeutic efficacy
+   studies** → Excel.
+3. Export the workbook's `Data` sheet to CSV as
+   `raw/mtm/<date>-tes.csv`.
+4. Run `node scripts/normalize-resistance.js` (defaults to the committed
+   extract; pass a path to use a newer one).
+
+Use of the data is subject to the WHO Terms and Conditions for data
+compilations — WHO is credited in `meta.source` and on the page. Note the
+extract carries a known source-data defect: 38 Tanzanian rows are coded `TA`
+for both country and ISO2. The normalizer maps them to `TZA` rather than
+dropping them, because Tanzania is one of the two register-verified countries
+in `data/products.js`; see the comment on `A2_TO_A3` in the script.
 
 ## Running manually
 
