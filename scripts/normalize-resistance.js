@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // WHO Malaria Threat Map normalizer — turns the manually downloaded
-// therapeutic-efficacy-study (TES) extract into the country-level resistance
-// dataset the dashboard map paints:
+// therapeutic-efficacy-study (TES) extract into the dataset behind the
+// resistance overlay on illustrated-journey-dashboard.html:
 //   node scripts/normalize-resistance.js [path-to-tes-csv]
 //
 // Where the input comes from (the one manual step — ~2 minutes):
@@ -15,11 +15,17 @@
 //   teammates run this script against it and never touch Excel.)
 //
 // Outputs:
-//   sourcing/staging/resistance_tes.csv   auditable intermediate: one row per
-//                                         country x drug that survived the
-//                                         filters, with the reason it won
-//   data/resistance.js                    window.LAUNCH_RESISTANCE, committed
-//                                         and read directly by index.html
+//   sourcing/staging/resistance_tes.csv   auditable intermediate: every study
+//                                         that survived parsing, one row each
+//   data/resistance.js                    window.LAUNCH_RESISTANCE, committed:
+//                                           .studies  every study (drill-down)
+//                                           .treatmentFailure  aggregated dots
+//
+// NOTHING is filtered out. Every Plasmodium species is kept, and studies of
+// any size are kept — the map flags small ones rather than hiding them. The
+// only rows dropped are those WHO itself publishes without a usable value
+// (a literal "NaN" in the failure column) or without coordinates; those are
+// counted and reported, never silently discarded.
 //
 // Source: WHO Global Malaria Programme, Malaria Threat Maps. Use of the data
 // is subject to the WHO Terms and Conditions for data compilations. WHO is
@@ -37,30 +43,31 @@ const IN = process.argv[2]
 const STAGING = path.join(root, "sourcing", "staging", "resistance_tes.csv");
 const OUT = path.join(root, "data", "resistance.js");
 
-// Extract date and WHO's own "last data update" stamp, both shown on the page
-// so a reader can tell how old the underlying studies are.
 const EXTRACT = "2026-09-05";
 const WHO_LAST_UPDATE = "2025-11-19";
 const SOURCE_URL = "https://apps.who.int/malaria/maps/threats/";
 
 // ---- aggregation rule -------------------------------------------------------
 // Printed verbatim under the map. If this changes, the sentence on the page
-// changes with it — the reader must never have to guess how a dot was chosen.
+// changes with it — a reader must never have to guess how a dot was derived.
 const RULE =
-  "Most recent study year per country; where that year has several sites, the " +
-  "highest treatment-failure value; P. falciparum only; studies with fewer " +
-  "than 20 evaluable patients excluded.";
+  "Each dot is the most recent study year for that country, drug and species, " +
+  "averaged across every site studied that year and weighted by the number of " +
+  "patients — so a large study counts for more than a small one. No study is " +
+  "excluded; click a dot to see all of them.";
 
-const MIN_SAMPLE = 20;
-const SPECIES = "P. falciparum";
+// A dot resting on few patients is drawn differently by the renderer rather
+// than dropped. This is the threshold it uses, kept here so the data file and
+// the page agree on one number.
+const SMALL_STUDY = 20;
+
 // Per-protocol failure is the plainly-labelled percentage in the WHO glossary
 // ("Percentage of patients with treatment failure"); the Kaplan-Meier estimate
-// is carried alongside it for reference but is not what the dot is sized on.
+// is carried alongside for reference but is not what the dot is built from.
 const METRIC = "TREATMENT_FAILURE_PP";
 
 // ---- ISO2 -> ISO3 -----------------------------------------------------------
 // Embedded rather than pulled from a package, matching scripts/build-map.js.
-// Covers every country present in the WHO extract.
 const A2_TO_A3 = {
   AF:"AFG",AO:"AGO",BD:"BGD",BF:"BFA",BI:"BDI",BJ:"BEN",BO:"BOL",BR:"BRA",BT:"BTN",
   CD:"COD",CF:"CAF",CG:"COG",CI:"CIV",CM:"CMR",CN:"CHN",CO:"COL",DJ:"DJI",ER:"ERI",
@@ -72,8 +79,8 @@ const A2_TO_A3 = {
   VE:"VEN",VN:"VNM",VU:"VUT",YE:"YEM",ZM:"ZMB",ZW:"ZWE",
 
   // Source-data correction. 38 rows in the 2026-09-05 extract carry the
-  // non-standard code "TA" with COUNTRY_NAME also "TA". Every one of them is
-  // a Tanzanian site (Tabora, Bagamoyo, Kilombero, Igombe...) and the
+  // non-standard code "TA" with COUNTRY_NAME also "TA". Every one is a
+  // Tanzanian site (Tabora, Bagamoyo, Kilombero, Igombe...) and the
   // latitude/longitude confirm it. Mapped to TZA rather than dropped, because
   // Tanzania is one of the two countries whose registrations are
   // register-verified in data/products.js — silently losing it would leave a
@@ -81,7 +88,7 @@ const A2_TO_A3 = {
   TA:"TZA"
 };
 
-// ---- CSV ------------------------------------------------------------------
+// ---- CSV --------------------------------------------------------------------
 // Minimal RFC4180 reader — the WHO extract quotes fields containing commas
 // (institution names in DATA_SOURCE), so splitting on "," is not safe.
 function parseCsv(text) {
@@ -102,11 +109,11 @@ function parseCsv(text) {
   if (field.length || row.length) { row.push(field); rows.push(row); }
   return rows.filter(r => r.length > 1 || r[0] !== "");
 }
-
 const csvCell = (v) => {
   const s = v === undefined || v === null ? "" : String(v);
   return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
 };
+const round = (n, p) => Math.round(n * 10 ** p) / 10 ** p;
 
 // ---- read -------------------------------------------------------------------
 if (!fs.existsSync(IN)) {
@@ -117,7 +124,6 @@ const table = parseCsv(fs.readFileSync(IN, "utf8"));
 const header = table[0];
 const idx = {};
 header.forEach((h, i) => { idx[h.trim()] = i; });
-
 for (const need of ["ISO2", "COUNTRY_NAME", "ADMIN2", "SITE_NAME", "LATITUDE", "LONGITUDE",
                     "YEAR_START", "DRUG_NAME", "PLASMODIUM_SPECIES", "SAMPLE_SIZE",
                     METRIC, "DATA_SOURCE"]) {
@@ -126,12 +132,11 @@ for (const need of ["ISO2", "COUNTRY_NAME", "ADMIN2", "SITE_NAME", "LATITUDE", "
     process.exit(1);
   }
 }
-const KM = "TREATMENT_FAILURE_KM";
-const CITE = "CITATION_URL";
+const KM = "TREATMENT_FAILURE_KM", CITE = "CITATION_URL";
 
-// ---- filter + aggregate -----------------------------------------------------
-const stats = { total: 0, species: 0, small: 0, noIso: 0, badValue: 0, kept: 0, taFixed: 0 };
-const best = new Map();   // "ISO3 drug" -> record
+// ---- collect every study ----------------------------------------------------
+const stats = { total: 0, noValue: 0, noIso: 0, noCoords: 0, kept: 0, taFixed: 0, small: 0 };
+const studies = [];
 
 for (let r = 1; r < table.length; r++) {
   const row = table[r];
@@ -139,65 +144,104 @@ for (let r = 1; r < table.length; r++) {
   stats.total++;
   const get = (k) => (row[idx[k]] || "").trim();
 
-  if (get("PLASMODIUM_SPECIES") !== SPECIES) { stats.species++; continue; }
-
-  const n = parseInt(get("SAMPLE_SIZE"), 10);
-  if (!Number.isFinite(n) || n < MIN_SAMPLE) { stats.small++; continue; }
-
   const a2 = get("ISO2").toUpperCase();
   const iso3 = A2_TO_A3[a2];
   if (!iso3) { stats.noIso++; continue; }
-  if (a2 === "TA") stats.taFixed++;
 
-  const v = parseFloat(get(METRIC));
+  const v = parseFloat(get(METRIC));           // WHO writes a literal "NaN" when unavailable
   const year = parseInt(get("YEAR_START"), 10);
-  const lat = parseFloat(get("LATITUDE"));
-  const lon = parseFloat(get("LONGITUDE"));
-  if (![v, year, lat, lon].every(Number.isFinite) || v < 0 || v > 100) { stats.badValue++; continue; }
+  const n = parseInt(get("SAMPLE_SIZE"), 10);
+  const lat = parseFloat(get("LATITUDE")), lon = parseFloat(get("LONGITUDE"));
+  if (!Number.isFinite(v) || v < 0 || v > 100 || !Number.isInteger(year)) { stats.noValue++; continue; }
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) { stats.noCoords++; continue; }
 
+  if (a2 === "TA") stats.taFixed++;
+  if (Number.isFinite(n) && n < SMALL_STUDY) stats.small++;
   stats.kept++;
-  const drug = get("DRUG_NAME");
-  const key = iso3 + " " + drug;
-  const prev = best.get(key);
-  // latest year wins; within the same year the highest value wins
-  if (!prev || year > prev.year || (year === prev.year && v > prev.v)) {
-    const km = parseFloat(get(KM));
-    best.set(key, {
-      iso3, drug, v, year, n,
-      km: Number.isFinite(km) ? km : null,
-      site: get("SITE_NAME"),
-      // ADMIN2 is the province/region WHO shows alongside the site name. Present
-      // on ~88% of usable rows; the renderer omits the line when it is blank.
-      region: get("ADMIN2"),
-      country: a2 === "TA" ? "Tanzania" : get("COUNTRY_NAME"),
-      lat: Math.round(lat * 1e4) / 1e4,
-      lon: Math.round(lon * 1e4) / 1e4,
-      source: get("DATA_SOURCE"),
-      citation: CITE in idx ? get(CITE) : ""
-    });
-  }
+  const km = parseFloat(get(KM));
+  studies.push({
+    iso3,
+    country: a2 === "TA" ? "Tanzania" : get("COUNTRY_NAME"),
+    drug: get("DRUG_NAME"),
+    species: get("PLASMODIUM_SPECIES"),
+    year, v: round(v, 2),
+    km: Number.isFinite(km) ? round(km, 2) : null,
+    n: Number.isFinite(n) ? n : null,
+    site: get("SITE_NAME"),
+    region: get("ADMIN2"),
+    lat: round(lat, 4), lon: round(lon, 4),
+    source: get("DATA_SOURCE"),
+    citation: CITE in idx ? get(CITE) : ""
+  });
 }
 
-const records = [...best.values()].sort((a, b) =>
-  a.drug.localeCompare(b.drug) || a.iso3.localeCompare(b.iso3));
+studies.sort((a, b) =>
+  a.drug.localeCompare(b.drug) || a.species.localeCompare(b.species) ||
+  a.iso3.localeCompare(b.iso3) || b.year - a.year || a.site.localeCompare(b.site));
+
+// ---- aggregate to one dot per country x drug x species ----------------------
+// Latest year wins; within that year every site is combined into a
+// patient-weighted mean, so one tiny study cannot decide a country's colour.
+// The dot's position is the patient-weighted centroid of those same sites, so
+// it sits among the studies it summarises rather than at an arbitrary one.
+const byCell = new Map();
+for (const s of studies) {
+  const key = s.drug + " " + s.species + " " + s.iso3;
+  if (!byCell.has(key)) byCell.set(key, []);
+  byCell.get(key).push(s);
+}
+const layer = {};
+let cells = 0, weightedCells = 0, unweighted = 0;
+for (const group of byCell.values()) {
+  const year = Math.max(...group.map(s => s.year));
+  const inYear = group.filter(s => s.year === year);
+  // weight by patients; rows with no sample size fall back to equal weight so
+  // they still contribute rather than vanishing
+  const anyN = inYear.some(s => Number.isInteger(s.n) && s.n > 0);
+  const wOf = (s) => (anyN ? (Number.isInteger(s.n) && s.n > 0 ? s.n : 0) : 1);
+  const W = inYear.reduce((a, s) => a + wOf(s), 0) || inYear.length;
+  const v = inYear.reduce((a, s) => a + s.v * wOf(s), 0) / W;
+  const lat = inYear.reduce((a, s) => a + s.lat * wOf(s), 0) / W;
+  const lon = inYear.reduce((a, s) => a + s.lon * wOf(s), 0) / W;
+  const patients = inYear.reduce((a, s) => a + (Number.isInteger(s.n) ? s.n : 0), 0);
+  if (inYear.length > 1) weightedCells++;
+  if (!anyN) unweighted++;
+  const s0 = inYear[0];
+  ((layer[s0.drug] = layer[s0.drug] || {})[s0.species] =
+    layer[s0.drug][s0.species] || {})[s0.iso3] = {
+      v: round(v, 2), year, n: patients, sites: inYear.length,
+      lat: round(lat, 4), lon: round(lon, 4),
+      // the single site is worth naming when the dot rests on exactly one study
+      site: inYear.length === 1 ? s0.site : "", region: inYear.length === 1 ? s0.region : "",
+      small: patients > 0 && patients < SMALL_STUDY
+    };
+  cells++;
+}
 
 // ---- staging CSV ------------------------------------------------------------
-const cols = ["iso3","country","drug","value_pct","value_km_pct","year","sample_size",
-              "site","region","latitude","longitude","data_source","citation_url"];
+const cols = ["iso3","country","drug","species","year","value_pct","value_km_pct",
+              "sample_size","site","region","latitude","longitude","data_source","citation_url"];
 fs.mkdirSync(path.dirname(STAGING), { recursive: true });
 fs.writeFileSync(STAGING,
   cols.join(",") + "\n" +
-  records.map(r => [r.iso3, r.country, r.drug, r.v, r.km === null ? "" : r.km, r.year,
-                    r.n, r.site, r.region, r.lat, r.lon, r.source, r.citation].map(csvCell).join(",")).join("\n") + "\n");
+  studies.map(s => [s.iso3, s.country, s.drug, s.species, s.year, s.v, s.km === null ? "" : s.km,
+                    s.n === null ? "" : s.n, s.site, s.region, s.lat, s.lon, s.source, s.citation]
+                    .map(csvCell).join(",")).join("\n") + "\n");
 
 // ---- data/resistance.js -----------------------------------------------------
-const byDrug = {};
-for (const r of records) {
-  (byDrug[r.drug] = byDrug[r.drug] || {})[r.iso3] = {
-    v: r.v, year: r.year, n: r.n, site: r.site, region: r.region, lat: r.lat, lon: r.lon,
-    km: r.km, source: r.source, citation: r.citation
-  };
-}
+// `studies` is stored as rows against a field list rather than as objects —
+// the same 1,600 keys repeated 14 times each would roughly triple the file.
+const FIELDS = ["iso3","country","drug","species","year","v","km","n","site","region","lat","lon","source","citation"];
+// These five columns repeat a handful of values across every row — the study
+// institution alone is 112 KB of the raw file for 224 distinct strings. Storing
+// them as indices into a lookup roughly halves the committed file, which
+// matters because it is regenerated whole on every WHO extract.
+const CODED = ["country", "drug", "species", "source", "citation"];
+const dict = {};
+for (const f of CODED) dict[f] = [...new Set(studies.map(s => s[f]))].sort();
+const codeIdx = {};
+for (const f of CODED) codeIdx[f] = new Map(dict[f].map((v, i) => [v, i]));
+const encode = (s) => FIELDS.map(f => CODED.includes(f) ? codeIdx[f].get(s[f]) : s[f]);
 
 const payload = {
   meta: {
@@ -208,11 +252,15 @@ const payload = {
     metric: "Treatment failure (per-protocol), % of evaluable patients",
     status: "draft",
     rule: RULE,
-    minSampleSize: MIN_SAMPLE,
-    species: SPECIES,
-    countryDrugPairs: records.length
+    smallStudy: SMALL_STUDY,
+    studyCount: studies.length,
+    cellCount: cells
   },
-  treatmentFailure: byDrug
+  fields: FIELDS,
+  coded: CODED,          // these columns hold an index into dict[<column>]
+  dict,
+  studies: studies.map(encode),
+  treatmentFailure: layer
 };
 
 const file =
@@ -220,19 +268,24 @@ const file =
   "// Maps therapeutic-efficacy extract in sourcing/raw/mtm/.\n" +
   "// Do not edit by hand; rerun the normalizer instead.\n" +
   "//\n" +
-  "// Source: WHO Global Malaria Programme. Country values are AGGREGATED from\n" +
-  "// site-level studies by the rule in meta.rule — they are not WHO's own\n" +
-  "// country figures, and the rule is shown on the page alongside the map.\n" +
+  "// Source: WHO Global Malaria Programme. `studies` is every study in the\n" +
+  "// extract (all species, all sample sizes) and backs the click-through panel.\n" +
+  "// `treatmentFailure` holds the AGGREGATED country values the dots are drawn\n" +
+  "// from — these are derived by meta.rule, not WHO's own country figures, and\n" +
+  "// the rule is shown on the page beside the map.\n" +
   "window.LAUNCH_RESISTANCE = " + JSON.stringify(payload) + ";\n";
-
 fs.writeFileSync(OUT, file);
 
 // ---- report -----------------------------------------------------------------
-const drugs = Object.keys(byDrug).sort();
+const drugs = Object.keys(layer).length;
+const species = new Set(studies.map(s => s.species));
 console.log(`Read ${stats.total} rows from ${path.relative(root, IN)}`);
-console.log(`  dropped ${stats.species} non-${SPECIES}, ${stats.small} with n<${MIN_SAMPLE}` +
-            `, ${stats.noIso} with an unmappable ISO2, ${stats.badValue} with an unusable value`);
-console.log(`  ${stats.kept} rows kept; "TA" -> TZA correction applied to ${stats.taFixed}`);
-console.log(`Wrote ${path.relative(root, STAGING)} — ${records.length} country x drug rows`);
-console.log(`Wrote ${path.relative(root, OUT)} — ${drugs.length} drugs, ` +
+console.log(`  kept ${stats.kept} studies — no species or sample-size filter applied`);
+console.log(`  dropped ${stats.noValue} with no usable value (WHO writes "NaN"), ` +
+            `${stats.noCoords} with no coordinates, ${stats.noIso} with an unmappable ISO2`);
+console.log(`  "TA" -> TZA correction applied to ${stats.taFixed}; ` +
+            `${stats.small} studies have fewer than ${SMALL_STUDY} patients (kept, flagged on the map)`);
+console.log(`Wrote ${path.relative(root, STAGING)} — ${studies.length} studies`);
+console.log(`Wrote ${path.relative(root, OUT)} — ${drugs} drugs x ${species.size} species, ` +
+            `${cells} country dots (${weightedCells} average several sites, ${unweighted} have no sample sizes), ` +
             `${Math.round(file.length / 1024)} KB`);
