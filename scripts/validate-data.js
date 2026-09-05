@@ -220,6 +220,79 @@ if (!Array.isArray(data.products) || data.products.length === 0) {
   });
 }
 
+// ---- resistance layer (data/resistance.js) ---------------------------------
+// Governance for the WHO-derived map overlay. Runs only on the default (real)
+// invocation: resistance is a single global dataset, not one per product data
+// file, so re-checking it on the synthetic run would only double the output.
+if (!process.argv[2]) {
+  const RES_FILE = path.join(__dirname, "..", "data", "resistance.js");
+  const MAP_FILE = path.join(__dirname, "..", "data", "world-map.js");
+  if (!fs.existsSync(RES_FILE)) {
+    warn('data/resistance.js is missing — run "node scripts/normalize-resistance.js"');
+  } else {
+    const box = {};
+    try {
+      new Function("window", fs.readFileSync(RES_FILE, "utf8"))(box);
+      new Function("window", fs.readFileSync(MAP_FILE, "utf8"))(box);
+    } catch (e) {
+      err("data/resistance.js could not be evaluated: " + e.message);
+    }
+    const R = box.LAUNCH_RESISTANCE;
+    const drawn = (box.LAUNCH_MAP && box.LAUNCH_MAP.countries) || {};
+    if (!R || typeof R !== "object") {
+      err("data/resistance.js did not define window.LAUNCH_RESISTANCE");
+    } else {
+      const m = R.meta || {};
+      for (const k of ["source", "sourceUrl", "extract", "metric", "rule", "status"])
+        if (!m[k] || !String(m[k]).trim()) err(`resistance meta: "${k}" is required`);
+      if (!["illustrative", "draft", "verified"].includes(m.status))
+        err(`resistance meta.status must be illustrative/draft/verified (got "${m.status}")`);
+      // The rule is printed under the map. A vague one is a governance failure:
+      // an aggregated dot the reader cannot interpret is worse than no dot.
+      if (m.rule && String(m.rule).trim().length < 40)
+        err("resistance meta.rule must spell out how site studies were reduced to one country value");
+      const minN = Number.isInteger(m.minSampleSize) ? m.minSampleSize : 0;
+
+      const layers = Object.keys(R).filter((k) => k !== "meta");
+      if (!layers.length) err("data/resistance.js has no resistance layers");
+      const thisYear = new Date().getUTCFullYear();
+      let cells = 0, undrawn = 0, uncited = 0;
+
+      for (const layer of layers) {
+        const byDrug = R[layer] || {};
+        if (!Object.keys(byDrug).length) err(`resistance.${layer}: no drugs`);
+        for (const [drug, countries] of Object.entries(byDrug)) {
+          if (!drug.trim()) err(`resistance.${layer}: a drug key is empty`);
+          for (const [iso3, e] of Object.entries(countries)) {
+            const tag = `resistance.${layer} ${drug} ${iso3}`;
+            cells++;
+            if (!/^[A-Z]{3}$/.test(iso3)) err(`${tag}: iso3 must be 3 uppercase letters`);
+            // Not an error: WHO covers small island states the 110m basemap
+            // does not draw. But it is silently dropped data, so say so.
+            else if (!(iso3 in drawn)) { undrawn++; warn(`${tag}: not drawn on data/world-map.js — this value is invisible on the map`); }
+            if (typeof e.v !== "number" || !Number.isFinite(e.v) || e.v < 0 || e.v > 100)
+              err(`${tag}: v must be a number between 0 and 100 (got ${JSON.stringify(e.v)})`);
+            if (!Number.isInteger(e.year) || e.year < 1990 || e.year > thisYear + 1)
+              err(`${tag}: year must be an integer between 1990 and ${thisYear + 1} (got ${JSON.stringify(e.year)})`);
+            if (!Number.isInteger(e.n) || e.n < minN)
+              err(`${tag}: n must be an integer of at least ${minN} (got ${JSON.stringify(e.n)})`);
+            if (!Number.isFinite(e.lat) || e.lat < -90 || e.lat > 90 ||
+                !Number.isFinite(e.lon) || e.lon < -180 || e.lon > 180)
+              err(`${tag}: lat/lon are required and must be valid coordinates`);
+            if (!e.site || !String(e.site).trim())
+              err(`${tag}: site is required — the dot must name the study it came from`);
+            if (!e.citation || !String(e.citation).trim()) uncited++;
+          }
+        }
+      }
+      if (uncited) warn(`resistance: ${uncited} of ${cells} country values have no citation URL (WHO publishes many studies without one)`);
+      if (undrawn) warn(`resistance: ${undrawn} value(s) fall outside the drawn basemap`);
+      if (Number.isInteger(m.countryDrugPairs) && m.countryDrugPairs !== cells)
+        err(`resistance meta.countryDrugPairs says ${m.countryDrugPairs} but ${cells} were found — rerun the normalizer`);
+    }
+  }
+}
+
 // ---- report -----------------------------------------------------------------
 for (const w of warnings) console.log("WARN  " + w);
 for (const e of errors) console.log("ERROR " + e);
