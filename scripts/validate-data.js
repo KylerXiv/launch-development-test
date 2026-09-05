@@ -251,44 +251,76 @@ if (!process.argv[2]) {
       // an aggregated dot the reader cannot interpret is worse than no dot.
       if (m.rule && String(m.rule).trim().length < 40)
         err("resistance meta.rule must spell out how site studies were reduced to one country value");
-      const minN = Number.isInteger(m.minSampleSize) ? m.minSampleSize : 0;
 
-      const layers = Object.keys(R).filter((k) => k !== "meta");
+      // ---- the study table that backs the click-through panel ----
+      const FIELDS = Array.isArray(R.fields) ? R.fields : [];
+      const CODED = Array.isArray(R.coded) ? R.coded : [];
+      if (!FIELDS.length) err("resistance: fields[] is required to decode studies[]");
+      for (const c of CODED)
+        if (!R.dict || !Array.isArray(R.dict[c]))
+          err(`resistance: coded column "${c}" has no dict[] to decode against`);
+      const studies = Array.isArray(R.studies) ? R.studies : [];
+      if (!studies.length) err("resistance: studies[] is empty — the drill-down panel would have nothing to show");
+      const at = {}; FIELDS.forEach((f, i) => { at[f] = i; });
+      let badRow = 0, badCode = 0, uncited = 0, unnamed = 0;
+      studies.forEach((row, i) => {
+        if (!Array.isArray(row) || row.length !== FIELDS.length) { if (badRow++ < 3) err(`resistance studies[${i}]: expected ${FIELDS.length} values, got ${row && row.length}`); return; }
+        for (const c of CODED) {
+          const v = row[at[c]];
+          if (!Number.isInteger(v) || !R.dict[c] || v < 0 || v >= R.dict[c].length) {
+            if (badCode++ < 3) err(`resistance studies[${i}]: "${c}" index ${v} is outside dict.${c}`);
+          }
+        }
+        const v = row[at.v], yr = row[at.year];
+        if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 100)
+          err(`resistance studies[${i}]: value must be a number 0–100 (got ${JSON.stringify(v)})`);
+        if (!Number.isInteger(yr) || yr < 1990 || yr > new Date().getUTCFullYear() + 1)
+          err(`resistance studies[${i}]: implausible year ${JSON.stringify(yr)}`);
+        // WHO itself publishes the occasional study with no site or region
+        // named. Nothing is filtered out of this dataset, so that is recorded
+        // as provenance debt, not treated as a failure — the panel renders it
+        // as "—" and the coordinates still place the dot.
+        if (!row[at.site] || !String(row[at.site]).trim()) unnamed++;
+        if (!row[at.citation] && !String(R.dict.citation[row[at.citation]] || "").trim()) uncited++;
+      });
+      if (Number.isInteger(m.studyCount) && m.studyCount !== studies.length)
+        err(`resistance meta.studyCount says ${m.studyCount} but studies[] holds ${studies.length} — rerun the normalizer`);
+
+      // ---- the aggregated dots ----
+      const layers = Object.keys(R).filter((k) => !["meta", "fields", "coded", "dict", "studies"].includes(k));
       if (!layers.length) err("data/resistance.js has no resistance layers");
       const thisYear = new Date().getUTCFullYear();
-      let cells = 0, undrawn = 0, uncited = 0;
-
+      let cells = 0, undrawn = 0;
       for (const layer of layers) {
-        const byDrug = R[layer] || {};
-        if (!Object.keys(byDrug).length) err(`resistance.${layer}: no drugs`);
-        for (const [drug, countries] of Object.entries(byDrug)) {
+        for (const [drug, bySpecies] of Object.entries(R[layer] || {})) {
           if (!drug.trim()) err(`resistance.${layer}: a drug key is empty`);
-          for (const [iso3, e] of Object.entries(countries)) {
-            const tag = `resistance.${layer} ${drug} ${iso3}`;
-            cells++;
-            if (!/^[A-Z]{3}$/.test(iso3)) err(`${tag}: iso3 must be 3 uppercase letters`);
-            // Not an error: WHO covers small island states the 110m basemap
-            // does not draw. But it is silently dropped data, so say so.
-            else if (!(iso3 in drawn)) { undrawn++; warn(`${tag}: not drawn on data/world-map.js — this value is invisible on the map`); }
-            if (typeof e.v !== "number" || !Number.isFinite(e.v) || e.v < 0 || e.v > 100)
-              err(`${tag}: v must be a number between 0 and 100 (got ${JSON.stringify(e.v)})`);
-            if (!Number.isInteger(e.year) || e.year < 1990 || e.year > thisYear + 1)
-              err(`${tag}: year must be an integer between 1990 and ${thisYear + 1} (got ${JSON.stringify(e.year)})`);
-            if (!Number.isInteger(e.n) || e.n < minN)
-              err(`${tag}: n must be an integer of at least ${minN} (got ${JSON.stringify(e.n)})`);
-            if (!Number.isFinite(e.lat) || e.lat < -90 || e.lat > 90 ||
-                !Number.isFinite(e.lon) || e.lon < -180 || e.lon > 180)
-              err(`${tag}: lat/lon are required and must be valid coordinates`);
-            if (!e.site || !String(e.site).trim())
-              err(`${tag}: site is required — the dot must name the study it came from`);
-            if (!e.citation || !String(e.citation).trim()) uncited++;
+          for (const [species, countries] of Object.entries(bySpecies || {})) {
+            if (!species.trim()) err(`resistance.${layer} ${drug}: a species key is empty`);
+            for (const [iso3, e] of Object.entries(countries)) {
+              const tag = `resistance.${layer} ${drug} ${species} ${iso3}`;
+              cells++;
+              if (!/^[A-Z]{3}$/.test(iso3)) err(`${tag}: iso3 must be 3 uppercase letters`);
+              // Not an error: WHO covers small island states the 110m basemap
+              // does not draw. But it is silently dropped data, so say so.
+              else if (!(iso3 in drawn)) { undrawn++; }
+              if (typeof e.v !== "number" || !Number.isFinite(e.v) || e.v < 0 || e.v > 100)
+                err(`${tag}: v must be a number between 0 and 100 (got ${JSON.stringify(e.v)})`);
+              if (!Number.isInteger(e.year) || e.year < 1990 || e.year > thisYear + 1)
+                err(`${tag}: year must be an integer between 1990 and ${thisYear + 1}`);
+              if (!Number.isInteger(e.sites) || e.sites < 1)
+                err(`${tag}: sites must say how many studies the dot averages`);
+              if (!Number.isFinite(e.lat) || e.lat < -90 || e.lat > 90 ||
+                  !Number.isFinite(e.lon) || e.lon < -180 || e.lon > 180)
+                err(`${tag}: lat/lon are required and must be valid coordinates`);
+            }
           }
         }
       }
-      if (uncited) warn(`resistance: ${uncited} of ${cells} country values have no citation URL (WHO publishes many studies without one)`);
-      if (undrawn) warn(`resistance: ${undrawn} value(s) fall outside the drawn basemap`);
-      if (Number.isInteger(m.countryDrugPairs) && m.countryDrugPairs !== cells)
-        err(`resistance meta.countryDrugPairs says ${m.countryDrugPairs} but ${cells} were found — rerun the normalizer`);
+      if (Number.isInteger(m.cellCount) && m.cellCount !== cells)
+        err(`resistance meta.cellCount says ${m.cellCount} but ${cells} were found — rerun the normalizer`);
+      if (unnamed) warn(`resistance: ${unnamed} of ${studies.length} studies name no site in the source data`);
+      if (uncited) warn(`resistance: ${uncited} of ${studies.length} studies have no citation URL (WHO publishes many without one)`);
+      if (undrawn) warn(`resistance: ${undrawn} country value(s) fall outside the drawn basemap and are invisible on the map`);
     }
   }
 }
