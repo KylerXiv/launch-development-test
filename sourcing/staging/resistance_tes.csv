@@ -1,0 +1,166 @@
+iso3,country,drug,value_pct,value_km_pct,year,sample_size,site,region,latitude,longitude,data_source,citation_url
+CAF,Central African Republic,Amodiaquine+sulfadoxine-pyrimethamine,3.6,,2010,56,Bangui,Bangui Prefecture,4.3733,18.5628,"Laboratoire national de biologie et santé publique et de la population, Unité de chimiorésistance du paludisme",https://www.ncbi.nlm.nih.gov/pubmed/24122669
+CMR,Cameroon,Amodiaquine+sulfadoxine-pyrimethamine,8.6,,2014,118,North and Far North Regions,,10.0446,14.0935,"Laboratory for Public Health Research Biotechnologies, University of Yaoundé",
+AFG,Afghanistan,Artemether-lumefantrine,0,0,2019,63,Mihtarlam,Laghman,34.6456,70.1814,National Malaria and Leishmaniasis Control Programme,
+AGO,Angola,Artemether-lumefantrine,13,12,2021,98,Zaire Province,,-6.2667,14.2333,"National Malaria Control Program, Ministry of Health",https://pubmed.ncbi.nlm.nih.gov/38421163/
+BDI,Burundi,Artemether-lumefantrine,1.4,1.3,2021,72,Buhiga,Karuzi,-3.0307,30.1604,Programme National Intégré de Lutte contre le Paludisme,
+BEN,Benin,Artemether-lumefantrine,3.7,3.7,2018,115,Bohicon,Zou,7.1797,2.0598,Programme National de Lutte contre le Paludisme,https://pubmed.ncbi.nlm.nih.gov/34255739/
+BFA,Burkina Faso,Artemether-lumefantrine,42.6,26.5,2017,54,Nanoro,Boulkiemdé,12.6833,-2.1833,Centre National de Recherche et de Formation sur le Paludisme,https://pubmed.ncbi.nlm.nih.gov/33468147/
+BGD,Bangladesh,Artemether-lumefantrine,0,0,2018,65,Bandarban,Chittagong,21.8311,92.3686,"Malaria and Parasitic Disease Control Unit, Directorate General of Health Services",
+BRA,Brazil,Artemether-lumefantrine,0,0,2015,74,Cruzeiro do Sul,Acre,-7.628,-72.6762,"Malaria Branch, Division of Parasitic Diseases and Malaria, Center for Global Health, Center for Disease Control and Prevention",https://www.ncbi.nlm.nih.gov/pubmed/29141762
+CAF,Central African Republic,Artemether-lumefantrine,2.2,2.2,2017,44,Bangui,Bangui Prefecture,4.3733,18.5628,Université de Bangui,
+CIV,Côte d’Ivoire,Artemether-lumefantrine,5.8,5.4,2019,52,Bouna,Zanzan,9.2701,-3.0154,Programme National de Lutte contre le Paludisme,
+CMR,Cameroon,Artemether-lumefantrine,3.4,,2010,61,Mutengene,Fako,4.0892,9.3146,University of Yaoundé I,https://pubmed.ncbi.nlm.nih.gov/25626448/
+COD,Democratic Republic of the Congo,Artemether-lumefantrine,18,14,2018,92,Mikalayi,Kasaï-Oriental,-6.0246,22.3177,Centers for Disease Control and Prevention,https://pubmed.ncbi.nlm.nih.gov/34491220/
+COG,Congo,Artemether-lumefantrine,6,5.8,2019,50,Ouesso,Sangha,1.6141,16.0326,"Programme National de Lutte contre le Paludisme, Ministère de la Santé et de la Population",
+COL,Colombia,Artemether-lumefantrine,0,0,2018,83,Quibdo,Chocó,5.6956,-76.6498,"Grupo de Parasitología, Instituto Nacional de Salud",https://www.ncbi.nlm.nih.gov/pubmed/32100686
+COM,Comoros,Artemether-lumefantrine,1.01,,2019,99,Grande Comore,,-11.5833,43.3333,Guangzhou University of Chinese Medicine,https://pubmed.ncbi.nlm.nih.gov/35988664/
+DJI,Djibouti,Artemether-lumefantrine,0,0,2024,82,Boualos,,11.5724,43.155,"National Malaria Control Programme, Djibouti",
+ERI,Eritrea,Artemether-lumefantrine,0,0,2017,61,Shambuko,Gash-Barka,14.9252,37.838,"National Malaria Control Program, Disease Prevention and Control Division",
+ETH,Ethiopia,Artemether-lumefantrine,4.5,2.7,2022,67,North Gondar Zone,Amhara,12.4192,36.9541,"School of Biomedical and Laboratory Sciences, College of Medicine and Health Sciences, University of Gondar",https://pubmed.ncbi.nlm.nih.gov/39215366/
+GAB,Gabon,Artemether-lumefantrine,2.7,2,2017,37,Lambaréné,Ogooué et des Lacs,-0.7015,10.2404,Centre de Recherches Médicales de Lambaréné,https://www.ncbi.nlm.nih.gov/pubmed/31842893
+GHA,Ghana,Artemether-lumefantrine,0,0,2018,41,Ga West,Greater Accra,5.7025,-0.3,"Department of Biomedical Sciences, School of Basic & Biomedical Sciences, University of Health and Allied Sciences",https://pubmed.ncbi.nlm.nih.gov/33163636/
+GIN,Guinea,Artemether-lumefantrine,7.6,,2018,144,Forécariah,Kindia,9.4377,-13.0935,Centre National de Formation et de Recherche en Santé Rurale (CNFRSR) de Mafèrinyah,
+GMB,Gambia,Artemether-lumefantrine,0,0,2022,75,Brikama,,13.2748,-16.6409,National Malaria Control Programme,
+GNB,Guinea-Bissau,Artemether-lumefantrine,5,5,2012,140,Bissau,Bissau Autonomous Sector,11.8817,-15.6178,Projecto de Saúde de Bandim,https://www.ncbi.nlm.nih.gov/pubmed/27649561
+GNQ,Equatorial Guinea,Artemether-lumefantrine,7.6,6.3,2018,66,Ebebiyin,Kié-Ntem,2.0656,11.207,"Programa Nacional de Lucha contra el Paludismo, Dirección General de Salud Pública y Prevención de Enfermedades",
+IDN,Indonesia,Artemether-lumefantrine,0,0,2015,55,North Sumatra Province,,2,99,"Department of Paediatrics, Faculty of Medicine, Universitas Sumatera Utara",https://pubmed.ncbi.nlm.nih.gov/32420402/
+IND,India,Artemether-lumefantrine,1.25,,2023,80,Lunglei,Mizoram,22.8671,92.7655,National Institute for Research in Tribal Health (NIRTH),https://pubmed.ncbi.nlm.nih.gov/40170104/
+KEN,Kenya,Artemether-lumefantrine,0,0,2018,44,Kilifi,,-3.5107,39.9093,Mahidol-Oxford Tropical Medicine Research Unit (MORU) and Kenya Medical Research Institute Wellcome Trust Research Programme,https://pubmed.ncbi.nlm.nih.gov/34111412/
+KHM,Cambodia,Artemether-lumefantrine,13.5,13.5,2018,37,Pailin and Pursat Provinces,,12.4626,102.9863,"Mahidol Oxford Tropical Medicine Research Unit, Faculty of Tropical Medicine, Mahidol University, Bangkok, Thailand; Centre for Tropical Medicine and Global Health, Nuffield Department of Medicine, University of Oxford, Oxford, United Kingdom",https://pubmed.ncbi.nlm.nih.gov/35276064/
+LAO,Lao People's Democratic Republic,Artemether-lumefantrine,5.3,5.3,2021,38,"Sanxay, Saysetha, Sanamxay and Phouvong districts",Attapeu,14.6806,106.512,"Center of Malariology, Parasitology and Entomology, Ministry of Public Health",
+LBR,Liberia,Artemether-lumefantrine,0,0,2017,79,Kakata,Margibi,6.5292,-10.3584,"National Malaria Control Programme, Ministry of Health",https://pubmed.ncbi.nlm.nih.gov/35477399/
+MDG,Madagascar,Artemether-lumefantrine,4,,2018,82,Vangaindrano,Atsimo-Andrefana,-23.3505,47.5914,"National Malaria Control Program, Madagascar",
+MLI,Mali,Artemether-lumefantrine,0,0,2018,87,Bougouni Cercle,Sikasso,11.416,-7.597,"Malaria Research and Training Center, University of Sciences, Techniques and Technologies of Bamako",https://pubmed.ncbi.nlm.nih.gov/33498803/
+MMR,Myanmar,Artemether-lumefantrine,3.3,3.2,2019,61,Tamu,Sagaing,24.2199,94.3103,Department of Medical Research (Upper Myanmar),
+MOZ,Mozambique,Artemether-lumefantrine,2.63,2.4,2020,76,Mopeia,Zambezia,-17.98,35.715,Centro de Investigação em Saúde de Manhiça,https://pubmed.ncbi.nlm.nih.gov/40660279/
+MWI,Malawi,Artemether-lumefantrine,2.1,,2016,238,Multiple sites,,-14.4445,34.885,"National Malaria Control Programme, Ministry of Health, Malawi",
+MYS,Malaysia,Artemether-lumefantrine,0,0,2018,101,All country (Malaysia),,2.5,112.5,"Vector Borne Disease Sector, Disease Control Division, Ministry of Health",
+NER,Niger,Artemether-lumefantrine,8,,2020,64,Tessaoua,Maradi,13.7559,7.9865,Centre de Santé Intégré (CSI),https://pubmed.ncbi.nlm.nih.gov/38741101/
+NGA,Nigeria,Artemether-lumefantrine,0,0,2021,71,Lagos,Lagos,6.5244,3.3792,Nigerian Institute for Medical Research,https://pubmed.ncbi.nlm.nih.gov/39210367/
+PAK,Pakistan,Artemether-lumefantrine,0,0,2019,88,Khyber District,Khyber Pakhtunkhwa,34.0211,71.2874,"Directorate of Malaria Control, Ministry of National Health Services, Regulations and Coordination",
+PHL,Philippines,Artemether-lumefantrine,0,0,2017,62,Rizal,Palawan,9.8349,118.7384,"Research Institute of Tropical Medicine, Department of Health",
+PNG,Papua New Guinea,Artemether-lumefantrine,3.3,3,2022,74,Kavieng,New Ireland,-2.5718,150.8048,Papua New Guinea Institute of Medical Research,
+RWA,Rwanda,Artemether-lumefantrine,6.2,5.5,2018,69,Kayonza,Eastern Province,-1.9139,30.62,"Malaria and Other Parasitic Division, Institute of HIV/AIDS, Disease Prevention & Control (IHDPC), Rwanda Biomedical Center, Ministry of Health",https://pubmed.ncbi.nlm.nih.gov/33864801/
+SDN,Sudan,Artemether-lumefantrine,0,0,2019,89,Singa,Sennar,13.15,33.9333,"Federal Ministry of Health, National Malaria Control Programme",
+SEN,Senegal,Artemether-lumefantrine,0,0,2019,96,Kolda,Kolda,12.9337,-14.9561,"Faculty of Medicine, University of Cheikh Anta Diop",
+SLB,Solomon Islands,Artemether-lumefantrine,0,0,2011,23,Tetere,Guadalcanal,-9.4241,160.1698,"National Vector-Borne Disease Control Program, Ministry of Health and Medical Services",
+SLE,Sierra Leone,Artemether-lumefantrine,0,0,2016,51,Kenema,Eastern Province,7.8758,-11.1908,National Malaria Control Programme,https://www.ncbi.nlm.nih.gov/pubmed/29932931
+SOM,Somalia,Artemether-lumefantrine,0,0,2017,51,Jowhar,Middle Shabelle,2.7833,45.5,"Global Malaria Programme, World Health Organization",https://pubmed.ncbi.nlm.nih.gov/31296223/
+STP,Sao Tome and Principe,Artemether-lumefantrine,0,0,2017,34,Água Grande,Sao Tome Island,0.3333,6.7333,"Centre National des Endémies, Ministère de la Santé",
+TCD,Chad,Artemether-lumefantrine,2.2,2.1,2020,45,Kelo,Tandjilé Ouest,9.31,15.81,Programme National de Lutte contre le Paludisme,
+TGO,Togo,Artemether-lumefantrine,1.4,1.4,2021,71,Anié,Plateaux,7.7611,1.1917,"Faculté des Sciences de la Santé, Université de Lomé",
+THA,Thailand,Artemether-lumefantrine,11.3,10.9,2012,44,Kra Buri,Ranong,10.056,98.641,"Bureau of Vector Borne Disease, Department of Disease Control, Ministry of Public Health",
+TLS,Timor-Leste,Artemether-lumefantrine,0,0,2012,28,Multiple sites,,-8.8754,125.7044,National Malaria Control Programme,
+TZA,United Republic of Tanzania,Artemether-lumefantrine,10.1,10.1,2022,69,Pwani,,-7.3238,38.8205,Ifakara Health Institute,https://pubmed.ncbi.nlm.nih.gov/39186698/
+UGA,Uganda,Artemether-lumefantrine,19,19,2022,108,Busia,Eastern Region,0.3833,34,"Department of Medicine, Makerere University",https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(25)00407-4/abstract
+VNM,Viet Nam,Artemether-lumefantrine,8,8,2018,25,Binh Phouc and Khanh Hoa Provinces,,11.9497,107.3364,"Mahidol Oxford Tropical Medicine Research Unit, Faculty of Tropical Medicine, Mahidol University, Bangkok, Thailand; Centre for Tropical Medicine and Global Health, Nuffield Department of Medicine, University of Oxford, Oxford, United Kingdom",https://pubmed.ncbi.nlm.nih.gov/35276064/
+YEM,Yemen,Artemether-lumefantrine,1.1,1.1,2023,88,Bani Qa'is,Hajjah,15.5833,43.4167,"National Malaria Control Programme, Yemen",
+ZMB,Zambia,Artemether-lumefantrine,0,0,2016,29,Gwembe,Southern,-16.5,28,"National Malaria Control Center, Ministry of Health",
+ZWE,Zimbabwe,Artemether-lumefantrine,4.8,,2017,62,Binga,Matabeleland North,-17.6241,27.3411,"National Institute of Health Research, Ministry of Health and Child Welfare",
+KHM,Cambodia,Artemether-lumefantrine + amodiaquine,7.9,8,2018,38,Pailin and Pursat Provinces,,12.4626,102.9863,"Mahidol Oxford Tropical Medicine Research Unit, Faculty of Tropical Medicine, Mahidol University, Bangkok, Thailand; Centre for Tropical Medicine and Global Health, Nuffield Department of Medicine, University of Oxford, Oxford, United Kingdom",https://pubmed.ncbi.nlm.nih.gov/35276064/
+VNM,Viet Nam,Artemether-lumefantrine + amodiaquine,0,0,2018,26,Binh Phouc and Khanh Hoa Provinces,,11.9497,107.3364,"Mahidol Oxford Tropical Medicine Research Unit, Faculty of Tropical Medicine, Mahidol University, Bangkok, Thailand; Centre for Tropical Medicine and Global Health, Nuffield Department of Medicine, University of Oxford, Oxford, United Kingdom",https://pubmed.ncbi.nlm.nih.gov/35276064/
+ETH,Ethiopia,Artemether-lumefantrine+primaquine,0,0,2023,85,Arba Minch,South Ethiopia Regional State,6.0333,37.55,"College of Health Sciences, Addis Ababa University",https://pubmed.ncbi.nlm.nih.gov/40102850/
+COM,Comoros,Artemisinin-piperaquine,1.94,,2019,105,Grande Comore,,-11.5833,43.3333,Guangzhou University of Chinese Medicine,https://pubmed.ncbi.nlm.nih.gov/35988664/
+KEN,Kenya,Arterolane-piperaquine,0,0,2018,65,Kilifi,,-3.5107,39.9093,Mahidol-Oxford Tropical Medicine Research Unit (MORU) and Kenya Medical Research Institute Wellcome Trust Research Programme,https://pubmed.ncbi.nlm.nih.gov/34111412/
+KEN,Kenya,Arterolane–piperaquine–mefloquine,0,0,2018,60,Kilifi,,-3.5107,39.9093,Mahidol-Oxford Tropical Medicine Research Unit (MORU) and Kenya Medical Research Institute Wellcome Trust Research Programme,https://pubmed.ncbi.nlm.nih.gov/34111412/
+GUY,Guyana,Artesunate,0,0,2014,47,Georgetown,Demerara-Mahaica,6.8058,-58.1667,"Central Vector Control Department, Ministry of Public Health",https://www.ncbi.nlm.nih.gov/pubmed/27704030
+MLI,Mali,Artesunate,0,0,2015,94,Faladié,Koulikoro,13.1354,-8.3349,"Malaria Research and Training Center, University of Sciences, Techniques and Technologies of Bamako",https://pubmed.ncbi.nlm.nih.gov/32320811/
+MMR,Myanmar,Artesunate,0,0,2011,25,Kawthaung,Tanintharyi,9.9958,98.5529,Department of Medical Research (Lower Myanmar),http://www.ncbi.nlm.nih.gov/pubmed/23520478
+VNM,Viet Nam,Artesunate,2.6,2.5,2011,39,Phu Thien,Gia Lai,13.4589,108.2852,"National Institute of Malariology, Parasitology and Entomology",
+AGO,Angola,Artesunate-amodiaquine,9,9,2021,97,Zaire Province,,-6.2667,14.2333,"National Malaria Control Program, Ministry of Health",https://pubmed.ncbi.nlm.nih.gov/38421163/
+BDI,Burundi,Artesunate-amodiaquine,7.7,6.5,2019,65,Mutaho,Gitega,-3.1567,29.8561,Programme National Intégré de Lutte contre le Paludisme,
+BFA,Burkina Faso,Artesunate-amodiaquine,4.4,,2016,91,Nouna,Kossi,12.743,-3.8554,Heidelberg Institute of Global Health,https://pubmed.ncbi.nlm.nih.gov/31600221/
+CAF,Central African Republic,Artesunate-amodiaquine,0,0,2010,56,Bangui,Bangui Prefecture,4.3733,18.5628,"Laboratoire national de biologie et santé publique et de la population, Unité de chimiorésistance du paludisme",https://www.ncbi.nlm.nih.gov/pubmed/24122669
+CIV,Côte d’Ivoire,Artesunate-amodiaquine,0,0,2019,59,Abengourou,Comoé,6.7157,-3.4801,Programme National de Lutte contre le Paludisme,
+CMR,Cameroon,Artesunate-amodiaquine,8.2,,2014,117,North and Far North Regions,,10.0446,14.0935,"Laboratory for Public Health Research Biotechnologies, University of Yaoundé",
+COD,Democratic Republic of the Congo,Artesunate-amodiaquine,9,9,2018,82,Rutshuru,Nord Kivu,-1.1833,29.45,Centers for Disease Control and Prevention,https://pubmed.ncbi.nlm.nih.gov/34491220/
+COG,Congo,Artesunate-amodiaquine,5.7,5.3,2017,52,Dolisie,Niari,-4.2,12.6667,"Faculté des Sciences et Techniques, Université Marien Ngouabi",https://pubmed.ncbi.nlm.nih.gov/35501861/
+ERI,Eritrea,Artesunate-amodiaquine,2.2,2.2,2022,90,Tokombia,Gash-Barka,14.7825,37.4745,"National Malaria Control Programme, Ertirea",
+GAB,Gabon,Artesunate-amodiaquine,4.8,4,2017,42,Lambaréné,Ogooué et des Lacs,-0.7015,10.2404,Centre de Recherches Médicales de Lambaréné,https://www.ncbi.nlm.nih.gov/pubmed/31842893
+GHA,Ghana,Artesunate-amodiaquine,1.8,1.8,2017,55,Kassena Nankana East,Upper East Region,10.7334,-1.4787,University of Ghana College of Health Sciences,https://www.ncbi.nlm.nih.gov/pubmed/31234874
+GIN,Guinea,Artesunate-amodiaquine,7.7,,2018,26,Labé,Labé,11.3167,-12.2833,Centre National de Formation et de Recherche en Santé Rurale (CNFRSR) de Mafèrinyah,
+GNQ,Equatorial Guinea,Artesunate-amodiaquine,1.4,1.3,2017,72,Ebebiyin,Kié-Ntem,2.0656,11.207,"Programa Nacional de Lucha contra el Paludismo, Dirección General de Salud Pública y Prevención de Enfermedades",
+IDN,Indonesia,Artesunate-amodiaquine,16.7,,2012,24,Pesawaran,Lampung,-5.4821,104.9137,"Department of Microbiology and Parasitology, Faculty of Medicine, University of Lampung",https://www.ncbi.nlm.nih.gov/pubmed/31123479
+KHM,Cambodia,Artesunate-amodiaquine,22.6,22.6,2016,31,Kaoh Nheaek,Mondulkiri,13.0755,107.0362,"Malaria Molecular Epidemiology Unit, Institut Pasteur of Cambodia",https://pubmed.ncbi.nlm.nih.gov/32459308/
+LBR,Liberia,Artesunate-amodiaquine,9.8,7.9,2017,51,Careyburg,Montserrado,6.396,-10.4979,"National Malaria Control Programme, Ministry of Health",https://pubmed.ncbi.nlm.nih.gov/35477399/
+MDG,Madagascar,Artesunate-amodiaquine,2,,2018,82,Vangaindrano,Atsimo-Andrefana,-23.3505,47.5914,"National Malaria Control Program, Madagascar",
+MLI,Mali,Artesunate-amodiaquine,2.8,2.7,2015,208,Sélingué,Sikasso,11.6167,-8.2333,"University of Sciences, Techniques and Technologies of Bamako",https://pubmed.ncbi.nlm.nih.gov/34034754/
+MOZ,Mozambique,Artesunate-amodiaquine,0,0,2020,84,Dondo,Sofala,-19.6115,34.7409,Centro de Investigação em Saúde de Manhiça,https://pubmed.ncbi.nlm.nih.gov/40660279/
+MRT,Mauritania,Artesunate-amodiaquine,1.8,1.7,2012,57,Kobeni,Hodh El Gharbi,15.8208,-9.4145,"Université des Sciences, de Technologie et de Médecine",http://www.ncbi.nlm.nih.gov/pubmed/25515535
+MWI,Malawi,Artesunate-amodiaquine,1,,2016,305,Multiple sites,,-14.4445,34.885,"National Malaria Control Programme, Ministry of Health, Malawi",
+NER,Niger,Artesunate-amodiaquine,2.7,,2017,73,Dogondoutchi,Dosso,13.6504,4.0313,Centre de Recherche Médicale et Sanitaire,https://pubmed.ncbi.nlm.nih.gov/32881447/
+NGA,Nigeria,Artesunate-amodiaquine,2.3,,2018,86,Kura,Kano,11.7714,8.4303,"National Malaria Elimination Programme, Federal Ministry of Health",
+SEN,Senegal,Artesunate-amodiaquine,0,0,2019,96,Kolda,Kolda,12.9337,-14.9561,"Faculty of Medicine, University of Cheikh Anta Diop",
+SLE,Sierra Leone,Artesunate-amodiaquine,0,0,2016,58,Bombali,Northern Province,9.3333,-12.25,National Malaria Control Programme,https://www.ncbi.nlm.nih.gov/pubmed/29932931
+STP,Sao Tome and Principe,Artesunate-amodiaquine,0,0,2017,52,Água Grande,Sao Tome Island,0.3333,6.7333,"Centre National des Endémies, Ministère de la Santé",
+TCD,Chad,Artesunate-amodiaquine,0,0,2020,33,Koyom,Mayo-Kebbi Est,12.1333,22.25,Programme National de Lutte contre le Paludisme,
+TGO,Togo,Artesunate-amodiaquine,0,0,2013,91,Lomé,Maritime,6.1725,1.2314,"Faculté des Sciences de la Santé, Université de Lomé",http://www.ncbi.nlm.nih.gov/pubmed/27334876
+TZA,United Republic of Tanzania,Artesunate-amodiaquine,0,0,2022,86,Karagwe,Kagera,-1.502,30.99,National Insititute for Medical Research,
+UGA,Uganda,Artesunate-amodiaquine,0,0,2022,95,Busia,Eastern Region,0.3833,34,"Department of Medicine, Makerere University",https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(25)00407-4/abstract
+ZMB,Zambia,Artesunate-amodiaquine,0,0,2016,25,Gwembe,Southern,-16.5,28,"National Malaria Control Center, Ministry of Health",
+BRA,Brazil,Artesunate-mefloquine,0,0,2012,61,Macapá,Amapá,0.0356,-51.0705,Federal University of Pará,https://www.ncbi.nlm.nih.gov/pubmed/30012152
+KHM,Cambodia,Artesunate-mefloquine,0,0,2021,20,Phnom Sruoch,Kampong Speu,11.4,104.4,"National Center for Parasitology, Entomology and Malaria Control, Ministry of Health",
+MMR,Myanmar,Artesunate-mefloquine,2.2,2.2,2013,46,Kawthaung,Tanintharyi,9.9958,98.5529,"Department of Medical Environmental Biology and Tropical Medicine, School of Medicine, Kangwon National University",https://www.ncbi.nlm.nih.gov/pubmed/28806957
+MYS,Malaysia,Artesunate-mefloquine,0,0,2012,49,Sabah,,5.7389,116.1805,Menzies School of Health Research,https://www.ncbi.nlm.nih.gov/pubmed/30526613
+SEN,Senegal,Artesunate-mefloquine,1.5,,2010,70,Multiple sites,,14.3432,-15.3746,"Faculty of Medicine, University of Cheikh Anta Diop",http://www.ncbi.nlm.nih.gov/pubmed/23234606
+THA,Thailand,Artesunate-mefloquine,0,0,2016,37,Yala Province,,6.5411,101.2804,"Bureau of Vector Borne Disease, Department of Disease Control, Ministry of Public Health",
+VNM,Viet Nam,Artesunate-mefloquine,0,0,2020,36,Dak Lak Province,,12.6667,108.05,"National Institute of Malariology, Parasitology and Entomology",
+AGO,Angola,Artesunate-pyronaridine,0,0,2021,100,Benguela,Benguela Province,-12.5905,13.4165,"National Malaria Control Program, Ministry of Health",https://pubmed.ncbi.nlm.nih.gov/38421163/
+BFA,Burkina Faso,Artesunate-pyronaridine,1.2,,2011,160,Bobo-Dioulasso,Houet,11.1649,-4.3052,"Department of Epidemiology of Parasitic Diseases, University of Sciences, Techniques and Technologies of Bamako",https://www.ncbi.nlm.nih.gov/pubmed/29606364
+ETH,Ethiopia,Artesunate-pyronaridine,1.1,1.1,2021,87,Dera,Amhara,11.785,37.5627,Ethiopian Public Health Institute,https://pubmed.ncbi.nlm.nih.gov/37330475/
+GIN,Guinea,Artesunate-pyronaridine,0.5,,2011,201,Forécariah,Kindia,9.4377,-13.0935,"Malaria Research and Training Center, University of Sciences, Techniques and Technologies of Bamako",https://www.ncbi.nlm.nih.gov/pubmed/29606364
+KEN,Kenya,Artesunate-pyronaridine,5.6,5.3,2015,71,Homa Bay,,-0.535,34.4531,Academic Medical Center,https://www.ncbi.nlm.nih.gov/pubmed/29764419
+KHM,Cambodia,Artesunate-pyronaridine,1.7,1.7,2018,59,Oral,Kampong Speu,11.8119,104.0072,"National Center for Parasitology, Entomology and Malaria Control, Ministry of Health",
+LAO,Lao People's Democratic Republic,Artesunate-pyronaridine,0,0,2018,29,Salavan Province,,15.7166,106.4141,"Center of Malariology, Parasitology and Entomology, Ministry of Public Health",
+MLI,Mali,Artesunate-pyronaridine,0.6,,2011,177,Bougoula,Sikasso,10.7833,-6.9167,"Malaria Research and Training Center, University of Sciences, Techniques and Technologies of Bamako",https://www.ncbi.nlm.nih.gov/pubmed/29606364
+MMR,Myanmar,Artesunate-pyronaridine,0,0,2017,43,Mohnyin,Kachin,24.7833,96.3667,Department of Medical Research (Lower Myanmar),https://pubmed.ncbi.nlm.nih.gov/32524960/
+MOZ,Mozambique,Artesunate-pyronaridine,2.78,2.3,2020,72,Mopeia,Zambezia,-17.98,35.715,Centro de Investigação em Saúde de Manhiça,https://pubmed.ncbi.nlm.nih.gov/40660279/
+UGA,Uganda,Artesunate-pyronaridine,13,13,2022,62,Arua,Northern Region,3.0353,30.9108,"Department of Medicine, Makerere University",https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(25)00407-4/abstract
+VNM,Viet Nam,Artesunate-pyronaridine,7.1,6.5,2022,32,Krong Pa and Kbang districts,Gia Lai,13.4687,108.6721,"National Institute of Malariology, Parasitology and Entomology and the Institute of Malariology, Parasitology and Entomology Quy Nhon",
+KHM,Cambodia,Artesunate+atovaquone-proguanil,0,0,2014,73,Anlong Veng,Oddar Meanchey,14.2414,104.0943,US Army Armed Forces Research Institute of Medical Sciences,https://www.ncbi.nlm.nih.gov/pubmed/31660398
+VNM,Viet Nam,Artesunate+dihydroartemisinin-piperaquine,0,0,2015,30,Chu Rcam,Gia Lai,13.3082,108.6101,Institute of Tropical Medicine,https://pubmed.ncbi.nlm.nih.gov/30654808/
+AFG,Afghanistan,Artesunate+sulfadoxine-pyrimethamine,0,0,2016,57,Laghman Province,,34.66,70.2,National Malaria and Leishmaniasis Control Programme,
+IND,India,Artesunate+sulfadoxine-pyrimethamine,0,0,2017,58,Betul,Madhya Pradesh,21.9108,77.9012,"National Institute of Malaria Research, Indian Council of Medical Research",
+IRN,Iran (Islamic Republic of),Artesunate+sulfadoxine-pyrimethamine,0,0,2013,38,Sistan and Baluchestan Province,,27.53,60.5821,"Department of Medical Parasitology and Mycology, School of Public Health, Tehran University of Medical Sciences",https://www.ncbi.nlm.nih.gov/pubmed/17024359
+MLI,Mali,Artesunate+sulfadoxine-pyrimethamine,0,0,2013,117,Kati,Koulikoro,12.7454,-8.0738,"Department of Epidemiology of Parasitic Diseases, University of Sciences, Techniques and Technologies of Bamako",https://pubmed.ncbi.nlm.nih.gov/26811430/
+PAK,Pakistan,Artesunate+sulfadoxine-pyrimethamine,0,0,2017,93,Zhob,Balochistan,31.3413,69.4487,"Directorate of Malaria Control, Ministry of National Health Services, Regulations and Coordination",
+SDN,Sudan,Artesunate+sulfadoxine-pyrimethamine,16.4,16.4,2015,61,Damazin,Blue Nile,11.7855,34.3421,"Department of Biochemistry, Faculty of Medicine, University of Khartoum",https://www.ncbi.nlm.nih.gov/pubmed/28427409
+SOM,Somalia,Artesunate+sulfadoxine-pyrimethamine,12.3,12.1,2015,81,Bosaso,Bari,11.2847,49.1825,"Global Malaria Programme, World Health Organization",https://www.ncbi.nlm.nih.gov/pubmed/25583123
+YEM,Yemen,Artesunate+sulfadoxine-pyrimethamine,3.6,3.5,2014,84,Multiple sites,,15.3235,45.599,"Faculty of Medicine, University of Malaya",http://www.ncbi.nlm.nih.gov/pubmed/27234587
+KHM,Cambodia,Atovaquone-proguanil,1.5,1.5,2014,72,Anlong Veng,Oddar Meanchey,14.2414,104.0943,US Army Armed Forces Research Institute of Medical Sciences,https://www.ncbi.nlm.nih.gov/pubmed/31660398
+AGO,Angola,Dihydroartemisinin-piperaquine,2,2,2021,104,Benguela,Benguela Province,-12.5905,13.4165,"National Malaria Control Program, Ministry of Health",https://pubmed.ncbi.nlm.nih.gov/38421163/
+BFA,Burkina Faso,Dihydroartemisinin-piperaquine,18.7,16.4,2017,96,Gourcy,Zondoma,13.2036,-2.3567,Centre National de Recherche et de Formation sur le Paludisme,https://pubmed.ncbi.nlm.nih.gov/33468147/
+CHN,China,Dihydroartemisinin-piperaquine,3.2,3.1,2014,31,Menglian,Yunnan,22.3291,99.5842,"National Institute of Parasitic Diseases, Chinese Center for Disease Control and Prevention, WHO Collaborating Center for Malaria, Schistosomiasis and Filariasis",https://pubmed.ncbi.nlm.nih.gov/32928233/
+CMR,Cameroon,Dihydroartemisinin-piperaquine,0,,2018,138,Yaoundé,Mfoundi,3.848,11.5021,"Institut Toulousain des Maladies Infectieuses et Inflammatoires, Université Toulouse",https://pubmed.ncbi.nlm.nih.gov/34453535/
+COD,Democratic Republic of the Congo,Dihydroartemisinin-piperaquine,12,3,2018,88,Mikalayi,Kasaï-Oriental,-6.0246,22.3177,Centers for Disease Control and Prevention,https://pubmed.ncbi.nlm.nih.gov/34491220/
+ETH,Ethiopia,Dihydroartemisinin-piperaquine,0,0,2017,59,Pawe Special Woreda,Beneshangul Gumuz,11.3333,36.3333,Ethiopian Public Health Institute,https://pubmed.ncbi.nlm.nih.gov/36451216/
+GHA,Ghana,Dihydroartemisinin-piperaquine,9.7,,2020,83,Navrongo,Upper East Region,10.895,-1.0888,University of Ghana College of Health Sciences,https://pubmed.ncbi.nlm.nih.gov/36683700/
+GIN,Guinea,Dihydroartemisinin-piperaquine,0.4,,2011,268,Forécariah,Kindia,9.4377,-13.0935,"Malaria Research and Training Center, University of Sciences, Techniques and Technologies of Bamako",https://www.ncbi.nlm.nih.gov/pubmed/29606364
+GMB,Gambia,Dihydroartemisinin-piperaquine,0,0,2022,39,Kuntaur,,13.6707,-14.89,National Malaria Control Programme,
+GNB,Guinea-Bissau,Dihydroartemisinin-piperaquine,0,0,2012,140,Bissau,Bissau Autonomous Sector,11.8817,-15.6178,Projecto de Saúde de Bandim,https://www.ncbi.nlm.nih.gov/pubmed/27649561
+IDN,Indonesia,Dihydroartemisinin-piperaquine,2,1.9,2017,97,Keerom,Papua,-3.3,140.6167,Eijkman Institute for Molecular Biology,
+KEN,Kenya,Dihydroartemisinin-piperaquine,7,,2016,115,Siaya,,-0.0998,34.2747,"Kenya Medical Research Institute, Centre for Global Health Research",https://pubmed.ncbi.nlm.nih.gov/36036611/
+KHM,Cambodia,Dihydroartemisinin-piperaquine,28.3,27.8,2016,46,Siem Pang,Stung Treng,14.1125,106.3905,"National Center for Parasitology, Entomology and Malaria Control, Ministry of Health",
+LAO,Lao People's Democratic Republic,Dihydroartemisinin-piperaquine,32.4,32.4,2016,34,Champasak Province,,14.6579,105.97,"Center of Malariology, Parasitology and Entomology, Ministry of Public Health",
+MLI,Mali,Dihydroartemisinin-piperaquine,1.2,,2013,148,Doneguedougou and Torodo,Koulikoro,13.0569,-8.2069,"Malaria Research and Training Center, University of Sciences, Techniques and Technologies of Bamako",https://www.ncbi.nlm.nih.gov/pubmed/29606364
+MMR,Myanmar,Dihydroartemisinin-piperaquine,2,2,2019,50,Buthidaung,Rakhine,20.8695,92.5272,"Department of Medical Research, Ministry of Health and Sports",
+MOZ,Mozambique,Dihydroartemisinin-piperaquine,0,0,2020,86,Massinga,Inhambane,-23.332,35.382,Centro de Investigação em Saúde de Manhiça,https://pubmed.ncbi.nlm.nih.gov/40660279/
+MWI,Malawi,Dihydroartemisinin-piperaquine,0.8,,2013,120,Southern Region,,-14.9407,35.4782,Centro de Investigação em Saúde de Manhiça,https://www.ncbi.nlm.nih.gov/pubmed/31429785
+NER,Niger,Dihydroartemisinin-piperaquine,1.9,0.9,2013,152,Maradi,Maradi,13.4833,7.1,Epicentre,https://www.ncbi.nlm.nih.gov/pubmed/29370844
+NGA,Nigeria,Dihydroartemisinin-piperaquine,0,0,2018,90,Nkanu West,Enugu,6.304,7.5548,"National Malaria Elimination Programme, Federal Ministry of Health",
+PAK,Pakistan,Dihydroartemisinin-piperaquine,0,0,2015,80,Zhob,Balochistan,31.3413,69.4487,"World Health Organization, Pakistan",https://pubmed.ncbi.nlm.nih.gov/27515812/
+PNG,Papua New Guinea,Dihydroartemisinin-piperaquine,0,0,2012,54,Alotau,Milne Bay,-10.3157,150.4588,Papua New Guinea Institute of Medical Research,
+RWA,Rwanda,Dihydroartemisinin-piperaquine,3.3,3,2013,121,Gasabo,Kigali,-1.8833,30.1333,"Malaria and Other Parasitic Division, Institute of HIV/AIDS, Disease Prevention & Control (IHDPC), Rwanda Biomedical Center, Ministry of Health",https://www.ncbi.nlm.nih.gov/pubmed/30892640
+SDN,Sudan,Dihydroartemisinin-piperaquine,0,0,2019,78,Nyala,South Darfur,12.0364,24.8769,"Federal Ministry of Health, National Malaria Control Programme",
+SEN,Senegal,Dihydroartemisinin-piperaquine,2.4,,2018,84,Kedougou,Kedougou,12.5578,-12.2006,"Department of Parasitology and Mycology, Cheikh Anta Diop University",https://pubmed.ncbi.nlm.nih.gov/32483161/
+SLE,Sierra Leone,Dihydroartemisinin-piperaquine,2.3,2.2,2016,42,Bo,Southern Province,7.9564,-11.74,National Malaria Control Programme,https://www.ncbi.nlm.nih.gov/pubmed/29932931
+SOM,Somalia,Dihydroartemisinin-piperaquine,2.5,2.5,2016,80,Bosaso,Bari,11.2847,49.1825,"Global Malaria Programme, World Health Organization",https://pubmed.ncbi.nlm.nih.gov/31296223/
+TGO,Togo,Dihydroartemisinin-piperaquine,1.2,1.1,2021,84,Kouvé,Maritime,6.6564,1.4193,"Faculté des Sciences de la Santé, Université de Lomé",
+THA,Thailand,Dihydroartemisinin-piperaquine,5.9,5.9,2014,34,Sai Yok,Kanchanaburi,14.4758,98.8527,"Bureau of Vector Borne Disease, Department of Disease Control, Ministry of Public Health",
+TZA,United Republic of Tanzania,Dihydroartemisinin-piperaquine,1.1,,2017,89,Ilemela,Mwanza,-2.4045,32.961,"Department of Pharmacology, Catholic University of Health and Allied Sciences",https://pubmed.ncbi.nlm.nih.gov/34838151/
+UGA,Uganda,Dihydroartemisinin-piperaquine,5,5,2022,84,Agago,Northern Region,2.8333,33.3333,"Department of Medicine, Makerere University",https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(25)00407-4/abstract
+VNM,Viet Nam,Dihydroartemisinin-piperaquine,68.1,64.1,2019,72,Krông Năng,Dak Lak,13,108.417,"National Institute of Malariology, Parasitology and Entomology",
+ZMB,Zambia,Dihydroartemisinin-piperaquine,0,0,2016,31,Gwembe,Southern,-16.5,28,"National Malaria Control Center, Ministry of Health",
+KHM,Cambodia,Dihydroartemisinin-piperaquine+mefloquine,0,0,2015,29,Pailin,Pailin Province,12.7418,102.6331,"Mahidol-Oxford Tropical Medicine Research Unit, Faculty of Tropical Medicine, Mahidol University, Bangkok, Thailand; Centre for Tropical Medicine and Global Health, University of Oxford, Oxford, UK; The Open University, Milton Keynes, UK.",https://pubmed.ncbi.nlm.nih.gov/32171078/
+VNM,Viet Nam,Dihydroartemisinin-piperaquine+mefloquine,0,0,2015,57,Bu Gia Map,Binh Phuoc,12.0392,107.0539,"Mahidol Oxford Tropical Medicine Research Unit, Faculty of Tropical Medicine, Mahidol University, Bangkok, Thailand; Centre for Tropical Medicine and Global Health, Nuffield Department of Medicine, University of Oxford, Oxford, United Kingdom",https://pubmed.ncbi.nlm.nih.gov/32171078/
