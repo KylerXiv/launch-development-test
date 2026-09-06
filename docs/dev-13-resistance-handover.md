@@ -1,12 +1,14 @@
 # DEV-13 — WHO resistance overlay: working notes
 
 Handover written 5 Sep 2026, last updated 6 Sep 2026. Branch
-`feat/resistance-map-country-dots`, **pushed**.
+`feat/resistance-map-site-dots` (**V2, in progress**), branched off
+`feat/resistance-map-country-dots` (V1, frozen and pushed).
 
-**This is version 1 of two.** V1 draws one dot per country because this map has
-no zoom. V2 will follow WHO and draw one dot per study site with a pan/zoom
-map. V2 is not started and nothing here should be built toward it yet — see
-§1b for the split and why it exists.
+**V1 is frozen; V2 is what this branch is.** V1 drew one dot per country
+because the map could not zoom. V2 follows WHO and draws one dot per study
+site on a pan/zoom map. The zoom is now built (**D13**); the site layer is
+next, and the one decision blocking it is recorded as **D14** — read it before
+touching the data.
 
 Read this first: §1 for where things stand, §1b for the two-version
 plan, §6 for the decisions and why they were made (that's the part that's
@@ -18,11 +20,12 @@ expensive to reconstruct), §7 for what's left.
 
 | | |
 |---|---|
-| Branch | `feat/resistance-map-country-dots` (off `main` @ `6e3e739`) |
-| Version | **1 of 2** — country-level dots (see §1b) |
-| Commits | 16, all `DEV-13:` prefixed |
+| Branch | `feat/resistance-map-site-dots` (off `feat/resistance-map-country-dots` @ `f32384c`) |
+| Version | **2 of 2** — site-level dots on a pan/zoom map (see §1b) |
+| Commits | 17 — 16 inherited from V1, 1 new on this branch, all `DEV-13:` prefixed |
 | Working tree | clean |
-| Pushed | **yes**, 6 Sep 2026 |
+| Pushed | V1 yes (6 Sep 2026); **V2 not yet** |
+| V1 PR | **drafted, not yet opened** — see §7 |
 | CI locally | all green (0 errors, 3 warnings) |
 | Page affected | `illustrated-journey-dashboard.html` **only** |
 
@@ -43,7 +46,7 @@ means and whether the map zooms.
 | map | fixed 960×420 SVG, no zoom | pan/zoom |
 | dot value | aggregated across sites (see D6, D12) | that site's own most recent study |
 | detail | click → panel of every study | click → that site's history |
-| status | **frozen — see D12** | **next up, starts in a fresh session** |
+| status | **frozen — see D12** | **in progress on this branch** — zoom built (D13), site layer next (D14) |
 
 **Why V1 aggregates.** The basemap is fixed at 960×420 and **Myanmar occupies
 26×54 pixels** — its 35 study sites need ~61px² each and the box offers 39px².
@@ -66,8 +69,15 @@ fix. Do not let a reviewer discover it themselves.
 
 **V1 is now frozen** (6 Sep 2026). The colour rule was re-examined against WHO's
 published methodology and left unchanged — see **D12**, which is the section to
-read before starting V2, because the WHO standard it establishes is what V2
-should be built to.
+read before continuing V2, because the WHO standard it establishes is what V2
+is being built to.
+
+**V2 will not be a straight swap to site dots.** Decided 6 Sep 2026: the map
+shows country dots zoomed out and splits into site dots as you zoom in
+(**D14**). That keeps a readable world view — 84% of site dots overlap at 1x,
+which is exactly the problem V1 was shaped around — at the cost of keeping a
+country-level aggregation rule alive at low zoom. Which rule that should be is
+the open decision in D14.
 
 ## 2. What the feature is
 
@@ -90,10 +100,18 @@ panel below the map listing every study behind it.
 
 ---
 
-## 3. Committed so far (16 commits)
+## 3. Committed so far
+
+V2 (`feat/resistance-map-site-dots`):
 
 ```
-(pending)  WHO methodology check (D12), V1 frozen
+(pending)  pan/zoom on the country access map (D13)
+```
+
+V1 (`feat/resistance-map-country-dots`), inherited:
+
+```
+f32384c  record the WHO methodology check; freeze V1
 4bc972c  update the handover notes; add repo working conventions
 6fcc756  frame this branch as V1 of two, country dots
 813eecf  country totals in the tooltip, drop the selection summary
@@ -113,7 +131,7 @@ d7c870f  document the resistance layer and its manual export step
 
 ---
 
-## 4. What the 16 commits contain
+## 4. What the commits contain
 
 Roughly in build order:
 
@@ -129,9 +147,13 @@ Roughly in build order:
 | 14 | branch renamed to `…-country-dots`, framed as V1 of two; this document |
 | 15 | `CLAUDE.md` working conventions; handover corrections |
 | 16 | WHO methodology check (D12); V1 frozen, V2 handed the standard |
+| 17 | **V2 begins:** viewBox pan/zoom on the map (D13); no data change |
 
-Net against `main`: 9 files, ~2,400 insertions, no deletions outside files this
-branch created.
+Net against `main` at V1's tip (`f32384c`), measured with
+`git diff --ignore-cr-at-eol --stat origin/main...`: **11 files, 4,728
+insertions**, no deletions outside files this branch created. (An earlier
+draft of this section said 9 files / ~2,400 — it predated commits 14–16 and
+did not count the two CSVs.)
 
 ## 5. Files and what each does
 
@@ -364,40 +386,129 @@ WHO `.xlsx`. `CITATION_URL` is WHO's own column 17. Verified: 0 of 267 URLs and
 0 of 224 institutions appear in our data without being in the source file. The
 only things authored here are D10 and the D6 maths.
 
+**D13 — Zoom is a smaller viewBox, not a mapping library.** V2's first commit,
+and deliberately data-neutral: it changes no value and no dot, so the
+interaction can be reviewed on its own before the site layer lands.
+
+The projection (`PX`/`PY`) is a linear equirectangular transform fitted to
+lon −120..155 / lat −40..42, reproduced from `scripts/build-map.js`. Because it
+is linear, zooming needs no reprojection — the viewBox alone does it, and the
+page keeps its zero-dependency shape. `d3-zoom`/`d3-geo` was the alternative
+and was not taken: it would be the first runtime dependency on a page that has
+none, for behaviour that is ~150 lines here.
+
+What the viewBox scales, and therefore what has to be counter-scaled:
+
+| | fix | why |
+|---|---|---|
+| country borders, dot halos | `vector-effect: non-scaling-stroke` in CSS | at 8x a `.75`-unit border renders 6px wide and swallows the small countries it exists to separate |
+| dot radius | `r = 4.4 / k`, set in `applyZoom()` **and** at creation in `drawResistance` | a dot must mean the same thing at every zoom. Setting it in both places is not redundant: a drug change redraws dots while zoomed |
+
+Verified in a headless browser across 1x → 4.1x → 8x → reset: the dot's
+measured screen radius holds at 9.95–10.08 px throughout, the viewBox clamps
+inside the basemap at every pan, and a dot's click still opens its study panel.
+
+*Interaction choices worth not re-litigating.* **Ctrl/⌘ + wheel, never a bare
+wheel** — the map sits mid-page and swallowing the page's scroll to zoom it is
+the most complained-about behaviour in embedded maps; the affordance line under
+the map states it. **Drag pans only above 1x**, so `.mapwrap`'s own horizontal
+scroll on narrow screens behaves exactly as it always has. A drag that ends
+over a dot is swallowed by a **capture-phase** click listener, so panning never
+opens a study panel by accident. Zoom buttons plus arrow-key panning give
+keyboard parity; the level readout is `aria-live`.
+
+**`ZMAX = 8`, and it is set by the basemap, not the data.** `world-map.js` is
+Natural Earth 110m: past ~8x its coastlines read as visible straight-line
+facets (screenshotted at 12x to confirm). 8x is also more than the site layer
+needs — it puts Myanmar, the worst case at 26×54 px, at 208×432 px for its 35
+sites. **Raising this means shipping a 50m basemap first**, which would also
+retire one of the three standing validator warnings (7 country values the 110m
+map does not draw). Considered and deferred: it is a basemap swap and a review
+of its own.
+
+**D14 — OPEN: country dots zoomed out, site dots zoomed in.** Decided 6 Sep
+2026 that V2 is a level-of-detail map rather than a straight swap to site dots.
+The alternative — plot every site always and let the user zoom, as WHO does —
+was rejected because our map opens at world scale where 84% of site dots
+overlap, and a first impression of an unreadable smear is worse than an honest
+aggregate.
+
+**The consequence is that V1's aggregation does not go away, and its weakest
+part is exactly the part with no WHO rule behind it.** D12 established that the
+within-year maths is already WHO's pooled proportion and must not be touched;
+the choice of *which year* is ours alone, and it is what makes Kenya read 0%.
+So the low-zoom dot still needs a rule, and this is the decision to take before
+any site-layer code is written:
+
+| option | what the zoomed-out dot means | cost |
+|---|---|---|
+| **keep V1's rule** | most recent study year, pooled across that year's sites | ships as-is; Kenya and Cambodia still read 0%, and the two zoom levels disagree about the same country |
+| **roll up the site dots** (recommended) | each site's most recent study, pooled by patients — WHO's own per-site rule, aggregated | **97 of 267 dots change value (45 up, 52 down), 22 change colour band** (measured in D12). A dot then mixes years, so "Study year" becomes a range |
+
+The second is worth the churn for a reason that only appears now that both
+levels exist on one map: it makes the zoomed-out dot *literally the roll-up of
+the dots you see when you zoom in*, so the two levels can never contradict each
+other. Under V1's rule they can, and a reviewer who zooms in on Kenya would be
+the one to find it.
+
+Not yet decided. Whoever takes it should also settle what the dot count means
+in the drug list (§D8) once a country can expand into sites.
+
 ---
 
 ## 7. What's left
+
+### V2, in build order
+
+1. **Decide D14** — what the zoomed-out country dot means now that a
+   site-level dot exists underneath it. Nothing else in the site layer should
+   be written first; the answer decides the shape of the data the renderer
+   reads.
+2. **Emit site-level cells from the normalizer.** `studies[]` already ships all
+   1,633 studies, so this is a second derived structure beside
+   `treatmentFailure`, not a re-ingest. No new WHO extract is needed.
+3. **Render site dots above a zoom threshold**, country dots below it, with one
+   crossfade and one rule for which is showing. Pick the threshold from
+   Myanmar: it is the densest case and the one that set `ZMAX`.
+4. **The click panel changes meaning at site level** — D4 put every study
+   behind a country in the panel; a site dot should open that site's own
+   history. Decide whether the country panel survives at low zoom.
 
 ### V1 is frozen
 
 Decided 6 Sep 2026: V1 ships as it stands. The colour rule was re-examined
 against WHO's published methodology and confirmed correct for within-year
 aggregation (**D12**) — so there is nothing to fix here, not merely nothing
-worth fixing. V2 begins in a fresh session and should be built to the standard
-D12 sets out.
+worth fixing.
 
-### Not in this branch — that is V2
+### The "most recent year" weakness — V1's known limitation, now D14's decision
 
-The "most recent year" weakness described in §1b is **deliberate scope**, not an
-open defect. Do not fix it here: changing the aggregation moves 97 of 267 dots
-and 22 colour bands, which is a review in its own right, and V2 removes the need
-for aggregation altogether.
+Deliberate scope in V1, not an open defect there: changing the aggregation
+moves 97 of 267 dots and 22 colour bands, which is a review in its own right.
 
-Kept here because it is the measured case for V2, and the numbers are tedious to
-rederive:
+It does **not** disappear in V2. Because V2 keeps country dots at low zoom
+(**D14**), a country-level rule is still needed and this is what it has to
+answer. The measured case, kept because the numbers are tedious to rederive:
 
 | | dot uses | ignores | dot reads |
 |---|---|---|---|
 | Cambodia · ASPY | 9 patients (2020) | 354 patients, incl. Pailin 18% (2014) | 0% |
 | Kenya · AL | 44 patients (2018) | 883 patients, incl. Siaya 11.5% (2016) | 0% |
 
-If V2 slips and a stopgap is wanted for V1, the cheapest honest option is WHO's
-per-site rule applied at country level: take each site's most recent study, then
-patient-weight the sites. Measured — Cambodia 0% → **5.03%**, Kenya 0% → **3.71%**,
-and 95 of 274 dots change. It is a middle step, not a substitute for V2.
+WHO's per-site rule applied at country level — each site's most recent study,
+then patient-weighted across sites — fixes both: Cambodia 0% → **5.03%**,
+Kenya 0% → **3.71%**, with 95 of 274 dots changing. In V1 this was a stopgap
+worth avoiding. In V2 it is the recommended option in D14, because it also makes
+the zoomed-out dot the exact roll-up of the site dots underneath it.
 
 ### Then
-1. **Open the PR.** Three things belong in the description:
+1. **Open V1's PR.** A full description is drafted and covers all three points
+   below; it was handed over in the 6 Sep session rather than committed,
+   because it is a PR body and not a repo artefact. There is **no `gh` CLI on
+   this machine**, so it is opened by hand at
+   <https://github.com/Keith-paradox/launch-development/compare/main...feat/resistance-map-country-dots?expand=1>.
+   Note that V2 is branched off V1, so the two are stacked — review feedback on
+   V1 lands underneath this branch. Three things belong in the description:
    - This is **V1 of two** and it ships with a known limitation: the map
      understates countries whose most recent study year was small (Kenya 0%,
      Cambodia 0% — see §1b). The panel shows the full history so nothing is
@@ -411,11 +522,7 @@ and 95 of 274 dots change. It is a middle step, not a substitute for V2.
      WHO covers that the 110m basemap doesn't draw, 730 studies with no citation
      URL, 1 study with no site name in WHO's own data. Provenance debt, flagged
      deliberately in the repo's existing warn-don't-block style.
-2. **Start V2 in a fresh session.** Branch from this one, not `main`, so it
-   inherits the normalizer and data file unchanged (§8). Read §1b and **D12**
-   first — D12 carries the WHO standard V2 should be built to, and the
-   measurements behind it are tedious to rederive.
-3. **Talk to the team about ticket scope.** DEV-13 says all three study-result
+2. **Talk to the team about ticket scope.** DEV-13 says all three study-result
    types; one is built. Either re-scope the ticket to this and raise DEV-13b/c,
    or agree it lands as partial.
 
@@ -460,12 +567,16 @@ Kept for the record. Nothing was staged; everything was already committed.
 No bot commit follows a push to this branch: `publish.yml` is scoped to
 `branches: [main]`, so it only runs when the PR merges. See §9.
 
-When V2 starts, branch it from this one rather than from `main`, so it inherits
-the normalizer and data file unchanged:
+### V2 branched — done 6 Sep 2026
+
+Branched off V1 rather than `main`, so it inherits the normalizer and data file
+unchanged:
 
 ```powershell
 git switch -c feat/resistance-map-site-dots
 ```
+
+Not yet pushed. `publish.yml` does not fire on it either (§9).
 
 ### Verify before committing
 
@@ -484,6 +595,10 @@ python -m http.server 8000                    # then open illustrated-journey-da
 **Line endings.** Files on disk are CRLF; the repo stores LF. `core.autocrlf`
 is set to `input` locally, so `git status` is clean and commits normalise
 correctly — but **raw `git diff` shows whole-file churn**. Always review with:
+
+(Checked 6 Sep 2026: `illustrated-journey-dashboard.html` is in fact pure LF on
+disk — 0 CRLF pairs — so the churn does not affect the one file V2 edits most.
+Verify per file rather than assuming; the flag below is harmless either way.)
 
 ```powershell
 git diff --ignore-cr-at-eol --stat

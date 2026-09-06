@@ -445,8 +445,18 @@
   .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .mapwrap { position: relative; overflow-x: auto; }
-  .mapwrap svg { display: block; width: 100%; min-width: 640px; height: auto; background: var(--surface-2); border-radius: 10px; }
-  .mapwrap path { fill: var(--map-nodata); stroke: var(--map-border); stroke-width: .75; cursor: help; }
+  .mapwrap svg { display: block; width: 100%; min-width: 640px; height: auto; background: var(--surface-2); border-radius: 10px;
+                 /* vertical page scroll still belongs to the page; horizontal drag is ours */
+                 touch-action: pan-y; }
+  .mapwrap.zoomed svg { cursor: grab; }
+  .mapwrap.zoomed.panning svg { cursor: grabbing; }
+  /* Strokes and dot radii are screen furniture, not geography. The viewBox zoom
+     scales everything inside it, so at 8x a .75-unit border would render 6px
+     wide and swallow the small countries it is meant to separate.
+     non-scaling-stroke pins every stroke to the device; dot radii are
+     counter-scaled in applyZoom() for the same reason. */
+  .mapwrap path { fill: var(--map-nodata); stroke: var(--map-border); stroke-width: .75; cursor: help;
+                  vector-effect: non-scaling-stroke; }
   /* One hue per stage, 60 deg apart, each clearing 3:1 against the no-data fill
      and the ocean, and all three clear of the status ramp (green / amber / red)
      so a colour never reads as good-or-bad. Lightness still descends across the
@@ -537,7 +547,22 @@
   .resdot.b2, .mapwrap circle.b2 { background: #FB9A50; fill: #FB9A50; }
   .resdot.b3, .mapwrap circle.b3 { background: #EF5F13; fill: #EF5F13; }
   .resdot.b4, .mapwrap circle.b4 { background: #C21807; fill: #C21807; }
-  .mapwrap circle.res-dot { stroke: var(--map-nodata, #FFFFFF); stroke-width: 1; cursor: help; }
+  .mapwrap circle.res-dot { stroke: var(--map-nodata, #FFFFFF); stroke-width: 1; cursor: help;
+                            vector-effect: non-scaling-stroke; }
+  /* Zoom controls sit over the map's top-right corner. .map-empty is inset:0
+     with pointer-events:none, so this only needs to out-stack it, not dodge it. */
+  .map-zoom { position: absolute; top: 8px; right: 8px; z-index: 2; display: flex; align-items: center; gap: 4px; }
+  .map-zoom button {
+    font: inherit; font-size: 12px; font-weight: 650; line-height: 1;
+    min-width: 26px; height: 26px; padding: 0 7px; cursor: pointer; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--map-border); border-radius: 6px;
+  }
+  .map-zoom button:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-3); }
+  .map-zoom button:disabled { opacity: .4; cursor: default; }
+  .map-zoom button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .map-zoom .lvl { font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--ink-3);
+                   min-width: 2.6em; text-align: right; padding-right: 2px; }
+  .map-hint { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 6px 0 0; }
   .mapwrap circle.res-dot:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
   .timing-axis { position: relative; height: 18px; margin-left: 150px; }
@@ -650,6 +675,7 @@
       <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
     </div>
     <div class="mapwrap" id="mapwrap"></div>
+    <p class="map-hint" id="map-hint">Drag to pan · Ctrl + scroll or double-click to zoom · arrow keys pan when the map has focus</p>
     <div class="map-overlay" id="map-overlay" hidden></div>
     <div class="map-legend">
       <span class="key"><span class="mapsw registered"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
@@ -1271,7 +1297,158 @@
     const paths = Object.entries(M.countries).map(([iso3, c]) =>
       `<path data-iso3="${iso3}" data-name="${esc(c.n)}" d="${c.d}"></path>`).join("");
     wrap.innerHTML = `<svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="World map of country access">${paths}</svg>
-      <div class="map-empty" id="map-empty" hidden></div>`;
+      <div class="map-empty" id="map-empty" hidden></div>
+      <div class="map-zoom" role="group" aria-label="Map zoom">
+        <span class="lvl" id="mz-lvl" aria-live="polite"></span>
+        <button type="button" id="mz-out" aria-label="Zoom out" disabled>\u2212</button>
+        <button type="button" id="mz-in" aria-label="Zoom in">+</button>
+        <button type="button" id="mz-reset" aria-label="Reset zoom to whole map" disabled>Reset</button>
+      </div>`;
+
+    // ---- map pan / zoom ---------------------------------------------------
+    // Built for V2. V1 draws one dot per country because this map cannot zoom:
+    // Myanmar is 26x54 pixels against 35 study sites, and plotting WHO's own
+    // unit — the study site — would put 84% of dots on top of another one.
+    // Zoom is the thing that makes a site-level layer legible, so it lands
+    // first and on its own. This block changes no data and no dot value.
+    //
+    // The projection below (PX/PY) is a linear equirectangular transform, so
+    // zooming is nothing more than a smaller viewBox — no reprojection, no
+    // library, in keeping with the rest of the page.
+    const Z = { k: 1, x: 0, y: 0 };
+    // ZMAX is set by the basemap, not by the data: world-map.js is Natural
+    // Earth 110m, and past ~8x its coastlines read as visible straight-line
+    // facets. 8x is also more than the site layer needs — it puts Myanmar, the
+    // worst case at 26x54 px, at 208x432 px for its 35 sites. Raising this
+    // means shipping a 50m basemap first.
+    const ZMAX = 8, ZSTEP = 1.6, DOT_R = 4.4;
+
+    function applyZoom() {
+      // clamp first: k within range, then the window inside the map, so the
+      // viewBox can never show ocean off the edge of the basemap
+      Z.k = Math.min(ZMAX, Math.max(1, Z.k));
+      const vw = M.w / Z.k, vh = M.h / Z.k;
+      Z.x = Math.min(M.w - vw, Math.max(0, Z.x));
+      Z.y = Math.min(M.h - vh, Math.max(0, Z.y));
+
+      const svg = wrap.querySelector("svg");
+      if (!svg) return;
+      svg.setAttribute("viewBox",
+        `${Z.x.toFixed(2)} ${Z.y.toFixed(2)} ${vw.toFixed(2)} ${vh.toFixed(2)}`);
+      // a dot means the same thing at every zoom, so it keeps the same screen size
+      svg.querySelectorAll("circle.res-dot").forEach((c) =>
+        c.setAttribute("r", (DOT_R / Z.k).toFixed(2)));
+
+      wrap.classList.toggle("zoomed", Z.k > 1);
+      const btn = (id) => document.getElementById(id);
+      if (btn("mz-in")) btn("mz-in").disabled = Z.k >= ZMAX;
+      if (btn("mz-out")) btn("mz-out").disabled = Z.k <= 1;
+      if (btn("mz-reset")) btn("mz-reset").disabled = Z.k === 1;
+      if (btn("mz-lvl")) btn("mz-lvl").textContent =
+        Z.k > 1 ? Z.k.toFixed(1).replace(/\.0$/, "") + "\u00d7" : "";
+    }
+
+    // Zoom about a fixed point in MAP units: whatever sits under the cursor
+    // stays under it. Buttons pass the centre of the current view.
+    function zoomAt(k1, mx, my) {
+      const k0 = Z.k;
+      Z.k = Math.min(ZMAX, Math.max(1, k1));
+      Z.x = mx - (mx - Z.x) * (k0 / Z.k);
+      Z.y = my - (my - Z.y) * (k0 / Z.k);
+      applyZoom();
+    }
+    const viewCentre = () => ({ x: Z.x + M.w / Z.k / 2, y: Z.y + M.h / Z.k / 2 });
+
+    // client px -> map units. The viewBox aspect matches the rendered box
+    // (width:100%, height:auto), so there is no letterboxing to correct for.
+    function toMap(clientX, clientY) {
+      const r = wrap.querySelector("svg").getBoundingClientRect();
+      return {
+        x: Z.x + ((clientX - r.left) / r.width) * (M.w / Z.k),
+        y: Z.y + ((clientY - r.top) / r.height) * (M.h / Z.k)
+      };
+    }
+
+    {
+      const svg = wrap.querySelector("svg");
+
+      document.getElementById("mz-in").addEventListener("click", () => {
+        const c = viewCentre(); zoomAt(Z.k * ZSTEP, c.x, c.y);
+      });
+      document.getElementById("mz-out").addEventListener("click", () => {
+        const c = viewCentre(); zoomAt(Z.k / ZSTEP, c.x, c.y);
+      });
+      document.getElementById("mz-reset").addEventListener("click", () => {
+        Z.k = 1; Z.x = 0; Z.y = 0; applyZoom();
+      });
+
+      // Ctrl/Cmd + wheel, never a bare wheel: this map is mid-page, and
+      // swallowing the page's scroll to zoom it is the single most complained-
+      // about behaviour in embedded maps. The affordance line says so.
+      svg.addEventListener("wheel", (ev) => {
+        if (!ev.ctrlKey && !ev.metaKey) return;
+        ev.preventDefault();
+        const m = toMap(ev.clientX, ev.clientY);
+        zoomAt(Z.k * (ev.deltaY < 0 ? ZSTEP : 1 / ZSTEP), m.x, m.y);
+      }, { passive: false });
+
+      svg.addEventListener("dblclick", (ev) => {
+        if (ev.target.classList.contains("res-dot")) return;   // that click opens the panel
+        const m = toMap(ev.clientX, ev.clientY);
+        zoomAt(Z.k * ZSTEP, m.x, m.y);
+      });
+
+      // Drag to pan, but only once zoomed — at 1x the map fits, and leaving
+      // drag alone keeps .mapwrap's own horizontal scroll working on narrow
+      // screens, which is how this map has always behaved.
+      let drag = null, moved = false;
+      svg.addEventListener("pointerdown", (ev) => {
+        if (Z.k <= 1 || ev.button !== 0 || ev.target.closest(".map-zoom")) return;
+        drag = { cx: ev.clientX, cy: ev.clientY, x: Z.x, y: Z.y };
+        moved = false;
+        svg.setPointerCapture(ev.pointerId);
+        wrap.classList.add("panning");
+      });
+      svg.addEventListener("pointermove", (ev) => {
+        if (!drag) return;
+        const r = svg.getBoundingClientRect();
+        const dx = (ev.clientX - drag.cx) / r.width * (M.w / Z.k);
+        const dy = (ev.clientY - drag.cy) / r.height * (M.h / Z.k);
+        if (Math.abs(ev.clientX - drag.cx) > 4 || Math.abs(ev.clientY - drag.cy) > 4) moved = true;
+        Z.x = drag.x - dx; Z.y = drag.y - dy;
+        applyZoom();
+      });
+      const endDrag = (ev) => {
+        if (!drag) return;
+        drag = null;
+        wrap.classList.remove("panning");
+        try { svg.releasePointerCapture(ev.pointerId); } catch (e) {}
+      };
+      svg.addEventListener("pointerup", endDrag);
+      svg.addEventListener("pointercancel", endDrag);
+      // A drag that happens to finish over a dot must not also open that dot's
+      // study panel. Capture phase, so this runs before the circle's own
+      // click listener rather than after it.
+      svg.addEventListener("click", (ev) => {
+        if (moved) { moved = false; ev.stopPropagation(); ev.preventDefault(); }
+      }, true);
+
+      // Keyboard parity: the buttons cover zoom, arrows cover pan. Country
+      // paths are focusable, so this fires with a country selected too.
+      wrap.addEventListener("keydown", (ev) => {
+        if (Z.k <= 1 || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+        const step = (M.w / Z.k) * 0.12;
+        if (ev.key === "ArrowLeft") Z.x -= step;
+        else if (ev.key === "ArrowRight") Z.x += step;
+        else if (ev.key === "ArrowUp") Z.y -= step * (M.h / M.w);
+        else if (ev.key === "ArrowDown") Z.y += step * (M.h / M.w);
+        else return;
+        ev.preventDefault();
+        applyZoom();
+      });
+
+      applyZoom();
+    }
 
     let mapProduct = "", mapStatus = "";
     const tabs = document.getElementById("maptabs");
@@ -1568,7 +1745,7 @@
         c.setAttribute("class", "res-dot " + bandOf(e.v));
         c.setAttribute("cx", PX(e.lon).toFixed(1));
         c.setAttribute("cy", PY(e.lat).toFixed(1));
-        c.setAttribute("r", "4.4");
+        c.setAttribute("r", (DOT_R / Z.k).toFixed(2));
         c.setAttribute("tabindex", "0");
         c.setAttribute("role", "button");
         // Same tooltip grammar as the country cards: a title, label/value rows,
