@@ -5,10 +5,10 @@ Handover written 5 Sep 2026, last updated 6 Sep 2026. Branch
 `feat/resistance-map-country-dots` (V1, frozen and pushed).
 
 **V1 is frozen; V2 is what this branch is.** V1 drew one dot per country
-because the map could not zoom. V2 follows WHO and draws one dot per study
-site on a pan/zoom map. The zoom is now built (**D13**); the site layer is
-next, and the one decision blocking it is recorded as **D14** — read it before
-touching the data.
+because the map could not zoom. V2 follows WHO and draws **one dot per study
+site** on a pan/zoom map. Both halves are built: the zoom (**D13**) and the
+site layer with its clustering (**D14**, **D15**). Country dots are gone
+entirely, and with them the country aggregation rule that made Kenya read 0%.
 
 Read this first: §1 for where things stand, §1b for the two-version
 plan, §6 for the decisions and why they were made (that's the part that's
@@ -22,7 +22,7 @@ expensive to reconstruct), §7 for what's left.
 |---|---|
 | Branch | `feat/resistance-map-site-dots` (off `feat/resistance-map-country-dots` @ `f32384c`) |
 | Version | **2 of 2** — site-level dots on a pan/zoom map (see §1b) |
-| Commits | 17 — 16 inherited from V1, 1 new on this branch, all `DEV-13:` prefixed |
+| Commits | 18 — 16 inherited from V1, 2 new on this branch, all `DEV-13:` prefixed |
 | Working tree | clean |
 | Pushed | V1 yes (6 Sep 2026); **V2 not yet** |
 | V1 PR | **drafted, not yet opened** — see §7 |
@@ -46,7 +46,7 @@ means and whether the map zooms.
 | map | fixed 960×420 SVG, no zoom | pan/zoom |
 | dot value | aggregated across sites (see D6, D12) | that site's own most recent study |
 | detail | click → panel of every study | click → that site's history |
-| status | **frozen — see D12** | **in progress on this branch** — zoom built (D13), site layer next (D14) |
+| status | **frozen — see D12** | **built** — zoom (D13), site dots and clustering (D14, D15) |
 
 **Why V1 aggregates.** The basemap is fixed at 960×420 and **Myanmar occupies
 26×54 pixels** — its 35 study sites need ~61px² each and the box offers 39px².
@@ -72,12 +72,13 @@ published methodology and left unchanged — see **D12**, which is the section t
 read before continuing V2, because the WHO standard it establishes is what V2
 is being built to.
 
-**V2 will not be a straight swap to site dots.** Decided 6 Sep 2026: the map
-shows country dots zoomed out and splits into site dots as you zoom in
-(**D14**). That keeps a readable world view — 84% of site dots overlap at 1x,
-which is exactly the problem V1 was shaped around — at the cost of keeping a
-country-level aggregation rule alive at low zoom. Which rule that should be is
-the open decision in D14.
+**V2 has no country dots at all.** Decided 6 Sep 2026: every mark is a study
+site, and sites too close to draw apart merge into a numbered cluster that
+splits as you zoom (**D14**, **D15**). The world view stays readable — 80% of
+site dots would otherwise overlap at 1x, which is the problem V1 was shaped
+around — without any country aggregation rule surviving anywhere. **That closes
+the Kenya problem rather than relocating it:** Kilifi and Siaya are now separate
+dots showing their own results, so nothing has to choose between them.
 
 ## 2. What the feature is
 
@@ -105,7 +106,8 @@ panel below the map listing every study behind it.
 V2 (`feat/resistance-map-site-dots`):
 
 ```
-(pending)  pan/zoom on the country access map (D13)
+(pending)  one dot per study site (D14, D15)
+fdbbf48    pan/zoom on the country access map (D13)
 ```
 
 V1 (`feat/resistance-map-country-dots`), inherited:
@@ -148,6 +150,7 @@ Roughly in build order:
 | 15 | `CLAUDE.md` working conventions; handover corrections |
 | 16 | WHO methodology check (D12); V1 frozen, V2 handed the standard |
 | 17 | **V2 begins:** viewBox pan/zoom on the map (D13); no data change |
+| 18 | one dot per study site, clustered by proximity (D14, D15); no data change |
 
 Net against `main` at V1's tip (`f32384c`), measured with
 `git diff --ignore-cr-at-eol --stat origin/main...`: **11 files, 4,728
@@ -162,8 +165,8 @@ did not count the two CSVs.)
 | `sourcing/raw/mtm/2026-09-05-tes.csv` | The WHO extract, verbatim. 1,642 rows. Committed so CI and teammates never touch Excel. |
 | `scripts/normalize-resistance.js` | Reads that CSV → writes the two outputs below. Zero dependencies, no network. |
 | `sourcing/staging/resistance_tes.csv` | Auditable intermediate: every study, one row each. |
-| `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633, backs the panel) + `treatmentFailure` (274 aggregated country dots). |
-| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` to find the block. |
+| `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **Unchanged by V2 — byte-identical to V1.** |
+| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer, `---- map pan / zoom` for D13, and `---- site-level marks` for D14/D15. The only file V2 changes. |
 | `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). |
 
 ### Current numbers
@@ -426,53 +429,107 @@ retire one of the three standing validator warnings (7 country values the 110m
 map does not draw). Considered and deferred: it is a basemap swap and a review
 of its own.
 
-**D14 — OPEN: country dots zoomed out, site dots zoomed in.** Decided 6 Sep
-2026 that V2 is a level-of-detail map rather than a straight swap to site dots.
-The alternative — plot every site always and let the user zoom, as WHO does —
-was rejected because our map opens at world scale where 84% of site dots
-overlap, and a first impression of an unreadable smear is worse than an honest
-aggregate.
+**D14 — RESOLVED: no country dots. Every mark is a study site.** Opened and
+closed 6 Sep 2026. The question was what a zoomed-out country dot should mean
+once site dots existed beneath it; the answer was that it should not exist.
 
-**The consequence is that V1's aggregation does not go away, and its weakest
-part is exactly the part with no WHO rule behind it.** D12 established that the
-within-year maths is already WHO's pooled proportion and must not be touched;
-the choice of *which year* is ours alone, and it is what makes Kenya read 0%.
-So the low-zoom dot still needs a rule, and this is the decision to take before
-any site-layer code is written:
+Three options were on the table, all measured first:
 
-| option | what the zoomed-out dot means | cost |
+| option | what it meant | why not |
 |---|---|---|
-| **keep V1's rule** | most recent study year, pooled across that year's sites | ships as-is; Kenya and Cambodia still read 0%, and the two zoom levels disagree about the same country |
-| **roll up the site dots** (recommended) | each site's most recent study, pooled by patients — WHO's own per-site rule, aggregated | **97 of 267 dots change value (45 up, 52 down), 22 change colour band** (measured in D12). A dot then mixes years, so "Study year" becomes a range |
+| keep V1's rule at low zoom | most recent study year, pooled across that year's sites | Kenya and Cambodia still read 0%, and zooming in shows site dots that visibly disagree with the country dot above them |
+| roll up the site dots at low zoom | each site's latest study, pooled by patients | correct, and it makes the two levels agree — but it keeps a country aggregation rule alive for no reason once clustering exists |
+| **always site dots, clustered** | sites too close to draw apart merge into one numbered mark | **chosen.** No country rule survives anywhere, which is what D12 said WHO's own practice implies |
 
-The second is worth the churn for a reason that only appears now that both
-levels exist on one map: it makes the zoomed-out dot *literally the roll-up of
-the dots you see when you zoom in*, so the two levels can never contradict each
-other. Under V1's rule they can, and a reviewer who zooms in on Kenya would be
-the one to find it.
+**The roll-up rule was not discarded — it became the CLUSTER rule.** A cluster
+is the patient-weighted pool of its members' most recent studies, which is
+exactly what the second option would have computed for a country. So a cluster
+is the sum of the dots it is hiding, and no zoom level can contradict another.
+Verified against an independent recomputation straight from `studies[]`: across
+every mark at every zoom the divergence is at most **0.0049 pp** — rounding, the
+same standard D12 held V1's 274 dots to.
 
-Not yet decided. Whoever takes it should also settle what the dot count means
-in the drug list (§D8) once a country can expand into sites.
+**What this closes.** V1's known limitation, stated in its PR, was that a
+country whose most recent year was small reads too low — Kenya 0% off 44
+patients while Siaya measured 11.5% on 104. There is now no country value to be
+wrong: Kilifi and Siaya are separate dots, each showing its own study. The
+"which year" choice, the one part of V1 with no WHO rule behind it (D12), is
+gone rather than improved.
+
+**D15 — Clustering: within a country, in screen pixels, recomputed per zoom.**
+The mechanism that makes "one dot per site" survive a world view.
+
+*Why clustering rather than raw site dots.* At 1x, 300 of the 376
+Artemether-lumefantrine sites sit within a dot's width of another. WHO can plot
+raw sites because their map opens at a zoom the reader chooses; ours opens at
+world scale, where the honest picture of 376 sites is an unreadable smear.
+
+*Recomputed on zoom, never on pan.* What overlaps is a function of `k` alone, so
+`applyZoom` rebuilds the marks when `k` changes and does nothing while dragging.
+
+*A cluster never crosses a border.* Not cartography — the rest of the page: the
+fill layer, D11's tooltip grammar and the study panel are all country-scoped,
+and a mark spanning Kenya and Tanzania could be labelled in none of them.
+
+**The cost of that rule, measured:** within a country nothing overlaps at any
+zoom (verified: **0 same-country overlaps** at 1x, 2.6x, 6.6x and 8x). Across a
+border marks still can, because they may never merge — Myanmar/Thailand,
+DRC/Congo, Eritrea/Ethiopia. **61 overlapping pairs at 1x, falling to 4 at 8x.**
+Zoom is the answer, and marks are drawn biggest-first so the smaller of an
+overlapping pair sits on top and stays hoverable; keyboard already reached both,
+since every mark is focusable regardless of what is painted over it.
+
+*Rejected — nudging colliding marks apart.* It would have cleared the last four
+overlaps, but a dot whose position is adjusted is no longer at its study site,
+and this map's whole claim is that the position is WHO's.
+
+**A bug worth recording, because the same mistake is easy to repeat.** The first
+implementation used one fixed merge distance calibrated on the site dot's
+radius. Clusters are drawn much larger, so two adjacent clusters passed the
+"far enough apart" test and still overlapped on screen — **71 overlapping pairs
+at 1x, the worst by 12 px.** The fix is that the distance two marks need is the
+sum of *their own* radii plus a gap, recomputed as a mark grows during a pass.
+Same-country overlaps went to zero. Any future change to a mark's size has to go
+through `radiusOf`, or this returns.
+
+*Not a WHO rule, and the page says so.* WHO publishes no clustering methodology
+because their map does not need one. The rule beside the legend states plainly
+that the merging of nearby sites is ours and every value is WHO's, and the
+provenance note repeats it. This is the only thing on the resistance layer
+authored here besides D10 and the D6 maths.
 
 ---
 
 ## 7. What's left
 
-### V2, in build order
+### V2 — what is built
 
-1. **Decide D14** — what the zoomed-out country dot means now that a
-   site-level dot exists underneath it. Nothing else in the site layer should
-   be written first; the answer decides the shape of the data the renderer
-   reads.
-2. **Emit site-level cells from the normalizer.** `studies[]` already ships all
-   1,633 studies, so this is a second derived structure beside
-   `treatmentFailure`, not a re-ingest. No new WHO extract is needed.
-3. **Render site dots above a zoom threshold**, country dots below it, with one
-   crossfade and one rule for which is showing. Pick the threshold from
-   Myanmar: it is the densest case and the one that set `ZMAX`.
-4. **The click panel changes meaning at site level** — D4 put every study
-   behind a country in the panel; a site dot should open that site's own
-   history. Decide whether the country panel survives at low zoom.
+Done, in two commits:
+
+1. **Pan/zoom** (D13) — viewBox only, capped at 8x by the 110m basemap.
+2. **One dot per study site** (D14) — derived in the browser from `studies[]`,
+   each site coloured by its own most recent study.
+3. **Proximity clustering** (D15) — nearby sites merge into a numbered mark,
+   recomputed per zoom, never crossing a border.
+4. **The panel narrows with the dot** — a site dot opens that site's history, a
+   cluster opens its members'. D4 put every study behind a country in the
+   panel; what you click is now what you get.
+
+**`data/resistance.js` is untouched by V2** — byte-identical to V1, no
+regeneration, nothing in the data for a reviewer to re-check. The whole site
+layer is derived at render time from `studies[]`, which already shipped all
+1,633 studies to back V1's panel.
+
+### V2 — still open
+
+- **`treatmentFailure` is now only an index.** It still backs the drug and
+  species country counts, but nothing positions or colours from it. Either
+  document it as a count index or have the normalizer stop emitting the
+  aggregate — it is 274 values that no longer appear on the page.
+- **The legend band attribution** (below) applies unchanged; V2 reuses the same
+  four bands.
+- **Cross-border overlap** — 4 pairs at maximum zoom. See D15 for why it is
+  left alone.
 
 ### V1 is frozen
 
@@ -481,25 +538,25 @@ against WHO's published methodology and confirmed correct for within-year
 aggregation (**D12**) — so there is nothing to fix here, not merely nothing
 worth fixing.
 
-### The "most recent year" weakness — V1's known limitation, now D14's decision
+### The "most recent year" weakness — V1's known limitation, closed in V2
 
 Deliberate scope in V1, not an open defect there: changing the aggregation
 moves 97 of 267 dots and 22 colour bands, which is a review in its own right.
 
-It does **not** disappear in V2. Because V2 keeps country dots at low zoom
-(**D14**), a country-level rule is still needed and this is what it has to
-answer. The measured case, kept because the numbers are tedious to rederive:
+It is **gone in V2**, not improved: with no country dot there is no country
+value to be wrong (**D14**). Kept here because it is the case V1's PR must
+still state, and the numbers are tedious to rederive:
 
 | | dot uses | ignores | dot reads |
 |---|---|---|---|
 | Cambodia · ASPY | 9 patients (2020) | 354 patients, incl. Pailin 18% (2014) | 0% |
 | Kenya · AL | 44 patients (2018) | 883 patients, incl. Siaya 11.5% (2016) | 0% |
 
-WHO's per-site rule applied at country level — each site's most recent study,
-then patient-weighted across sites — fixes both: Cambodia 0% → **5.03%**,
-Kenya 0% → **3.71%**, with 95 of 274 dots changing. In V1 this was a stopgap
-worth avoiding. In V2 it is the recommended option in D14, because it also makes
-the zoomed-out dot the exact roll-up of the site dots underneath it.
+In V1 this was a stopgap worth avoiding. In V2 the same arithmetic survives as
+the **cluster** rule (D14): a cluster is its members' most recent studies pooled
+by patient count. Applied to a whole country it gives Cambodia **5.03%** and
+Kenya **3.71%** — but it is only ever applied to marks the reader can zoom
+apart, so the country number is never the last word.
 
 ### Then
 1. **Open V1's PR.** A full description is drafted and covers all three points
@@ -587,6 +644,21 @@ node scripts/validate-data.js data/products.synthetic.js   # expect 0/0
 node scripts/make-preview.js                  # smoke test
 python -m http.server 8000                    # then open illustrated-journey-dashboard.html
 ```
+
+**V2 changes no data**, so all four still pass untouched — a diff in
+`data/resistance.js` after a V2 change means something is wrong, not something
+new. What V2 needs checking instead is in the renderer, and none of it is
+covered by the validator. What was checked headlessly at 1x, 2.6x, 4.1x, 6.6x
+and 8x, and is worth rechecking after any change to the marks:
+
+| invariant | expected |
+|---|---|
+| sites represented across all marks | constant (363 for AL/falciparum — 376 minus 13 in undrawn countries) |
+| same-country overlapping pairs | **0 at every zoom** — the D15 regression test |
+| cross-border overlapping pairs | 61 at 1x falling to 4 at 8x (see D15) |
+| a mark's value vs an independent pool from `studies[]` | within 0.005 pp |
+| a site dot's measured screen radius | constant, ~10 px at every zoom |
+| overlay off, then zoom | no dots return (see the `curSites = null` comment) |
 
 ---
 

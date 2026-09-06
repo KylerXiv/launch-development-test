@@ -549,6 +549,18 @@
   .resdot.b4, .mapwrap circle.b4 { background: #C21807; fill: #C21807; }
   .mapwrap circle.res-dot { stroke: var(--map-nodata, #FFFFFF); stroke-width: 1; cursor: help;
                             vector-effect: non-scaling-stroke; }
+  /* A cluster stands for several sites, so it must not read as one. It is
+     larger, carries its member count, and takes a heavier halo so the
+     difference survives at a glance and in greyscale. */
+  .mapwrap circle.res-cluster { stroke-width: 1.8; cursor: pointer; }
+  .mapwrap text.res-count {
+    text-anchor: middle; dominant-baseline: central; font-weight: 800;
+    font-family: inherit; pointer-events: none;   /* the circle owns the hover */
+    fill: #1A0A00;
+  }
+  /* Bands 1-3 are light enough to carry near-black at 4.5:1 or better; the
+     darkest band is the one that needs white instead. */
+  .mapwrap text.res-count.b4 { fill: #FFFFFF; }
   /* Zoom controls sit over the map's top-right corner. .map-empty is inset:0
      with pointer-events:none, so this only needs to out-stack it, not dodge it. */
   .map-zoom { position: absolute; top: 8px; right: 8px; z-index: 2; display: flex; align-items: center; gap: 4px; }
@@ -1322,6 +1334,10 @@
     // worst case at 26x54 px, at 208x432 px for its 35 sites. Raising this
     // means shipping a 50m basemap first.
     const ZMAX = 8, ZSTEP = 1.6, DOT_R = 4.4;
+    // Clustering depends on k and on nothing else, so marks are rebuilt when the
+    // zoom changes and never while panning. drawnK is the k they were built at.
+    let drawnK = 1, curSites = null, curMarks = [], curDrug = "", curSpecies = "";
+    let curUndrawn = 0, curFallback = false;
 
     function applyZoom() {
       // clamp first: k within range, then the window inside the map, so the
@@ -1335,9 +1351,11 @@
       if (!svg) return;
       svg.setAttribute("viewBox",
         `${Z.x.toFixed(2)} ${Z.y.toFixed(2)} ${vw.toFixed(2)} ${vh.toFixed(2)}`);
-      // a dot means the same thing at every zoom, so it keeps the same screen size
-      svg.querySelectorAll("circle.res-dot").forEach((c) =>
-        c.setAttribute("r", (DOT_R / Z.k).toFixed(2)));
+      // Which sites collide is a function of k, so a zoom change rebuilds the
+      // marks outright rather than just rescaling them — a cluster may split
+      // into several dots, or several may merge. Panning leaves k alone and so
+      // costs nothing. drawMarks re-counter-scales every radius as it draws.
+      if (curSites && Z.k !== drawnK) drawMarks();
 
       wrap.classList.toggle("zoomed", Z.k > 1);
       const btn = (id) => document.getElementById(id);
@@ -1543,24 +1561,161 @@
     };
 
     const cellsFor = (drug, species) => ((RES[LAYER] || {})[drug] || {})[species] || {};
-    // Per-country totals for the current drug and species, built once per
-    // render rather than per dot. These are the country's WHOLE history — the
-    // rows above them in the tooltip describe only the year the dot uses, so
-    // the country name is always stated with them to keep the two apart.
-    function countryTotals(drug, species) {
+
+    // ---- site-level marks (V2) --------------------------------------------
+    // WHO's unit is the study SITE, not the country: their status reports count
+    // studies against the 10% threshold rather than consolidating a country into
+    // one number (D12). V2 draws that unit. The sites are derived here from
+    // studies[], which already ships all 1,633 of them — so no new WHO extract,
+    // no normalizer change, and data/resistance.js is byte-identical to V1.
+    // `treatmentFailure` still backs the drug and species COUNTS; as of V2 it no
+    // longer positions or colours anything.
+    const siteKey = (r) => r[AT.iso3] + "|" + r[AT.site] + "|" + r[AT.lat] + "|" + r[AT.lon];
+
+    // WHO's decision quantity is a POOLED PROPORTION — failures over patients,
+    // never a mean of percentages and never a worst case (D12). Given only the
+    // percentage and its denominator, the patient-weighted mean IS that
+    // proportion; verified across all 274 V1 cells to within 0.005 pp.
+    function pooled(rows, val, num) {
+      let w = 0, vw = 0;
+      rows.forEach((r) => { const n = num(r) || 0; w += n; vw += val(r) * n; });
+      if (w > 0) return { v: +(vw / w).toFixed(2), n: w };
+      // defensive only: the extract carries a patient count on every study
+      return { v: +(rows.reduce((a, r) => a + val(r), 0) / rows.length).toFixed(2), n: 0 };
+    }
+
+    // One entry per site that studied this drug against this species. A site's
+    // value is its MOST RECENT year — "the most recent data in a site", as WHO's
+    // threat map puts it. That is the whole reason V2 needs no country
+    // aggregation rule where V1 did.
+    function sitesFor(drug, species) {
       const di = codeOf("drug", drug), si = codeOf("species", species);
       const by = {};
       for (const r of RES.studies) {
         if (r[AT.drug] !== di || r[AT.species] !== si) continue;
-        const k = r[AT.iso3];
-        const t = (by[k] = by[k] || { studies: 0, sites: new Set(), from: Infinity, to: -Infinity });
-        t.studies++;
-        t.sites.add(r[AT.site] + "|" + r[AT.lat] + "|" + r[AT.lon]);
-        if (r[AT.year] < t.from) t.from = r[AT.year];
-        if (r[AT.year] > t.to) t.to = r[AT.year];
+        if (!(r[AT.iso3] in M.countries)) continue;      // basemap does not draw it
+        const k = siteKey(r);
+        (by[k] = by[k] || []).push(r);
       }
-      return by;
+      return Object.keys(by).map((k) => {
+        const rows = by[k], first = rows[0];
+        const latest = Math.max.apply(null, rows.map((r) => r[AT.year]));
+        const cur = rows.filter((r) => r[AT.year] === latest);
+        const p = pooled(cur, (r) => r[AT.v], (r) => r[AT.n]);   // 24 sites need this
+        const older = rows.filter((r) => r[AT.year] !== latest);
+        const years = rows.map((r) => r[AT.year]);
+        return {
+          key: k, iso3: first[AT.iso3], site: first[AT.site], region: first[AT.region],
+          lat: first[AT.lat], lon: first[AT.lon],
+          v: p.v, n: p.n, year: latest, thisYear: cur.length, studies: rows.length,
+          from: Math.min.apply(null, years), to: Math.max.apply(null, years),
+          // the one thing a single dot cannot say for itself: this site has read
+          // worse before. 74 sites have changed colour band over their history.
+          peak: older.length
+            ? older.reduce((a, r) => (r[AT.v] > a[AT.v] ? r : a))
+            : null
+        };
+      });
     }
+
+    // Sites collide. At 1x, 300 of the 376 Artemether-lumefantrine sites sit
+    // within a dot's width of another, and even at the 8x cap 56 still do — so
+    // "one dot per site" is only honest if colliding sites visibly merge.
+    // Clusters are recomputed whenever the zoom changes and never on pan: what
+    // overlaps depends on k alone.
+    //
+    // A cluster never crosses a border. That is not cartography, it is the rest
+    // of the page: the fill layer, D11's tooltip grammar and the study panel are
+    // all country-scoped, and a mark spanning Kenya and Tanzania could not be
+    // labelled in any of them. At 1x a country's sites collapse to one mark, so
+    // the world view still reads as a country map.
+    // Radii in map units at 1x. The separation two marks need is the sum of
+    // THEIR OWN radii plus a gap — not one fixed distance. A cluster is drawn
+    // much larger than a site dot, so a single threshold calibrated on site dots
+    // lets adjacent clusters pass the test and still overlap on screen.
+    // Measured before this was fixed: 71 overlapping pairs at 1x, tightest -12 px.
+    const CLUSTER_R = 7.4, MARK_GAP = 1.6;
+    const CPASS = 20;         // safety bound; converges in 2-4 passes in practice
+    const radiusOf = (m) => (m.one ? DOT_R : CLUSTER_R);
+
+    // A mark's position and value are the patient-weighted roll-up of its
+    // members' most recent studies (D14) — the same pooled proportion as a
+    // single site, so a cluster is exactly the sum of the dots it is hiding and
+    // the two zoom levels can never contradict each other.
+    function mark(members) {
+      let w = 0, vw = 0, xs = 0, ys = 0;
+      members.forEach((s) => {
+        const n = s.n || 0;
+        w += n; vw += s.v * n; xs += PX(s.lon) * n; ys += PY(s.lat) * n;
+      });
+      const ok = w > 0;
+      const yrs = members.map((s) => s.year);
+      return {
+        members, iso3: members[0].iso3, one: members.length === 1,
+        x: ok ? xs / w : PX(members[0].lon),
+        y: ok ? ys / w : PY(members[0].lat),
+        v: ok ? +(vw / w).toFixed(2) : members[0].v,
+        n: w,
+        yearFrom: Math.min.apply(null, yrs), yearTo: Math.max.apply(null, yrs),
+        from: Math.min.apply(null, members.map((s) => s.from)),
+        to: Math.max.apply(null, members.map((s) => s.to)),
+        studies: members.reduce((a, s) => a + s.studies, 0)
+      };
+    }
+
+    function clusterSites(list, k) {
+      // Seeded biggest-study-first, so the result is deterministic between
+      // renders and a cluster settles on its heaviest evidence.
+      let marks = list.slice()
+        .sort((a, b) => (b.n - a.n) || a.key.localeCompare(b.key))
+        .map((s) => mark([s]));
+      for (let pass = 0; pass < CPASS; pass++) {
+        const taken = new Array(marks.length).fill(false);
+        const next = [];
+        let merged = false;
+        for (let i = 0; i < marks.length; i++) {
+          if (taken[i]) continue;
+          taken[i] = true;
+          let m = marks[i];
+          for (let j = i + 1; j < marks.length; j++) {
+            if (taken[j] || marks[j].iso3 !== m.iso3) continue;
+            // absorbing grows m, so the distance it needs grows with it —
+            // recomputed per pair rather than fixed for the whole pass
+            const need = (radiusOf(m) + radiusOf(marks[j]) + MARK_GAP) / k;
+            const dx = m.x - marks[j].x, dy = m.y - marks[j].y;
+            if (dx * dx + dy * dy < need * need) {
+              m = mark(m.members.concat(marks[j].members));   // centroid moves
+              taken[j] = true; merged = true;
+            }
+          }
+          next.push(m);
+        }
+        marks = next;
+        if (!merged) break;                 // a pass that merges nothing is stable
+      }
+      return marks;
+    }
+
+    // The rule is written here, not read from meta.rule, because as of V2 it is
+    // the RENDERER's rule. meta.rule still correctly describes the aggregated
+    // `treatmentFailure` structure in the data file — V2 simply no longer draws
+    // it, so quoting it beside the legend would describe the wrong thing.
+    const RULE_SITE =
+      "Each dot is one WHO study site, coloured by its most recent study there — the same unit WHO's own threat map uses. " +
+      "Sites too close to draw apart at this zoom merge into one numbered dot, pooled across them by patient count. Zoom in to separate them; click any dot for the studies behind it.";
+
+    function resLayer(clear) {
+      const svg = wrap.querySelector("svg");
+      let g = svg.querySelector("g.res-layer");
+      if (!g) {
+        g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("class", "res-layer");
+        svg.appendChild(g);                  // after the paths, so dots sit on top
+      }
+      if (clear) while (g.firstChild) g.removeChild(g.firstChild);
+      return g;
+    }
+
     const prettyDate = (iso) => {
       const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
       if (!m) return iso || "";
@@ -1647,16 +1802,6 @@
       if (p) { p.hidden = true; panelRows = []; }
     }
 
-    function openPanel(iso3, drug, species) {
-      const di = codeOf("drug", drug), si = codeOf("species", species), ci = AT.iso3;
-      panelRows = RES.studies
-        .filter((r) => r[ci] === iso3 && r[AT.drug] === di && r[AT.species] === si)
-        .map(decode);
-      panelTitle = `${M.countries[iso3] ? M.countries[iso3].n : iso3} · ${drug} · ${species}`;
-      panelSort = { col: "year", dir: -1 };
-      renderPanel();
-    }
-
     function renderPanel() {
       const panel = document.getElementById("res-panel");
       const table = document.getElementById("res-table");
@@ -1707,6 +1852,144 @@
       panel.hidden = false;
     }
 
+
+    // Tooltips follow D11: one scope per line, and never the country's history
+    // dressed up as this mark's basis. At site level that discipline gets easier
+    // — the mark IS the site, so every line below the rows is about this site.
+    function siteTip(mk) {
+      const s = mk.members[0];
+      const cn = M.countries[s.iso3] ? M.countries[s.iso3].n : s.iso3;
+      const small = (RES.meta && RES.meta.smallStudy) || 20;
+      const where = [s.region, cn].filter(Boolean).join(", ");
+      // 194 of 1,136 site dots rest on fewer than 20 patients and the smallest
+      // on one. Nothing is filtered (D5) and nothing is re-weighted here — the
+      // colour is WHO's measured value — so the denominator is stated instead.
+      const pat = s.n ? esc(String(s.n)) + (s.n < small ? " · small study" : "") : "—";
+      const hist = s.studies > 1
+        ? esc(s.studies + " studies here, " + (s.from === s.to ? s.from : s.from + "–" + s.to))
+        : "The only study here";
+      // Only when an earlier study lands in a HIGHER BAND — the 74 sites whose
+      // colour has changed over their history. Any worse-than-now value would
+      // fire on differences the colour does not register ("Earlier here: 1%"
+      // under a 0% dot), which is noise in the one line that has to carry the
+      // Kenya problem: a dot reading 0% where the site once measured 11.5%.
+      const peak = s.peak && s.peak[AT.v] > s.v && bandOf(s.peak[AT.v]) !== bandOf(s.v)
+        ? "<br>Earlier here: " + esc(s.peak[AT.v] + "% in " + s.peak[AT.year]) : "";
+      return "<b>" + esc(s.site || "Unnamed site") + "</b>" +
+        '<div class="trow"><span>Treatment failure</span><span>' + s.v + "%</span></div>" +
+        '<div class="trow"><span>Study year</span><span>' + s.year +
+          (s.thisYear > 1 ? " · " + s.thisYear + " studies" : "") + "</span></div>" +
+        '<div class="trow"><span>Patients</span><span>' + pat + "</span></div>" +
+        '<div class="tprod">' + esc(where) + "<br>" + hist + peak +
+        "<br>" + esc(curDrug) + " · Click for this site's studies</div>";
+    }
+
+    function clusterTip(mk) {
+      const cn = M.countries[mk.iso3] ? M.countries[mk.iso3].n : mk.iso3;
+      const yr = mk.yearFrom === mk.yearTo ? String(mk.yearFrom) : mk.yearFrom + "–" + mk.yearTo;
+      return "<b>" + esc(cn + " — " + mk.members.length + " sites") + "</b>" +
+        '<div class="trow"><span>Treatment failure</span><span>' + mk.v + "%</span></div>" +
+        '<div class="trow"><span>' + (mk.yearFrom === mk.yearTo ? "Study year" : "Study years") +
+          "</span><span>" + yr + "</span></div>" +
+        '<div class="trow"><span>Patients</span><span>' + (mk.n || "—") + "</span></div>" +
+        '<div class="tprod">Pooled across these ' + mk.members.length +
+        " sites, each at its most recent study<br>Zoom in to separate them" +
+        "<br>" + esc(curDrug) + " · Click for every study here</div>";
+    }
+
+    // A site dot opens that site's own history; a cluster opens the sites it is
+    // hiding. D4 put every study behind a country in this panel — at site level
+    // the panel narrows with the dot, so what you clicked is what you get.
+    function openMarkPanel(mk) {
+      const di = codeOf("drug", curDrug), si = codeOf("species", curSpecies);
+      const keys = {};
+      mk.members.forEach((s) => { keys[s.key] = 1; });
+      panelRows = RES.studies
+        .filter((r) => r[AT.drug] === di && r[AT.species] === si && keys[siteKey(r)])
+        .map(decode);
+      const cn = M.countries[mk.iso3] ? M.countries[mk.iso3].n : mk.iso3;
+      panelTitle = (mk.one
+        ? (mk.members[0].site || "Unnamed site") + ", " + cn
+        : cn + " — " + mk.members.length + " sites") + " · " + curDrug + " · " + curSpecies;
+      panelSort = { col: "year", dir: -1 };
+      renderPanel();
+    }
+
+    function writeNote() {
+      const note = document.getElementById("res-note");
+      const m = RES.meta || {};
+      const bits = [];
+      if (!curSites || !curSites.length)
+        bits.push(`No WHO study results for ${curDrug} against ${curSpecies}.`);
+      if (curFallback)
+        bits.push(`${mapProduct} has no efficacy studies of its own; ${FALLBACK_DRUG} is shown as the reference treatment.`);
+      if (curSites && curSites.length) {
+        const nS = curSites.length, nM = curMarks.length;
+        bits.push(nS === nM
+          ? `All ${nS} ${nS === 1 ? "site is" : "sites are"} drawn separately at this zoom.`
+          : `${nS} ${nS === 1 ? "site" : "sites"} in ${nM} ${nM === 1 ? "mark" : "marks"} at this zoom — zoom in to separate them.`);
+      }
+      if (curUndrawn)
+        bits.push(`${curUndrawn} further ${curUndrawn === 1 ? "country is" : "countries are"} not drawn on this basemap.`);
+      bits.push(`Source: ${m.source || "WHO"} — WHO last updated ${prettyDate(m.whoLastDataUpdate)}, extract ${prettyDate(m.extract)}. Each value is WHO's own study result; only the merging of nearby sites is ours.`);
+      note.textContent = bits.filter(Boolean).join(" ");
+      note.hidden = false;
+    }
+
+    function drawMarks() {
+      if (!RES || !curSites) return;
+      const g = resLayer(true);
+      drawnK = Z.k;
+      const NS = "http://www.w3.org/2000/svg";
+      const marks = clusterSites(curSites, Z.k);
+      curMarks = marks;
+      // Within a country nothing overlaps (verified: 0 same-country overlaps at
+      // every zoom). Across a border it still can, because a cluster never
+      // crosses one — Myanmar/Thailand and DRC/Congo sit closer than a dot is
+      // wide. Zoom resolves it (61 overlapping pairs at 1x, 4 at 8x), but at
+      // low zoom a small mark could be buried under a big one and unhoverable.
+      // Drawing biggest-first puts the smaller mark on top, so both stay
+      // reachable by mouse. Keyboard already reached both: every mark is
+      // focusable regardless of what is painted over it.
+      marks.sort((a, b) => (b.one ? 0 : 1) - (a.one ? 0 : 1));
+      writeNote();                 // the mark count in it is zoom-dependent
+      // counter-scaled so a mark holds its screen size at every zoom (D13)
+      const rSite = DOT_R / Z.k, rCluster = CLUSTER_R / Z.k, fs = 8.2 / Z.k;
+      marks.forEach((mk) => {
+        const band = bandOf(mk.v);
+        const c = document.createElementNS(NS, "circle");
+        c.setAttribute("class", "res-dot " + band + (mk.one ? "" : " res-cluster"));
+        c.setAttribute("cx", mk.x.toFixed(2));
+        c.setAttribute("cy", mk.y.toFixed(2));
+        c.setAttribute("r", (mk.one ? rSite : rCluster).toFixed(3));
+        c.setAttribute("tabindex", "0");
+        c.setAttribute("role", "button");
+        const html = mk.one ? siteTip(mk) : clusterTip(mk);
+        const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
+        c.addEventListener("mouseenter", track);
+        c.addEventListener("mousemove", track);
+        c.addEventListener("focus", () => showTipAt(c, html));   // keyboard: no cursor
+        c.addEventListener("mouseleave", hideTip);
+        c.addEventListener("blur", hideTip);
+        c.addEventListener("click", () => openMarkPanel(mk));
+        c.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); openMarkPanel(mk); }
+        });
+        g.appendChild(c);
+        if (!mk.one) {
+          // the count is the only thing that says a mark is more than one site
+          const t = document.createElementNS(NS, "text");
+          t.setAttribute("class", "res-count " + band);
+          t.setAttribute("x", mk.x.toFixed(2));
+          t.setAttribute("y", mk.y.toFixed(2));
+          t.setAttribute("font-size", fs.toFixed(3));
+          t.textContent = String(mk.members.length);
+          g.appendChild(t);
+        }
+      });
+      return marks;
+    }
+
     function drawResistance() {
       if (!RES) return;
       document.getElementById("res-controls").hidden = false;
@@ -1715,100 +1998,52 @@
       const note = document.getElementById("res-note");
       const sel = document.getElementById("res-drug");
       const spSel = document.getElementById("res-species");
-      const svg = wrap.querySelector("svg");
-      let g = svg.querySelector("g.res-layer");
-      if (!g) {
-        g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        g.setAttribute("class", "res-layer");
-        svg.appendChild(g);                    // after the paths, so dots sit on top
-      }
-      while (g.firstChild) g.removeChild(g.firstChild);
+      resLayer(true);
 
       const checked = document.querySelector('input[name="reslayer"]:checked');
       const on = checked && checked.value !== "off";
       const drug = sel.value, species = spSel.value;
       if (!on || !drug || !species) {
         legend.hidden = true; ruleEl.hidden = true; note.hidden = true;
+        // applyZoom redraws on a zoom change only while curSites is set —
+        // leaving it behind would repaint the dots after the overlay was
+        // switched off, the next time the reader zoomed
+        curSites = null; curMarks = [];
         closePanel();
         const em = document.getElementById("map-empty");
         if (em) em.classList.remove("demoted");   // map is blank again — recentre
         return;
       }
 
-      const totals = countryTotals(drug, species);
+      curDrug = drug; curSpecies = species;
+      curSites = sitesFor(drug, species);
       const cells = cellsFor(drug, species);
-      const all = Object.keys(cells);
-      const isos = all.filter((i) => i in M.countries);
-      isos.forEach((iso) => {
-        const e = cells[iso];
-        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        c.setAttribute("class", "res-dot " + bandOf(e.v));
-        c.setAttribute("cx", PX(e.lon).toFixed(1));
-        c.setAttribute("cy", PY(e.lat).toFixed(1));
-        c.setAttribute("r", (DOT_R / Z.k).toFixed(2));
-        c.setAttribute("tabindex", "0");
-        c.setAttribute("role", "button");
-        // Same tooltip grammar as the country cards: a title, label/value rows,
-        // and a dimmed footer. Kept separate from the country tooltip so the
-        // access claim and the resistance claim are never read as one statement.
-        // Two clearly separated lines. The first says where THIS dot's number
-        // came from — named when one study produced it, counted when several
-        // did. The second is the country's whole history, always prefixed with
-        // the country name so it can never be read as the dot's own basis.
-        const src = e.sites > 1
-          ? `${e.sites} sites in ${e.year}`
-          : "Latest study: " + ([e.site, e.region].filter(Boolean).join(", ") || "unnamed site");
-        const t = totals[iso];
-        const total = t
-          ? `${M.countries[iso].n}: ${t.studies} ${t.studies === 1 ? "study" : "studies"} at ` +
-            `${t.sites.size} ${t.sites.size === 1 ? "site" : "sites"}, ` +
-            `${t.from === t.to ? t.from : t.from + "–" + t.to}`
-          : "";
-        const html = `<b>${esc(M.countries[iso].n)}</b>` +
-          `<div class="trow"><span>Treatment failure</span><span>${e.v}%</span></div>` +
-          `<div class="trow"><span>Study year</span><span>${e.year}</span></div>` +
-          `<div class="trow"><span>${e.sites > 1 ? "Patients (all sites)" : "Patients"}</span><span>${e.n || "—"}</span></div>` +
-          `<div class="tprod">${esc(src)}${total ? "<br>" + esc(total) : ""}` +
-          `<br>${esc(drug)} · Click for every study</div>`;
-        const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
-        c.addEventListener("mouseenter", track);
-        c.addEventListener("mousemove", track);
-        c.addEventListener("focus", () => showTipAt(c, html));   // keyboard: no cursor
-        c.addEventListener("mouseleave", hideTip);
-        c.addEventListener("blur", hideTip);
-        c.addEventListener("click", () => openPanel(iso, drug, species));
-        c.addEventListener("keydown", (ev) => {
-          if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); openPanel(iso, drug, species); }
-        });
-        g.appendChild(c);
-      });
+      // countries WHO covers that this basemap does not draw — counted from the
+      // country index rather than from the sites, which are already filtered out
+      curUndrawn = Object.keys(cells).filter((i) => !(i in M.countries)).length;
+      curFallback = sel.dataset.bound === "fallback";
+      drawMarks();                 // writes the note, which needs the two above
 
       // the map is no longer blank once dots are on it — move the access
       // empty-state out of the way rather than letting it sit over the data
       const emptyMsg = document.getElementById("map-empty");
-      if (emptyMsg) emptyMsg.classList.toggle("demoted", isos.length > 0);
+      if (emptyMsg) emptyMsg.classList.toggle("demoted", curSites.length > 0);
 
-      legend.hidden = !isos.length;
+      legend.hidden = !curSites.length;
       const m = RES.meta || {};
 
       // 1. THE RULE — sits with the legend it explains, as WHO puts "determined
       //    by the most recent data in a site" directly under theirs.
-      ruleEl.textContent = isos.length ? (m.rule || "") : "";
-      ruleEl.hidden = !isos.length || !m.rule;
+      ruleEl.textContent = curSites.length ? RULE_SITE : "";
+      ruleEl.hidden = !curSites.length;
 
       // 2. PROVENANCE — source, dates and caveats. Country and site totals are
       //    NOT here: they belong to one country and live in the tooltip and the
       //    panel title. Kept separate from the access layer's ILLUSTRATIVE
       //    banner above, which describes entirely different data.
-      const bits = [];
-      if (!isos.length) bits.push(`No WHO study results for ${drug} against ${species}.`);
-      if (sel.dataset.bound === "fallback")
-        bits.push(`${mapProduct} has no efficacy studies of its own; ${FALLBACK_DRUG} is shown as the reference treatment.`);
-      if (all.length > isos.length)
-        bits.push(`${all.length - isos.length} further ${all.length - isos.length === 1 ? "country is" : "countries are"} not drawn on this basemap.`);
-      bits.push(`Source: ${m.source || "WHO"} — WHO last updated ${prettyDate(m.whoLastDataUpdate)}, extract ${prettyDate(m.extract)}. Country values are aggregated from site-level studies, not WHO's own country figures.`);
-      note.textContent = bits.filter(Boolean).join(" ");
-      note.hidden = false;
+      //    One sentence of it counts MARKS, which changes with the zoom, so the
+      //    note is rewritten by drawMarks rather than only on a drug change.
+      writeNote();                 // the rule and legend above may have changed too
     }
 
     document.querySelectorAll('input[name="reslayer"]').forEach((r) =>
