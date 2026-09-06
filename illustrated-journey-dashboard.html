@@ -527,7 +527,12 @@
   .res-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .res-table tr.small td { opacity: .65; }
   .res-table .yr { font-variant-numeric: tabular-nums; }
-  .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 8px 0 0; max-width: 92ch; }
+  /* Three scopes, three blocks, following the WHO threat map's split: the rule
+     sits with the legend it explains, the summary counts the whole selection,
+     and provenance stands on its own. Mixing them in one paragraph is what made
+     the tooltip's and the panel's counts look like they disagreed. */
+  .res-rule { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 4px 0 0; max-width: 92ch; }
+  .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 6px 0 0; max-width: 92ch; }
   .resdot.b1, .mapwrap circle.b1 { background: #FDCFA6; fill: #FDCFA6; }
   .resdot.b2, .mapwrap circle.b2 { background: #FB9A50; fill: #FB9A50; }
   .resdot.b3, .mapwrap circle.b3 { background: #EF5F13; fill: #EF5F13; }
@@ -659,6 +664,7 @@
       <span class="key"><span class="resdot b3"></span>10–20%</span>
       <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
     </div>
+    <p class="res-rule" id="res-rule" hidden></p>
     <p class="res-note" id="res-note" hidden></p>
     <div class="res-panel" id="res-panel" hidden>
       <div class="res-panel-head">
@@ -1360,6 +1366,30 @@
     };
 
     const cellsFor = (drug, species) => ((RES[LAYER] || {})[drug] || {})[species] || {};
+    // Per-country totals for the current drug and species, built once per
+    // render rather than per dot. These are the country's WHOLE history — the
+    // rows above them in the tooltip describe only the year the dot uses, so
+    // the country name is always stated with them to keep the two apart.
+    function countryTotals(drug, species) {
+      const di = codeOf("drug", drug), si = codeOf("species", species);
+      const by = {};
+      for (const r of RES.studies) {
+        if (r[AT.drug] !== di || r[AT.species] !== si) continue;
+        const k = r[AT.iso3];
+        const t = (by[k] = by[k] || { studies: 0, sites: new Set(), from: Infinity, to: -Infinity });
+        t.studies++;
+        t.sites.add(r[AT.site] + "|" + r[AT.lat] + "|" + r[AT.lon]);
+        if (r[AT.year] < t.from) t.from = r[AT.year];
+        if (r[AT.year] > t.to) t.to = r[AT.year];
+      }
+      return by;
+    }
+    const prettyDate = (iso) => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+      if (!m) return iso || "";
+      const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      return `${+m[3]} ${MON[+m[2] - 1]} ${m[1]}`;
+    };
     // countries a pairing would actually paint — the basemap does not draw
     // every country WHO covers, so this counts what the reader will see
     const drawnCount = (drug, species) => {
@@ -1488,9 +1518,15 @@
         panelSort = { col: k, dir: panelSort.col === k ? -panelSort.dir : (k === "year" || k === "n" || k === "v" ? -1 : 1) };
         renderPanel();
       }));
+      // The panel is the FULL history, not the dot's basis — say so, so the
+      // counts here can never be mistaken for the ones in the tooltip.
       const n = panelRows.length;
+      const siteCount = new Set(panelRows.map((r) => r.site + "|" + r.region)).size;
+      const yrs = panelRows.map((r) => r.year);
+      const lo = Math.min(...yrs), hi = Math.max(...yrs);
       document.getElementById("res-panel-title").textContent =
-        `${panelTitle} — ${n} ${n === 1 ? "study" : "studies"}`;
+        `${panelTitle} — ${n} ${n === 1 ? "study" : "studies"} at ` +
+        `${siteCount} ${siteCount === 1 ? "site" : "sites"}, ${lo === hi ? lo : lo + "–" + hi}`;
       panel.hidden = false;
     }
 
@@ -1498,6 +1534,7 @@
       if (!RES) return;
       document.getElementById("res-controls").hidden = false;
       const legend = document.getElementById("res-legend");
+      const ruleEl = document.getElementById("res-rule");
       const note = document.getElementById("res-note");
       const sel = document.getElementById("res-drug");
       const spSel = document.getElementById("res-species");
@@ -1514,13 +1551,14 @@
       const on = checked && checked.value !== "off";
       const drug = sel.value, species = spSel.value;
       if (!on || !drug || !species) {
-        legend.hidden = true; note.hidden = true;
+        legend.hidden = true; ruleEl.hidden = true; note.hidden = true;
         closePanel();
         const em = document.getElementById("map-empty");
         if (em) em.classList.remove("demoted");   // map is blank again — recentre
         return;
       }
 
+      const totals = countryTotals(drug, species);
       const cells = cellsFor(drug, species);
       const all = Object.keys(cells);
       const isos = all.filter((i) => i in M.countries);
@@ -1536,14 +1574,25 @@
         // Same tooltip grammar as the country cards: a title, label/value rows,
         // and a dimmed footer. Kept separate from the country tooltip so the
         // access claim and the resistance claim are never read as one statement.
-        const where = e.sites > 1
-          ? `${e.sites} sites · ${e.n} patients`
-          : [e.site, e.region].filter(Boolean).join(", ") || `${e.n} patients`;
+        // Two clearly separated lines. The first says where THIS dot's number
+        // came from — named when one study produced it, counted when several
+        // did. The second is the country's whole history, always prefixed with
+        // the country name so it can never be read as the dot's own basis.
+        const src = e.sites > 1
+          ? `${e.sites} sites in ${e.year}`
+          : "Latest study: " + ([e.site, e.region].filter(Boolean).join(", ") || "unnamed site");
+        const t = totals[iso];
+        const total = t
+          ? `${M.countries[iso].n}: ${t.studies} ${t.studies === 1 ? "study" : "studies"} at ` +
+            `${t.sites.size} ${t.sites.size === 1 ? "site" : "sites"}, ` +
+            `${t.from === t.to ? t.from : t.from + "–" + t.to}`
+          : "";
         const html = `<b>${esc(M.countries[iso].n)}</b>` +
           `<div class="trow"><span>Treatment failure</span><span>${e.v}%</span></div>` +
           `<div class="trow"><span>Study year</span><span>${e.year}</span></div>` +
           `<div class="trow"><span>${e.sites > 1 ? "Patients (all sites)" : "Patients"}</span><span>${e.n || "—"}</span></div>` +
-          `<div class="tprod">${esc(where)} · ${esc(drug)}<br>Click for every study</div>`;
+          `<div class="tprod">${esc(src)}${total ? "<br>" + esc(total) : ""}` +
+          `<br>${esc(drug)} · Click for every study</div>`;
         const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
         c.addEventListener("mouseenter", track);
         c.addEventListener("mousemove", track);
@@ -1564,20 +1613,23 @@
 
       legend.hidden = !isos.length;
       const m = RES.meta || {};
+
+      // 1. THE RULE — sits with the legend it explains, as WHO puts "determined
+      //    by the most recent data in a site" directly under theirs.
+      ruleEl.textContent = isos.length ? (m.rule || "") : "";
+      ruleEl.hidden = !isos.length || !m.rule;
+
+      // 2. PROVENANCE — source, dates and caveats. Country and site totals are
+      //    NOT here: they belong to one country and live in the tooltip and the
+      //    panel title. Kept separate from the access layer's ILLUSTRATIVE
+      //    banner above, which describes entirely different data.
       const bits = [];
-      if (!isos.length) {
-        bits.push(`No WHO study results for ${drug} against ${species}.`);
-      } else {
-        bits.push(`${isos.length} ${isos.length === 1 ? "country" : "countries"} with WHO study results for ${drug} against ${species}.`);
-        if (sel.dataset.bound === "fallback")
-          bits.push(`${mapProduct} has no efficacy studies of its own; ${FALLBACK_DRUG} is shown as the reference treatment.`);
-        if (all.length > isos.length)
-          bits.push(`${all.length - isos.length} further ${all.length - isos.length === 1 ? "country is" : "countries are"} not drawn on this basemap.`);
-        bits.push(m.rule || "");
-      }
-      // Provenance for THIS layer only — separate from the access layer's
-      // ILLUSTRATIVE banner above, which describes entirely different data.
-      bits.push(`Source: ${m.source || "WHO"} (extract ${m.extract || "n/a"}${m.whoLastDataUpdate ? ", WHO last updated " + m.whoLastDataUpdate : ""}). Country values are aggregated from site-level studies, not WHO's own country figures.`);
+      if (!isos.length) bits.push(`No WHO study results for ${drug} against ${species}.`);
+      if (sel.dataset.bound === "fallback")
+        bits.push(`${mapProduct} has no efficacy studies of its own; ${FALLBACK_DRUG} is shown as the reference treatment.`);
+      if (all.length > isos.length)
+        bits.push(`${all.length - isos.length} further ${all.length - isos.length === 1 ? "country is" : "countries are"} not drawn on this basemap.`);
+      bits.push(`Source: ${m.source || "WHO"} — WHO last updated ${prettyDate(m.whoLastDataUpdate)}, extract ${prettyDate(m.extract)}. Country values are aggregated from site-level studies, not WHO's own country figures.`);
       note.textContent = bits.filter(Boolean).join(" ");
       note.hidden = false;
     }

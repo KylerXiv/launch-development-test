@@ -184,6 +184,41 @@ countries** in `data/products.js` — losing it would leave a verified country
 looking like it had no data. This is the one place we override the source; the
 reasoning is a comment on `A2_TO_A3`.
 
+**D11 — One scope per place, following WHO's own layout.** Counts were appearing
+at three different scopes in one tooltip, which is why Cambodia showed "2 sites"
+against a panel listing 8, and Kenya showed a bare "Kilifi" against a panel
+listing 5. Both numbers were always right; nothing said which scope it covered.
+143 of 274 dots rest on a single site, and 58 of those countries have more sites
+in their history — so this was the common case, not an edge case.
+
+WHO's threat map keeps three scopes in three places and never mixes them: the
+rule sits under the legend, a summary box counts the whole selection ("there are
+N studies found with the specified criteria" plus LAST DATA UPDATE), and the dot
+hover carries only that dot. Adopted the same split:
+
+| block | scope | content |
+|---|---|---|
+| tooltip, rows | this dot | value, year, patients |
+| tooltip, line 1 | the dot's source | "Latest study: Kilifi" when one study produced it, "2 sites in 2020" when several did |
+| tooltip, line 2 | this country | "Kenya: 8 studies at 5 sites, 2010–2018" — always prefixed with the country name so it cannot be read as the dot's basis |
+| `res-rule` | the method | `meta.rule`, beside the legend it explains |
+| panel title | this country | "8 studies at 5 sites, 2010–2018" — same wording as the tooltip's line 2, so hover and click agree |
+| `res-note` | provenance | source, both dates, the aggregation caveat, undrawn countries |
+
+A selection-wide summary block ("588 studies at 376 sites across 57 countries")
+was built and then removed: the useful question turned out to be "how much is
+known about *this country*", not about the whole drug. Its dates moved into the
+provenance note.
+
+We cannot go as minimal as WHO on hover — their dot is a *site*, so colour alone
+conveys the value, whereas ours is a country aggregate and the number has to be
+readable. The two dates were previously buried mid-paragraph and are different
+things: when WHO last refreshed the data (2025-11-19) and when we pulled our
+extract (2026-09-05).
+
+**This is presentation only.** It makes the latest-year weakness visible; it does
+not fix it. Kenya still reads 0%. See the open question at the top of §7.
+
 **Provenance note:** every value and every citation URL comes from the uploaded
 WHO `.xlsx`. `CITATION_URL` is WHO's own column 17. Verified: 0 of 267 URLs and
 0 of 224 institutions appear in our data without being in the source file. The
@@ -193,7 +228,43 @@ only things authored here are D10 and the D6 maths.
 
 ## 7. What's left
 
-### Immediately
+### First thing — an open question about the dot rule
+
+Found late on 5 Sep and **deliberately deferred**, not resolved. The
+"most recent year" half of D6 has a weakness the patient-weighting does not
+cover: a tiny recent study outranks a much larger older one.
+
+Cambodia · ASPY · *P. falciparum*:
+
+| year | sites | patients | weighted |
+|---|---|---|---|
+| **2020** | 2 | **9** | **0%** ← the dot uses this |
+| 2018 | 4 | 119 | 0.8% |
+| 2017 | 2 | 118 | 2.5% |
+| 2014 | 3 | 117 | **12.8%** (Pailin 18%) |
+
+So the map paints Cambodia in the palest band for a tracked product in the
+Mekong, on the strength of 9 patients, ignoring 354.
+
+**WHO's own approach, from their threat map (checked 5 Sep):** their dot is one
+*site*, not one country, and "determined by the most recent data in a site"
+means the latest study **per site**. They never average across sites or years —
+clicking a site opens a time-series chart of its studies.
+
+We cannot plot sites (no zoom, D3), but the per-site half is borrowable:
+take each site's most recent study — WHO's rule verbatim — then patient-weight
+those site values into the country dot. Measured:
+
+- Cambodia: **0% → 5.03%**, 8 sites, 238 patients, spanning 2014–2020
+  (Pailin's 18% counts again, because 2014 is genuinely the last thing known
+  about Pailin)
+- Across all 274 dots: **95 change, 44 upward, 22 change colour band**
+
+Its real advantage is that the method becomes citable — "each site shows its
+most recent study, per WHO's rule; sites combine by patient count because this
+map has no zoom" — instead of a rule we invented. Not implemented; decide first.
+
+### Then
 1. **Commit the v2 work** (§8) and push.
 2. **Open the PR.** Two things belong in the description:
    - The `data/products.js` changelog line trips `publish.yml`'s path filter, so
