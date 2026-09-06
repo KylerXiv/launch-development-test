@@ -1,10 +1,16 @@
 # DEV-13 — WHO resistance overlay: working notes
 
-Handover written 5 Sep 2026. Branch `feat/resistance-map`, **not pushed yet**.
+Handover written 5 Sep 2026. Branch `feat/resistance-map-country-dots`,
+**not pushed yet**.
 
-Read this first tomorrow: §1 for where things stand, §6 for the decisions and
-why they were made (that's the part that's expensive to reconstruct), §7 for
-what's left.
+**This is version 1 of two.** V1 draws one dot per country because this map has
+no zoom. V2 will follow WHO and draw one dot per study site with a pan/zoom
+map. V2 is not started and nothing here should be built toward it yet — see
+§1b for the split and why it exists.
+
+Read this first tomorrow: §1 for where things stand, §1b for the two-version
+plan, §6 for the decisions and why they were made (that's the part that's
+expensive to reconstruct), §7 for what's left.
 
 ---
 
@@ -12,9 +18,10 @@ what's left.
 
 | | |
 |---|---|
-| Branch | `feat/resistance-map` (off `main` @ `6e3e739`) |
-| Commits | 6, all `DEV-13:` prefixed |
-| Uncommitted | yes — a substantial v2 rewrite, see §4 |
+| Branch | `feat/resistance-map-country-dots` (off `main` @ `6e3e739`) |
+| Version | **1 of 2** — country-level dots (see §1b) |
+| Commits | 13, all `DEV-13:` prefixed |
+| Working tree | clean |
 | Pushed | **no** |
 | CI locally | all green (0 errors, 3 warnings) |
 | Page affected | `illustrated-journey-dashboard.html` **only** |
@@ -24,6 +31,38 @@ built** (treatment failure). See §7 for the other two and why they differ
 wildly in cost.
 
 ---
+
+## 1b. The two versions
+
+Both are the same data and the same normalizer; they differ only in what a dot
+means and whether the map zooms.
+
+| | **V1 — country dots** (this branch) | **V2 — site dots** (not started) |
+|---|---|---|
+| a dot is | one country | one study site, as WHO does |
+| map | fixed 960×420 SVG, no zoom | pan/zoom |
+| dot value | aggregated across sites (see D6) | that site's own most recent study |
+| detail | click → panel of every study | click → that site's history |
+| status | complete, ready for review | **do not start yet** |
+
+**Why V1 aggregates.** The basemap is fixed at 960×420 and **Myanmar occupies
+26×54 pixels** — its 35 study sites need ~61px² each and the box offers 39px².
+Plotting every study unfiltered would put **84% of dots on top of another one**
+(worst spot: 73 overlapping studies in the Cambodian Mekong). Aggregation was
+forced by the pixels, not chosen.
+
+**Why V2 is worth doing.** Aggregating to a country forces a choice of *which*
+studies represent it, and every such choice loses something. The clearest cost
+is visible today: Kenya reads **0%** because its most recent year (2018) had one
+44-patient study at Kilifi, while Siaya's 2016 study measured **11.5% on 104
+patients**. Cambodia reads **0%** off 9 patients while ignoring 354. A site-level
+map has no such problem — each site simply shows its own latest result, which is
+exactly what WHO does and why their map needs no aggregation rule at all.
+
+**V1 ships with that limitation known and documented.** It must be stated in the
+PR description: the map understates countries whose most recent year happened to
+be small, the panel shows the full history so nothing is hidden, and V2 is the
+fix. Do not let a reviewer discover it themselves.
 
 ## 2. What the feature is
 
@@ -46,9 +85,16 @@ panel below the map listing every study behind it.
 
 ---
 
-## 3. Committed so far (6 commits)
+## 3. Committed so far (13 commits)
 
 ```
+813eecf  country totals in the tooltip, drop the selection summary
+bd2af05  flat alphabetical drug list
+7ec4680  working notes for handover
+7a526ba  document the unfiltered dataset and the aggregation rule
+88f594b  validate the studies table and the new dot shape
+fbc1b9c  species selector and click-through study panel
+745025e  ship every study, aggregate dots by patient-weighted average
 e346a47  group the drug list, keep the empty state clear of the dots
 12cdc7e  strip stray NUL bytes from the normalizer
 d7c870f  document the resistance layer and its manual export step
@@ -59,25 +105,22 @@ d7c870f  document the resistance layer and its manual export step
 
 ---
 
-## 4. Uncommitted work (the v2 rewrite)
+## 4. What the 13 commits contain
 
-This is the big one — it removes all filtering and adds the drill-down. Roughly
-2,000 lines changed, most of it the regenerated staging CSV.
+Roughly in build order:
 
-```
- M data/products.js                    +1   changelog entry (rewritten for v2)
- M data/resistance.js                  regenerated — now 183 KB
- M docs/developer-guide.md             +28  §9 note rewritten
- M illustrated-journey-dashboard.html  +198 species select, weighted dots, panel
- M scripts/normalize-resistance.js     +137 no filters, weighted aggregation, dict encoding
- M scripts/validate-data.js            +62  rules for the new data shape
- M sourcing/README.md                  +1   row updated
- M sourcing/staging/resistance_tes.csv +1634 now every study, not just aggregates
-```
+| commits | what |
+|---|---|
+| 1 | ingest: raw WHO extract, normalizer, `data/resistance.js`, staging CSV |
+| 2 | validator rules for the resistance dataset |
+| 3 | the overlay itself on the illustrated dashboard |
+| 4 | docs: developer guide §9, `sourcing/README.md` manual export step |
+| 5 | NUL-byte fix (see §9) |
+| 6–9 | the unfiltered rewrite: all species, all study sizes, patient-weighted dots, dictionary encoding, species selector, click-through panel |
+| 10–13 | drug list to flat A–Z, empty-state placement, count scopes, country totals in the tooltip |
 
-**Commit it before doing anything else tomorrow** — §8 has the command.
-
----
+Net against `main`: 9 files, ~2,400 insertions, no deletions outside files this
+branch created.
 
 ## 5. Files and what each does
 
@@ -228,45 +271,33 @@ only things authored here are D10 and the D6 maths.
 
 ## 7. What's left
 
-### First thing — an open question about the dot rule
+### Not in this branch — that is V2
 
-Found late on 5 Sep and **deliberately deferred**, not resolved. The
-"most recent year" half of D6 has a weakness the patient-weighting does not
-cover: a tiny recent study outranks a much larger older one.
+The "most recent year" weakness described in §1b is **deliberate scope**, not an
+open defect. Do not fix it here: changing the aggregation would move 95 of 274
+dots and 22 colour bands, which is a review in its own right, and V2 removes the
+need for aggregation altogether.
 
-Cambodia · ASPY · *P. falciparum*:
+Kept here because it is the measured case for V2, and the numbers are tedious to
+rederive:
 
-| year | sites | patients | weighted |
+| | dot uses | ignores | dot reads |
 |---|---|---|---|
-| **2020** | 2 | **9** | **0%** ← the dot uses this |
-| 2018 | 4 | 119 | 0.8% |
-| 2017 | 2 | 118 | 2.5% |
-| 2014 | 3 | 117 | **12.8%** (Pailin 18%) |
+| Cambodia · ASPY | 9 patients (2020) | 354 patients, incl. Pailin 18% (2014) | 0% |
+| Kenya · AL | 44 patients (2018) | 883 patients, incl. Siaya 11.5% (2016) | 0% |
 
-So the map paints Cambodia in the palest band for a tracked product in the
-Mekong, on the strength of 9 patients, ignoring 354.
-
-**WHO's own approach, from their threat map (checked 5 Sep):** their dot is one
-*site*, not one country, and "determined by the most recent data in a site"
-means the latest study **per site**. They never average across sites or years —
-clicking a site opens a time-series chart of its studies.
-
-We cannot plot sites (no zoom, D3), but the per-site half is borrowable:
-take each site's most recent study — WHO's rule verbatim — then patient-weight
-those site values into the country dot. Measured:
-
-- Cambodia: **0% → 5.03%**, 8 sites, 238 patients, spanning 2014–2020
-  (Pailin's 18% counts again, because 2014 is genuinely the last thing known
-  about Pailin)
-- Across all 274 dots: **95 change, 44 upward, 22 change colour band**
-
-Its real advantage is that the method becomes citable — "each site shows its
-most recent study, per WHO's rule; sites combine by patient count because this
-map has no zoom" — instead of a rule we invented. Not implemented; decide first.
+If V2 slips and a stopgap is wanted for V1, the cheapest honest option is WHO's
+per-site rule applied at country level: take each site's most recent study, then
+patient-weight the sites. Measured — Cambodia 0% → **5.03%**, Kenya 0% → **3.71%**,
+and 95 of 274 dots change. It is a middle step, not a substitute for V2.
 
 ### Then
-1. **Commit the v2 work** (§8) and push.
-2. **Open the PR.** Two things belong in the description:
+1. **Rename and push** (§8). Everything is committed already.
+2. **Open the PR.** Three things belong in the description:
+   - This is **V1 of two** and it ships with a known limitation: the map
+     understates countries whose most recent study year was small (Kenya 0%,
+     Cambodia 0% — see §1b). The panel shows the full history so nothing is
+     hidden, and V2 removes the need for aggregation. Say it up front.
    - The `data/products.js` changelog line trips `publish.yml`'s path filter, so
      a bot commit adding `history/products-2026-09-05.js` and a rebuilt
      `feed.xml` will land on the branch after pushing. Expected, not a failure.
@@ -307,38 +338,23 @@ map has no zoom" — instead of a rule we invented. Not implemented; decide firs
 
 ## 8. Commands
 
-### Commit the v2 work
+### Rename and push
 
 ```powershell
-git add scripts/normalize-resistance.js data/resistance.js sourcing/staging/resistance_tes.csv
-git commit -m "DEV-13: ship every study, aggregate dots by patient-weighted average
-
-Removes the P. falciparum and n>=20 filters - all five species and all study
-sizes now ship (1,633 studies). Each country dot is the most recent study year
-averaged across that year's sites and weighted by patient count, so a small
-study can no longer decide a country's colour. data/resistance.js now also
-carries every study for the click-through panel, dictionary-encoded to halve
-the file (373 KB -> 183 KB)."
-
-git add illustrated-journey-dashboard.html
-git commit -m "DEV-13: species selector and click-through study panel
-
-Adds a species select with impossible drug/species pairings disabled, and a
-sortable panel below the map listing every study behind a country dot."
-
-git add scripts/validate-data.js
-git commit -m "DEV-13: validate the studies table and the new dot shape"
-
-git add docs/developer-guide.md sourcing/README.md data/products.js
-git commit -m "DEV-13: document the unfiltered dataset and the aggregation rule"
+git branch -m feat/resistance-map-country-dots
+git push -u origin feat/resistance-map-country-dots
 ```
 
-Then add this file:
+Everything is committed; there is nothing to stage. Expect a bot commit adding
+`history/products-2026-09-05.js` and a rebuilt `feed.xml` shortly after the
+push — that is `publish.yml` reacting to the changelog line in
+`data/products.js`, not a failure.
+
+When V2 starts, branch it from this one rather than from `main`, so it inherits
+the normalizer and data file unchanged:
 
 ```powershell
-git add docs/dev-13-resistance-handover.md
-git commit -m "DEV-13: working notes for handover"
-git push -u origin feat/resistance-map
+git switch -c feat/resistance-map-site-dots
 ```
 
 ### Verify before committing
