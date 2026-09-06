@@ -20,9 +20,9 @@ expensive to reconstruct), §7 for what's left.
 |---|---|
 | Branch | `feat/resistance-map-country-dots` (off `main` @ `6e3e739`) |
 | Version | **1 of 2** — country-level dots (see §1b) |
-| Commits | 14, all `DEV-13:` prefixed |
+| Commits | 16, all `DEV-13:` prefixed |
 | Working tree | clean |
-| Pushed | **yes**, 6 Sep 2026 — confirm on GitHub that the expected `publish.yml` bot commit landed (§8) |
+| Pushed | **yes**, 6 Sep 2026 |
 | CI locally | all green (0 errors, 3 warnings) |
 | Page affected | `illustrated-journey-dashboard.html` **only** |
 
@@ -41,9 +41,9 @@ means and whether the map zooms.
 |---|---|---|
 | a dot is | one country | one study site, as WHO does |
 | map | fixed 960×420 SVG, no zoom | pan/zoom |
-| dot value | aggregated across sites (see D6) | that site's own most recent study |
+| dot value | aggregated across sites (see D6, D12) | that site's own most recent study |
 | detail | click → panel of every study | click → that site's history |
-| status | complete, ready for review | **do not start yet** |
+| status | **frozen — see D12** | **next up, starts in a fresh session** |
 
 **Why V1 aggregates.** The basemap is fixed at 960×420 and **Myanmar occupies
 26×54 pixels** — its 35 study sites need ~61px² each and the box offers 39px².
@@ -63,6 +63,11 @@ exactly what WHO does and why their map needs no aggregation rule at all.
 PR description: the map understates countries whose most recent year happened to
 be small, the panel shows the full history so nothing is hidden, and V2 is the
 fix. Do not let a reviewer discover it themselves.
+
+**V1 is now frozen** (6 Sep 2026). The colour rule was re-examined against WHO's
+published methodology and left unchanged — see **D12**, which is the section to
+read before starting V2, because the WHO standard it establishes is what V2
+should be built to.
 
 ## 2. What the feature is
 
@@ -85,9 +90,11 @@ panel below the map listing every study behind it.
 
 ---
 
-## 3. Committed so far (14 commits)
+## 3. Committed so far (16 commits)
 
 ```
+(pending)  WHO methodology check (D12), V1 frozen
+4bc972c  update the handover notes; add repo working conventions
 6fcc756  frame this branch as V1 of two, country dots
 813eecf  country totals in the tooltip, drop the selection summary
 bd2af05  flat alphabetical drug list
@@ -106,7 +113,7 @@ d7c870f  document the resistance layer and its manual export step
 
 ---
 
-## 4. What the 14 commits contain
+## 4. What the 16 commits contain
 
 Roughly in build order:
 
@@ -120,6 +127,8 @@ Roughly in build order:
 | 6–9 | the unfiltered rewrite: all species, all study sizes, patient-weighted dots, dictionary encoding, species selector, click-through panel |
 | 10–13 | drug list to flat A–Z, empty-state placement, count scopes, country totals in the tooltip |
 | 14 | branch renamed to `…-country-dots`, framed as V1 of two; this document |
+| 15 | `CLAUDE.md` working conventions; handover corrections |
+| 16 | WHO methodology check (D12); V1 frozen, V2 handed the standard |
 
 Net against `main`: 9 files, ~2,400 insertions, no deletions outside files this
 branch created.
@@ -264,6 +273,92 @@ extract (2026-09-05).
 **This is presentation only.** It makes the latest-year weakness visible; it does
 not fix it. Kenya still reads 0%. See the open question at the top of §7.
 
+**D12 — Checked the colour rule against WHO's published standard; kept it.**
+Re-opened on 6 Sep 2026 after the question "if two sites in the same year
+disagree, which value should the colour show?". The answer turned out to be that
+the existing rule is already right, and the finding is worth not re-deriving.
+
+*WHO's decision quantity.* The current WHO guidelines for malaria (13 Aug 2025)
+and the earlier treatment guidelines both state it identically:
+
+> "An antimalarial medicine that is recommended in the national malaria
+> treatment policy should be changed if the **total treatment failure
+> proportion is ≥ 10%**"
+
+Two things follow. It is a **proportion** — failures ÷ patients, pooled — not a
+mean of site percentages and not a worst case. And 10% is a *policy trigger*,
+which is why it is one of our band boundaries.
+
+*The existing rule already computes it.* A patient-weighted mean of site
+percentages is algebraically failures ÷ patients. Verified against the data
+rather than assumed: across all 274 cells the dot's value differs from the
+pooled proportion by at most **0.005 pp** — rounding only. So **within a year,
+D6's aggregation is exactly WHO's quantity**. Do not "improve" it.
+
+*Rejected — worst site wins.* Proposed and measured before the methodology was
+checked: 23 of 267 dots would change band, 17 of them driven by a study of ≥20
+patients. It was then withdrawn, because an extreme is not a proportion and WHO
+publishes no such rule. Recorded here so it is not proposed a third time.
+
+*Rejected — a per-dot evidence line in the tooltip* ("This dot: 44 of 927
+patients (2018 only)"). Built, tested, screenshotted, then reverted: it only
+speaks on hover, and the ask was for the **colour** to carry the meaning. The
+measurement behind it is still worth having — 70 of 267 dots rest on under a
+quarter of the patients ever studied there, 33 of those read 0%, and 20 are
+countries where an earlier study measured ≥10%.
+
+*WHO's reporting unit is the study, not the country.* WHO's own status reports
+count studies against the threshold rather than consolidating a country into one
+number — "treatment failure rates greater than 10% occurred in four of the 159
+studies"; Cambodia "13 of the 27 studies conducted". The efficacy database is
+study-level and country summaries are a derived product. **This is the strongest
+argument for V2** and it comes from WHO, not from us.
+
+### What V2 should be built to
+
+The one part of V1 with no WHO rule behind it is the choice of *which year*.
+WHO's Threats Map answers it per site — "the most recent data in a site" — and
+that rule combined with the pooled proportion is the most faithful country-level
+aggregation available. Measured on this dataset, for whoever picks up V2:
+
+| | now | per-site latest, pooled |
+|---|---|---|
+| Thailand · DHA-PPQ | 0% | **27.44%** |
+| Papua New Guinea · AL | 4.32% | **18.59%** |
+| Vietnam · DHA-PPQ | 54.12% | **14.33%** |
+| Uganda · AL | 12.51% | 6.29% |
+| Kenya · AL | 0% | 3.71% |
+| Cambodia · ASPY | 0% | 5.03% |
+
+**97 of 267 dots change value (45 up, 52 down); 22 change colour band.** It
+corrects in both directions, which the earlier "understates resistance" framing
+did not anticipate. Its cost is that one dot then mixes years, so a single
+"Study year" row becomes a range — acceptable for V2, where a dot is a site and
+the question does not arise.
+
+Scenario counts for the latest year, if any within-year rule is ever revisited:
+139 dots have one study that year, 89 have several all ≥20 patients, 14 are
+mixed with the worst being a large study, 11 are mixed with the worst being a
+small one, 14 have only small studies, and **0** have a study with no sample
+size — every one of the 1,633 studies carries a patient count.
+
+*Sources for the above* (checked 6 Sep 2026):
+
+- WHO guidelines for malaria, 13 Aug 2025 — <https://www.ncbi.nlm.nih.gov/books/NBK588130/>
+- Guidelines for the treatment of malaria, efficacy monitoring chapter — <https://www.ncbi.nlm.nih.gov/books/NBK294423/>
+- Antimalarial drug efficacy database (study-level, per-protocol, 28-day PCR-corrected) — <https://www.who.int/teams/global-malaria-programme/case-management/drug-efficacy-and-resistance/antimalarial-drug-efficacy-database>
+- Malaria Threats Map — <https://www.who.int/teams/global-malaria-programme/surveillance/malaria-threats-map>
+- Artemisinin resistance and ACT efficacy status report — <https://www.who.int/docs/default-source/documents/publications/gmp/who-cds-gmp-2018-26-eng.pdf>
+
+The Threats Map page itself publishes no aggregation methodology; WHO directs
+questions to gmp-maps@who.int. If V2 needs the exact per-site rule in writing,
+that is the address to ask.
+
+**Open — the legend attributes the bands to WHO and that is unverified.** The
+10% boundary is confirmed as WHO's policy threshold. The <5 / 5–10 / 10–20 /
+>20 split is **not** traced to a published WHO scheme. Either find the citation
+or stop attributing it. Flag it in the PR if it ships unresolved.
+
 **Provenance note:** every value and every citation URL comes from the uploaded
 WHO `.xlsx`. `CITATION_URL` is WHO's own column 17. Verified: 0 of 267 URLs and
 0 of 224 institutions appear in our data without being in the source file. The
@@ -273,12 +368,20 @@ only things authored here are D10 and the D6 maths.
 
 ## 7. What's left
 
+### V1 is frozen
+
+Decided 6 Sep 2026: V1 ships as it stands. The colour rule was re-examined
+against WHO's published methodology and confirmed correct for within-year
+aggregation (**D12**) — so there is nothing to fix here, not merely nothing
+worth fixing. V2 begins in a fresh session and should be built to the standard
+D12 sets out.
+
 ### Not in this branch — that is V2
 
 The "most recent year" weakness described in §1b is **deliberate scope**, not an
-open defect. Do not fix it here: changing the aggregation would move 95 of 274
-dots and 22 colour bands, which is a review in its own right, and V2 removes the
-need for aggregation altogether.
+open defect. Do not fix it here: changing the aggregation moves 97 of 267 dots
+and 22 colour bands, which is a review in its own right, and V2 removes the need
+for aggregation altogether.
 
 Kept here because it is the measured case for V2, and the numbers are tedious to
 rederive:
@@ -299,14 +402,20 @@ and 95 of 274 dots change. It is a middle step, not a substitute for V2.
      understates countries whose most recent study year was small (Kenya 0%,
      Cambodia 0% — see §1b). The panel shows the full history so nothing is
      hidden, and V2 removes the need for aggregation. Say it up front.
-   - The `data/products.js` changelog line trips `publish.yml`'s path filter, so
-     a bot commit adding `history/products-2026-09-05.js` and a rebuilt
-     `feed.xml` will land on the branch after pushing. Expected, not a failure.
+   - **On merge**, the `data/products.js` changelog line trips `publish.yml`, so
+     a bot commit adding `history/products-2026-09-05.js` plus a rebuilt
+     `feed.xml` and the two ontology exports will land on `main`. Expected, not
+     a failure. It does **not** fire on this branch — `publish.yml` is scoped
+     to `branches: [main]`.
    - The validator reports **3 warnings, 0 errors** by design — 7 country values
      WHO covers that the 110m basemap doesn't draw, 730 studies with no citation
      URL, 1 study with no site name in WHO's own data. Provenance debt, flagged
      deliberately in the repo's existing warn-don't-block style.
-2. **Talk to the team about ticket scope.** DEV-13 says all three study-result
+2. **Start V2 in a fresh session.** Branch from this one, not `main`, so it
+   inherits the normalizer and data file unchanged (§8). Read §1b and **D12**
+   first — D12 carries the WHO standard V2 should be built to, and the
+   measurements behind it are tedious to rederive.
+3. **Talk to the team about ticket scope.** DEV-13 says all three study-result
    types; one is built. Either re-scope the ticket to this and raise DEV-13b/c,
    or agree it lands as partial.
 
@@ -347,10 +456,9 @@ git push -u origin feat/resistance-map-country-dots
 ```
 
 Kept for the record. Nothing was staged; everything was already committed.
-Expect a bot commit adding
-`history/products-2026-09-05.js` and a rebuilt `feed.xml` shortly after the
-push — that is `publish.yml` reacting to the changelog line in
-`data/products.js`, not a failure.
+
+No bot commit follows a push to this branch: `publish.yml` is scoped to
+`branches: [main]`, so it only runs when the PR merges. See §9.
 
 When V2 starts, branch it from this one rather than from `main`, so it inherits
 the normalizer and data file unchanged:
@@ -391,8 +499,16 @@ Remove-Item .git\index.lock
 **`preview.html`** is gitignored — `make-preview.js` writes it as a smoke test,
 it is not a deliverable.
 
-**Touching `data/products.js`** triggers `publish.yml`. Only the changelog entry
-does this here, and the bot commit that follows is expected behaviour.
+**Touching `data/products.js`** triggers `publish.yml` — but **only on `main`**
+(`on: push: branches: [main], paths: ["data/products.js"]`). Feature-branch
+pushes never fire it, so there is nothing to watch for until merge. On merge it
+validates, appends `history/products-<meta.lastUpdated>.js`, rebuilds `feed.xml`
+and the two ontology exports, and pushes one `[bot]` commit to `main`.
+
+The snapshot is **append-only**: if `history/products-2026-09-05.js` already
+exists with different content, the job fails on purpose and tells you to bump
+`meta.lastUpdated` first. That is the one way this workflow can legitimately go
+red. Only the changelog entry touches `data/products.js` on this branch.
 
 ---
 
