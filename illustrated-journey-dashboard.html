@@ -575,7 +575,26 @@
   .map-zoom .lvl { font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--ink-3);
                    min-width: 2.6em; text-align: right; padding-right: 2px; }
   .map-hint { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 6px 0 0; }
-  .mapwrap circle.res-dot:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  /* An `outline` on an SVG circle is drawn around its BOUNDING BOX, in the
+     browser's own weight — against a 10px dot that reads as a heavy black
+     square ring several times the dot's size. Exactly the problem the country
+     paths have above, and it takes the same fix they do: keep the mark's own
+     halo and let an accent glow define the outer edge. */
+  .mapwrap circle.res-dot:focus { outline: none; }
+  .mapwrap circle.res-dot:focus-visible {
+    outline: none;
+    filter: drop-shadow(0 0 2px var(--accent)) drop-shadow(0 0 1.5px var(--accent));
+  }
+  /* The dot whose study panel is open, so the map says which one you are
+     reading below. A ring drawn OUTSIDE the dot rather than a recolour of its
+     own stroke: that stroke is --map-nodata, which in dark theme holds the same
+     value as --ink, so restroking made a selected dot indistinguishable from an
+     unselected one there. --accent is saturated in both themes and reads on
+     every fill this basemap uses — white, teal, blue, purple and dark ocean. */
+  .mapwrap circle.res-ring {
+    fill: none; stroke: var(--accent); stroke-width: 2;
+    vector-effect: non-scaling-stroke; pointer-events: none;
+  }
 
   .timing-axis { position: relative; height: 18px; margin-left: 150px; }
   .timing-axis span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -1328,16 +1347,32 @@
     // zooming is nothing more than a smaller viewBox — no reprojection, no
     // library, in keeping with the rest of the page.
     const Z = { k: 1, x: 0, y: 0 };
-    // ZMAX is set by the basemap, not by the data: world-map.js is Natural
-    // Earth 110m, and past ~8x its coastlines read as visible straight-line
-    // facets. 8x is also more than the site layer needs — it puts Myanmar, the
-    // worst case at 26x54 px, at 208x432 px for its 35 sites. Raising this
-    // means shipping a 50m basemap first.
-    const ZMAX = 8, ZSTEP = 1.6, DOT_R = 4.4;
+    // ZMAX is chosen off the DATA, and it costs something. The 110m basemap's
+    // coastlines read as visible straight-line facets past ~8x, so this is a
+    // deliberate trade: faceted coastlines in exchange for sites that actually
+    // come apart. 8x left Pailin and Tasanh — 28 km apart, and the pair that
+    // hid Cambodia's 18% Pailin result behind a pooled 15.52% — permanently
+    // merged, because they need 11.6x.
+    //
+    // Same-country pairs that collide at 1x, and how many are still merged:
+    //   8x: 155 of 2007   12x: 94   16x: 73   20x: 49   30x: 30
+    // 16x separates 96% and clears Pailin/Tasanh with headroom. The returns
+    // past it are poor because most of the residue is WHO recording ONE place
+    // twice at different granularity — "Zaire Province" and M'Banza-Kongo its
+    // capital, "Kolkata" and "West Bengal", "Tamu" and "Kalay and Tamu" — and
+    // 3 pairs share identical coordinates outright. No zoom separates those,
+    // and merging them is the right answer rather than a limitation.
+    // Going further than this wants a 50m basemap, which is its own review:
+    // data/world-map.js is loaded by 12 pages, including the three design
+    // options under client review, so it cannot be swapped in place.
+    const ZMAX = 16, ZSTEP = 1.6, DOT_R = 4.4;
     // Clustering depends on k and on nothing else, so marks are rebuilt when the
     // zoom changes and never while panning. drawnK is the k they were built at.
     let drawnK = 1, curSites = null, curMarks = [], curDrug = "", curSpecies = "";
     let curUndrawn = 0, curFallback = false;
+    // the site keys behind the open study panel, so the map can say which dot
+    // the panel belongs to — and keep saying it after a zoom rebuilds the marks
+    let selKeys = null;
 
     function applyZoom() {
       // clamp first: k within range, then the window inside the map, so the
@@ -1422,25 +1457,34 @@
       let drag = null, moved = false;
       svg.addEventListener("pointerdown", (ev) => {
         if (Z.k <= 1 || ev.button !== 0 || ev.target.closest(".map-zoom")) return;
-        drag = { cx: ev.clientX, cy: ev.clientY, x: Z.x, y: Z.y };
+        drag = { cx: ev.clientX, cy: ev.clientY, x: Z.x, y: Z.y, id: ev.pointerId, held: false };
         moved = false;
-        svg.setPointerCapture(ev.pointerId);
-        wrap.classList.add("panning");
+        // NOTHING is captured here, and that is the point. setPointerCapture on
+        // pointerdown retargets the following `click` to the capturing element,
+        // so a dot's own click listener never fired and the study panel would
+        // not open at all once the map was zoomed in. Capture is taken below,
+        // only once the pointer has actually travelled far enough to be a pan.
       });
       svg.addEventListener("pointermove", (ev) => {
         if (!drag) return;
+        if (!moved) {
+          // a press that has not travelled 4 px is still a click, not a pan
+          if (Math.abs(ev.clientX - drag.cx) <= 4 && Math.abs(ev.clientY - drag.cy) <= 4) return;
+          moved = true;
+          try { svg.setPointerCapture(drag.id); drag.held = true; } catch (e) {}
+          wrap.classList.add("panning");
+        }
         const r = svg.getBoundingClientRect();
         const dx = (ev.clientX - drag.cx) / r.width * (M.w / Z.k);
         const dy = (ev.clientY - drag.cy) / r.height * (M.h / Z.k);
-        if (Math.abs(ev.clientX - drag.cx) > 4 || Math.abs(ev.clientY - drag.cy) > 4) moved = true;
         Z.x = drag.x - dx; Z.y = drag.y - dy;
         applyZoom();
       });
-      const endDrag = (ev) => {
+      const endDrag = () => {
         if (!drag) return;
-        drag = null;
         wrap.classList.remove("panning");
-        try { svg.releasePointerCapture(ev.pointerId); } catch (e) {}
+        if (drag.held) { try { svg.releasePointerCapture(drag.id); } catch (e) {} }
+        drag = null;
       };
       svg.addEventListener("pointerup", endDrag);
       svg.addEventListener("pointercancel", endDrag);
@@ -1800,6 +1844,8 @@
     function closePanel() {
       const p = document.getElementById("res-panel");
       if (p) { p.hidden = true; panelRows = []; }
+      selKeys = null;
+      if (typeof applySelection === "function") applySelection();
     }
 
     function renderPanel() {
@@ -1860,7 +1906,10 @@
       const s = mk.members[0];
       const cn = M.countries[s.iso3] ? M.countries[s.iso3].n : s.iso3;
       const small = (RES.meta && RES.meta.smallStudy) || 20;
-      const where = [s.region, cn].filter(Boolean).join(", ");
+      // Site, region, country on one line — the way WHO's threat map labels a
+      // dot. It also removes the guesswork from site names that are a bare
+      // district ("Kayin State", "Jowhar") or repeat across countries.
+      const where = [s.site || "Unnamed site", s.region, cn].filter(Boolean).join(", ");
       // 194 of 1,136 site dots rest on fewer than 20 patients and the smallest
       // on one. Nothing is filtered (D5) and nothing is re-weighted here — the
       // colour is WHO's measured value — so the denominator is stated instead.
@@ -1875,12 +1924,12 @@
       // Kenya problem: a dot reading 0% where the site once measured 11.5%.
       const peak = s.peak && s.peak[AT.v] > s.v && bandOf(s.peak[AT.v]) !== bandOf(s.v)
         ? "<br>Earlier here: " + esc(s.peak[AT.v] + "% in " + s.peak[AT.year]) : "";
-      return "<b>" + esc(s.site || "Unnamed site") + "</b>" +
+      return "<b>" + esc(where) + "</b>" +
         '<div class="trow"><span>Treatment failure</span><span>' + s.v + "%</span></div>" +
         '<div class="trow"><span>Study year</span><span>' + s.year +
           (s.thisYear > 1 ? " · " + s.thisYear + " studies" : "") + "</span></div>" +
         '<div class="trow"><span>Patients</span><span>' + pat + "</span></div>" +
-        '<div class="tprod">' + esc(where) + "<br>" + hist + peak +
+        '<div class="tprod">' + hist + peak +
         "<br>" + esc(curDrug) + " · Click for this site's studies</div>";
     }
 
@@ -1912,6 +1961,8 @@
         ? (mk.members[0].site || "Unnamed site") + ", " + cn
         : cn + " — " + mk.members.length + " sites") + " · " + curDrug + " · " + curSpecies;
       panelSort = { col: "year", dir: -1 };
+      selKeys = new Set(mk.members.map((x) => x.key));
+      applySelection();
       renderPanel();
     }
 
@@ -1934,6 +1985,26 @@
       bits.push(`Source: ${m.source || "WHO"} — WHO last updated ${prettyDate(m.whoLastDataUpdate)}, extract ${prettyDate(m.extract)}. Each value is WHO's own study result; only the merging of nearby sites is ours.`);
       note.textContent = bits.filter(Boolean).join(" ");
       note.hidden = false;
+    }
+
+    // Reapplied after every redraw rather than set once on the clicked circle,
+    // because a zoom change rebuilds every mark. A selected cluster that splits
+    // marks all its parts: each new mark is entirely within the old selection.
+    function applySelection() {
+      const g = wrap.querySelector("svg g.res-layer");
+      if (!g) return;
+      g.querySelectorAll("circle.res-ring").forEach((r) => r.remove());
+      if (!selKeys) return;
+      g.querySelectorAll("circle.res-dot").forEach((c) => {
+        const mk = c.__mark;
+        if (!(mk && mk.members.every((x) => selKeys.has(x.key)))) return;
+        const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        ring.setAttribute("class", "res-ring");
+        ring.setAttribute("cx", c.getAttribute("cx"));
+        ring.setAttribute("cy", c.getAttribute("cy"));
+        ring.setAttribute("r", (+c.getAttribute("r") + 3.2 / Z.k).toFixed(3));
+        g.appendChild(ring);       // last, so it is never painted over
+      });
     }
 
     function drawMarks() {
@@ -1964,6 +2035,7 @@
         c.setAttribute("r", (mk.one ? rSite : rCluster).toFixed(3));
         c.setAttribute("tabindex", "0");
         c.setAttribute("role", "button");
+        c.__mark = mk;                 // applySelection needs it after a rebuild
         const html = mk.one ? siteTip(mk) : clusterTip(mk);
         const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
         c.addEventListener("mouseenter", track);
@@ -1987,6 +2059,9 @@
           g.appendChild(t);
         }
       });
+      // after the circles exist, not before — the ring has to be reapplied on
+      // every rebuild, and a zoom change rebuilds all of them
+      applySelection();
       return marks;
     }
 

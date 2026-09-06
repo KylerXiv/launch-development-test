@@ -22,7 +22,7 @@ expensive to reconstruct), §7 for what's left.
 |---|---|
 | Branch | `feat/resistance-map-site-dots` (off `feat/resistance-map-country-dots` @ `f32384c`) |
 | Version | **2 of 2** — site-level dots on a pan/zoom map (see §1b) |
-| Commits | 18 — 16 inherited from V1, 2 new on this branch, all `DEV-13:` prefixed |
+| Commits | 19 — 16 inherited from V1, 3 new on this branch, all `DEV-13:` prefixed |
 | Working tree | clean |
 | Pushed | V1 yes (6 Sep 2026); **V2 not yet** |
 | V1 PR | **drafted, not yet opened** — see §7 |
@@ -106,7 +106,8 @@ panel below the map listing every study behind it.
 V2 (`feat/resistance-map-site-dots`):
 
 ```
-(pending)  one dot per study site (D14, D15)
+(pending)  separate co-located sites; fix the click-through (D13, D16)
+628aad3    one dot per study site, clustered by proximity (D14, D15)
 fdbbf48    pan/zoom on the country access map (D13)
 ```
 
@@ -151,6 +152,7 @@ Roughly in build order:
 | 16 | WHO methodology check (D12); V1 frozen, V2 handed the standard |
 | 17 | **V2 begins:** viewBox pan/zoom on the map (D13); no data change |
 | 18 | one dot per study site, clustered by proximity (D14, D15); no data change |
+| 19 | ZMAX 8 -> 16 so co-located sites separate; the pointer-capture bug that stopped the panel opening at zoom; hover title and selection ring (D13, D16) |
 
 Net against `main` at V1's tip (`f32384c`), measured with
 `git diff --ignore-cr-at-eol --stat origin/main...`: **11 files, 4,728
@@ -420,14 +422,60 @@ over a dot is swallowed by a **capture-phase** click listener, so panning never
 opens a study panel by accident. Zoom buttons plus arrow-key panning give
 keyboard parity; the level readout is `aria-live`.
 
-**`ZMAX = 8`, and it is set by the basemap, not the data.** `world-map.js` is
-Natural Earth 110m: past ~8x its coastlines read as visible straight-line
-facets (screenshotted at 12x to confirm). 8x is also more than the site layer
-needs — it puts Myanmar, the worst case at 26×54 px, at 208×432 px for its 35
-sites. **Raising this means shipping a 50m basemap first**, which would also
-retire one of the three standing validator warnings (7 country values the 110m
-map does not draw). Considered and deferred: it is a basemap swap and a review
-of its own.
+**`ZMAX = 16`, and it is chosen off the data at a known cost.** Originally 8,
+set by the basemap: past ~8x the 110m coastlines read as visible straight-line
+facets (screenshotted at 12x to confirm). Raised to 16 on 6 Sep 2026 once the
+site layer existed, because 8x left real sites permanently merged — **Pailin and
+Tasanh are 28 km apart and need 11.6x**, so Cambodia's 18% Pailin result stayed
+hidden behind a pooled 15.52% at every zoom the reader could reach. Faceted
+coastlines are the accepted price.
+
+Same-country pairs that collide at 1x, and how many are *still* merged at each
+cap (2,007 colliding pairs in total, across all 45 drug×species cells):
+
+| cap | still merged | separated |
+|---|---|---|
+| 8x | 155 | 92% |
+| 12x | 94 | 95% |
+| **16x** | **73** | **96%** |
+| 20x | 49 | 98% |
+| 30x | 30 | 99% |
+
+16x clears Pailin/Tasanh with headroom and the returns past it are poor,
+because **most of the residue is WHO recording one place twice at different
+granularity** — "Zaire Province" and M'Banza-Kongo which is its capital,
+"Kolkata" and "West Bengal", "Tamu" and "Kalay and Tamu", "All country
+(Malaysia)" and "National surveillance" — and 3 pairs sit at identical
+coordinates outright. No zoom separates those, and merging them is the right
+answer rather than a limitation. Worth knowing before anyone reads the 4% as a
+defect.
+
+**Going further wants a 50m basemap, and that is not a local change.**
+`data/world-map.js` is loaded by **12 pages** — `index.html`, `option-b.html`,
+`story.html` and both editions — including the three design options under
+client review, so it cannot be swapped in place (D1). It would need a second,
+higher-detail basemap loaded by this page alone. That would also retire one of
+the three standing validator warnings (7 country values the 110m map does not
+draw) and could carry admin-1 province borders, which is what WHO's own map
+shows. Costed and deferred: a new committed data file of a few hundred KB and a
+second path through `build-map.js`.
+
+**A bug that cost the whole click-through, recorded because the cause is not
+obvious.** Pointer capture was taken on `pointerdown` so that a drag could not
+be lost off the edge of the map. **`setPointerCapture` retargets the following
+`click` to the capturing element**, so once the map was zoomed past 1x a dot's
+own click listener never fired and the study panel would not open at all — while
+at 1x, where the drag handler returns early, it worked perfectly. Capture is now
+taken in `pointermove`, only once the pointer has travelled the 4 px that makes
+it a pan rather than a click. Verified: the panel opens on a click at zoom, on a
+click after a pan, and on a press-and-release that never moves.
+
+*Also worth not rediscovering:* a synthetic `dispatchEvent(new MouseEvent(
+"click"))` in a test **cannot see this bug** — it bypasses the pointer sequence
+entirely and passed throughout. It needs a real pointer press, and the element
+has to be scrolled into the viewport first: `getBoundingClientRect` on a mark
+below the fold returns coordinates a synthetic mouse click lands outside of,
+which looks exactly like a broken handler.
 
 **D14 — RESOLVED: no country dots. Every mark is a study site.** Opened and
 closed 6 Sep 2026. The question was what a zoomed-out country dot should mean
@@ -472,9 +520,10 @@ fill layer, D11's tooltip grammar and the study panel are all country-scoped,
 and a mark spanning Kenya and Tanzania could be labelled in none of them.
 
 **The cost of that rule, measured:** within a country nothing overlaps at any
-zoom (verified: **0 same-country overlaps** at 1x, 2.6x, 6.6x and 8x). Across a
-border marks still can, because they may never merge — Myanmar/Thailand,
-DRC/Congo, Eritrea/Ethiopia. **61 overlapping pairs at 1x, falling to 4 at 8x.**
+zoom (verified: **0 same-country overlaps** at 1x, 2.6x, 6.6x and 16x — this is
+the regression test to keep). Across a border marks still can, because they may
+never merge — Myanmar/Thailand, DRC/Congo, Eritrea/Ethiopia. **61 overlapping
+pairs at 1x, falling to 3 at 16x.**
 Zoom is the answer, and marks are drawn biggest-first so the smaller of an
 overlapping pair sits on top and stays hoverable; keyboard already reached both,
 since every mark is focusable regardless of what is painted over it.
@@ -497,6 +546,46 @@ because their map does not need one. The rule beside the legend states plainly
 that the merging of nearby sites is ours and every value is WHO's, and the
 provenance note repeats it. This is the only thing on the resistance layer
 authored here besides D10 and the D6 maths.
+
+**D16 — What a mark says on hover, and how the map marks the one you clicked.**
+Settled 6 Sep 2026 against WHO's own site map as the reference.
+
+*The hover title carries the whole place.* "Pailin, Pailin Province, Cambodia"
+on one bold line, as WHO's threat map labels a dot, rather than the site name
+alone with the place on a dimmer line below the numbers. WHO's own site names
+are often a bare district or state ("Kayin State", "Jowhar", "Multiple sites")
+and some repeat across countries, so the name by itself does not locate
+anything. The site's record stays below the numbers, because it is the one
+thing a single dot cannot say for itself: how many studies that site has, over
+what span, and whether an earlier one read into a higher band.
+
+*Rejected — title only, as WHO does.* Their hover carries almost nothing
+because their reader has already chosen a zoom and a filter, and colour alone
+conveys the value. Ours has to work at world scale on first sight.
+
+*The selected mark gets an accent ring, not a recoloured stroke.* Two things
+were wrong with the first attempt. `outline` on an SVG circle is drawn around
+its **bounding box** in the browser's own weight, which against a 10 px dot
+reads as a heavy black square ring several times its size — the same trap the
+country paths already carry a comment about. Restroking the dot instead looked
+right in light theme and **failed in dark**, because the dot's halo is
+`--map-nodata` and dark theme holds the same value in `--ink`: selected and
+unselected became indistinguishable. So the ring is a separate circle drawn
+outside the dot in `--accent`, which is saturated in both themes and reads on
+every fill this basemap uses. Keyboard focus takes the accent drop-shadow the
+country paths use, for the same reason and from the same tokens.
+
+*The ring is reapplied on every rebuild, not set once on the clicked circle.*
+A zoom change rebuilds every mark, and a selected cluster may split — so each
+new mark entirely inside the old selection is ringed, which means an exploded
+cluster marks all its parts. Setting the class at click time only, as the first
+version did, lost the ring on the next zoom while the panel stayed open.
+
+*Opacity stays at 1.* Semi-transparent dots were considered — WHO's map uses
+them, and they would soften the cross-border overlaps clustering cannot fix.
+Rejected: two overlapping dots would blend into a third colour that reads as a
+band neither of them is, and on a four-band scale whose 10% boundary is a
+treatment-policy trigger (D12) that is a misreading with consequences.
 
 ---
 
@@ -528,8 +617,12 @@ layer is derived at render time from `studies[]`, which already shipped all
   aggregate — it is 274 values that no longer appear on the page.
 - **The legend band attribution** (below) applies unchanged; V2 reuses the same
   four bands.
-- **Cross-border overlap** — 4 pairs at maximum zoom. See D15 for why it is
+- **Cross-border overlap** — 3 pairs at maximum zoom. See D15 for why it is
   left alone.
+- **A higher-detail basemap for this page only** — the one thing that would push
+  site separation past 96% and bring province borders, which is what WHO's map
+  shows. Costed in D13; it cannot be a swap of `data/world-map.js` because 12
+  pages load it.
 
 ### V1 is frozen
 
@@ -557,6 +650,13 @@ the **cluster** rule (D14): a cluster is its members' most recent studies pooled
 by patient count. Applied to a whole country it gives Cambodia **5.03%** and
 Kenya **3.71%** — but it is only ever applied to marks the reader can zoom
 apart, so the country number is never the last word.
+
+**Verified on screen, not just in the arithmetic.** At maximum zoom, Cambodia ·
+ASPY · falciparum draws **8 marks for its 8 sites**, and Pailin stands alone
+reading its own **18%** with its 2014 study and source link in the panel. This
+took raising `ZMAX` to 16 (D13): at 8x, Pailin and Tasanh — 28 km apart — stayed
+merged at a pooled 15.52%, so the finding the table above exists to preserve was
+still not reachable by a reader.
 
 ### Then
 1. **Open V1's PR.** A full description is drafted and covers all three points
@@ -659,6 +759,10 @@ and 8x, and is worth rechecking after any change to the marks:
 | a mark's value vs an independent pool from `studies[]` | within 0.005 pp |
 | a site dot's measured screen radius | constant, ~10 px at every zoom |
 | overlay off, then zoom | no dots return (see the `curSites = null` comment) |
+| **a real pointer click on a dot, at zoom** | the panel opens — see D13's capture bug. A synthetic `dispatchEvent` click cannot detect this; the dot must be scrolled into the viewport and pressed with a real pointer |
+| a press-and-release that never moves 4 px | opens the panel rather than panning |
+| the selection ring after a zoom change | still on the mark, panel still open |
+| Cambodia at max zoom, ASPY/falciparum | 8 marks for 8 sites, Pailin standalone at 18% |
 
 ---
 
