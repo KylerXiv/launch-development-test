@@ -1,14 +1,14 @@
 # DEV-13 — WHO resistance overlay: working notes
 
-Handover written 5 Sep 2026. Branch `feat/resistance-map-country-dots`,
-**not pushed yet**.
+Handover written 5 Sep 2026, last updated 6 Sep 2026. Branch
+`feat/resistance-map-country-dots`, **pushed**.
 
 **This is version 1 of two.** V1 draws one dot per country because this map has
 no zoom. V2 will follow WHO and draw one dot per study site with a pan/zoom
 map. V2 is not started and nothing here should be built toward it yet — see
 §1b for the split and why it exists.
 
-Read this first tomorrow: §1 for where things stand, §1b for the two-version
+Read this first: §1 for where things stand, §1b for the two-version
 plan, §6 for the decisions and why they were made (that's the part that's
 expensive to reconstruct), §7 for what's left.
 
@@ -20,9 +20,9 @@ expensive to reconstruct), §7 for what's left.
 |---|---|
 | Branch | `feat/resistance-map-country-dots` (off `main` @ `6e3e739`) |
 | Version | **1 of 2** — country-level dots (see §1b) |
-| Commits | 13, all `DEV-13:` prefixed |
+| Commits | 14, all `DEV-13:` prefixed |
 | Working tree | clean |
-| Pushed | **no** |
+| Pushed | **yes**, 6 Sep 2026 — confirm on GitHub that the expected `publish.yml` bot commit landed (§8) |
 | CI locally | all green (0 errors, 3 warnings) |
 | Page affected | `illustrated-journey-dashboard.html` **only** |
 
@@ -85,9 +85,10 @@ panel below the map listing every study behind it.
 
 ---
 
-## 3. Committed so far (13 commits)
+## 3. Committed so far (14 commits)
 
 ```
+6fcc756  frame this branch as V1 of two, country dots
 813eecf  country totals in the tooltip, drop the selection summary
 bd2af05  flat alphabetical drug list
 7ec4680  working notes for handover
@@ -105,7 +106,7 @@ d7c870f  document the resistance layer and its manual export step
 
 ---
 
-## 4. What the 13 commits contain
+## 4. What the 14 commits contain
 
 Roughly in build order:
 
@@ -118,6 +119,7 @@ Roughly in build order:
 | 5 | NUL-byte fix (see §9) |
 | 6–9 | the unfiltered rewrite: all species, all study sizes, patient-weighted dots, dictionary encoding, species selector, click-through panel |
 | 10–13 | drug list to flat A–Z, empty-state placement, count scopes, country totals in the tooltip |
+| 14 | branch renamed to `…-country-dots`, framed as V1 of two; this document |
 
 Net against `main`: 9 files, ~2,400 insertions, no deletions outside files this
 branch created.
@@ -292,8 +294,7 @@ patient-weight the sites. Measured — Cambodia 0% → **5.03%**, Kenya 0% → *
 and 95 of 274 dots change. It is a middle step, not a substitute for V2.
 
 ### Then
-1. **Rename and push** (§8). Everything is committed already.
-2. **Open the PR.** Three things belong in the description:
+1. **Open the PR.** Three things belong in the description:
    - This is **V1 of two** and it ships with a known limitation: the map
      understates countries whose most recent study year was small (Kenya 0%,
      Cambodia 0% — see §1b). The panel shows the full history so nothing is
@@ -305,7 +306,7 @@ and 95 of 274 dots change. It is a middle step, not a substitute for V2.
      WHO covers that the 110m basemap doesn't draw, 730 studies with no citation
      URL, 1 study with no site name in WHO's own data. Provenance debt, flagged
      deliberately in the repo's existing warn-don't-block style.
-3. **Talk to the team about ticket scope.** DEV-13 says all three study-result
+2. **Talk to the team about ticket scope.** DEV-13 says all three study-result
    types; one is built. Either re-scope the ticket to this and raise DEV-13b/c,
    or agree it lands as partial.
 
@@ -338,14 +339,15 @@ and 95 of 274 dots change. It is a middle step, not a substitute for V2.
 
 ## 8. Commands
 
-### Rename and push
+### Rename and push — done 6 Sep 2026
 
 ```powershell
 git branch -m feat/resistance-map-country-dots
 git push -u origin feat/resistance-map-country-dots
 ```
 
-Everything is committed; there is nothing to stage. Expect a bot commit adding
+Kept for the record. Nothing was staged; everything was already committed.
+Expect a bot commit adding
 `history/products-2026-09-05.js` and a rebuilt `feed.xml` shortly after the
 push — that is `publish.yml` reacting to the changelog line in
 `data/products.js`, not a failure.
@@ -391,3 +393,33 @@ it is not a deliverable.
 
 **Touching `data/products.js`** triggers `publish.yml`. Only the changelog entry
 does this here, and the bot commit that follows is expected behaviour.
+
+---
+
+## 10. Keeping this document current
+
+This file is the only written record of why the branch looks the way it does.
+It stops being useful the moment it disagrees with the repo, so it is updated
+as part of each task — not afterwards, and not at the end of the branch.
+
+**After every task that changes anything in the branch, before committing:**
+
+| Changed | Update |
+|---|---|
+| behaviour a reviewer would see | §2, and §6 if a *decision* was made rather than a detail chosen |
+| a rejected alternative, or a number that was expensive to measure | §6 — record the measurement, not just the verdict |
+| files added or removed | §5 |
+| commits | §1 count, §3 list, §4 grouping |
+| branch name, push state, CI result | §1 table |
+| something deferred, descoped, or newly found | §7 |
+| a command or environment trap worth not rediscovering | §8 / §9 |
+
+Two rules that matter more than the table:
+
+- **The doc edit goes in the same commit as the change it describes.** A
+  separate "update docs" commit is a promise to forget.
+- **Record what was rejected and why, with the numbers.** §6 is the expensive
+  part to reconstruct; the code can always be read back, the reasoning cannot.
+
+If a task changes nothing a reader of this file would care about, say so
+explicitly rather than silently skipping the update.
