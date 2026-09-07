@@ -97,10 +97,25 @@
     font: 15px/1.5 -apple-system, "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 56px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 56px; position: relative; }
 
   /* ---------- header ---------- */
   header { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 24px; margin-bottom: 6px; }
+  /* "Powered by" + the Unitaid mark, top right. The name is not written out —
+     the mark carries it, so the mark's alt text is what says "Unitaid". */
+  .attrib {
+    position: absolute; top: 22px; right: 24px;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .attrib .ptxt { font-size: 12.5px; line-height: 1.3; color: var(--ink-3); }
+  /* The mark carries its own dark navy, which the dark theme's near-black ground
+     swallows, so it keeps a white plate in both themes — never recoloured. */
+  .attrib img {
+    display: block; box-sizing: content-box; width: 46px; height: auto;
+    padding: 7px 8px; border-radius: 10px; background: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(22,48,63,.10);
+  }
+  @media (max-width: 760px) { .attrib { position: static; margin: 0 0 12px auto; width: fit-content; } }
   .brand h1 { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.01em; }
   .brand h1 span { color: var(--accent); }
   .brand h1 span.proto-badge {
@@ -121,6 +136,21 @@
   }
   .demo-banner b { color: var(--ink); }
   .demo-banner.error { background: var(--crit-soft); color: var(--crit); }
+  /* Unverified data has to read as a warning, not as another note in accent
+     blue — amber, a heavier rule down the leading edge and a lead line that
+     states the caveat before any of the detail. */
+  .demo-banner.draft {
+    background: var(--warn-soft); color: var(--ink-2);
+    border: 1px solid var(--warn); border-left-width: 5px;
+    padding: 12px 16px; font-size: 13.5px; line-height: 1.55;
+  }
+  .demo-banner.draft .bl {
+    display: block; margin-bottom: 3px;
+    font-size: 14px; font-weight: 750; letter-spacing: -.01em; color: var(--warn);
+  }
+  .demo-banner.draft .tbc {
+    font-weight: 700; color: var(--warn);
+  }
 
   /* ---------- summary + legend strip ---------- */
   .strip {
@@ -197,7 +227,8 @@
 
   /* pipeline track */
   .trackbox { overflow-x: auto; }
-  .track { display: flex; align-items: flex-start; min-width: 700px; }
+  /* Top padding is the lane the year-gap chips sit in — see .stage .tgap. */
+  .track { display: flex; align-items: flex-start; min-width: 700px; padding-top: 20px; }
   .stage { flex: 1; min-width: 80px; position: relative; text-align: center; }
   .stage .row { display: flex; align-items: center; }
   .stage .bar { flex: 1; height: 3px; background: var(--line); }
@@ -205,6 +236,36 @@
   .stage:first-child .bar.pre, .stage:last-child .bar.post { visibility: hidden; }
   .stage .lbl { font-size: 11px; line-height: 1.25; color: var(--ink-3); margin-top: 7px; padding: 0 3px; }
   .stage.cur .lbl { color: var(--ink); font-weight: 650; }
+  /* year a gate was reached, under its label — makes the gap chips checkable */
+  .stage .syear { font-size: 11px; font-weight: 650; color: var(--ink-2); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .stage.s-idle .syear { color: var(--ink-3); }
+
+  /* Years between two gates, centred on the midpoint between the two markers —
+     which is the stage's own left edge, since every marker is centred in an
+     equal-width stage. It rides in the track's top padding rather than on the
+     connector itself: at eight stages there is only ~38px of bar between two
+     markers, and a chip sized to sit in that gap would either collide with the
+     markers or force the track wider than the card, pushing the last stage out
+     of view. Above the line it can be read at any track width. */
+  .stage .tgap {
+    position: absolute; left: 0; top: -5px; transform: translate(-50%, -100%); z-index: 2;
+    padding: 2px 7px; border-radius: 999px; white-space: nowrap;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .01em;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid transparent;
+  }
+  .stage .tgap.g-good { background: var(--good-soft); color: var(--good); border-color: var(--good-soft); }
+  .stage .tgap.g-warn { background: var(--warn-soft); color: var(--warn); border-color: var(--warn-soft); }
+  .stage .tgap.g-crit { background: var(--crit-soft); color: var(--crit); border-color: var(--crit-soft); }
+  /* the later gate in pathway order was reached first — a fact about sequence,
+     not a delay, so it never borrows the red/amber vocabulary */
+  .stage .tgap.g-back { background: var(--surface-2); color: var(--ink-3); border-color: var(--line); }
+  /* same chip, shown flat in the legend */
+  .tgap-key {
+    padding: 2px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 700;
+    font-variant-numeric: tabular-nums; background: var(--warn-soft); color: var(--warn);
+  }
+  .tgap-key.g-back { background: var(--surface-2); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
 
   /* illustrated stage marker: journey icon + status badge overlay */
   .stage .smark {
@@ -338,6 +399,7 @@
     font-size: 12.5px; line-height: 1.45; box-shadow: var(--shadow); display: none;
   }
   #tip b { display: block; margin-bottom: 2px; }
+  #tip .thint { margin-top: 5px; font-size: 11px; opacity: .6; }
   #tip .trow { display: flex; gap: 8px; justify-content: space-between; }
   #tip .trow span:first-child { opacity: .7; }
   /* country readout: every stage listed, ticked up to the one reached */
@@ -406,8 +468,33 @@
   .updates .ud { flex: none; width: 84px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
   .updates .up { flex: none; width: 84px; font-weight: 650; color: var(--ink); }
 
+  /* Changes list: one readable sentence per entry, with the date and the
+     medicine it concerns as a quiet line above it rather than as two narrow
+     columns the sentence has to squeeze past. */
+  .updates .updates-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); max-width: 76ch; }
+  .updates.changes li { display: block; padding: 11px 0; }
+  .updates.changes .um { font-size: 11.5px; color: var(--ink-3); letter-spacing: .02em; margin-bottom: 2px; }
+  .updates.changes .um .up-name { color: var(--ink-2); font-weight: 650; letter-spacing: 0; }
+  .updates.changes .ut { font-size: 14px; line-height: 1.55; color: var(--ink); max-width: 72ch; }
+
   footer { margin-top: 30px; font-size: 12.5px; color: var(--ink-3); line-height: 1.7; border-top: 1px solid var(--line); padding-top: 16px; }
   footer b { color: var(--ink-2); }
+  /* Sources: one named source per line, each opening its own official site.
+     Two columns on a wide screen so the list stays a footnote rather than
+     becoming a page of its own; one column once that would squeeze the text. */
+  .srclist {
+    margin: 8px 0 12px; padding: 0; list-style: none;
+    columns: 2; column-gap: 34px;
+  }
+  .srclist li { break-inside: avoid; margin: 0 0 7px; line-height: 1.5; }
+  .srclist a { color: var(--accent); font-weight: 650; text-decoration: none; }
+  .srclist a:hover, .srclist a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+  .srclist .srcname { font-weight: 650; color: var(--ink-2); }
+  .srclist li > span { display: block; }
+  .srclist li > span a { font-weight: 400; }
+  .ext { margin-left: 3px; font-size: .85em; opacity: .75; }
+  @media (max-width: 720px) { .srclist { columns: 1; } }
+  footer a { color: var(--accent); }
 
   /* glossary terms */
   .gloss { text-decoration: underline dotted; text-decoration-color: var(--ink-3); text-underline-offset: 2px; cursor: help; }
@@ -553,6 +640,11 @@
 </style>
 
 <div class="wrap">
+  <div class="attrib">
+    <span class="ptxt">Powered by</span>
+    <img src="assets/unitaid-mark.svg" alt="Unitaid" width="388" height="251">
+  </div>
+
   <header>
     <div class="brand">
       <h1><span>LAUNCH</span> Transparency Dashboard <span class="proto-badge">Prototype — data presented here may not be accurate</span></h1>
@@ -580,6 +672,8 @@
       <span class="key"><span class="dot prog" aria-hidden="true">›</span> In progress</span>
       <span class="key"><span class="dot late" aria-hidden="true">!</span> Delayed / bottleneck</span>
       <span class="key"><span class="dot idle" aria-hidden="true"></span> Not started (stage glyph dimmed, no badge)</span>
+      <span class="key"><span class="tgap-key g-warn" aria-hidden="true">+3 yrs</span> Years taken to get from one gate to the next</span>
+      <span class="key"><span class="tgap-key g-back" aria-hidden="true">−1 yr</span> Gate reached before the one ahead of it in the pathway</span>
     </div>
     <button class="dl-btn" id="dl-csv" type="button">Download CSV</button>
   </div>
@@ -610,8 +704,9 @@
     <div class="timing-pending" id="timing-pending"></div>
   </section>
 
-  <details class="updates" id="updates" hidden>
-    <summary>Recent updates</summary>
+  <details class="updates changes" id="updates" hidden>
+    <summary>What&#39;s changed recently</summary>
+    <p class="updates-intro">The eight most recent changes we have made to the information on this page, in plain English.</p>
     <ul id="updates-list"></ul>
   </details>
 
@@ -624,10 +719,51 @@
     <b>About the data.</b> The LAUNCH dashboard displays publicly available information only. Product-specific details
     (including pricing) appear solely where the manufacturer has confirmed in writing that they may be shared.
     Hover any stage for status detail; select a medicine to open its full profile.<br>
-    <b>Sources.</b> WHO Guidelines &amp; Prequalification updates · stringent regulatory authority registers ·
-    national regulatory authorities · Global Fund / PMI procurement data · manufacturer communications.
-    A LAUNCH initiative of Unitaid partners, hosted on RBM dashboards.
-      <br><b>Spotted an error?</b> <a class="report-link" href="#report-issue" data-report-issue>Report an issue or contact the LAUNCH team</a> — corrections from country teams, manufacturers and partners are welcome.
+    <b>Sources.</b> Everything on this page is traceable to one of the public sources below.
+    Each name opens that source's own official site in a new tab, so you can check any figure yourself.
+    <ul class="srclist">
+      <li>
+        <a href="https://www.who.int/teams/global-malaria-programme/guidelines-for-malaria" target="_blank" rel="noopener noreferrer">WHO malaria guidelines<span class="ext" aria-hidden="true">↗</span></a>
+        <span>Which medicines the World Health Organization recommends, and from when.</span>
+      </li>
+      <li>
+        <a href="https://extranet.who.int/prequal/medicines/prequalified/finished-pharmaceutical-products" target="_blank" rel="noopener noreferrer">WHO prequalification list<span class="ext" aria-hidden="true">↗</span></a>
+        <span>The medicines WHO has checked for quality, safety and effectiveness. <a href="https://extranet.who.int/prequal/vector-control-products/prequalified-product-list" target="_blank" rel="noopener noreferrer">Prevention tools are on a separate list<span class="ext" aria-hidden="true">↗</span></a>.</span>
+      </li>
+      <li>
+        <a href="https://www.ema.europa.eu/en/medicines/download-medicine-data" target="_blank" rel="noopener noreferrer">European Medicines Agency<span class="ext" aria-hidden="true">↗</span></a>
+        <span>European approval decisions, including its opinions on medicines meant for use outside Europe.</span>
+      </li>
+      <li>
+        <a href="https://greenbook.nafdac.gov.ng/" target="_blank" rel="noopener noreferrer">Nigeria: NAFDAC Green Book<span class="ext" aria-hidden="true">↗</span></a>
+        <span>The national register of every medicine approved for sale in Nigeria.</span>
+      </li>
+      <li>
+        <a href="https://imis2.tmda.go.tz/portal/#/public/registered-medicines" target="_blank" rel="noopener noreferrer">Tanzania: TMDA register<span class="ext" aria-hidden="true">↗</span></a>
+        <span>The national register of every medicine approved for sale in Tanzania.</span>
+      </li>
+      <li>
+        <a href="https://insights.theglobalfund.org/t/Public/views/PriceQualityReportingTransactionSummary/TransactionSummary" target="_blank" rel="noopener noreferrer">Global Fund price and quality reporting<span class="ext" aria-hidden="true">↗</span></a>
+        <span>What was actually bought for countries — how many packs, at what price, in which year.</span>
+      </li>
+      <li>
+        <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer">ClinicalTrials.gov<span class="ext" aria-hidden="true">↗</span></a>
+        <span>Trial records: how many people took part, when a trial finished, and what it found.</span>
+      </li>
+      <li>
+        <span class="srcname">US President's Malaria Initiative</span>
+        <span>Its public data portal closed in 2025, so US-funded purchases from that point on are a gap we cannot yet fill.</span>
+      </li>
+      <li>
+        <span class="srcname">Manufacturer communications</span>
+        <span>Company announcements, and figures a manufacturer has confirmed to us in writing. There is no public register for these.</span>
+      </li>
+    </ul>
+    A LAUNCH initiative of
+    <a href="https://unitaid.org/" target="_blank" rel="noopener noreferrer">Unitaid<span class="ext" aria-hidden="true">↗</span></a>
+    partners, to be hosted by the
+    <a href="https://endmalaria.org/" target="_blank" rel="noopener noreferrer">RBM Partnership to End Malaria<span class="ext" aria-hidden="true">↗</span></a>.
+      <br><b>Something look wrong?</b> <a class="report-link" href="#report-issue" data-report-issue>Send feedback to the LAUNCH team</a> — corrections and comments from country teams, manufacturers and partners are always welcome.
   </footer>
 </div>
 
@@ -668,18 +804,34 @@
   const status = DATA.meta.dataStatus;
   const BANNERS = {
     illustrative: "<b>Design mockup.</b> All statuses, dates, prices and volumes below are illustrative placeholders for layout review — not real programme data.",
-    draft: "<b>Draft data.</b> Compiled from public sources and pending LAUNCH team verification and manufacturer written confirmation. Unverified values are shown as TBC, never estimated."
+    draft: '<span class="bl">⚠ Draft figures — not yet verified. Please do not quote them.</span>' +
+      "Everything on this page was gathered from public sources. The LAUNCH team is still checking it, " +
+      "and manufacturers have not yet confirmed their own figures in writing. " +
+      'Where we cannot confirm something we show <span class="tbc">TBC</span> — we never fill a gap with an estimate.'
   };
-  if (BANNERS[status]) { banner.hidden = false; banner.innerHTML = BANNERS[status]; }
+  if (BANNERS[status]) {
+    banner.hidden = false;
+    banner.innerHTML = BANNERS[status];
+    banner.classList.add(status);
+  }
   document.getElementById("meta-note").textContent =
-    status === "live" ? " · Data confirmed by manufacturers for public release" : " · " + status + " data";
+    status === "live" ? " · Data confirmed by manufacturers for public release"
+    : status === "draft" ? " · Draft — figures not yet verified"
+    : " · " + status + " data";
 
   // changelog
   const updates = DATA.changelog || [];
   if (updates.length) {
     document.getElementById("updates").hidden = false;
+    // Prefer the plain-language retelling where the data carries one; the
+    // technical `change` line stays the record of what actually happened and
+    // is what the RSS feed and the other editions still publish.
     document.getElementById("updates-list").innerHTML = updates.slice(0, 8).map(u =>
-      `<li><span class="ud">${esc(u.date)}</span><span class="up">${esc(u.product)}</span><span>${esc(u.change)}</span></li>`
+      `<li>
+         <div class="um">${esc(readableDate(u.date))} · <span class="up-name">${
+           u.product === "All" ? "The whole dashboard" : esc(u.product)}</span></div>
+         <div class="ut">${esc(u.plain || u.change)}</div>
+       </li>`
     ).join("");
   }
 
@@ -730,12 +882,81 @@
 
   function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+  // "2026-08-25" → "25 August 2026" — spelled out, so the changes list reads
+  // as prose rather than as a database column.
+  function readableDate(iso) {
+    const d = new Date(iso + "T00:00:00");
+    return isNaN(d) ? iso : d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  }
 
   // pathway legend strip: the eight stages as illustrated badges
   const pathway = document.getElementById("pathway");
   pathway.hidden = false;
   // The strip is the only element on the page that owns all eight gates, so it
   // is the entry point for the systemic question: who is stuck at this gate?
+  // The single fact a marker is worth showing on hover. The hover is a peek —
+  // "what is the state of this gate" — and the click opens the panel that
+  // carries the note, the next step, the source and the verification date.
+  // Anything more than one line here just says the panel's content over the
+  // top of it.
+  //
+  // It leads with the same four words the legend teaches (Complete / In
+  // progress / Delayed / Not started) and adds at most one qualifier: when a
+  // cleared gate was reached, or when a gate still ahead is expected. Both are
+  // quoted from the data, never inferred — but only the first clause of a date,
+  // since these are prose ("2015–2023; requal. 20 Jan 2025", "Announced 12 Nov
+  // 2025; trial completed 25 Nov 2025") and the trailing clause is the second
+  // fact, which is what the panel is for. "TBC" is dropped rather than shown as
+  // "expected TBC": an unknown date reads better as no date at all.
+  function firstClause(text) {
+    return String(text || "").split(";")[0].trim();
+  }
+  function peekLine(status, date, nextDate) {
+    const when = firstClause(date);
+    const due = firstClause(nextDate);
+    const expected = due && !/^tbc$/i.test(due) ? " · expected " + due : "";
+    if (status === "done") return LABEL.done + (when ? " · " + when : "");
+    if (status === "idle") return LABEL.idle + expected;
+    return LABEL[status] + (when ? " · " + when : expected);
+  }
+
+  // ---- years between gates on the track -------------------------------------
+  // Stage `date` is free text written for a reader ("2012 (label update 2025)",
+  // "2015–2023; requal. 20 Jan 2025", "Rolling"), so the year is read out of it
+  // rather than stored separately. Only a `done` stage counts: its date is when
+  // the gate was actually cleared, whereas a stage still in progress carries a
+  // target, and a target must never be drawn as elapsed time. The first year in
+  // the string is the one we want — a range starts at the year it was reached.
+  function stageYear(st) {
+    if (!st || st.status !== "done") return null;
+    const m = String(st.date || "").match(/\b(19|20)\d{2}\b/);
+    if (!m) return null;
+    const y = +m[0];
+    return y >= 1990 && y <= 2100 ? y : null;
+  }
+
+  // The gap between gate i-1 and gate i, drawn on the connector between them.
+  // The pathway is an order of gates, not a guaranteed chronology: WHO
+  // prequalification can be reached years before a WHO guideline recommendation.
+  // Where that happens the gap is negative, and it is shown in the neutral grey
+  // rather than the red a five-year delay earns — it is a fact about sequence.
+  function gapChip(years, i) {
+    if (i === 0) return "";
+    const a = years[i - 1], b = years[i];
+    if (!a || !b) return "";
+    const gap = b - a;
+    const abs = Math.abs(gap);
+    const unit = abs === 1 ? "yr" : "yrs";
+    const cls = gap < 0 ? "g-back" : gap <= 2 ? "g-good" : gap <= 5 ? "g-warn" : "g-crit";
+    const txt = gap === 0 ? "same yr" : (gap < 0 ? "−" : "+") + abs + " " + unit;
+    const label = gap === 0
+      ? `${STAGES[i]} was reached in ${b}, the same year as ${STAGES[i - 1]}.`
+      : gap < 0
+      ? `${STAGES[i]} was reached in ${b}, ${abs} ${unit} before ${STAGES[i - 1]} in ${a} — these gates were not cleared in pathway order.`
+      : `${abs} ${unit} from ${STAGES[i - 1]} in ${a} to ${STAGES[i]} in ${b}.`;
+    return `<span class="tgap ${cls}" role="img" title="${esc(label)}" aria-label="${esc(label)}">${txt}</span>`;
+  }
+
   const lateAt = i => tracked.filter(p => p.stages[i].status === "late").length;
   pathway.innerHTML = STAGES.map((s, i) => {
     const n = lateAt(i);
@@ -746,24 +967,25 @@
   }).join(`<span class="patharrow" aria-hidden="true">→</span>`);
 
   tracked.forEach(p => {
+    const years = p.stages.map(stageYear);
     const stagesHtml = p.stages.map((st, i) => {
       const preDone = i > 0 && (p.stages[i - 1].status === "done");
       const postDone = st.status === "done";
       return `
         <div class="stage ${i === p.currentStage ? "cur" : ""} s-${st.status}">
+          ${gapChip(years, i)}
           <div class="row">
             <div class="bar pre ${preDone ? "done-bar" : ""}"></div>
             <button class="smark" type="button"
               aria-expanded="false" aria-controls="${esc(p.id)}-gate"
-              aria-label="${esc(STAGES[i])}: ${LABEL[st.status]}. ${esc(st.note)}"
+              aria-label="${esc(STAGES[i])}. ${esc(peekLine(st.status, st.date, st.nextDate))}. Opens the full detail."
               data-stage="${esc(STAGES[i])}" data-stagei="${i}" data-pid="${esc(p.id)}"
               data-status="${st.status}"
-              data-note="${esc(st.note)}" data-date="${esc(st.date)}"
-              data-next="${esc(st.next)}" data-nextdate="${esc(st.nextDate)}"
-              data-asof="${esc(st.asOf)}">${stageIconImg(i, "sicon")}<span class="dot ${st.status}" aria-hidden="true">${ICON[st.status]}</span></button>
+              data-date="${esc(st.date)}" data-nextdate="${esc(st.nextDate)}">${stageIconImg(i, "sicon")}<span class="dot ${st.status}" aria-hidden="true">${ICON[st.status]}</span></button>
             <div class="bar post ${postDone ? "done-bar" : ""}"></div>
           </div>
           <div class="lbl">${esc(STAGES[i])}</div>
+          ${years[i] ? `<div class="syear">${years[i]}</div>` : ""}
         </div>`;
     }).join("");
 
@@ -888,7 +1110,7 @@
           <div class="src">${status === "illustrative"
             ? "Illustrative data for design review. Live version: each figure links to its public source and the date the manufacturer confirmed release."
             : status === "draft"
-            ? "Draft data compiled from public sources — pending verification. Manufacturer-specific details will appear only once release is confirmed in writing."
+            ? "Draft — not yet verified. These figures come from public sources and are still being checked. Manufacturer-specific details appear only once that manufacturer confirms in writing that they may be shown."
             : "Each figure reflects its cited public source; manufacturer-specific details are shown only where release was confirmed in writing."}</div>
         </div>
       </section>
@@ -1112,13 +1334,11 @@
   }
   function hideTip() { tip.style.display = "none"; }
   function showStageTip(dot) {
-    const rows = [];
-    if (dot.dataset.note) rows.push(`<div style="margin-bottom:4px">${esc(dot.dataset.note)}</div>`);
-    if (dot.dataset.date) rows.push(`<div class="trow"><span>Date</span><span>${esc(dot.dataset.date)}</span></div>`);
-    if (dot.dataset.next) rows.push(`<div class="trow"><span>Next step</span><span>${esc(dot.dataset.next)}</span></div>`);
-    if (dot.dataset.nextdate) rows.push(`<div class="trow"><span>Expected</span><span>${esc(dot.dataset.nextdate)}</span></div>`);
-    if (dot.dataset.asof) rows.push(`<div class="trow"><span>Verified</span><span>${esc(dot.dataset.asof)}</span></div>`);
-    showTipAt(dot, `<b>${esc(dot.dataset.stage)} — ${LABEL[dot.dataset.status]}</b>${rows.join("")}`);
+    const d = dot.dataset;
+    showTipAt(dot,
+      `<b>${esc(d.stage)}</b>` +
+      `<div>${esc(peekLine(d.status, d.date, d.nextdate))}</div>` +
+      `<div class="thint">Click for the full detail</div>`);
   }
   document.querySelectorAll(".stage .smark").forEach(dot => {
     // The tooltip is the fast peek; the panel is the full read. Once a marker's
@@ -1252,7 +1472,7 @@
         empty.hidden = true;
         const c = p.detail.countries;
         overlay.hidden = c.status === "verified";
-        overlay.textContent = (c.status === "illustrative" ? "ILLUSTRATIVE — " : "DRAFT — ") + c.note;
+        overlay.textContent = (c.status === "illustrative" ? "ILLUSTRATIVE — " : "DRAFT, NOT YET VERIFIED — ") + c.note;
       }
     }
     tabs.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => selectMap(t.dataset.id)));
@@ -1370,4 +1590,33 @@
 })();
 </script>
 
+<script>
+  /* This page runs the shared report-issue widget as "Send feedback" — same
+     form and same seam, friendlier framing for a general visitor. Must be set
+     before the widget script runs. */
+  window.LAUNCH_FEEDBACK_COPY = {
+    pill:         "Send feedback",
+    title:        "Send feedback",
+    intro:        "Something look wrong, out of date, or hard to follow? Tell the LAUNCH team — we read every message.",
+    typeLabel:    "What is your feedback about?",
+    types: {
+      correction: "Something on the page looks wrong",
+      source:     "A source is missing or out of date",
+      suggestion: "An idea for making this clearer or more useful",
+      other:      "Something else"
+    },
+    messageLabel: "What would you like to tell us?",
+    messagePlaceholder:
+      "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026.",
+    note: "If you leave an email address we will only use it to come back to you about this message. " +
+          "We also note which page you were on and which version of the data you saw, so the team can find what you found.",
+    submit:       "Send feedback",
+    sending:      "Sending…",
+    failed:       "Sorry — your feedback could not be sent just now. Please try again in a moment.",
+    doneTitle:    "Thank you — we have your feedback.",
+    doneMessage:  "The LAUNCH team reads every message. If you have pointed us to a public source that " +
+                  "checks out, we correct the data at the next update and note it under <em>What's changed recently</em>.",
+    again:        "Send more feedback"
+  };
+</script>
 <script src="assets/report-issue.js" defer></script>

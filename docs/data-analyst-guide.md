@@ -134,8 +134,16 @@ array must have exactly one entry per name, same order. Changing this list is a
 
 ### `changelog`
 
-Array of `{ date, product, change }`, newest first. `product` is a product name
-or `"All"`. Feeds the Recent updates panel (first 8 shown).
+Array of `{ date, product, change, plain? }`, newest first. `product` is a
+product name or `"All"`. Feeds the Recent updates panel (first 8 shown).
+
+`change` is the record of what happened, written for the team — keep the source
+names, register codes and figures in it; it is what `feed.xml` and the other
+editions publish. `plain` is an optional retelling of the same change for a
+general visitor: no acronyms, no register jargon, spell out organisations in
+full. The illustrated journey page shows `plain` where it exists and falls back
+to `change` where it does not, so an entry without one is still correct — just
+more technical than it needs to be.
 
 ### `glossary`
 
