@@ -254,15 +254,15 @@ did not count the two CSVs.)
 | `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **Unchanged by V2 — byte-identical to V1.** |
 | `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom, theme), `---- keyboard-accessible country list` for D21. The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. The map's surrounding chrome (`#mapsec`'s HTML, the `.map-dock`/`.dock-section` CSS) is the "Dock" layout, D23 — a separate change from the renderer, touching only markup/CSS, not the JS this row otherwise describes. `---- click-through: every study behind one country dot` covers `openMarkPanel`/`renderPanel`/`chartPlan`/`renderChart` (D25) and `bindDrug`/`curBoundDrug` (D24). |
 | `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). Still checks resistance `iso3` values against `data/world-map.js` only (D17) — unaware of `data/world-map-geo.js` below. |
-| `scripts/build-map-geo.js` | **New.** Sibling to `scripts/build-map.js`, same dev-only-deps/`NODE_PATH` convention. Emits GeoJSON (not SVG paths) at Natural Earth **50m** from the identical `NUM_TO_A3` country table — this page's basemap only (D17). |
-| `data/world-map-geo.js` | **New**, generated output of the above. `window.LAUNCH_MAP_GEO = {type:"FeatureCollection", features:[{properties:{iso3,name}, geometry}]}`. 100 countries (6 more than `data/world-map.js`'s 94 — see D17 for the exact accounting). Not yet loaded by any page as of this commit. |
+| `scripts/build-map-geo.js` | Sibling to `scripts/build-map.js`, same dev-only-deps/`NODE_PATH` convention (now also needs `i18n-iso-countries` and `antimeridian-ts`). Emits GeoJSON (not SVG paths) at Natural Earth **50m** — originally from the identical 100-country `NUM_TO_A3` table (D17), now from every ID `i18n-iso-countries` can resolve to an ISO3 code, i.e. the whole world (D27), antimeridian-cut per feature via `fixGeoJson` (D28 — `geoStitch` tried first, replaced same day), Antarctica dropped outright (D30) — this page's basemap only. |
+| `data/world-map-geo.js` | Generated output of the above. `window.LAUNCH_MAP_GEO = {type:"FeatureCollection", features:[{properties:{iso3,name}, geometry}]}`. **235 countries/territories** (D27 widened from the original 100; D30 later dropped Antarctica — see D27/D30 for why). Loaded only by `illustrated-journey-dashboard.html`. |
 
 ### Current numbers
 
 - **1,633 studies** shipped (1,642 raw minus 9 WHO publishes with a literal `NaN`)
 - **26 drugs × 5 species → 274 country dots**
 - `data/resistance.js` is **183 KB**
-- `data/world-map-geo.js` is **~620 KB** (50m detail costs more than `data/world-map.js`'s 110m; not minified beyond 3-decimal coordinate rounding — untested whether further simplification is worth it)
+- `data/world-map-geo.js` is **~1.55 MB** (D27 widened it from ~620 KB when it carried only the 100 WHO-tracked countries, to ~1.6 MB for the whole world; D30 then dropped Antarctica, ~1.55 MB; 50m detail costs more than `data/world-map.js`'s 110m; not minified beyond 3-decimal coordinate rounding — untested whether further simplification is worth it)
 
 ---
 
@@ -1134,6 +1134,184 @@ was already scoped correctly and needed no change — it re-ran with
 identical results before and after this fix, which is itself confirmation
 the sweep was never exercising the broken range.
 
+**D27 — LAUNCH_MAP_GEO widened to the whole world; reverses D17's "identical
+country table, not a superset" for this one file.** Reported: selecting
+"Europe" in the Location filter painted a blank map — not a bug in the
+filter logic, but the honest result of D17's original scope: GEO only ever
+carried geometry for the 94 WHO-tracked malaria countries (100 with GEO's
+own 6-country superset), and none of them sit in WHO's European region
+(malaria isn't endemic there). Two narrower fixes were tried and rejected
+before this one, in order:
+
+1. *Disable "Europe" in the Region `<select>`* (mirroring D7's disabled-not-
+   blank convention for study types with no data) — reverted: the branch
+   owner wanted Europe selectable, not hidden.
+2. *A hand-picked fallback bbox, just for the camera to fly to on
+   "Europe" with an otherwise still-100-country GEO* — reverted before it
+   shipped: shown a screenshot of WHO's own live threat map, where **every**
+   country in the world is always drawn, in grey "data not available" by
+   default, and a region filter only narrows which ones are highlighted —
+   never removes the rest of the world's shapes. A hand-picked bbox over an
+   otherwise-empty ocean doesn't reproduce that; only real geometry does.
+
+**What shipped instead:** `scripts/build-map-geo.js`'s country table —
+previously a copy of `build-map.js`'s 94-country `NUM_TO_A3`, `world-atlas`'s
+own numeric IDs mapped by hand — is replaced with every ID the
+`i18n-iso-countries` package can resolve to an ISO 3166-1 alpha-3 code, i.e.
+every country/territory Natural Earth 50m carries. Verified before
+switching: `i18n-iso-countries`'s `numericToAlpha3` agrees with all 101
+entries of the old hand-written table (0 diffs) — a straight superset, not a
+divergent renumbering. Output: **236 countries/territories** (up from 100),
+`data/world-map-geo.js` **~1.6 MB** (up from ~620 KB). 5 topology entries
+with no numeric ISO code at all (Kosovo, Somaliland, Northern Cyprus,
+Siachen Glacier, the Indian Ocean Territory — Natural Earth carries these as
+shapes without an ISO 3166 assignment) are skipped; there is no iso3 to key
+them on.
+
+`data/world-map.js` (94 countries, 12-page shared, SVG-path) is **untouched** —
+D17's reasoning for why that file can't be touched still holds. What
+actually reversed is GEO's own scope, which D17 explicitly tied to
+`world-map.js`'s ("identical... not a superset") — that tie is now cut, on
+purpose, only for GEO. `LAUNCH_MAP` (`M`) stays the sole authority for
+"which countries count as drawn" (`drawnCount`, the legend counts, the
+validator's undrawn-country warning) exactly as D17 intended; nothing that
+used to be undrawn becomes wrongly *paintable* — a country only gets a real
+access colour through `byIso`, which still only ever comes from a product's
+real WHO data. The new countries just give the "no data" grey a shape to be
+grey *on*, the same way WHO's own map never has true blank space.
+
+Three follow-on changes, all in illustrated-journey-dashboard.html:
+
+- **`WHO_REGION`** grows from the 100 tracked/superset countries to all
+  **195** classified — every WHO member state GEO has a shape for, by WHO's
+  real 6-region scheme (so EURO now correctly includes Russia and the
+  Central Asian republics, not just "geographic Europe" narrowly).
+  Dependent territories and disputed/unrecognised areas (Puerto Rico, Hong
+  Kong, Western Sahara, Taiwan, Antarctica, …) are deliberately left
+  unclassified — not WHO member states, no official region — so they render
+  in the unfiltered view but never appear under a specific Region.
+- **`regionCountries`/`fillCountryList`** now source their country list from
+  GEO (every drawn iso3) instead of `M.countries` (the 94 tracked) — the
+  Region and Country pickers can filter to any of the 195, not just the ones
+  with WHO resistance data.
+- **The region fitBounds computes a "framing" bbox that excludes any single
+  country whose own shape spans more than 180° of longitude** (Russia:
+  −180 to 179.9° in this dataset, since Natural Earth represents it as one
+  polygon straddling the antimeridian rather than splitting it; also USA,
+  New Zealand, Fiji, Kiribati) — without this, selecting "Europe" computed a
+  bbox spanning the entire globe's width (Russia alone) and the "zoom to
+  Europe" fit looked identical to the unfiltered whole-world view. Excluded
+  from the camera fit only — still rendered, still part of the filter.
+
+Not touched, deliberately: `LON0/LON1/LAT0/LAT1`, `maxBounds`, `ZMAX` (D13's
+pan/zoom window, tuned against and re-verified for the previous 94/100-
+country extent — D15/D20/D22's collision measurements are pinned to this
+exact projection window). The consequence: countries at the edges of or
+outside `maxBounds` (Svalbard, most of Canada's and Russia's Arctic,
+Antarctica) render but can never be panned fully into view. Accepted as a
+cosmetic edge-of-map limitation rather than re-deriving D13/D15/D20's
+already-verified zoom/clustering guarantees against a new window.
+
+**D28 — Antimeridian cut for the whole-world basemap, found from a
+screenshot the day after D27 shipped.** Reported: a large invalid white/grey
+sliver cutting diagonally across the default map view, roughly between
+North America and Europe/Asia. Cause: Natural Earth stores Russia (and the
+USA, via the Aleutians; New Zealand; Fiji; Kiribati) as a single ring that
+crosses ±180° longitude instead of a MultiPolygon split there — D27's own
+per-feature longitude-span check had already flagged exactly these 6
+countries (§6 D27) but only used that fact to exclude them from the region
+*camera-framing* fitBounds, not from rendering. Left as one unsplit ring, a
+WebGL renderer's triangulator (earcut, underneath MapLibre) treats far-apart
+vertices as directly connected, producing an arbitrarily large invalid
+triangle anywhere in the ring's vertex order — not confined to whatever
+screen position the real antimeridian happens to project to. This never
+surfaced before D27 because none of the 100 countries D17's original scope
+included ever crossed the antimeridian; widening to the whole world was what
+finally included Russia and the USA.
+
+**First attempt, shipped then found incomplete the same day:** `geoStitch`
+(from the `d3-geo-projection` package) runs over the raw topology before
+`topojson.feature` extracts any country, splitting every antimeridian-
+crossing arc into proper pieces. It fixed the USA, New Zealand and Kiribati
+completely (0 polygon parts over 170° of longitude, down from 1 each), and
+looked like it had fixed Russia and Fiji too — each kept exactly one part
+still spanning ~360°, which was assumed at the time to be a real island
+sitting on ±180° (Russia's Wrangel Island group; one small Fijian island),
+too small to be the reported sliver. **That assumption was wrong.** A
+follow-up screenshot (a thin diagonal line, not the original wide sliver —
+smaller, but the same class of bug, still there) prompted checking the
+actual ring: Russia's still-wide part had **4,894 points and a 41–78°
+latitude span — the country's mainland**, not an island; `geoStitch`'s
+arc-based approach missed the one arc where it crosses near Chukotka
+because that arc isn't shared with a neighbouring country. Replaced with
+`antimeridian-ts` (`fixGeoJson`, run per feature, after `topojson.feature`
+rather than on the raw topology beforehand) — it fixes Russia's mainland
+and every other case `geoStitch` handled, leaving **zero** polygon parts
+over 170° of longitude across all 236 countries except Antarctica (dropped
+in D30 for an unrelated, unfixable reason). `data/world-map-geo.js`
+regenerated: still 236 countries/territories at this point (D30 later
+dropped to 235), ~1.6 MB (stitching/fixing only reshapes existing geometry,
+it doesn't add or drop countries by itself).
+
+**D29 — Zoom range 16x → 64x, at the branch owner's request; re-verified,
+not just changed.** `ZMAX` (D13/D26) goes from 16 to 64 in
+illustrated-journey-dashboard.html — `maxZoom: Math.log2(ZMAX)` already
+handled the linear→exponential conversion correctly since D26, so this is a
+one-constant change, not a repeat of that bug. What isn't a one-constant
+change: D15/D20/D22 measured clustering correctness up to 16x specifically,
+so raising the ceiling needed the same re-proof D22 already established the
+pattern for. `scripts/verify-map-clusters.js`'s `ZOOMS` sweep extended from
+`[0, 1.4, 2.0, 2.7, 3.0, 4.0]` (1x…16x) to add `4.5, 5.0, 5.5, 6.0`
+(~23x/32x/45x/64x). Re-run: **0 same-country overlaps across 45 populated
+cells × 10 zoom levels (450 checks)**, including the new 64x cap.
+Cross-border overlaps keep shrinking monotonically with zoom exactly as
+D15 found (108 at 8x → 58 at 16x → 36 → 17 → 12 → **10 at 64x**) — the
+existing invariant extends cleanly into the new range rather than needing a
+different explanation there.
+
+**D30 — `maxBounds` widened to near-global; a real bug this uncovered,
+Antarctica, fixed by dropping it.** Reported alongside D29's ask: "it can
+only show until 3x, I want 1x" — the Region picker's fitBounds (and even the
+bare default view) could never reach `minZoom: 0` (1x) no matter how far the
+reader tried to zoom out. Root cause, found by bisecting against a bare
+MapLibre map at the same container size: `maxBounds` does more than stop
+panning — MapLibre silently raises the *effective* floor above `minZoom` so
+`maxBounds` always fills the container, and the old box
+(`LON0-20..LON1+20`, `LAT0-15..LAT1+15` — sized for the pre-D27
+tracked-country extent) had an aspect ratio that didn't match a typical wide
+map panel, so the floor silently sat around 1.9–3x depending on container
+shape instead of the intended 1x. Confirmed empirically (a 498×360 test
+container): the old box floors at 1.86x; `[[-179,-85],[179,85]]` (near the
+whole world, inset from the literal ±180/±90 that make MapLibre throw
+internally) reaches exactly 1.0x. `LON0/LON1/LAT0/LAT1` and `ZMAX` are
+untouched — only `maxBounds` changed, and it doesn't affect the zoom↔scale
+relationship D15/D20/D22/D29 measured, only how far a reader can pan/zoom
+out, so none of that needed re-verification; `verify-map-clusters.js` was
+re-run anyway as a sanity check and still passes (0 same-country overlaps).
+One side effect worth recording: cross-border overlaps at "zoom 0" jumped
+from 419 (D29's run) to 838 — not a regression, but confirmation of exactly
+this bug: D29's "zoom 0" was silently served at the old ~1.86x floor, not
+real 1x, so it was measuring a more-zoomed-in, less-crowded view than it
+thought. This likely also explains D22 vs D29's earlier unexplained
+294-vs-419 mismatch at "1x" (§6 D29) — both were measuring whatever the
+maxBounds-derived floor of the moment happened to be, not a fixed 1x.
+
+Widening `maxBounds` down to -85° latitude exposed a second, previously
+unreachable bug: Antarctica (the old box bottomed out at -55°, well north of
+where Antarctica sits, so its geometry was in the dataset but never
+panned-to). Reported as "a straight line and a big white triangle at the
+bottom of the map." Antarctica's Natural Earth shape spans every longitude
+at the pole — a landmass encircling a pole has no valid "inside" boundary
+once flattened to a simple lon/lat polygon, and neither D28's antimeridian
+fix nor any per-ring cut can fix that (it isn't a wrapping bug, it's what
+the geometry actually is at a pole). Fixed by dropping Antarctica from
+`scripts/build-map-geo.js`'s output outright — it was never a WHO region
+member and never carried resistance data, so nothing downstream (WHO_REGION,
+the Location filter, legend counts) ever referenced it. `data/world-map-geo.js`
+regenerated: **235 countries/territories** (down from 236), **~1.55 MB**
+(down from ~1.6 MB) — every remaining feature has zero polygon parts
+spanning more than 170° of longitude.
+
 ---
 
 ## 7. What's left
@@ -1313,7 +1491,7 @@ node scripts/normalize-resistance.js          # regenerate; output should be ide
 node scripts/validate-data.js                 # expect 0 errors, 3 warnings
 node scripts/validate-data.js data/products.synthetic.js   # expect 0/0
 node scripts/make-preview.js                  # smoke test
-node scripts/verify-map-clusters.js           # expect 0 same-country overlaps (D22)
+node scripts/verify-map-clusters.js           # expect 0 same-country overlaps (D22, extended D29)
 ```
 
 **There is no Python on this machine** — `python -m http.server` (the command
@@ -1341,8 +1519,8 @@ ones:
 | invariant | expected (original, SVG/equirectangular) | status under MapLibre |
 |---|---|---|
 | sites represented across all marks | constant (363 for AL/falciparum) | unaffected — `sitesFor()` untouched; not re-run but no code path changed |
-| same-country overlapping pairs | **0 at every zoom** — the D15 regression test | **re-confirmed** (D22): 0 across all 45 populated cells at 6 zoom levels (270 checks), via `scripts/verify-map-clusters.js` |
-| cross-border overlapping pairs | 61 at 1x falling to 4 at 8x | **re-measured, different numbers as D20 predicted** (D22): 294 at 1x falling to 60 at 16x, summed across all 45 cells |
+| same-country overlapping pairs | **0 at every zoom** — the D15 regression test | **re-confirmed** (D22, sweep extended by D29): 0 across all 45 populated cells at 10 zoom levels up to 64x (450 checks), via `scripts/verify-map-clusters.js` |
+| cross-border overlapping pairs | 61 at 1x falling to 4 at 8x | **re-measured, different numbers as D20 predicted** (D22): 294 at 1x falling to 60 at 16x, summed across all 45 cells. **D29's re-run** (same 45 cells, sweep extended to 64x) got 419 at 1x, 58 at 16x, falling to 10 at 64x — 16x agrees closely with D22; 1x does not (419 vs 294), likely sub-pixel overlap-detection variance between Chromium versions at the most crowded zoom, not a regression, since the only pass/fail invariant (same-country overlaps) stayed 0 in both runs — worth a closer look if it ever needs to be load-bearing rather than informational |
 | a mark's value vs an independent pool from `studies[]` | within 0.005 pp | unaffected — only `mark()`'s coordinate output changed, not its `v`/`n` arithmetic |
 | a site dot's measured screen radius | constant, ~10 px at every zoom | **simplifies to true by construction** — DOM `Marker` elements are never counter-scaled (D20); confirmed visually via screenshot at multiple zooms, not measured in px |
 | overlay off, then zoom | no dots return | confirmed — same `curSites = null` gate, now checked before the `zoomend` handler calls `drawMarks()` |

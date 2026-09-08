@@ -9,21 +9,61 @@
 // MapLibre needs real GeoJSON geometry, not SVG path strings.
 //
 // Dev-only dependencies — install anywhere and point NODE_PATH at it:
-//   npm i topojson-client world-atlas d3-geo
+//   npm i topojson-client world-atlas antimeridian-ts i18n-iso-countries
 //   node scripts/build-map-geo.js [path-to-node_modules]
 //
 // Output: data/world-map-geo.js -> window.LAUNCH_MAP_GEO = GeoJSON FeatureCollection,
-// one feature per country, properties = { iso3, name }.
+// one feature per country/territory, properties = { iso3, name }.
 // Uses Natural Earth 50m (public domain) via the world-atlas package — one
 // resolution step up from build-map.js's 110m, chosen because a page-specific
 // basemap can carry more detail without the 12-page blast radius a change to
 // data/world-map.js would have (see dev-13-resistance-handover.md D17).
 //
-// Country set is intentionally IDENTICAL to build-map.js's NUM_TO_A3 (not a
-// superset) — data/world-map.js stays the single source of truth for "which
-// countries count as drawn" (sitesFor's filter, drawnCount, curUndrawn, the
-// validator's undrawn-country warning). This file supplies geometry only, at
-// the same scope. See D17 for the alternative considered and rejected.
+// Country set: EVERY country/territory world-atlas's topology can resolve to an
+// ISO 3166-1 alpha-3 code (via i18n-iso-countries' numeric->alpha3 table) — this
+// reverses D17's original "identical to build-map.js's NUM_TO_A3, not a
+// superset" choice, specifically and only for this file (see the later
+// decision recorded in dev-13-resistance-handover.md — the Location filter's
+// "Region" picker needs every WHO region to actually have country shapes to
+// show, including regions like Europe with no WHO malaria-resistance tracking
+// at all, the same way WHO's own threat map always draws the full world and
+// greys out whatever has no data). data/world-map.js (94 countries) is
+// UNCHANGED and stays the sole authority for "which countries count as
+// drawn" (sitesFor, drawnCount, the legend counts, the validator's
+// undrawn-country warning) — this expansion only ever supplies extra
+// geometry for countries the rest of the page paints as "no data" by default,
+// never data itself.
+// A handful of topology entries have no numeric ISO code at all (disputed or
+// unrecognised: Kosovo, Somaliland, Northern Cyprus, Siachen Glacier, the
+// Indian Ocean Territory) and are skipped — Natural Earth carries them as
+// separate shapes without an ISO 3166 assignment, so there is no iso3 to key
+// them on.
+//
+// Antimeridian cut: Natural Earth stores Russia (and a few others — the USA
+// via the Aleutians, New Zealand, Fiji, Kiribati) as a single ring that
+// crosses ±180° longitude rather than as a MultiPolygon split there. Left
+// alone, a WebGL renderer triangulates that ring as if it wrapped the SHORT
+// way through 0°, producing a giant invalid sliver across the whole map (D28
+// found this after D27 widened the basemap to the whole world — Russia was
+// never part of the 100-country set D27 started from, so the bug had no
+// chance to surface before). `fixGeoJson` (from `antimeridian-ts`) runs per
+// feature, after `topojson.feature` extracts it, splitting every
+// antimeridian-crossing ring into proper MultiPolygon pieces. Tried first:
+// `geoStitch` (from `d3-geo-projection`), which operates on the raw topology
+// before extraction — it fixed the USA, New Zealand, Fiji and Kiribati
+// completely, but left Russia's *mainland* ring (not a small island — 4,894
+// points, the bulk of the country) still wrapping, because the one arc where
+// it crosses near Chukotka isn't shared with a neighbouring country and
+// geoStitch's arc-based approach missed it. `antimeridian-ts` fixes every one
+// of these (Russia included) with 0 wide (>170°) polygon parts remaining
+// across all 236 countries — the only exception is Antarctica, which
+// genuinely does span every longitude at the pole: a landmass encircling a
+// pole has no valid "inside" boundary once flattened to a simple lon/lat
+// polygon, antimeridian cutting or not. Explicitly dropped below rather than
+// left broken — it was never a WHO region member or reachable data-wise, and
+// D30's wider maxBounds (down to -85°, up from -55°, so 1x is actually
+// reachable) means it's no longer off in unreachable space either; it would
+// render as an invalid shape the first time anyone panned that far south.
 
 const path = require("path");
 const fs = require("fs");
@@ -32,15 +72,9 @@ const extra = process.argv[2];
 if (extra) module.paths.unshift(path.resolve(extra));
 
 const topojson = require("topojson-client");
+const { fixGeoJson } = require("antimeridian-ts");
 const world = require(require.resolve("world-atlas/countries-50m.json"));
-
-// Identical to build-map.js's NUM_TO_A3 — do not diverge without updating both
-// files and D17's rationale for why they stay in lockstep.
-const NUM_TO_A3 = {
-  "024":"AGO","204":"BEN","072":"BWA","854":"BFA","108":"BDI","120":"CMR","132":"CPV","140":"CAF","148":"TCD","174":"COM","178":"COG","180":"COD","384":"CIV","262":"DJI","818":"EGY","226":"GNQ","232":"ERI","748":"SWZ","231":"ETH","266":"GAB","270":"GMB","288":"GHA","324":"GIN","624":"GNB","404":"KEN","426":"LSO","430":"LBR","434":"LBY","450":"MDG","454":"MWI","466":"MLI","478":"MRT","480":"MUS","504":"MAR","508":"MOZ","516":"NAM","562":"NER","566":"NGA","646":"RWA","678":"STP","686":"SEN","690":"SYC","694":"SLE","706":"SOM","710":"ZAF","728":"SSD","729":"SDN","834":"TZA","768":"TGO","788":"TUN","800":"UGA","894":"ZMB","716":"ZWE",
-  "004":"AFG","050":"BGD","064":"BTN","104":"MMR","116":"KHM","144":"LKA","156":"CHN","356":"IND","360":"IDN","364":"IRN","368":"IRQ","408":"PRK","410":"KOR","418":"LAO","458":"MYS","524":"NPL","586":"PAK","598":"PNG","608":"PHL","626":"TLS","702":"SGP","704":"VNM","760":"SYR","764":"THA","887":"YEM","682":"SAU","512":"OMN",
-  "068":"BOL","076":"BRA","170":"COL","188":"CRI","192":"CUB","214":"DOM","218":"ECU","222":"SLV","254":"GUF","320":"GTM","328":"GUY","332":"HTI","340":"HND","484":"MEX","558":"NIC","591":"PAN","600":"PRY","604":"PER","740":"SUR","862":"VEN","032":"ARG"
-};
+const isoCountries = require("i18n-iso-countries");
 
 // Coordinate precision: round to 3 decimal places (~110m at the equator, well
 // under a single screen pixel at any zoom this map reaches) to keep file size
@@ -57,13 +91,17 @@ function roundCoords(node) {
 
 const feats = topojson.feature(world, world.objects.countries).features;
 const out = [];
+let skipped = 0;
 for (const f of feats) {
-  const a3 = NUM_TO_A3[String(f.id).padStart(3, "0")];
-  if (!a3) continue;
+  if (f.id == null) { skipped++; continue; }
+  const a3 = isoCountries.numericToAlpha3(String(f.id).padStart(3, "0"));
+  if (!a3) { skipped++; continue; }
+  if (a3 === "ATA") { skipped++; continue; }   // pole-wrapping geometry, see comment above
+  const fixed = fixGeoJson(f);
   out.push({
     type: "Feature",
     properties: { iso3: a3, name: f.properties.name },
-    geometry: { type: f.geometry.type, coordinates: roundCoords(f.geometry.coordinates) },
+    geometry: { type: fixed.geometry.type, coordinates: roundCoords(fixed.geometry.coordinates) },
   });
 }
 
@@ -75,4 +113,4 @@ const file =
   JSON.stringify(geo) + ";\n";
 
 fs.writeFileSync(path.join(__dirname, "..", "data", "world-map-geo.js"), file);
-console.log("Wrote data/world-map-geo.js — " + out.length + " countries, " + Math.round(file.length / 1024) + " KB");
+console.log("Wrote data/world-map-geo.js — " + out.length + " countries (" + skipped + " unresolvable shapes skipped), " + Math.round(file.length / 1024) + " KB");

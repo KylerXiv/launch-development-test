@@ -36,8 +36,11 @@ const puppeteer = require("puppeteer");
 const PAGE_URL = "file:///" + path.resolve(__dirname, "..", "illustrated-journey-dashboard.html").replace(/\\/g, "/");
 // A spread from world view to a heavily zoomed-in view, matching D15's
 // original 1x/2.6x/4.1x/6.6x/8x spirit -- MapLibre's zoom is log2 scale
-// (2^zoom), so these roughly correspond to 1x/2.6x/4x/6.5x/8x/16x.
-const ZOOMS = [0, 1.4, 2.0, 2.7, 3.0, 4.0];
+// (2^zoom), so these roughly correspond to 1x/2.6x/4x/6.5x/8x/16x/23x/32x/45x/64x.
+// Extended past 4.0 (16x) per D29, when ZMAX went from 16 to 64 -- the whole
+// point of re-running this script on a zoom-range change is to cover the new
+// range, not just the old one.
+const ZOOMS = [0, 1.4, 2.0, 2.7, 3.0, 4.0, 4.5, 5.0, 5.5, 6.0];
 
 async function readMarks(page) {
   return page.evaluate(() => {

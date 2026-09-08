@@ -14,16 +14,17 @@
       integrity="sha512-KIMsMWIdnoG9OwZa+oaIafmbDonqck1UCmq+/zcUi2aaZ97N9QE6TqpTM+n36EO40HGh64hU/375zxtjx7WTyQ==" crossorigin="anonymous">
 <style>
   :root {
-    --ground: #F5F7F8;
+    color-scheme: light;
+    --ground: #FFFFFF;
     --surface: #FFFFFF;
-    --surface-2: #EDF1F3;
+    --surface-2: #F4F7F8;
     --ink: #16303F;
     --ink-2: #4E6371;
     --ink-3: #7C8E99;
-    --line: #D8E0E4;
-    --accent: #14657E;
+    --line: #DCE3E7;
+    --accent: #0F5A72;
     --accent-ink: #FFFFFF;
-    --accent-soft: #E3EEF2;
+    --accent-soft: #E6F1F4;
     --good: #1E8A5A;
     --good-soft: #E2F2EA;
     --warn: #B87500;
@@ -42,62 +43,10 @@
     --map-registered: var(--map1);
     --map-guidelines: var(--map2);
     --map-mft: var(--map3);
-    --shadow: 0 1px 2px rgba(22,48,63,.06), 0 4px 16px rgba(22,48,63,.07);
+    --shadow: 0 1px 3px rgba(22,48,63,.07), 0 8px 24px rgba(22,48,63,.08);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --ground: #101B22;
-      --surface: #17252E;
-      --surface-2: #1E3039;
-      --ink: #E7EEF2;
-      --ink-2: #A9BBC5;
-      --ink-3: #7C919D;
-      --line: #2B404C;
-      --accent: #4FA8C3;
-      --accent-ink: #0D1D25;
-      --accent-soft: #1C3947;
-      --good: #47B983;
-      --good-soft: #16352A;
-      --warn: #E0A63C;
-      --warn-soft: #3A2E14;
-      --crit: #E06A5C;
-      --crit-soft: #40201C;
-      --idle: #647883;
-      --idle-soft: #22333C;
-      --map1: #0C8691;
-      --map2: #82A0E8;
-      --map3: #F4B8F4;
-      --map-nodata: #17252E;
-      --map-border: #577179;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
-    }
-  }
-  :root[data-theme="dark"] {
-    --ground: #101B22;
-    --surface: #17252E;
-    --surface-2: #1E3039;
-    --ink: #E7EEF2;
-    --ink-2: #A9BBC5;
-    --ink-3: #7C919D;
-    --line: #2B404C;
-    --accent: #4FA8C3;
-    --accent-ink: #0D1D25;
-    --accent-soft: #1C3947;
-    --good: #47B983;
-    --good-soft: #16352A;
-    --warn: #E0A63C;
-    --warn-soft: #3A2E14;
-    --crit: #E06A5C;
-    --crit-soft: #40201C;
-    --idle: #647883;
-    --idle-soft: #22333C;
-    --map1: #0C8691;
-    --map2: #82A0E8;
-    --map3: #F4B8F4;
-    --map-nodata: #17252E;
-    --map-border: #577179;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
-  }
+  /* Light theme only — dark mode intentionally removed so the page always
+     renders on a white ground regardless of OS/browser color-scheme. */
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -106,25 +55,30 @@
     font: 15px/1.5 -apple-system, "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 56px; position: relative; }
+  .wrap { margin: 0; padding: 28px clamp(24px, 4vw, 64px) 56px; position: relative; }
 
   /* ---------- header ---------- */
   header { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 24px; margin-bottom: 6px; }
-  /* "Powered by" + the Unitaid mark, top right. The name is not written out —
-     the mark carries it, so the mark's alt text is what says "Unitaid". */
-  .attrib {
-    position: absolute; top: 22px; right: 24px;
-    display: flex; align-items: center; gap: 9px;
+  /* "Powered by" + the Unitaid mark, stacked above the meta block so it
+     reads as part of that right-aligned column rather than floating loose
+     in the corner — one card, one link, rather than plain text beside a
+     plated logo, so the shadow reads as belonging to the whole attribution,
+     not just the mark. The name is not written out — the mark carries it,
+     so the mark's alt text is what says "Unitaid". */
+  .attrib { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+  .attrib a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px 7px 10px; border-radius: 10px;
+    text-decoration: none; transition: box-shadow .15s ease, transform .15s ease;
+    /* Fixed white, never recoloured — a deliberate plate for the mark's own
+       dark navy, independent of this page's (light-only) theme tokens. */
+    background: #FFFFFF; box-shadow: 0 1px 2px rgba(22,48,63,.10), 0 4px 14px rgba(22,48,63,.08);
   }
+  .attrib a:hover { box-shadow: 0 2px 4px rgba(22,48,63,.14), 0 8px 22px rgba(22,48,63,.12); transform: translateY(-1px); }
+  .attrib a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .attrib .ptxt { font-size: 12.5px; line-height: 1.3; color: var(--ink-3); }
-  /* The mark carries its own dark navy, which the dark theme's near-black ground
-     swallows, so it keeps a white plate in both themes — never recoloured. */
-  .attrib img {
-    display: block; box-sizing: content-box; width: 46px; height: auto;
-    padding: 7px 8px; border-radius: 10px; background: #FFFFFF;
-    box-shadow: 0 1px 2px rgba(22,48,63,.10);
-  }
-  @media (max-width: 760px) { .attrib { position: static; margin: 0 0 12px auto; width: fit-content; } }
+  .attrib img { display: block; width: 40px; height: auto; }
+  @media (max-width: 760px) { .attrib { justify-content: flex-start; } }
   .brand h1 { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.01em; }
   .brand h1 span { color: var(--accent); }
   .brand h1 span.proto-badge {
@@ -190,11 +144,24 @@
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
   .pathnode svg { width: 30px; height: 30px; display: block; margin: 0 auto; color: var(--accent); }
   .pathnode .pill {
+    position: relative;
     display: inline-flex; align-items: center; justify-content: center;
     width: 44px; height: 44px; border-radius: 50%;
     background: var(--accent-soft); border: 1px solid var(--line);
   }
   .pathnode span { display: block; font-size: 11px; line-height: 1.25; color: var(--ink-2); margin-top: 5px; padding: 0 3px; }
+  /* always-on badge marking every gate icon as clickable, not just on hover */
+  .pathnode .pill::after {
+    content: "\25be"; position: absolute; top: -6px; right: -6px;
+    width: 24px; height: 24px; border-radius: 50%; line-height: 24px; text-align: center;
+    font-size: 15px; font-weight: 700; color: var(--ink-2);
+    background: var(--surface); box-shadow: 0 0 0 1px var(--line);
+    transition: color .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .pathnode:hover .pill::after, .pathnode[aria-expanded="true"] .pill::after {
+    color: var(--accent); box-shadow: 0 0 0 1px var(--accent);
+  }
+  .pathnode[aria-expanded="true"] .pill::after { transform: rotate(180deg); }
   .patharrow { flex: none; color: var(--ink-3); font-size: 15px; margin-top: 15px; user-select: none; }
 
   /* ---------- product rows ---------- */
@@ -207,22 +174,14 @@
   /* The row is a plain grid, not a button: the eight stage markers are real
      buttons now, and HTML forbids interactive content inside a button. The
      product toggle is the identity block on the left; the track is its sibling. */
-  .prow { display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; padding: 18px 20px; }
+  .prow { display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; padding: 26px 20px; }
   .pbtn {
     display: block; width: 100%; padding: 0; cursor: pointer;
     background: none; border: 0; text-align: left; color: inherit; font: inherit;
     border-radius: 8px;
   }
   .pbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-  /* the toggle no longer covers the whole row, so it needs to look like a toggle */
-  .pid .name { display: flex; align-items: baseline; gap: 7px; }
-  .pid .chev {
-    flex: none; font-size: 11px; color: var(--ink-3); transition: transform .15s ease;
-    display: inline-block;
-  }
-  .product.open .pid .chev { transform: rotate(90deg); color: var(--accent); }
-  .pbtn:hover .pid .chev { color: var(--accent); }
-  .pid .name { font-size: 16.5px; font-weight: 700; letter-spacing: -.005em; }
+  .pid .name { display: flex; align-items: baseline; gap: 7px; font-size: 16.5px; font-weight: 700; letter-spacing: -.005em; }
   .pid .name .txt { min-width: 0; }
   .pid .inn { color: var(--ink-2); font-size: 13px; margin-top: 1px; }
   .pid .mfr { color: var(--ink-3); font-size: 12.5px; margin-top: 2px; }
@@ -233,11 +192,26 @@
   }
   .chip.pipeline { background: var(--accent-soft); color: var(--accent); }
   .chip.soon { background: var(--idle-soft); color: var(--ink-3); }
+  .peek {
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 9px;
+    font-size: 12px; font-weight: 650; color: var(--accent);
+  }
+  .peek .pchev { font-size: 15px; transition: transform .15s ease; display: inline-block; }
+  .peek .peek-open { display: none; }
+  .product.open .peek .peek-open { display: inline; }
+  .product.open .peek .peek-closed { display: none; }
+  .product.open .peek .pchev { transform: rotate(180deg); }
+  .pbtn:hover .peek .peek-txt { text-decoration: underline; }
 
   /* pipeline track */
-  .trackbox { overflow-x: auto; }
-  /* Top padding is the lane the year-gap chips sit in — see .stage .tgap. */
-  .track { display: flex; align-items: flex-start; min-width: 700px; padding-top: 20px; }
+  /* overflow-x: auto here forces overflow-y to a used value of auto too (a
+     browser can't leave one axis visible while the other scrolls) — so with
+     no padding, the top of the "cur" stage's smark ring (.stage.cur .smark's
+     4px box-shadow) sits exactly on that invisible clip line and gets sheared
+     flat instead of curving. padding-top gives it (and the hover lift, and
+     the focus/aria-expanded rings) room to draw before the clip. */
+  .trackbox { overflow-x: auto; padding-top: 8px; }
+  .track { display: flex; align-items: flex-start; min-width: 700px; }
   .stage { flex: 1; min-width: 80px; position: relative; text-align: center; }
   .stage .row { display: flex; align-items: center; }
   .stage .bar { flex: 1; height: 3px; background: var(--line); }
@@ -245,34 +219,25 @@
   .stage:first-child .bar.pre, .stage:last-child .bar.post { visibility: hidden; }
   .stage .lbl { font-size: 11px; line-height: 1.25; color: var(--ink-3); margin-top: 7px; padding: 0 3px; }
   .stage.cur .lbl { color: var(--ink); font-weight: 650; }
-  /* year a gate was reached, under its label — makes the gap chips checkable */
+  /* year a gate was reached, under its label — also the value plotted on the
+     real-year timeline underneath (.tlbox), so this and that stay honest twins */
   .stage .syear { font-size: 11px; font-weight: 650; color: var(--ink-2); margin-top: 3px; font-variant-numeric: tabular-nums; }
   .stage.s-idle .syear { color: var(--ink-3); }
 
-  /* Years between two gates, centred on the midpoint between the two markers —
-     which is the stage's own left edge, since every marker is centred in an
-     equal-width stage. It rides in the track's top padding rather than on the
-     connector itself: at eight stages there is only ~38px of bar between two
-     markers, and a chip sized to sit in that gap would either collide with the
-     markers or force the track wider than the card, pushing the last stage out
-     of view. Above the line it can be read at any track width. */
-  .stage .tgap {
-    position: absolute; left: 0; top: -5px; transform: translate(-50%, -100%); z-index: 2;
-    padding: 2px 7px; border-radius: 999px; white-space: nowrap;
-    font-size: 10.5px; font-weight: 700; letter-spacing: .01em;
-    font-variant-numeric: tabular-nums;
-    border: 1px solid transparent;
-  }
-  .stage .tgap.g-good { background: var(--good-soft); color: var(--good); border-color: var(--good-soft); }
-  .stage .tgap.g-warn { background: var(--warn-soft); color: var(--warn); border-color: var(--warn-soft); }
-  .stage .tgap.g-crit { background: var(--crit-soft); color: var(--crit); border-color: var(--crit-soft); }
-  /* the later gate in pathway order was reached first — a fact about sequence,
-     not a delay, so it never borrows the red/amber vocabulary */
-  .stage .tgap.g-back { background: var(--surface-2); color: var(--ink-3); border-color: var(--line); }
-  /* same chip, shown flat in the legend */
+  /* trackwrap holds both the stepper (trackbox) and, underneath it, its own
+     standalone real-year timeline (.tlbox) — min-width:0 keeps the nested
+     horizontal-scroll regions from blowing out the .prow grid track. */
+  .trackwrap { min-width: 0; }
+  .tlbox { overflow-x: auto; margin-top: 16px; padding-top: 13px; border-top: 1px dashed var(--line); }
+  .tlbox svg { display: block; width: 100%; height: auto; }
+  .tl-caption { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px; }
+  .tl-caption .tl-total { font-size: 11.5px; letter-spacing: normal; text-transform: none; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  /* same small pill the status legend uses for the timeline's two facts —
+     a reached gate's real year (good), and one reached out of pathway order
+     (neutral grey: a fact about sequence, not a delay) */
   .tgap-key {
     padding: 2px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 700;
-    font-variant-numeric: tabular-nums; background: var(--warn-soft); color: var(--warn);
+    font-variant-numeric: tabular-nums; background: var(--good-soft); color: var(--good);
   }
   .tgap-key.g-back { background: var(--surface-2); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
 
@@ -296,6 +261,19 @@
   .stage .smark .dot { position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; font-size: 9.5px; box-shadow: 0 0 0 2px var(--surface); cursor: help; }
   .stage.s-idle .smark .dot { display: none; }
   .stage.cur .smark { box-shadow: 0 0 0 4px var(--accent-soft); }
+  /* always-on badge marking every stage marker as clickable, not just on hover —
+     top-right so it doesn't collide with the status .dot at bottom-right */
+  .stage .smark::after {
+    content: "\25be"; position: absolute; top: -5px; right: -5px;
+    width: 22px; height: 22px; border-radius: 50%; line-height: 22px; text-align: center;
+    font-size: 14px; font-weight: 700; color: var(--ink-2);
+    background: var(--surface); box-shadow: 0 0 0 1px var(--line);
+    transition: color .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .stage .smark:hover::after, .stage .smark[aria-expanded="true"]::after {
+    color: var(--accent); box-shadow: 0 0 0 1px var(--accent);
+  }
+  .stage .smark[aria-expanded="true"]::after { transform: rotate(180deg); }
   /* ---------- gate drill-down (cell tier) ----------
      A sibling of .prow inside the product card, so it spans the card. Kept
      independent of .detail: "why is this stuck" and "what is this medicine"
@@ -323,7 +301,7 @@
   .gp-pill.prog { background: var(--warn-soft); color: var(--warn); }
   .gp-pill.late { background: var(--crit-soft); color: var(--crit); }
   .gp-pill.idle { background: var(--idle-soft); color: var(--ink-3); }
-  .gp-note { margin: 9px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); max-width: 78ch; }
+  .gp-note { margin: 9px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
   .gp-why {
     margin-top: 10px; padding: 9px 12px; border-radius: 8px;
     background: var(--crit-soft); color: var(--crit);
@@ -347,10 +325,10 @@
     background: none; border: 0; font: inherit; color: inherit; cursor: pointer;
     padding: 2px 0 4px; border-radius: 9px;
   }
-  .pathnode:hover .pill { border-color: var(--accent); }
+  .pathnode:hover .pill { border-color: var(--accent); transform: translateY(-1px); }
   .pathnode:hover .plabel { color: var(--ink); }
   .pathnode:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .pathnode .pill { transition: border-color .12s ease, box-shadow .12s ease; }
+  .pathnode .pill { transition: border-color .12s ease, box-shadow .12s ease, transform .12s ease; }
   .pathnode[aria-expanded="true"] .pill { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
   .pathnode[aria-expanded="true"] .plabel { color: var(--accent); font-weight: 700; }
   .pathnode .cnt {
@@ -480,11 +458,11 @@
   /* Changes list: one readable sentence per entry, with the date and the
      medicine it concerns as a quiet line above it rather than as two narrow
      columns the sentence has to squeeze past. */
-  .updates .updates-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); max-width: 76ch; }
+  .updates .updates-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); }
   .updates.changes li { display: block; padding: 11px 0; }
   .updates.changes .um { font-size: 11.5px; color: var(--ink-3); letter-spacing: .02em; margin-bottom: 2px; }
   .updates.changes .um .up-name { color: var(--ink-2); font-weight: 650; letter-spacing: 0; }
-  .updates.changes .ut { font-size: 14px; line-height: 1.55; color: var(--ink); max-width: 72ch; }
+  .updates.changes .ut { font-size: 14px; line-height: 1.55; color: var(--ink); }
 
   footer { margin-top: 30px; font-size: 12.5px; color: var(--ink-3); line-height: 1.7; border-top: 1px solid var(--line); padding-top: 16px; }
   footer b { color: var(--ink-2); }
@@ -510,21 +488,6 @@
   .gloss:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 2px; }
   .glossary-panel .gt { flex: none; width: 84px; font-weight: 650; color: var(--ink); }
 
-  /* pathway timing (journey) */
-  .journey-wrap { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
-  .journey-wrap h3 { margin: 0 0 4px; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-  .journey-wrap .jnote { font-size: 12px; color: var(--ink-3); margin: 0 0 10px; }
-  .journey { display: flex; align-items: flex-start; overflow-x: auto; padding-bottom: 4px; }
-  .jnode { text-align: center; min-width: 108px; flex: none; }
-  .jnode .jyear { font-weight: 750; font-size: 15px; font-variant-numeric: tabular-nums; }
-  .jnode .jyear.tbc { color: var(--ink-3); }
-  .jnode .jlbl { font-size: 11.5px; line-height: 1.3; color: var(--ink-2); margin-top: 3px; padding: 0 4px; }
-  .jgap { align-self: flex-start; margin: 1px 4px 0; flex: none; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 650; white-space: nowrap; }
-  .jgap.g-good { background: var(--good-soft); color: var(--good); }
-  .jgap.g-warn { background: var(--warn-soft); color: var(--warn); }
-  .jgap.g-crit { background: var(--crit-soft); color: var(--crit); }
-  .jgap.g-tbc { background: var(--idle-soft); color: var(--ink-3); }
-
   /* ---------- visualization sections (map, timing) ---------- */
   .viz {
     margin-top: 22px; background: var(--surface); border: 1px solid var(--line);
@@ -541,6 +504,22 @@
     background: var(--surface-2); border: 1px solid var(--map-border); border-radius: 10px;
     padding: 12px 14px; max-height: 480px; overflow-y: auto;
   }
+  /* Both rails otherwise end wherever their own content does, leaving a gap
+     of bare page below whichever one is shorter than the map (plus its hint
+     and legend) beside them. Grid's own align-self: stretch would fit a
+     rail to the ROW's height instead — the tallest of all three columns,
+     which at narrow widths is the left rail itself, not the map — so a
+     script keeps both rails' height matched to .map-dock-center specifically
+     (see the ResizeObserver below). Left keeps its own scrollbar for when
+     its filters (Drug/Study result/Species/Location) still don't fit in
+     that height; right stays hidden and relies on flex (.dock-detail,
+     .res-panel) to hand the space to its one scrollable part, the study list. */
+  .map-dock-left { max-height: none; overflow-y: auto; }
+  .map-dock-right {
+    max-height: none; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .map-dock-right .dock-detail { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   /* `display` on .map-dock-rail is an author rule and so outranks the browser's
      [hidden] { display: none } — same trap .map-empty already carries a fix for. */
   .map-dock-rail[hidden] { display: none; }
@@ -568,7 +547,7 @@
      aspect-ratio keeps the same responsive width-drives-height behaviour the
      old SVG had (960x420, the fitted lon/lat window build-map-geo.js shares
      with build-map.js). */
-  #mapwrap-gl { width: 100%; min-height: 320px; aspect-ratio: 960 / 420; background: var(--surface-2); border-radius: 10px; }
+  #mapwrap-gl { width: 100%; min-height: 360px; aspect-ratio: 960 / 480; background: var(--surface-2); border-radius: 10px; }
   #mapwrap-gl .maplibregl-canvas { border-radius: 10px; }
   /* Rotation/pitch are locked off in the map's own options (DEV-13 D19) — the
      choropleth has always read north-up and fixed, and nothing asked for that
@@ -577,10 +556,6 @@
   .maplibregl-ctrl-group button + button { border-top: 1px solid var(--map-border); }
   /* MapLibre's stock zoom-icon SVGs are dark-on-transparent; dark theme needs
      them inverted the same way the rest of this page swaps its own tokens. */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .maplibregl-ctrl-icon { filter: invert(1) brightness(1.5); }
-  }
-  :root[data-theme="dark"] .maplibregl-ctrl-icon { filter: invert(1) brightness(1.5); }
   .maplibregl-ctrl-attrib, .maplibregl-ctrl-bottom-right .maplibregl-ctrl { display: none; }
   /* Custom zoom-level readout beside MapLibre's own NavigationControl — the
      control draws +/- buttons but no "2.6x" readout, which D13's affordance
@@ -609,10 +584,6 @@
     display: block; margin: 2px 4px; padding: 4px 8px; background: var(--surface); color: var(--ink);
     border: 1px solid var(--accent); border-radius: 6px; outline: 2px solid var(--accent); outline-offset: 2px;
   }
-  .map-overlay {
-    margin-top: 10px; background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn);
-    border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 650; line-height: 1.45;
-  }
   .map-empty {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     font-size: 13.5px; color: var(--ink-3); text-align: center; padding: 20px;
@@ -622,6 +593,11 @@
      [hidden] { display: none }. Without this the box stays laid out over the
      whole map, invisible, and swallows every country hover. */
   .map-empty[hidden] { display: none; }
+  .map-legend-bar {
+    margin-top: 10px; background: var(--surface-2); border: 1px solid var(--map-border); border-radius: 10px;
+    padding: 12px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px;
+  }
+  .map-legend-bar .dock-section { margin: 0; }
   .map-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: 12.5px; color: var(--ink-2); }
   /* one swatch definition, shared by the legend, the country tooltip and the
      gate panel's counts, so none of them can drift from the map */
@@ -668,7 +644,14 @@
                        text-align: left; padding: 8px 2px 0; }
   /* click-through panel: every study behind a country dot. Lives below the map
      so it can hold Myanmar's 108 rows without covering anything. */
-  .res-panel { margin-top: 12px; border: 1px solid var(--map-border); border-radius: 10px; background: var(--surface-2); }
+  .res-panel {
+    margin-top: 12px; border: 1px solid var(--map-border); border-radius: 10px; background: var(--surface-2);
+    display: flex; flex-direction: column; flex: 1; min-height: 0;
+  }
+  /* `display: flex` above is an author rule and so outranks the browser's
+     [hidden] { display: none } — same trap .map-dock-rail[hidden] already
+     carries a fix for. */
+  .res-panel[hidden] { display: none; }
   .res-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 10px 12px 6px; }
   .res-panel-head h3 { margin: 0; font-size: 13.5px; }
   .res-close { font: inherit; font-size: 12px; background: none; border: 1px solid var(--map-border);
@@ -681,8 +664,7 @@
      the precision a self-scaling bar can't. */
   .res-panel-chart { padding: 8px 12px 2px; border-bottom: 1px solid var(--map-border); }
   .chart-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
-  .chart-label { width: 100px; flex: none; font-size: 11.5px; color: var(--ink-2);
-                  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chart-label { width: 100px; flex: none; font-size: 11.5px; color: var(--ink-2); line-height: 1.25; }
   .chart-track { flex: 1; height: 16px; background: var(--surface); border-radius: 3px; }
   /* Rounded at the data end (away from the 0% baseline), square at the
      baseline itself, per the mark spec — never a full pill. */
@@ -692,24 +674,28 @@
   .chart-bar:focus { outline: none; }
   .chart-bar:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-  .res-panel-scroll { max-height: 340px; overflow: auto; padding: 0 12px 12px; }
-  /* A cluster can carry dozens of rows across 6 columns (Myanmar's history
-     runs past 100) — min-width keeps every column legible and lets
-     .res-panel-scroll's own overflow:auto scroll it horizontally inside the
-     dock's right rail, rather than squeezing columns unreadably thin. */
-  .res-table { width: 100%; min-width: 460px; border-collapse: collapse; font-size: 12px; }
-  .res-table th, .res-table td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--map-border); vertical-align: top; }
-  .res-table th { position: sticky; top: 0; background: var(--surface-2); font-weight: 650; cursor: pointer; white-space: nowrap; }
-  .res-table th[aria-sort="ascending"]::after { content: " \2191"; }
-  .res-table th[aria-sort="descending"]::after { content: " \2193"; }
-  .res-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .res-table tr.small td { opacity: .65; }
-  .res-table .yr { font-variant-numeric: tabular-nums; }
+  .res-panel-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 12px; }
+  /* A cluster can carry dozens of rows (Myanmar's history runs past 100) —
+     cards stack vertically instead of a table's fixed columns, so the right
+     rail's ~300px never has to scroll sideways to read one. Always most
+     recent study first; no per-column sort control. */
+  .res-cards { display: flex; flex-direction: column; font-size: 12px; }
+  .res-card { padding: 6px 0; border-bottom: 1px solid var(--map-border); }
+  .res-card:last-child { border-bottom: none; }
+  .res-card.small { opacity: .65; }
+  .res-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-variant-numeric: tabular-nums; }
+  .res-card-year, .res-card-fail { font-weight: 650; color: var(--ink); }
+  .res-card-loc { color: var(--ink-2); margin-top: 1px; }
+  .res-card-meta { display: flex; gap: 6px; color: var(--ink-3); margin-top: 1px; font-variant-numeric: tabular-nums; }
+  .res-card-meta a { color: inherit; }
   /* Three scopes, three blocks, following the WHO threat map's split: the rule
      sits with the legend it explains, the summary counts the whole selection,
      and provenance stands on its own. Mixing them in one paragraph is what made
      the tooltip's and the panel's counts look like they disagreed. */
-  .res-rule { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 4px 0 0; max-width: 92ch; }
+  .res-rule { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 4px 0 0; }
+  /* .res-note stays capped: unlike .res-rule (in the wide legend bar under the
+     map), it lives in the 340px right rail, well under 92ch already — the cap
+     was never binding there, just consistent with .res-rule before this. */
   .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 6px 0 0; max-width: 92ch; }
   .resdot.b1, .chart-bar.b1 { background: #FDCFA6; }
   .resdot.b2, .chart-bar.b2 { background: #FB9A50; }
@@ -792,6 +778,7 @@
 
   @media (max-width: 760px) {
     .wrap { padding: 20px 14px 48px; }
+    .brand h1 { font-size: 21px; line-height: 1.25; }
     .prow { grid-template-columns: 1fr; padding: 14px 14px; }
     .flagnote { margin-left: 14px; margin-right: 14px; }
     .meta { text-align: left; margin-left: 0; }
@@ -811,24 +798,19 @@
 </style>
 
 <div class="wrap">
-  <div class="attrib">
-    <span class="ptxt">Powered by</span>
-    <img src="assets/unitaid-mark.svg" alt="Unitaid" width="388" height="251">
-  </div>
-
   <header>
     <div class="brand">
       <h1><span>LAUNCH</span> Transparency Dashboard <span class="proto-badge">Prototype — data presented here may not be accurate</span></h1>
       <p>Illustrated journey view — tracking new antimalarial medicines from approval to access — where each product stands, and where it is stuck.</p>
     </div>
     <div class="meta">
-      <b id="host-note">To be hosted by the RBM Partnership to End Malaria</b><br>
+      <div class="attrib">
+        <a href="https://unitaid.org" target="_blank" rel="noopener noreferrer">
+          <span class="ptxt">Powered by</span>
+          <img src="assets/unitaid-mark.svg" alt="Unitaid" width="388" height="251">
+        </a>
+      </div>
       <span id="updated"></span><span id="meta-note"></span><br>
-      <a href="index.html" style="color:var(--accent)">Journey board (A)</a> ·
-      <a href="option-b.html" style="color:var(--accent)">Comparison matrix (B)</a> ·
-      <a href="pipeline.html" style="color:var(--accent)">Pipeline poster</a> ·
-      <a href="story.html" style="color:var(--accent)">Data story</a> ·
-      <a href="unitaid/index.html" style="color:var(--accent)">Unitaid brand preview</a>
     </div>
   </header>
 
@@ -843,8 +825,8 @@
       <span class="key"><span class="dot prog" aria-hidden="true">›</span> In progress</span>
       <span class="key"><span class="dot late" aria-hidden="true">!</span> Delayed / bottleneck</span>
       <span class="key"><span class="dot idle" aria-hidden="true"></span> Not started (stage glyph dimmed, no badge)</span>
-      <span class="key"><span class="tgap-key g-warn" aria-hidden="true">+3 yrs</span> Years taken to get from one gate to the next</span>
-      <span class="key"><span class="tgap-key g-back" aria-hidden="true">−1 yr</span> Gate reached before the one ahead of it in the pathway</span>
+      <span class="key"><span class="tgap-key" aria-hidden="true">●</span> Gate's real year — see the timeline below each pathway</span>
+      <span class="key"><span class="tgap-key g-back" aria-hidden="true">↩</span> Reached before the gate ahead of it in the pathway (line dips back)</span>
     </div>
     <button class="dl-btn" id="dl-csv" type="button">Download CSV</button>
   </div>
@@ -881,32 +863,39 @@
             <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
           </div>
         </div>
+        <div class="dock-section" id="loc-controls">
+          <h3>Location</h3>
+          <label class="res-pick">Region <select id="loc-region" aria-label="Filter map by WHO region"></select></label>
+          <label class="res-pick">Country or area <select id="loc-country" aria-label="Filter map by country"></select></label>
+          <label class="res-pick">Site <select id="loc-site" aria-label="Filter map by WHO study site"></select></label>
+        </div>
       </aside>
 
       <div class="map-dock-center">
         <div class="mapwrap" id="mapwrap"></div>
         <p class="map-hint" id="map-hint">Drag to pan · Ctrl + scroll or double-click to zoom · arrow keys pan when the map has focus</p>
-        <div class="map-overlay" id="map-overlay" hidden></div>
+        <div class="map-legend-bar">
+          <div class="dock-section">
+            <h3>Legend</h3>
+            <div class="map-legend">
+              <span class="key"><span class="mapsw registered"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
+              <span class="key"><span class="mapsw guidelines"></span> In national guidelines <span class="ct" id="mapct-guidelines">–</span></span>
+              <span class="key"><span class="mapsw mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
+              <span class="key"><span class="mapsw none"></span> No data <span class="ct" id="mapct-none">–</span></span>
+            </div>
+            <div class="res-legend" id="res-legend" hidden>
+              <span class="res-t">Treatment failure</span>
+              <span class="key"><span class="resdot b1"></span>&lt; 5%</span>
+              <span class="key"><span class="resdot b2"></span>5–10%</span>
+              <span class="key"><span class="resdot b3"></span>10–20%</span>
+              <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
+            </div>
+            <p class="res-rule" id="res-rule" hidden></p>
+          </div>
+        </div>
       </div>
 
       <aside class="map-dock-rail map-dock-right">
-        <div class="dock-section">
-          <h3>Legend</h3>
-          <div class="map-legend">
-            <span class="key"><span class="mapsw registered"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
-            <span class="key"><span class="mapsw guidelines"></span> In national guidelines <span class="ct" id="mapct-guidelines">–</span></span>
-            <span class="key"><span class="mapsw mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
-            <span class="key"><span class="mapsw none"></span> No data <span class="ct" id="mapct-none">–</span></span>
-          </div>
-          <div class="res-legend" id="res-legend" hidden>
-            <span class="res-t">Treatment failure</span>
-            <span class="key"><span class="resdot b1"></span>&lt; 5%</span>
-            <span class="key"><span class="resdot b2"></span>5–10%</span>
-            <span class="key"><span class="resdot b3"></span>10–20%</span>
-            <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
-          </div>
-          <p class="res-rule" id="res-rule" hidden></p>
-        </div>
         <div class="dock-section dock-detail">
           <h3>Detail</h3>
           <p class="res-note" id="res-note" hidden></p>
@@ -916,7 +905,9 @@
               <button type="button" class="res-close" id="res-close" aria-label="Close study list">Close</button>
             </div>
             <div class="res-panel-chart" id="res-panel-chart" hidden></div>
-            <div class="res-panel-scroll"><table class="res-table" id="res-table"></table></div>
+            <div class="res-panel-scroll">
+              <div class="res-cards" id="res-cards"></div>
+            </div>
           </div>
         </div>
       </aside>
@@ -989,7 +980,6 @@
     <a href="https://unitaid.org/" target="_blank" rel="noopener noreferrer">Unitaid<span class="ext" aria-hidden="true">↗</span></a>
     partners, to be hosted by the
     <a href="https://endmalaria.org/" target="_blank" rel="noopener noreferrer">RBM Partnership to End Malaria<span class="ext" aria-hidden="true">↗</span></a>.
-      <br><b>Something look wrong?</b> <a class="report-link" href="#report-issue" data-report-issue>Send feedback to the LAUNCH team</a> — corrections and comments from country teams, manufacturers and partners are always welcome.
   </footer>
 </div>
 
@@ -1166,26 +1156,160 @@
     return y >= 1990 && y <= 2100 ? y : null;
   }
 
-  // The gap between gate i-1 and gate i, drawn on the connector between them.
-  // The pathway is an order of gates, not a guaranteed chronology: WHO
-  // prequalification can be reached years before a WHO guideline recommendation.
-  // Where that happens the gap is negative, and it is shown in the neutral grey
-  // rather than the red a five-year delay earns — it is a fact about sequence.
-  function gapChip(years, i) {
-    if (i === 0) return "";
-    const a = years[i - 1], b = years[i];
-    if (!a || !b) return "";
-    const gap = b - a;
-    const abs = Math.abs(gap);
-    const unit = abs === 1 ? "yr" : "yrs";
-    const cls = gap < 0 ? "g-back" : gap <= 2 ? "g-good" : gap <= 5 ? "g-warn" : "g-crit";
-    const txt = gap === 0 ? "same yr" : (gap < 0 ? "−" : "+") + abs + " " + unit;
-    const label = gap === 0
-      ? `${STAGES[i]} was reached in ${b}, the same year as ${STAGES[i - 1]}.`
-      : gap < 0
-      ? `${STAGES[i]} was reached in ${b}, ${abs} ${unit} before ${STAGES[i - 1]} in ${a} — these gates were not cleared in pathway order.`
-      : `${abs} ${unit} from ${STAGES[i - 1]} in ${a} to ${STAGES[i]} in ${b}.`;
-    return `<span class="tgap ${cls}" role="img" title="${esc(label)}" aria-label="${esc(label)}">${txt}</span>`;
+  // ---- standalone real-year timeline, drawn under the always-visible track --
+  // Independent of the stepper above it — no lines tie the two together. Every
+  // gate with a real year gets its own point, name written out in full, on an
+  // axis zoomed to this product's own span. Points still join in pathway order,
+  // so a gate reached out of that order (WHO prequalification can land years
+  // before the WHO guideline recommendation that precedes it) shows as the
+  // join dipping backward rather than a chip explaining it — a fact about
+  // sequence, drawn in neutral grey rather than the red a real delay earns.
+  // The active gate (currentStage) always gets an open-ended "today" marker
+  // even without a date, since that's the one fact every product has.
+  function wrapLabel(label) {
+    if (label.length <= 15) return [label];
+    const words = label.split(" ");
+    if (words.length === 1) return [label];
+    let best = 0, bestDiff = Infinity;
+    for (let i = 0; i < words.length - 1; i++) {
+      const acc = words.slice(0, i + 1).join(" ");
+      const diff = Math.abs(acc.length - label.length / 2);
+      if (diff < bestDiff) { bestDiff = diff; best = i; }
+    }
+    return [words.slice(0, best + 1).join(" "), words.slice(best + 1).join(" ")];
+  }
+  function estHalfWidth(lines) {
+    const widest = Math.max(...lines.map(l => String(l).length));
+    return Math.max(26, Math.min(58, widest * 3 + 8));
+  }
+  // Skyline packing: a label drops to the next tier down only when it would
+  // collide with one already claimed at the tier above it.
+  function packTiers(items) {
+    const tiers = [];
+    items.forEach(it => {
+      const start = it.x - it.halfW, end = it.x + it.halfW;
+      let placed = false;
+      for (let t = 0; t < tiers.length; t++) {
+        const clash = tiers[t].some(iv => !(end < iv[0] - 6 || start > iv[1] + 6));
+        if (!clash) { tiers[t].push([start, end]); it.tier = t; placed = true; break; }
+      }
+      if (!placed) { tiers.push([[start, end]]); it.tier = tiers.length - 1; }
+    });
+    return tiers.length;
+  }
+  function niceTicks(lo, hi, target) {
+    const span = hi - lo;
+    const steps = [1, 2, 5, 10, 20, 25, 50];
+    const step = steps.find(s => s >= span / target) || steps[steps.length - 1];
+    const ticks = [];
+    for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks.push(t);
+    return ticks;
+  }
+
+  function stageTimeline(p, years, trackWidth) {
+    // "now" here means the data's own as-of date, same as nowYear in the gate
+    // drill-down below — not the visitor's clock, which could make "today"
+    // read later than the data has actually been checked to.
+    const CUR_YEAR = parseInt(DATA.meta.lastUpdated.slice(0, 4), 10);
+    // W matches the track column's real rendered width (set by fitTimelines,
+    // once the board is in the DOM) so the SVG never scales — 1 unit stays 1px
+    // regardless of how wide the full-bleed card is. 880 is only a pre-layout
+    // fallback for the very first paint.
+    const W = trackWidth || 880, marginX = 26, dotY = 34, dipY = 60;
+
+    const real = years.filter(y => y != null);
+    const domainYears = real.concat([CUR_YEAR]);
+    let lo = Math.min(...domainYears), hi = Math.max(...domainYears);
+    if (hi - lo < 2) { const mid = (hi + lo) / 2; lo = mid - 1; hi = mid + 1; }
+    const pad = Math.max(1, Math.round((hi - lo) * 0.1));
+    lo -= pad; hi += pad;
+    const scale = y => marginX + (y - lo) / (hi - lo) * (W - 2 * marginX);
+    const todayX = scale(CUR_YEAR);
+
+    const items = [];
+    STAGES.forEach((label, i) => {
+      let x = null, yearLine = null, isCurrent = false;
+      if (years[i] != null) { x = scale(years[i]); yearLine = String(years[i]); }
+      else if (i === p.currentStage) { x = todayX; yearLine = "in progress"; isCurrent = true; }
+      if (x == null) return;
+      const nameLines = wrapLabel(label);
+      items.push({ idx: i, x, isCurrent, nameLines, yearLine, halfW: estHalfWidth(nameLines.concat([yearLine])) });
+    });
+    if (!items.length) return "";
+    items.sort((a, b) => a.x - b.x);
+    const tierCount = packTiers(items);
+
+    const tierHeight = 40, labelTop0 = 76;
+    const H = labelTop0 + tierCount * tierHeight + 8;
+    const parts = [];
+
+    parts.push(`<line x1="${marginX}" y1="${dotY}" x2="${W - marginX}" y2="${dotY}" stroke="var(--line)" stroke-width="1"/>`);
+    // skip a reference tick where it would sit close enough to "today" to
+    // collide with that label — today always wins that spot
+    niceTicks(lo, hi, 4).filter(yr => Math.abs(scale(yr) - todayX) > 34).forEach(yr => {
+      const gx = scale(yr);
+      parts.push(`<line x1="${gx}" y1="${dotY - 4}" x2="${gx}" y2="${dotY}" stroke="var(--line)" stroke-width="1"/>`);
+      parts.push(`<text x="${gx}" y="${dotY - 9}" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">${yr}</text>`);
+    });
+    parts.push(`<line x1="${todayX}" y1="${dotY - 4}" x2="${todayX}" y2="${labelTop0 - 8}" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 3"/>`);
+    parts.push(`<text x="${todayX}" y="${dotY - 21}" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--ink-3)" font-variant-numeric="tabular-nums">${CUR_YEAR}</text>`);
+    parts.push(`<text x="${todayX}" y="${dotY - 9}" text-anchor="middle" font-size="9.5" fill="var(--ink-3)" font-style="italic">today</text>`);
+
+    const xByIdx = {};
+    items.forEach(it => xByIdx[it.idx] = it.x);
+    for (let i = 1; i < STAGES.length; i++) {
+      const ax = xByIdx[i - 1], bx = xByIdx[i];
+      if (ax == null || bx == null) continue;
+      const midX = (ax + bx) / 2;
+      if (bx < ax) {
+        const yrs = (years[i] != null && years[i - 1] != null) ? Math.abs(years[i] - years[i - 1]) : null;
+        const ttl = yrs != null
+          ? `${esc(STAGES[i])} was reached ${yrs} yr${yrs === 1 ? "" : "s"} before ${esc(STAGES[i - 1])} — these gates were not cleared in pathway order.`
+          : "";
+        parts.push(`<path d="M ${ax},${dotY} Q ${midX},${dipY} ${bx},${dotY}" fill="none" stroke="var(--ink-3)" stroke-width="1.75" stroke-dasharray="4 3">${ttl ? `<title>${ttl}</title>` : ""}</path>`);
+      } else {
+        const dashed = i === p.currentStage;
+        const yrs = (years[i] != null && years[i - 1] != null) ? years[i] - years[i - 1]
+          : (dashed && years[i - 1] != null) ? CUR_YEAR - years[i - 1] : null;
+        const ttl = (yrs != null && !dashed)
+          ? `${yrs} yr${yrs === 1 ? "" : "s"} from ${esc(STAGES[i - 1])} in ${years[i - 1]} to ${esc(STAGES[i])} in ${years[i]}.`
+          : "";
+        parts.push(`<line x1="${ax}" y1="${dotY}" x2="${bx}" y2="${dotY}" stroke="var(--ink-3)" stroke-width="1.75"${dashed ? ' stroke-dasharray="5 4"' : ""}>${ttl ? `<title>${ttl}</title>` : ""}</line>`);
+        if (yrs != null && yrs > 0) {
+          parts.push(`<text x="${midX}" y="${dotY + 20}" text-anchor="middle" font-size="10" font-weight="700" font-variant-numeric="tabular-nums" fill="var(--ink-2)">${yrs} yr${yrs === 1 ? "" : "s"}</text>`);
+        }
+      }
+    }
+
+    items.forEach(it => {
+      if (it.isCurrent) {
+        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="9" fill="var(--crit-soft)"/>`);
+        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="5" fill="var(--crit)"/>`);
+      } else {
+        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="4" fill="var(--good)"/>`);
+      }
+      const labelTopY = labelTop0 + it.tier * tierHeight;
+      parts.push(`<line x1="${it.x}" y1="${dotY + 6}" x2="${it.x}" y2="${labelTopY - 9}" stroke="var(--line)" stroke-width="1"/>`);
+      let ly = labelTopY;
+      it.nameLines.forEach(ln => {
+        parts.push(`<text x="${it.x}" y="${ly}" text-anchor="middle" font-size="11" fill="var(--ink-2)">${esc(ln)}</text>`);
+        ly += 13;
+      });
+      parts.push(`<text x="${it.x}" y="${ly}" text-anchor="middle" font-size="11" font-weight="700" font-variant-numeric="tabular-nums" fill="${it.isCurrent ? "var(--crit)" : "var(--ink)"}">${esc(it.yearLine)}</text>`);
+    });
+
+    // total elapsed time so far — first real gate to today (still ongoing,
+    // since every tracked product has an active, not-yet-cleared currentStage)
+    let totalLabel = "";
+    if (real.length) {
+      const firstYear = Math.min(...real);
+      const yrs = CUR_YEAR - firstYear;
+      totalLabel = yrs > 0 ? yrs + (yrs === 1 ? " yr" : " yrs") + ", ongoing" : "";
+    }
+
+    return `<div class="tlbox"><div class="tl-caption"><span>Actual timeline</span>${totalLabel ? `<span class="tl-total">${esc(totalLabel)}</span>` : ""}</div>
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Real timing of gates reached for ${esc(p.name)}">${parts.join("")}</svg>
+    </div>`;
   }
 
   const lateAt = i => tracked.filter(p => p.stages[i].status === "late").length;
@@ -1204,7 +1328,6 @@
       const postDone = st.status === "done";
       return `
         <div class="stage ${i === p.currentStage ? "cur" : ""} s-${st.status}">
-          ${gapChip(years, i)}
           <div class="row">
             <div class="bar pre ${preDone ? "done-bar" : ""}"></div>
             <button class="smark" type="button"
@@ -1240,28 +1363,6 @@
         <div class="sub">${esc(d.volumeNote || "Data not yet available")}</div>
       </div>`;
 
-    const journeyHtml = d.journey ? (() => {
-      const parts = [];
-      d.journey.forEach((g, i) => {
-        if (i > 0) {
-          const a = d.journey[i - 1].year, b = g.year;
-          let cls = "g-tbc", txt = "pending";
-          if (Number.isInteger(a) && Number.isInteger(b)) {
-            const gap = b - a;
-            txt = gap === 0 ? "same year" : "+" + gap + " yr" + (gap === 1 ? "" : "s");
-            cls = gap <= 2 ? "g-good" : gap <= 5 ? "g-warn" : "g-crit";
-          }
-          parts.push(`<span class="jgap ${cls}">${txt}</span>`);
-        }
-        parts.push(`<div class="jnode"><div class="jyear ${g.year === "TBC" ? "tbc" : ""}">${esc(g.year)}</div><div class="jlbl">${esc(g.label)}</div></div>`);
-      });
-      return `<div class="journey-wrap">
-        <h3>Time between gates</h3>
-        <p class="jnote">Elapsed time between access milestones. Benchmark (LAUNCH deep-dive, draft): ≤ 2 yrs between gates; 3–5 yrs slow; over 5 yrs a systemic delay.</p>
-        <div class="journey">${parts.join("")}</div>
-      </div>`;
-    })() : "";
-
     const priceProv = [
       d.price.source ? "Source: " + d.price.source : "",
       d.price.confirmedInWriting ? "Manufacturer-confirmed in writing" : "",
@@ -1273,15 +1374,23 @@
         <div class="prow">
           <button class="pbtn" aria-expanded="false" aria-controls="${esc(p.id)}-detail">
             <div class="pid">
-              <div class="name"><span class="chev" aria-hidden="true">▸</span><span class="txt">${esc(p.name)}</span></div>
+              <div class="name"><span class="txt">${esc(p.name)}</span></div>
               <div class="inn">${esc(p.inn)}</div>
               <div class="mfr">${esc(p.manufacturer)}</div>
               <div class="chips">
                 <span class="chip ${p.class === "pipeline" ? "pipeline" : ""}">${esc(p.classLabel)}</span>
               </div>
+              <div class="peek">
+                <span class="peek-txt peek-closed">View details</span>
+                <span class="peek-txt peek-open">Hide details</span>
+                <span class="pchev" aria-hidden="true">▾</span>
+              </div>
             </div>
           </button>
-          <div class="trackbox"><div class="track">${stagesHtml}</div></div>
+          <div class="trackwrap">
+            <div class="trackbox"><div class="track">${stagesHtml}</div></div>
+            ${stageTimeline(p, years)}
+          </div>
         </div>
         <div class="gatepanel" id="${esc(p.id)}-gate" hidden></div>
         ${p.flag ? `<div class="flagnote">${esc(p.flag)}</div>` : ""}
@@ -1322,7 +1431,6 @@
             </div>
             ${volumeCard}
           </div>
-          ${journeyHtml}
           <div class="mtable-box">
             <table class="mtable">
               <thead><tr><th>Milestone</th><th>Status</th><th>Date achieved / submitted</th><th>Next expected step</th><th>Anticipated</th></tr></thead>
@@ -1347,6 +1455,33 @@
       </section>
     `);
     board.appendChild(node);
+  });
+
+  // The timeline SVGs above were built against the 880 fallback width before
+  // any card had a real layout. Now that .trackwrap has one, measure it and
+  // regenerate every timeline at that exact pixel width — 1 SVG unit == 1px,
+  // so text and dots stay their authored size instead of stretching to fill
+  // the (now full-bleed, so much wider) card, and the axis still runs edge to
+  // edge with no leftover gap. Re-run on resize since the card's width is
+  // fluid.
+  function fitTimelines() {
+    const sample = document.querySelector(".trackwrap");
+    if (!sample) return;
+    const w = Math.round(sample.getBoundingClientRect().width);
+    if (!w) return;
+    tracked.forEach(p => {
+      const host = document.getElementById(p.id);
+      const tlbox = host && host.querySelector(".tlbox");
+      if (!tlbox) return;
+      const years = p.stages.map(stageYear);
+      tlbox.outerHTML = stageTimeline(p, years, w);
+    });
+  }
+  fitTimelines();
+  let fitTimelinesRAF = null;
+  window.addEventListener("resize", () => {
+    cancelAnimationFrame(fitTimelinesRAF);
+    fitTimelinesRAF = requestAnimationFrame(fitTimelines);
   });
 
   // placeholder rows (e.g. prevention tools not yet approved for tracking)
@@ -1644,16 +1779,102 @@
   if (window.LAUNCH_MAP && window.LAUNCH_MAP_GEO && window.maplibregl) {
     const mapsec = document.getElementById("mapsec");
     mapsec.hidden = false;
+
+    // Keeps both rails' boxes the same height as the map column (map + hint
+    // + legend) between them — CSS alone can't target one specific sibling's
+    // height (grid's align-self: stretch matches the tallest of all three
+    // columns, which is a rail itself at some widths, not the map), and the
+    // map column's own height moves with viewport width (the map keeps a
+    // fixed aspect ratio) as well as with the legend's line-wrapping.
+    const mapDockCenter = document.querySelector(".map-dock-center");
+    const mapDockLeft = document.querySelector(".map-dock-left");
+    const mapDockRight = document.querySelector(".map-dock-right");
+    if (mapDockCenter && window.ResizeObserver) {
+      new ResizeObserver(() => {
+        const h = mapDockCenter.offsetHeight + "px";
+        if (mapDockLeft) mapDockLeft.style.height = h;
+        if (mapDockRight) mapDockRight.style.height = h;
+      }).observe(mapDockCenter);
+    }
+
     const wrap = document.getElementById("mapwrap");
     // LAUNCH_MAP (94 countries, data/world-map.js) stays the single source of
     // truth for "which countries count as drawn" — sitesFor's filter,
     // drawnCount, curUndrawn, the legend counts and the validator's
     // undrawn-country warning all read it, unchanged by this migration
-    // (DEV-13 D17). LAUNCH_MAP_GEO (100 countries, 50m, this page only)
-    // supplies geometry for the MapLibre fill/line layer — a strict superset,
-    // so nothing that used to be undrawn becomes wrongly paintable.
+    // (DEV-13 D17). LAUNCH_MAP_GEO (236 countries/territories, 50m, this page
+    // only) supplies geometry for the MapLibre fill/line layer. It started as
+    // a strict superset of the 94 (100 countries) and was later widened to
+    // the whole world specifically so the Location filter's Region picker
+    // always has real shapes to show — including regions like Europe with no
+    // WHO malaria-resistance tracking at all — the same way WHO's own threat
+    // map always draws the full world and greys out whatever has no data
+    // (see the Location-filter decision recorded after D17 in
+    // dev-13-resistance-handover.md). Nothing that used to be undrawn becomes
+    // wrongly paintable: a country only ever gets a real access colour when
+    // byIso has an entry for it, which still only ever comes from a
+    // product's real WHO data.
     const M = window.LAUNCH_MAP;
     const GEO = window.LAUNCH_MAP_GEO;
+    // Every iso3 GEO actually carries geometry for, deduped — the basis for
+    // the Location filter's Region/Country lists and for the country-fill/
+    // line paint filter. Deliberately NOT M.countries: M stays scoped to the
+    // 94 WHO-tracked countries (see above), but the filter and the basemap
+    // itself now cover the whole world.
+    const GEO_COUNTRY_NAME = {};
+    GEO.features.forEach((f) => { GEO_COUNTRY_NAME[f.properties.iso3] = f.properties.name; });
+
+    // WHO's own six-region classification (not in any data file here — it's a
+    // fixed, public WHO scheme, not something extracted from a source we
+    // track) — lets the Location filter below group every drawn country the
+    // same way WHO's own threat map does. Covers every WHO member state GEO
+    // has a shape for, not just the 94 this page has resistance data for —
+    // countries with no data of their own still need a region to filter by,
+    // the same way WHO's own threat map greys them out rather than omitting
+    // them. A few GEO shapes (dependent territories, disputed/unrecognised
+    // areas: Puerto Rico, Hong Kong, Western Sahara, Taiwan, Antarctica, …)
+    // are deliberately left out — they are not WHO member states and have no
+    // official region — so they render (in the default, unfiltered view)
+    // but never appear under a specific Region.
+    const REGION_NAME = {
+      AFRO: "Africa", AMRO: "Americas", EMRO: "Eastern Mediterranean",
+      EURO: "Europe", SEARO: "South-East Asia", WPRO: "Western Pacific",
+    };
+    const WHO_REGION = {
+      AFG: "EMRO", AGO: "AFRO", ALB: "EURO", AND: "EURO", ARE: "EMRO", ARG: "AMRO",
+      ARM: "EURO", ATG: "AMRO", AUS: "WPRO", AUT: "EURO", AZE: "EURO", BDI: "AFRO",
+      BEL: "EURO", BEN: "AFRO", BFA: "AFRO", BGD: "SEARO", BGR: "EURO", BHR: "EMRO",
+      BHS: "AMRO", BIH: "EURO", BLR: "EURO", BLZ: "AMRO", BOL: "AMRO", BRA: "AMRO",
+      BRB: "AMRO", BRN: "WPRO", BTN: "SEARO", BWA: "AFRO", CAF: "AFRO", CAN: "AMRO",
+      CHE: "EURO", CHL: "AMRO", CHN: "WPRO", CIV: "AFRO", CMR: "AFRO", COD: "AFRO",
+      COG: "AFRO", COK: "WPRO", COL: "AMRO", COM: "AFRO", CPV: "AFRO", CRI: "AMRO",
+      CUB: "AMRO", CYP: "EURO", CZE: "EURO", DEU: "EURO", DJI: "EMRO", DMA: "AMRO",
+      DNK: "EURO", DOM: "AMRO", DZA: "AFRO", ECU: "AMRO", EGY: "EMRO", ERI: "AFRO",
+      ESP: "EURO", EST: "EURO", ETH: "AFRO", FIN: "EURO", FJI: "WPRO", FRA: "EURO",
+      FSM: "WPRO", GAB: "AFRO", GBR: "EURO", GEO: "EURO", GHA: "AFRO", GIN: "AFRO",
+      GMB: "AFRO", GNB: "AFRO", GNQ: "AFRO", GRC: "EURO", GRD: "AMRO", GTM: "AMRO",
+      GUY: "AMRO", HND: "AMRO", HRV: "EURO", HTI: "AMRO", HUN: "EURO", IDN: "SEARO",
+      IND: "SEARO", IRL: "EURO", IRN: "EMRO", IRQ: "EMRO", ISL: "EURO", ISR: "EURO",
+      ITA: "EURO", JAM: "AMRO", JOR: "EMRO", JPN: "WPRO", KAZ: "EURO", KEN: "AFRO",
+      KGZ: "EURO", KHM: "WPRO", KIR: "WPRO", KNA: "AMRO", KOR: "WPRO", KWT: "EMRO",
+      LAO: "WPRO", LBN: "EMRO", LBR: "AFRO", LBY: "EMRO", LCA: "AMRO", LIE: "EURO",
+      LKA: "SEARO", LSO: "AFRO", LTU: "EURO", LUX: "EURO", LVA: "EURO", MAR: "EMRO",
+      MCO: "EURO", MDA: "EURO", MDG: "AFRO", MDV: "SEARO", MEX: "AMRO", MHL: "WPRO",
+      MKD: "EURO", MLI: "AFRO", MLT: "EURO", MMR: "SEARO", MNE: "EURO", MNG: "WPRO",
+      MOZ: "AFRO", MRT: "AFRO", MUS: "AFRO", MWI: "AFRO", MYS: "WPRO", NAM: "AFRO",
+      NER: "AFRO", NGA: "AFRO", NIC: "AMRO", NIU: "WPRO", NLD: "EURO", NOR: "EURO",
+      NPL: "SEARO", NRU: "WPRO", NZL: "WPRO", OMN: "EMRO", PAK: "EMRO", PAN: "AMRO",
+      PER: "AMRO", PHL: "WPRO", PLW: "WPRO", PNG: "WPRO", POL: "EURO", PRK: "SEARO",
+      PRT: "EURO", PRY: "AMRO", PSE: "EMRO", QAT: "EMRO", ROU: "EURO", RUS: "EURO",
+      RWA: "AFRO", SAU: "EMRO", SDN: "EMRO", SEN: "AFRO", SGP: "WPRO", SLB: "WPRO",
+      SLE: "AFRO", SLV: "AMRO", SMR: "EURO", SOM: "EMRO", SRB: "EURO", SSD: "AFRO",
+      STP: "AFRO", SUR: "AMRO", SVK: "EURO", SVN: "EURO", SWE: "EURO", SWZ: "AFRO",
+      SYC: "AFRO", SYR: "EMRO", TCD: "AFRO", TGO: "AFRO", THA: "SEARO", TJK: "EURO",
+      TKM: "EURO", TLS: "SEARO", TON: "WPRO", TTO: "AMRO", TUN: "EMRO", TUR: "EURO",
+      TZA: "AFRO", UGA: "AFRO", UKR: "EURO", URY: "AMRO", USA: "AMRO", UZB: "EURO",
+      VCT: "AMRO", VEN: "AMRO", VNM: "WPRO", VUT: "WPRO", WSM: "WPRO", YEM: "EMRO",
+      ZAF: "AFRO", ZMB: "AFRO", ZWE: "AFRO",
+    };
 
     wrap.innerHTML = `<div id="mapwrap-gl"></div>
       <div class="map-empty" id="map-empty" hidden></div>
@@ -1675,12 +1896,18 @@
     // mzLvl readout showing "65536×" and the map collapsing to a single flat
     // colour at that zoom; D13's basemap-detail reasoning was never wrong,
     // it just never reached the map option it was meant to bound).
-    const ZMAX = 16;   // D13's basemap-detail reasoning still applies, now against a sharper 50m basemap
+    const ZMAX = 64;   // D13's basemap-detail reasoning still applies, now against a sharper 50m basemap; 16->64 per D29, re-verified by verify-map-clusters.js's extended sweep
     const DOT_R = 10, CLUSTER_R = 17, MARK_GAP = 2;         // CSS px — matches .res-dot/.res-cluster sizes
     const CPASS = 20;    // clustering convergence bound, unchanged from D15
 
     let curSites = null, curMarks = [], curDrug = "", curSpecies = "";
     let curUndrawn = 0;
+    // baseSites is sitesFor(drug, species) before the Location filter narrows
+    // it to curSites — kept separate so the Site dropdown can always offer
+    // every site in a country the reader picks, not just the ones a previous
+    // Location selection left visible.
+    let baseSites = null;
+    let locRegion = "", locCountry = "", locSite = "";
     // The drug bound to the currently selected product (PRODUCT_DRUG), or
     // null when that product has no WHO resistance data of its own (D24).
     let curBoundDrug = null;
@@ -1718,7 +1945,15 @@
       },
       center: [(LON0 + LON1) / 2, (LAT0 + LAT1) / 2], zoom: 0,
       minZoom: 0, maxZoom: Math.log2(ZMAX),   // ZMAX is linear (D13); MapLibre zoom is log2 (D26)
-      maxBounds: [[LON0 - 20, LAT0 - 15], [LON1 + 20, LAT1 + 15]],
+      // Near-global, not the old 94-country window (D30) -- MapLibre silently
+      // raises the EFFECTIVE floor above `minZoom` so maxBounds always fills
+      // the container; the old box (LON0-20..LON1+20, LAT0-15..LAT1+15) was
+      // sized for the pre-D27 tracked-country extent and its aspect ratio
+      // didn't match a typical wide map panel, so "zoom out" silently
+      // bottomed out around 2-3x instead of the intended 1x. -179/85, not
+      // -180/90 -- MapLibre throws internally on a maxBounds that spans the
+      // antimeridian or a pole exactly.
+      maxBounds: [[-179, -85], [179, 85]],
       // Locked to 2D, north-up — the SVG map this replaces never rotated or
       // tilted, and nothing asked for that to change (DEV-13 D19). MapLibre's
       // default keyboard handler binds Shift+arrow to rotate/pitch, which
@@ -1775,10 +2010,10 @@
       map.setPaintProperty("country-line", "line-color", mapColors.border);
       paintCountries();
     }
+    // The CSS is light-only now (no dark override, no [data-theme] toggle),
+    // so these listeners are no-ops in practice — kept as cheap insurance in
+    // case a theme toggle returns later.
     matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaintTheme);
-    // Defensive: no script on this page sets [data-theme] today, but the CSS
-    // carries a dark override for it (matching every other page's tokens) —
-    // cheap insurance against a future toggle silently going unrefreshed.
     new MutationObserver(repaintTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
     // ---- keyboard-accessible country list (DEV-13 D21) ---------------------
@@ -1868,19 +2103,14 @@
       // Paints the MapLibre fill layer via feature-state — the direct
       // replacement for the old per-<path> class/dataset loop (D19).
       applyCountryLevels(byIso);
-      const overlay = document.getElementById("map-overlay");
       const empty = document.getElementById("map-empty");
       if (!p.detail.countries) {
-        overlay.hidden = true;
         empty.hidden = false;
         empty.textContent = p.class === "pipeline"
           ? p.name + " is pre-launch — no country access yet."
           : "No country-level data yet for " + p.name + ".";
       } else {
         empty.hidden = true;
-        const c = p.detail.countries;
-        overlay.hidden = c.status === "verified";
-        overlay.textContent = (c.status === "illustrative" ? "ILLUSTRATIVE — " : "DRAFT, NOT YET VERIFIED — ") + c.note;
       }
       bindDrug(id);
     }
@@ -2140,7 +2370,6 @@
     }
 
     // ---- click-through: every study behind one country dot ------------------
-    let panelSort = { col: "year", dir: -1 };
     let panelRows = [], panelTitle = "";
 
     function closePanel() {
@@ -2227,43 +2456,24 @@
 
     function renderPanel() {
       const panel = document.getElementById("res-panel");
-      const table = document.getElementById("res-table");
+      const cards = document.getElementById("res-cards");
       if (!panelRows.length) { panel.hidden = true; return; }
-      renderChart(panelRows);   // fixed ordering of its own — independent of the table's sort state
-      const COLS = [
-        { k: "year",   t: "Year",     num: true },
-        { k: "site",   t: "Site" },
-        { k: "region", t: "Region" },
-        { k: "n",      t: "Patients", num: true },
-        { k: "v",      t: "Failure",  num: true },
-        { k: "source", t: "Study" }
-      ];
-      const dir = panelSort.dir, key = panelSort.col;
-      const sorted = panelRows.slice().sort((a, b) => {
-        const x = a[key], y = b[key];
-        if (x === y) return 0;
-        if (x === null || x === "") return 1;          // blanks last, either direction
-        if (y === null || y === "") return -1;
-        return (typeof x === "number" ? x - y : String(x).localeCompare(String(y))) * dir;
-      });
+      renderChart(panelRows);   // fixed ordering of its own — independent of the list below
+      const sorted = panelRows.slice().sort((a, b) => b.year - a.year);   // most recent study first
       const small = RES.meta.smallStudy || 20;
-      table.innerHTML =
-        "<thead><tr>" + COLS.map((c) =>
-          `<th data-k="${c.k}" scope="col"${c.k === key ? ` aria-sort="${dir === 1 ? "ascending" : "descending"}"` : ""}>${esc(c.t)}</th>`
-        ).join("") + "</tr></thead><tbody>" +
-        sorted.map((r) => {
-          const cite = r.citation
-            ? `<a href="${esc(r.citation)}" target="_blank" rel="noopener">${esc(r.source || "study")}</a>`
-            : esc(r.source || "—");
-          return `<tr${Number.isInteger(r.n) && r.n < small ? ' class="small"' : ""}>` +
-            `<td class="yr">${r.year}</td><td>${esc(r.site || "—")}</td><td>${esc(r.region || "—")}</td>` +
-            `<td class="num">${r.n === null ? "—" : r.n}</td><td class="num">${r.v}%</td><td>${cite}</td></tr>`;
-        }).join("") + "</tbody>";
-      table.querySelectorAll("th").forEach((th) => th.addEventListener("click", () => {
-        const k = th.dataset.k;
-        panelSort = { col: k, dir: panelSort.col === k ? -panelSort.dir : (k === "year" || k === "n" || k === "v" ? -1 : 1) };
-        renderPanel();
-      }));
+
+      cards.innerHTML = sorted.map((r) => {
+        const cite = r.citation
+          ? `<a href="${esc(r.citation)}" target="_blank" rel="noopener">${esc(r.source || "study")}</a>`
+          : esc(r.source || "—");
+        const isSmall = Number.isInteger(r.n) && r.n < small;
+        const loc = [r.site || "—", r.region].filter(Boolean).join(", ");
+        return `<div class="res-card${isSmall ? " small" : ""}">` +
+          `<div class="res-card-head"><span class="res-card-year">${r.year}</span><span class="res-card-fail">${r.v}%</span></div>` +
+          `<div class="res-card-loc">${esc(loc)}</div>` +
+          `<div class="res-card-meta"><span>${r.n === null ? "—" : r.n} patients${isSmall ? " · small study" : ""}</span><span>${cite}</span></div>` +
+          "</div>";
+      }).join("");
       // The panel is the FULL history, not the dot's basis — say so, so the
       // counts here can never be mistaken for the ones in the tooltip.
       const n = panelRows.length;
@@ -2338,7 +2548,6 @@
       panelTitle = (mk.one
         ? (mk.members[0].site || "Unnamed site") + ", " + cn
         : cn + " — " + mk.members.length + " sites") + " · " + curDrug + " · " + curSpecies;
-      panelSort = { col: "year", dir: -1 };
       selKeys = new Set(mk.members.map((x) => x.key));
       applySelection();
       renderPanel();
@@ -2349,16 +2558,16 @@
       const m = RES.meta || {};
       const bits = [];
       if (!curSites || !curSites.length)
-        bits.push(`No WHO study results for ${curDrug} against ${curSpecies}.`);
+        bits.push(`No WHO results for ${curDrug} vs ${curSpecies}.`);
       if (curSites && curSites.length) {
         const nS = curSites.length, nM = curMarks.length;
         bits.push(nS === nM
-          ? `All ${nS} ${nS === 1 ? "site is" : "sites are"} drawn separately at this zoom.`
-          : `${nS} ${nS === 1 ? "site" : "sites"} in ${nM} ${nM === 1 ? "mark" : "marks"} at this zoom — zoom in to separate them.`);
+          ? `${nS} ${nS === 1 ? "site" : "sites"} shown separately.`
+          : `${nS} sites in ${nM} marks — zoom in to separate.`);
       }
       if (curUndrawn)
-        bits.push(`${curUndrawn} further ${curUndrawn === 1 ? "country is" : "countries are"} not drawn on this basemap.`);
-      bits.push(`Source: ${m.source || "WHO"} — WHO last updated ${prettyDate(m.whoLastDataUpdate)}, extract ${prettyDate(m.extract)}. Each value is WHO's own study result; only the merging of nearby sites is ours.`);
+        bits.push(`${curUndrawn} more ${curUndrawn === 1 ? "country" : "countries"} not shown.`);
+      bits.push(`Source: WHO Malaria Threat Maps, updated ${prettyDate(m.whoLastDataUpdate)}. Values are WHO's; site-merging is ours.`);
       note.textContent = bits.filter(Boolean).join(" ");
       note.hidden = false;
     }
@@ -2442,6 +2651,140 @@
       },
     };
 
+    // ---- Location filter (region / country / site) -------------------------
+    // Mirrors WHO's own threat map: narrowing by region, then country, then
+    // site hides everything outside the selection AND pans/zooms to it — on
+    // both map layers (the product's country fill and, when on, the
+    // resistance dots), since a reader picking "Cambodia" wants the whole
+    // page to be about Cambodia, not just one of its two overlays.
+    const regionCountries = (region) => Object.keys(GEO_COUNTRY_NAME).filter((iso3) => !region || WHO_REGION[iso3] === region);
+
+    function fillRegionList() {
+      const sel = document.getElementById("loc-region");
+      sel.innerHTML = '<option value="">All regions</option>' +
+        Object.keys(REGION_NAME).map((r) => `<option value="${r}">${esc(REGION_NAME[r])}</option>`).join("");
+      sel.value = locRegion;
+    }
+
+    function fillCountryList() {
+      const sel = document.getElementById("loc-country");
+      const list = regionCountries(locRegion)
+        .map((iso3) => ({ iso3, n: (M.countries[iso3] || {}).n || GEO_COUNTRY_NAME[iso3] }))
+        .sort((a, b) => a.n.localeCompare(b.n));
+      sel.innerHTML = '<option value="">All countries</option>' +
+        list.map((c) => `<option value="${esc(c.iso3)}">${esc(c.n)}</option>`).join("");
+      if (!list.some((c) => c.iso3 === locCountry)) locCountry = "";
+      sel.value = locCountry;
+    }
+
+    // Sites, unlike regions and countries, only exist while the resistance
+    // overlay has something drawn (baseSites) — every other country a WHO
+    // site could sit in still filters fine, it just has no site list of its
+    // own to offer. Disabled for three different reasons, so the placeholder
+    // says which one rather than leaving a bare, unexplained "All sites".
+    function fillSiteList() {
+      const sel = document.getElementById("loc-site");
+      let placeholder = "All sites", sites = [];
+      if (!locCountry) {
+        placeholder = "Select a country first";
+      } else if (!baseSites) {
+        placeholder = "Turn on Treatment failure to see sites";
+      } else {
+        sites = baseSites.filter((s) => s.iso3 === locCountry);
+        if (!sites.length) placeholder = "No WHO sites here";
+      }
+      sel.disabled = !sites.length;
+      sel.innerHTML = `<option value="">${esc(placeholder)}</option>` +
+        sites.map((s) => `<option value="${esc(s.key)}">${esc(s.site || "Unnamed site")}${s.region ? ", " + esc(s.region) : ""}</option>`).join("");
+      if (!sites.some((s) => s.key === locSite)) locSite = "";
+      sel.value = locSite;
+    }
+
+    function applyLocFilter(list) {
+      if (!list) return list;
+      if (locSite) return list.filter((s) => s.key === locSite);
+      if (locCountry) return list.filter((s) => s.iso3 === locCountry);
+      if (locRegion) return list.filter((s) => WHO_REGION[s.iso3] === locRegion);
+      return list;
+    }
+
+    // Generic enough for a Polygon's or MultiPolygon's coordinate tree at any
+    // nesting depth — recurses until it hits a [lon, lat] pair.
+    function bboxOfFeatures(feats) {
+      let minLon = Infinity, minLat = Infinity, maxLon = -Infinity, maxLat = -Infinity;
+      (function walk(node) {
+        if (typeof node[0] === "number") {
+          const [lon, lat] = node;
+          if (lon < minLon) minLon = lon; if (lon > maxLon) maxLon = lon;
+          if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+        } else node.forEach(walk);
+      })(feats.map((f) => f.geometry.coordinates));
+      return [[minLon, minLat], [maxLon, maxLat]];
+    }
+
+    function applyLocationFilter() {
+      if (!map.isStyleLoaded()) return;   // style layers aren't addressable yet (defensive: see repaintTheme)
+      const isoList = locCountry ? [locCountry] : locRegion ? regionCountries(locRegion) : null;
+      const filterExpr = isoList ? ["in", ["get", "iso3"], ["literal", isoList]] : null;
+      map.setFilter("country-fill", filterExpr);
+      map.setFilter("country-line", filterExpr);
+
+      curSites = applyLocFilter(baseSites);
+      if (baseSites) drawMarks();
+
+      if (locSite && curSites) {
+        const s = curSites.find((x) => x.key === locSite);
+        if (s) map.flyTo({ center: [s.lon, s.lat], zoom: Math.max(map.getZoom(), 6) });
+      } else if (locCountry) {
+        const feat = GEO.features.find((f) => f.properties.iso3 === locCountry);
+        if (feat) map.fitBounds(bboxOfFeatures([feat]), { padding: 40, maxZoom: Math.log2(ZMAX) });
+      } else if (locRegion) {
+        const feats = GEO.features.filter((f) => isoList.includes(f.properties.iso3));
+        // A country whose own shape straddles the antimeridian instead of
+        // being split into two polygons (Russia: -180 to 179.9; also USA,
+        // NZL, Fiji, Kiribati here) would stretch the region's bbox across
+        // the entire globe and swamp the fit — excluded from the CAMERA
+        // framing only. It still renders and is still part of the filter;
+        // this only decides what the map zooms to.
+        const framingFeats = feats.filter((f) => {
+          const b = bboxOfFeatures([f]);
+          return b[1][0] - b[0][0] < 180;
+        });
+        if (framingFeats.length) map.fitBounds(bboxOfFeatures(framingFeats), { padding: 30, maxZoom: Math.log2(ZMAX) });
+      } else {
+        map.fitBounds([[LON0, LAT0], [LON1, LAT1]], { padding: 0 });
+      }
+    }
+
+    fillRegionList();
+    fillCountryList();
+    fillSiteList();
+
+    document.getElementById("loc-region").addEventListener("change", () => {
+      locRegion = document.getElementById("loc-region").value;
+      locCountry = ""; locSite = "";
+      fillCountryList();
+      fillSiteList();
+      applyLocationFilter();
+    });
+    document.getElementById("loc-country").addEventListener("change", () => {
+      locCountry = document.getElementById("loc-country").value;
+      locSite = "";
+      // picking a country directly (region still "All regions") pins the
+      // region select to match, rather than leaving the two looking out of sync
+      if (locCountry && WHO_REGION[locCountry] && WHO_REGION[locCountry] !== locRegion) {
+        locRegion = WHO_REGION[locCountry];
+        document.getElementById("loc-region").value = locRegion;
+        fillCountryList();
+      }
+      fillSiteList();
+      applyLocationFilter();
+    });
+    document.getElementById("loc-site").addEventListener("change", () => {
+      locSite = document.getElementById("loc-site").value;
+      applyLocationFilter();
+    });
+
     function drawResistance() {
       if (!RES) return;
       document.getElementById("res-controls").hidden = false;
@@ -2459,7 +2802,8 @@
         // the zoomend handler only rebuilds marks while curSites is set —
         // leaving it behind would repaint the dots after the overlay was
         // switched off, the next time the reader zoomed
-        curSites = null; curMarks = [];
+        baseSites = null; curSites = null; curMarks = [];
+        fillSiteList();
         closePanel();
         const em = document.getElementById("map-empty");
         if (em) em.classList.remove("demoted");   // map is blank again — recentre
@@ -2476,7 +2820,9 @@
       }
 
       curDrug = drug; curSpecies = species;
-      curSites = sitesFor(drug, species);
+      baseSites = sitesFor(drug, species);
+      fillSiteList();
+      curSites = applyLocFilter(baseSites);
       const cells = cellsFor(drug, species);
       // countries WHO covers that this basemap does not draw — counted from the
       // country index rather than from the sites, which are already filtered out
