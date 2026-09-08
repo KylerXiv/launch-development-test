@@ -446,6 +446,29 @@
   .viz h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.005em; }
   .viz .viznote { margin: 3px 0 12px; font-size: 12.5px; color: var(--ink-3); }
   .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+  /* ---------- map dock layout (left filter rail / map / right legend+detail rail) ---------- */
+  .map-dock { display: grid; grid-template-columns: 220px minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  .map-dock-center { min-width: 0; }   /* lets the grid track shrink below the map's content size */
+  .map-dock-rail {
+    background: var(--surface-2); border: 1px solid var(--map-border); border-radius: 10px;
+    padding: 12px 14px; max-height: 480px; overflow-y: auto;
+  }
+  /* `display` on .map-dock-rail is an author rule and so outranks the browser's
+     [hidden] { display: none } — same trap .map-empty already carries a fix for. */
+  .map-dock-rail[hidden] { display: none; }
+  .dock-section { margin-bottom: 18px; }
+  .dock-section:last-child { margin-bottom: 0; }
+  /* Direct child only — .res-panel-head's own <h3> (the panel title) sits two
+     levels deeper inside .dock-detail and must not pick up this label style. */
+  .dock-section > h3 {
+    margin: 0 0 8px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--ink-3);
+  }
+  @media (max-width: 760px) {
+    .map-dock { grid-template-columns: 1fr; }
+    .map-dock-rail { max-height: none; }
+  }
   .tab {
     background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
     padding: 5px 14px; font: inherit; font-size: 13px; font-weight: 650; color: var(--ink-2); cursor: pointer;
@@ -526,11 +549,26 @@
      geography. Band fills mirror the WHO Malaria Threat Map bands and are
      fixed; the halo stroke picks up the basemap colour so dots stay legible
      against both the light and dark map. */
-  .res-controls { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; margin: 2px 0 10px; font-size: 12.5px; color: var(--ink-2); }
-  .res-controls fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
-  .res-controls legend { float: left; padding: 0 10px 0 0; font-weight: 650; color: var(--ink); }
-  .res-controls label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
-  .res-controls select { font: inherit; padding: 2px 6px; max-width: 15em; }
+  /* The dock-section's own <h3> already shows "Study result" visually — the
+     <fieldset><legend> stays for its native a11y grouping, just visually
+     hidden rather than doubled. */
+  .res-layer { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .res-layer legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .res-layer label {
+    display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px;
+    cursor: pointer; font-size: 12.5px; color: var(--ink-2);
+  }
+  .res-layer label:has(input:checked) { background: var(--surface); color: var(--ink); font-weight: 650; }
+  .res-layer label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .res-layer label.res-soon { cursor: default; align-items: flex-start; opacity: .6; }
+  .res-soon-body { display: flex; flex-direction: column; gap: 2px; }
+  .res-soon-tag {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--ink-3);
+  }
+  .res-pick { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--ink-2); margin-bottom: 10px; }
+  .res-pick:last-child { margin-bottom: 0; }
+  .res-pick select { font: inherit; padding: 5px 6px; width: 100%; }
   .res-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-top: 8px; font-size: 12.5px; color: var(--ink-2); }
   .res-legend .res-t { font-weight: 650; color: var(--ink); }
   .res-legend .resdot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; margin-right: 5px; vertical-align: -1px; }
@@ -549,7 +587,11 @@
   .res-close { font: inherit; font-size: 12px; background: none; border: 1px solid var(--map-border);
                border-radius: 6px; padding: 2px 10px; cursor: pointer; color: var(--ink-2); }
   .res-panel-scroll { max-height: 340px; overflow: auto; padding: 0 12px 12px; }
-  .res-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  /* A cluster can carry dozens of rows across 6 columns (Myanmar's history
+     runs past 100) — min-width keeps every column legible and lets
+     .res-panel-scroll's own overflow:auto scroll it horizontally inside the
+     dock's right rail, rather than squeezing columns unreadably thin. */
+  .res-table { width: 100%; min-width: 460px; border-collapse: collapse; font-size: 12px; }
   .res-table th, .res-table td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--map-border); vertical-align: top; }
   .res-table th { position: sticky; top: 0; background: var(--surface-2); font-weight: 650; cursor: pointer; white-space: nowrap; }
   .res-table th[aria-sort="ascending"]::after { content: " \2191"; }
@@ -703,39 +745,63 @@
     <h2>Country access map</h2>
     <p class="viznote" id="mapnote">Each country is shaded by the furthest stage it has reached — a country counted in MFT plans is registered too. Counts are of the countries drawn on this map.</p>
     <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
-    <div class="res-controls" id="res-controls" hidden>
-      <fieldset class="res-layer">
-        <legend>Resistance overlay</legend>
-        <label><input type="radio" name="reslayer" value="off" checked> Off</label>
-        <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
-      </fieldset>
-      <label class="res-pick">Drug <select id="res-drug" aria-label="Select drug for the resistance overlay"></select></label>
-      <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
-    </div>
-    <div class="mapwrap" id="mapwrap"></div>
-    <p class="map-hint" id="map-hint">Drag to pan · Ctrl + scroll or double-click to zoom · arrow keys pan when the map has focus</p>
-    <div class="map-overlay" id="map-overlay" hidden></div>
-    <div class="map-legend">
-      <span class="key"><span class="mapsw registered"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
-      <span class="key"><span class="mapsw guidelines"></span> In national guidelines <span class="ct" id="mapct-guidelines">–</span></span>
-      <span class="key"><span class="mapsw mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
-      <span class="key"><span class="mapsw none"></span> No data <span class="ct" id="mapct-none">–</span></span>
-    </div>
-    <div class="res-legend" id="res-legend" hidden>
-      <span class="res-t">Treatment failure</span>
-      <span class="key"><span class="resdot b1"></span>&lt; 5%</span>
-      <span class="key"><span class="resdot b2"></span>5–10%</span>
-      <span class="key"><span class="resdot b3"></span>10–20%</span>
-      <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
-    </div>
-    <p class="res-rule" id="res-rule" hidden></p>
-    <p class="res-note" id="res-note" hidden></p>
-    <div class="res-panel" id="res-panel" hidden>
-      <div class="res-panel-head">
-        <h3 id="res-panel-title"></h3>
-        <button type="button" class="res-close" id="res-close" aria-label="Close study list">Close</button>
+    <div class="map-dock">
+      <aside class="map-dock-rail map-dock-left" id="res-controls" hidden>
+        <div class="dock-section">
+          <h3>Study result</h3>
+          <fieldset class="res-layer">
+            <legend>Study result</legend>
+            <label><input type="radio" name="reslayer" value="off" checked> Off</label>
+            <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
+            <label class="res-soon"><input type="radio" name="reslayer" value="delayedClearance" disabled>
+              <span class="res-soon-body"><span>Delayed parasite clearance</span><span class="res-soon-tag">Not yet available</span></span></label>
+            <label class="res-soon"><input type="radio" name="reslayer" value="molecularMarkers" disabled>
+              <span class="res-soon-body"><span>Molecular markers of drug resistance</span><span class="res-soon-tag">Not yet available</span></span></label>
+          </fieldset>
+        </div>
+        <div class="dock-section">
+          <h3>Filters</h3>
+          <label class="res-pick">Drug <select id="res-drug" aria-label="Select drug for the resistance overlay"></select></label>
+          <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
+        </div>
+      </aside>
+
+      <div class="map-dock-center">
+        <div class="mapwrap" id="mapwrap"></div>
+        <p class="map-hint" id="map-hint">Drag to pan · Ctrl + scroll or double-click to zoom · arrow keys pan when the map has focus</p>
+        <div class="map-overlay" id="map-overlay" hidden></div>
       </div>
-      <div class="res-panel-scroll"><table class="res-table" id="res-table"></table></div>
+
+      <aside class="map-dock-rail map-dock-right">
+        <div class="dock-section">
+          <h3>Legend</h3>
+          <div class="map-legend">
+            <span class="key"><span class="mapsw registered"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
+            <span class="key"><span class="mapsw guidelines"></span> In national guidelines <span class="ct" id="mapct-guidelines">–</span></span>
+            <span class="key"><span class="mapsw mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
+            <span class="key"><span class="mapsw none"></span> No data <span class="ct" id="mapct-none">–</span></span>
+          </div>
+          <div class="res-legend" id="res-legend" hidden>
+            <span class="res-t">Treatment failure</span>
+            <span class="key"><span class="resdot b1"></span>&lt; 5%</span>
+            <span class="key"><span class="resdot b2"></span>5–10%</span>
+            <span class="key"><span class="resdot b3"></span>10–20%</span>
+            <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
+          </div>
+          <p class="res-rule" id="res-rule" hidden></p>
+        </div>
+        <div class="dock-section dock-detail">
+          <h3>Detail</h3>
+          <p class="res-note" id="res-note" hidden></p>
+          <div class="res-panel" id="res-panel" hidden>
+            <div class="res-panel-head">
+              <h3 id="res-panel-title"></h3>
+              <button type="button" class="res-close" id="res-close" aria-label="Close study list">Close</button>
+            </div>
+            <div class="res-panel-scroll"><table class="res-table" id="res-table"></table></div>
+          </div>
+        </div>
+      </aside>
     </div>
   </section>
 

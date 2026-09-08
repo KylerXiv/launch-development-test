@@ -162,7 +162,24 @@ important thing not to accidentally undo.
 
 Controls added under the product tabs: an **overlay** radio (Off / Treatment
 failure), a **drug** select, and a **species** select. Clicking any dot opens a
-panel below the map listing every study behind it.
+panel listing every study behind it.
+
+**Layout (D23): the "Dock" arrangement**, applied 8 Sep 2026 — the map's own
+UI chrome, not the rendering engine (that was D17–D22). Left rail: "Study
+result" (the overlay radio, now shown as vertical rows — all 3 study types
+listed, Delayed parasite clearance and Molecular markers of drug resistance
+**disabled** and labeled "Not yet available" per D7's existing
+disabled-not-blank convention, since only Treatment failure has real data)
+and "Filters" (the same drug/species `<select>` elements, unchanged — D8's
+flat A–Z drug list stays; the dock does **not** use the curated 4-drug picker
+an earlier mockup explored, that was tried and rejected once already on this
+feature). Right rail: "Legend" (access swatches + resistance bands + the
+WHO-rule sentence, always visible) and "Detail" below it (the provenance
+note, replaced by the click-through study table when a mark is clicked) —
+legend and detail are two separate, persistently-positioned sections, not one
+slot that swaps. Pure HTML/CSS repositioning of existing elements (found by
+`id`, not by DOM position) — no JS changes. See D23 in §6 for why the right
+rail is 340px, not the 260px an earlier mockup used.
 
 ---
 
@@ -233,7 +250,7 @@ did not count the two CSVs.)
 | `scripts/normalize-resistance.js` | Reads that CSV → writes the two outputs below. Zero dependencies, no network. |
 | `sourcing/staging/resistance_tes.csv` | Auditable intermediate: every study, one row each. |
 | `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **Unchanged by V2 — byte-identical to V1.** |
-| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom). The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. |
+| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom, theme), `---- keyboard-accessible country list` for D21. The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. The map's surrounding chrome (`#mapsec`'s HTML, the `.map-dock`/`.dock-section` CSS) is the "Dock" layout, D23 — a separate change from the renderer, touching only markup/CSS, not the JS this row otherwise describes. |
 | `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). Still checks resistance `iso3` values against `data/world-map.js` only (D17) — unaware of `data/world-map-geo.js` below. |
 | `scripts/build-map-geo.js` | **New.** Sibling to `scripts/build-map.js`, same dev-only-deps/`NODE_PATH` convention. Emits GeoJSON (not SVG paths) at Natural Earth **50m** from the identical `NUM_TO_A3` country table — this page's basemap only (D17). |
 | `data/world-map-geo.js` | **New**, generated output of the above. `window.LAUNCH_MAP_GEO = {type:"FeatureCollection", features:[{properties:{iso3,name}, geometry}]}`. 100 countries (6 more than `data/world-map.js`'s 94 — see D17 for the exact accounting). Not yet loaded by any page as of this commit. |
@@ -920,6 +937,69 @@ falciparum at maximum zoom) was also spot-checked directly against
 marks for 8 sites (Veun Sai, Kaoh Nheaek, Pailin, Veal Veng, Sesan, Tasanh,
 Siem Pang, Oral), and Pailin stands alone reading exactly 18%* — matching the
 original SVG-era finding precisely.
+
+**D23 — Apply the "Dock" mockup layout to the real page; two adaptations,
+both already reasoned about elsewhere in this document.** After D17–D22
+shipped the rendering-engine migration, the map's surrounding controls were
+still the pre-migration horizontal row (radio + two selects above the map,
+legend and panel stacked below). This decision is about that chrome, not the
+map itself — three earlier mockups (Overlay, Command Bar, Dock) had been
+built and "Dock" (persistent left filter rail, map centre, persistent right
+legend+detail rail) was picked; this closes the gap between that pick and
+the real page.
+
+Two literal mockup details were deliberately **not** carried over, both
+already decided against on this feature before the mockups existed:
+
+1. *Drugs stay the flat A–Z `<select>` (D8), not the mockup's 4-drug
+   checkboxes.* The mockup explored a curated list because it was scoping a
+   different, earlier product-card UI (GanLum/ALAQ/ASPY/DHA-PPQ) — porting
+   that scope restriction into the real drug filter would silently redo D8,
+   which already tried and rejected exactly this (a curated list hid
+   coverage gaps for the other 22 drugs).
+2. *All 3 "Study result" options are shown; 2 are disabled, not fabricated.*
+   The mockup used placeholder data for Delayed parasite clearance and
+   Molecular markers of drug resistance because it was a design exploration.
+   The real page never fabricates a WHO value (D2, D5) — so those two are
+   real, permanently-`disabled` radio inputs labeled "Not yet available",
+   the same pattern D7 already uses for a drug/species pairing with no data
+   behind it, extended here to a pairing that doesn't exist *yet* rather
+   than one that structurally never will.
+
+**The right rail is 340px, not the mockup's 260px.** Found while testing,
+not anticipated in the mockup: the click-through table (D4) is a real
+6-column, potentially dozens-of-rows table — the reason it originally lived
+full-width below the map ("so it can hold Myanmar's 108 rows without
+covering anything," per the CSS comment predating this decision). At 260px
+its Patients/Failure columns clipped. Two options were weighed: widen the
+rail and let the table scroll horizontally within it (chosen — keeps the
+persistent-legend/detail structure intact for every case, at the cost of a
+nested scroll region for wide tables), or keep the table full-width below
+the map as a deliberate exception to the 3-column layout (rejected — breaks
+the "detail lives in the dock" idea for exactly the cases where a reader
+most needs to see it, since a big table is also the most-studied,
+highest-signal case). `.res-table` carries a `min-width: 460px` so columns
+never squeeze below legibility; `.res-panel-scroll`'s existing
+`overflow: auto` handles the resulting horizontal scroll for free.
+
+**A CSS bug caught before it shipped:** the new `.dock-section h3` label
+style was a descendant selector, so it also matched `#res-panel-title` — an
+`<h3>` two levels deeper inside `.res-panel-head` — making the panel's own
+title render as a small uppercase section label instead of a normal heading.
+Fixed by scoping to `.dock-section > h3` (direct child only). Worth
+recording because the same trap is easy to repeat: any future section
+heading added under `.dock-section` must stay a direct child, or use a class
+rather than the bare element selector, if something else inside that section
+also happens to be an `<h3>`.
+
+**Verified:** a full headless-browser pass — product-tab switch recolors
+countries and updates counts, overlay on/off and drug/species changes still
+redraw the map, the two disabled radios are confirmed unclickable
+(`el.checked` stays `false` after a scripted click), zoom/pan still work,
+and a mark click opens the panel in the right rail's detail section with the
+full un-clipped table, closing correctly. No JS was changed to make any of
+this work, matching the design's own premise that this was a pure
+HTML/CSS repositioning of elements the JS already finds by `id`.
 
 ---
 
