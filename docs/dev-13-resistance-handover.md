@@ -747,6 +747,43 @@ Marks are drawn as MapLibre DOM `Marker`s (a plain `<div>`, not an SVG
 consequences of that choice are D21's, landing with the country-list commit
 next; this commit only carries the geometry/positioning change.
 
+**D21 — A keyboard-accessible country list replaces per-`<path>`
+focusability; DOM `Marker`s needed no equivalent fix.** Two different
+accessibility questions, two different answers, because canvas rendering
+breaks them differently:
+
+*Marks* were never at risk: `MapLibre.Marker({element})` uses a real DOM node
+you supply, not a canvas-drawn primitive. `.res-dot` divs (previous commit)
+keep `tabindex="0"`, `role="button"`, and the exact same
+`focus`/`blur`/`Enter`/`Space` wiring the old `<circle>` elements had — a
+like-for-like port, not a new mechanism, with the further benefit of
+removing the counter-scaling code entirely (a DOM element already holds
+constant screen size at every zoom).
+
+*Countries* had no such escape: the fill layer is a canvas paint operation
+with no per-feature DOM node to tab through, and that is a real regression
+against the old focusable `<path>` elements with no zero-cost fix. Solution,
+landing in this commit: a visually-hidden-until-focused `<ul>` of one
+`<button>` per country (standard clip-path pattern — hidden on the button
+itself, not on the list container; an earlier draft hid the `<ul>` too,
+which would have clipped a focused button trying to reveal itself, a bug
+caught before shipping), built from the full 100-country `LAUNCH_MAP_GEO`
+set so keyboard/screen-reader users reach everything sighted users can see
+on the map, wired to the exact same tooltip content (`countryTip`) countries
+have always shown on hover/focus. `selectMap()` updates each button's
+level/label in place on a product-tab switch, mirroring exactly what it used
+to do to each `<path>`'s class/dataset. The previous commit's dead
+`wrap.querySelectorAll("path")` wiring (a no-op since no `<path>` elements
+exist any more) is removed in this same commit, replaced by this list.
+
+*Rejected — a roving-tabindex simulation over the canvas itself.* Considered
+and set aside: more code, and worse screen-reader semantics than a plain
+list a screen reader already knows how to announce and count.
+
+**Verified:** the list renders 100 buttons; focusing one reveals it (163×32px,
+un-clipped); switching product tabs updates a given country's level/label
+correctly (confirmed for Ghana under the ASPY tab: "In MFT plans").
+
 ---
 
 ## 7. What's left
