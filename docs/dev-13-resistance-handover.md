@@ -169,13 +169,16 @@ did not count the two CSVs.)
 | `sourcing/staging/resistance_tes.csv` | Auditable intermediate: every study, one row each. |
 | `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **Unchanged by V2 — byte-identical to V1.** |
 | `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer, `---- map pan / zoom` for D13, and `---- site-level marks` for D14/D15. The only file V2 changes. |
-| `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). |
+| `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). Still checks resistance `iso3` values against `data/world-map.js` only (D17) — unaware of `data/world-map-geo.js` below. |
+| `scripts/build-map-geo.js` | **New.** Sibling to `scripts/build-map.js`, same dev-only-deps/`NODE_PATH` convention. Emits GeoJSON (not SVG paths) at Natural Earth **50m** from the identical `NUM_TO_A3` country table — this page's basemap only (D17). |
+| `data/world-map-geo.js` | **New**, generated output of the above. `window.LAUNCH_MAP_GEO = {type:"FeatureCollection", features:[{properties:{iso3,name}, geometry}]}`. 100 countries (6 more than `data/world-map.js`'s 94 — see D17 for the exact accounting). Not yet loaded by any page as of this commit. |
 
 ### Current numbers
 
 - **1,633 studies** shipped (1,642 raw minus 9 WHO publishes with a literal `NaN`)
 - **26 drugs × 5 species → 274 country dots**
 - `data/resistance.js` is **183 KB**
+- `data/world-map-geo.js` is **~620 KB** (50m detail costs more than `data/world-map.js`'s 110m; not minified beyond 3-decimal coordinate rounding — untested whether further simplification is worth it)
 
 ---
 
@@ -586,6 +589,71 @@ them, and they would soften the cross-border overlaps clustering cannot fix.
 Rejected: two overlapping dots would blend into a third colour that reads as a
 band neither of them is, and on a four-band scale whose 10% boundary is a
 treatment-policy trigger (D12) that is a misreading with consequences.
+
+### The MapLibre migration, first step
+
+Raised by whoever picked this branch back up: a request to redesign this
+map's UI using MapLibre GL JS is in tension with D13's rejection of any
+mapping-library dependency. Flagged before any code changed; the branch
+owner's explicit, informed answer was to override D13 for this page only.
+The full reasoning for that reversal is D18, landing with the renderer change
+itself. This decision — D17 — is the one piece that had to come first and
+stand alone: the basemap the new renderer needs.
+
+**D17 — A second, page-only 50m basemap; identical country table, not a
+superset.** `data/world-map.js` (94 countries, Natural Earth 110m) cannot be
+swapped — 12 pages load it, three of them the client's own design options
+under review (D1). A second file was the only option, already costed in D13's
+original writeup ("a new committed data file of a few hundred KB and a second
+path through build-map.js").
+
+Two things were decided together:
+
+1. *Resolution:* 50m, not 110m. The branch owner chose this after being told
+   the tradeoff (bigger file, no functional requirement forced it) — D13's
+   own writeup had already flagged 50m as "the natural next step." Measured:
+   `data/world-map-geo.js` is ~620 KB against `data/world-map.js`'s ~90 KB;
+   `scripts/build-map-geo.js` reuses `world-atlas`'s bundled `countries-50m.json`,
+   no new network dependency at build time.
+2. *Country scope:* `scripts/build-map-geo.js` copies `build-map.js`'s
+   `NUM_TO_A3` table **verbatim** — same 101 entries, not extended to cover
+   WHO-side countries the 94-set misses (COM, SLB, VUT — flagged in earlier
+   analysis as absent from the drawn set). Rejected alternative: add those
+   three now, since a new file was being written anyway. Not done, because
+   `data/world-map.js`/`LAUNCH_MAP` stays the single source of truth for
+   "which countries count as drawn" everywhere else on this page (`sitesFor`'s
+   filter, `drawnCount`, `curUndrawn`, the legend counts, and
+   `validate-data.js`'s undrawn-country warning) — silently widening that set
+   in the same PR that's supposed to be rendering-only would change a
+   reviewer-visible number (`curUndrawn`) without saying so.
+
+**What resolution alone changed, measured against the identical 101-entry
+table:** at 110m, 94 of 101 render (7 fail — coastline geometry too small to
+survive simplification; this is exactly `validate-data.js`'s "7 country
+values" warning count, confirmed by cross-checking the two independently).
+At 50m, **100 of 101 render** — six small island states (COM, CPV, MUS, SGP,
+STP, SYC) that 110m couldn't draw now have real, if tiny, polygons. One entry
+(GUF, French Guiana) renders at neither resolution — Natural Earth's
+country-level admin-0 layer appears not to carry it as a feature distinct
+from France at all, a data-source gap rather than a simplification artifact.
+
+**The one honest side-effect, stated rather than left for a reviewer to
+find:** the renderer landing in the next commit will make those 6
+newly-geometry-having countries visually present on the choropleth (as plain
+"no data" shapes, since none currently appear in `data/products.js`'s
+coverage lists) and in a keyboard-accessible country list, but `sitesFor()`
+still filters resistance sites against the **old** 94-country `LAUNCH_MAP`
+set (by design, per the parity decision above). Concretely: if COM ever gets
+a WHO study site for the selected drug/species, and COM ever appears in a
+product's country list, the country shape would be visibly paintable while
+the resistance dot behind it stays suppressed — a country visible but its own
+known resistance data unplottable. Before this migration the same country was
+invisible outright, which hid the same gap less confusingly but no more
+correctly. Pointing `sitesFor`'s filter and `curUndrawn` at the new
+100-country set instead is the natural fix, tracked in §7, not bundled here.
+
+This file's geometry is not yet used by anything — `illustrated-journey-dashboard.html`
+still renders the old SVG map as of this commit. The renderer change is next.
 
 ---
 
