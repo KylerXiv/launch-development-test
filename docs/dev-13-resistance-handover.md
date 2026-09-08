@@ -784,6 +784,21 @@ list a screen reader already knows how to announce and count.
 un-clipped); switching product tabs updates a given country's level/label
 correctly (confirmed for Ghana under the ASPY tab: "In MFT plans").
 
+**Theme-aware repaint.** No JS theme toggle exists on this page today (only
+`prefers-color-scheme`, plus a `[data-theme]` CSS block kept for consistency
+with other pages/tooling but never set here). `repaintTheme()` re-reads the
+4 hex tokens the map paints from and calls `setPaintProperty` on the
+background and country-line/fill layers only — band colours aren't
+theme-varying and marker DOM elements resolve CSS live, so nothing else needs
+a JS-driven refresh. Bound to `matchMedia('(prefers-color-scheme: dark)')`'s
+`change` event, plus a defensive `MutationObserver` on `<html data-theme>`
+(cheap insurance — this file already has one hard-won dark-theme
+color-collision bug on record, D16, from exactly this kind of "we didn't
+check the other theme" mistake). **Verified live**, not just wired: emulated
+a mid-session `prefers-color-scheme` flip in a headless browser and
+screenshotted before/after — the map's own background, country fill and
+NavigationControl icon colours all changed in place, no reload.
+
 ---
 
 ## 7. What's left

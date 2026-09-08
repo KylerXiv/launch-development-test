@@ -1445,6 +1445,22 @@
       ]);
     }
 
+    // Theme change repaints only the two canvas layers — band colours are not
+    // theme-varying (see the CSS) and marker DOM elements resolve CSS live, so
+    // nothing about the resistance layer needs a JS-driven refresh here.
+    function repaintTheme() {
+      readMapColors();
+      if (!map.isStyleLoaded()) return;
+      map.setPaintProperty("bg", "background-color", mapColors.surface2);
+      map.setPaintProperty("country-line", "line-color", mapColors.border);
+      paintCountries();
+    }
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaintTheme);
+    // Defensive: no script on this page sets [data-theme] today, but the CSS
+    // carries a dark override for it (matching every other page's tokens) —
+    // cheap insurance against a future toggle silently going unrefreshed.
+    new MutationObserver(repaintTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
     // ---- keyboard-accessible country list (DEV-13 D21) ---------------------
     // A canvas has no per-feature DOM node to tab through — this list is the
     // equivalent of the old focusable <path> elements: visually hidden until
