@@ -196,7 +196,10 @@ No test framework by design; two layers instead:
   set). The renderer colors countries from `detail.countries.list` and shows a
   warning overlay unless `countries.status === "verified"` — the map can never
   silently present unverified coverage. Self-contained by design: no tiles, no
-  CDN.
+  CDN — **except `illustrated-journey-dashboard.html`**, which loads MapLibre
+  GL JS from a CDN for its own map rendering only (see below and
+  `docs/dev-13-resistance-handover.md` D17/D18); the other 11 pages sharing
+  `data/world-map.js` are unaffected and remain fully self-contained.
 - **Resistance overlay** (implemented, `illustrated-journey-dashboard.html`
   only): WHO Malaria Threat Map treatment-failure results drawn as graduated
   dots on top of the access choropleth. The fill describes the *product*, the

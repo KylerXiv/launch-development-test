@@ -655,6 +655,26 @@ correctly. Pointing `sitesFor`'s filter and `curUndrawn` at the new
 This file's geometry is not yet used by anything — `illustrated-journey-dashboard.html`
 still renders the old SVG map as of this commit. The renderer change is next.
 
+**D18 — Adopt MapLibre GL JS for this page; supersedes D13.** D13's reasoning
+("the first runtime dependency on a page that has none... `d3-zoom`/`d3-geo`
+was the alternative and was not taken") is not wrong — it correctly describes
+the cost of exactly this kind of change, and every word of it still applies
+to any *other* page on this site. It is overridden here, specifically, after
+the branch owner was shown that cost in full: a new CDN dependency (MapLibre
+GL JS + CSS, cdnjs, pinned to `5.24.0` with Subresource Integrity), the second
+basemap file D17 just added, and re-deriving D13/D15/D16's already-verified
+interaction guarantees on a new substrate — that work is the next commit(s).
+Chosen over vendoring a local copy: this repo has no committed third-party JS
+anywhere and no build step to manage one; CDN-with-SRI was judged the smaller
+departure from "no local complexity" than adding the first one.
+`docs/developer-guide.md` §9's "Self-contained by design: no tiles, no CDN"
+line is updated in this same commit — it is no longer accurate for this one
+page and must say so, not go stale.
+
+This commit only loads the library (`<link>`/`<script>` tags, plus the
+`data/world-map-geo.js` script tag) — the page still renders the old SVG map
+unchanged. Nothing yet reads `window.maplibregl` or `window.LAUNCH_MAP_GEO`.
+
 ---
 
 ## 7. What's left
