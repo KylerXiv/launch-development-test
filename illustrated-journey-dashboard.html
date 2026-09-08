@@ -1414,6 +1414,12 @@
     map.getCanvas().setAttribute("aria-label", "World map, pan and zoom with the mouse or arrow keys");
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
+    // Test/verification hook only — read by scripts/verify-map-clusters.js to
+    // re-check D15's clustering invariants (same-country overlap, cross-border
+    // overlap) by script instead of by hand after any change to the marks.
+    // No cost to real users; not part of the app's own behaviour.
+    window.__DEV13_MAP__ = { getMap: () => map, getMarks: () => curMarks };
+
     // Keyboard parity for pan (D13's arrow-key affordance) — MapLibre's own
     // keyboard handler is off (see above), so arrows are hand-wired to a
     // plain pan with no rotate/pitch/zoom path at all.
@@ -2017,6 +2023,8 @@
         const band = bandOf(mk.v);
         const el = document.createElement("div");
         el.className = "res-dot " + band + (mk.one ? "" : " res-cluster");
+        el.dataset.iso3 = mk.iso3;   // lets scripts/verify-map-clusters.js tell same-country
+                                     // overlap from cross-border overlap without internal access
         el.tabIndex = 0;
         el.setAttribute("role", "button");
         el.style.zIndex = mk.one ? "2" : "1";

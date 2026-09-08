@@ -87,16 +87,16 @@ light/dark theme switch was emulated and screenshotted before/after — the
 map's background, country fill and NavigationControl icons all repainted in
 place, no reload.**
 
-**NOT yet done — flag this in review, do not let it slide:** the rigorous,
-full D15-style re-measurement this migration's own D20 promises (same-country
-overlap = 0 at a matched set of zoom levels, across **every** drug×species
-cell, not just the one worked example above; the cross-border overlap count
-at those zoom levels) has **not been run**. What's been verified is a smoke
-test proving the mechanism works, not the exhaustive sweep D15 originally did
-for the SVG renderer. This is real remaining work, tracked in §7, and the
-honest state of this branch until it's done. Also not yet done: telling the
-wider team — this was a mid-branch, out-of-ticket decision made explicitly
-with the branch owner, but nobody else has seen it yet.
+**The full D15-style re-measurement is now done — see D22 in §6.** Result:
+**0 same-country overlaps across all 45 populated drug×species cells at 6
+zoom levels (270 checks)**, run via a new committed tool,
+`scripts/verify-map-clusters.js`. The invariant D15 proved for the SVG
+renderer holds under MapLibre too; the absolute cross-border numbers differ
+from D15's, as D20 predicted they would, and are recorded in D22.
+
+**Still not done:** telling the wider team — this was a mid-branch,
+out-of-ticket decision made explicitly with the branch owner, but nobody
+else has seen it yet.
 
 ---
 
@@ -864,6 +864,63 @@ a mid-session `prefers-color-scheme` flip in a headless browser and
 screenshotted before/after — the map's own background, country fill and
 NavigationControl icon colours all changed in place, no reload.
 
+**D22 — The D15 re-measurement, done, and the tool that did it kept.**
+D20 flagged that D13/D15's collision tables were specific to the old
+equirectangular projection and had to be re-proved, not assumed, under
+MapLibre's Mercator projection. That re-proof is `scripts/verify-map-clusters.js`
+(dev-only Puppeteer dependency, same `NODE_PATH` convention as
+`build-map.js`/`build-map-geo.js`) — committed rather than run once and
+discarded, because D15's own framing of these checks as "the regression test
+to keep" applies just as much to the new renderer, and a future change to the
+marks should be able to re-run this in one command rather than repeat a
+one-off manual verification session.
+
+*What it measures, and how, without reimplementing the clustering math (and
+so nothing here can drift out of sync with what a reader actually sees):*
+drives the real page in a headless browser through every populated drug×
+species cell (via the actual `<select>` controls, not internal function
+calls), sets the real map's zoom via a small test-only hook
+(`window.__DEV13_MAP__`, exposing `getMap()`/`getMarks()` — no cost to real
+users, clearly named and commented as test-only in the renderer), and reads
+the **actual rendered** `.res-dot` marker `getBoundingClientRect()` positions
+and sizes from the DOM. Same-country vs. cross-border is told apart by a new
+`data-iso3` attribute on each marker (a one-line, permanent addition — it
+costs nothing and is generally useful, not test-only).
+
+*Result:* **45 populated cells** — matching D15's own count exactly, a strong
+sign the traversal is faithful — **at 6 zoom levels (MapLibre zoom 0, 1.4,
+2.0, 2.7, 3.0, 4.0, roughly 1x/2.6x/4x/6.5x/8x/16x): 0 same-country overlaps
+across all 270 checks.** The invariant D15 proved for the SVG renderer holds
+for MapLibre too.
+
+*Cross-border overlaps, summed across all 45 cells (not per-cell — matching
+how D13/D15 originally reported this number), by zoom:*
+
+| zoom | ~scale | cross-border overlapping pairs |
+|---|---|---|
+| 0 | 1.0x | 294 |
+| 1.4 | 2.6x | 272 |
+| 2.0 | 4.0x | 173 |
+| 2.7 | 6.5x | 138 |
+| 3.0 | 8.0x | 108 |
+| 4.0 | 16.0x | 60 |
+
+Shrinks monotonically with zoom, same qualitative pattern D15 found (there:
+61→3 across one specific accounting at 1x→8x) — the absolute numbers differ
+because Mercator and equirectangular disagree on how many screen pixels a
+given real-world distance covers, exactly as D20 anticipated. This is not a
+regression to chase toward zero: D15 already established that residual
+cross-border overlap at maximum zoom is mostly WHO recording one place at
+two granularities (a province and its capital, etc.), not a defect zoom can
+fix.
+
+*The one specific worked example §1c already cited (Cambodia · ASPY ·
+falciparum at maximum zoom) was also spot-checked directly against
+`getMarks()`, not just inferred from the aggregate sweep above: exactly 8
+marks for 8 sites (Veun Sai, Kaoh Nheaek, Pailin, Veal Veng, Sesan, Tasanh,
+Siem Pang, Oral), and Pailin stands alone reading exactly 18%* — matching the
+original SVG-era finding precisely.
+
 ---
 
 ## 7. What's left
@@ -904,17 +961,10 @@ layer is derived at render time from `studies[]`, which already shipped all
   four bands.
 - ~~A higher-detail basemap for this page only~~ — **done** (D17):
   `data/world-map-geo.js`, 50m, this page only.
-- **Cross-border overlap, and same-country overlap generally, need
-  re-measuring against the MapLibre/Mercator renderer.** D15's old numbers (3
-  cross-border pairs at max zoom; 0 same-country overlaps at 1x/2.6x/6.6x/8x)
-  were measured under the SVG renderer's equirectangular projection and do
-  not transfer (D20). Only a single worked example has been re-checked since
-  the migration (ASPY/falciparum, 13→24 marks across one zoom step). A full
-  sweep — every drug×species cell, a matched set of zoom levels — has not
-  been run. This is the single most important open item from the migration:
-  it is what D15's original work actually *proved*, and proving it again is
-  what makes the port trustworthy rather than merely working in the cases
-  someone happened to click.
+- ~~Cross-border and same-country overlap need re-measuring against the
+  MapLibre/Mercator renderer~~ — **done** (D22): 0 same-country overlaps
+  across all 45 populated cells at 6 zoom levels (270 checks), re-run any
+  time with `node scripts/verify-map-clusters.js`.
 - **`scripts/validate-data.js` still checks undrawn countries against
   `data/world-map.js` only** (94, not the new 100 — D17). Its "7 undrawn"
   warning is accurate for what `sitesFor` actually draws (still gated on the
@@ -1046,6 +1096,7 @@ node scripts/normalize-resistance.js          # regenerate; output should be ide
 node scripts/validate-data.js                 # expect 0 errors, 3 warnings
 node scripts/validate-data.js data/products.synthetic.js   # expect 0/0
 node scripts/make-preview.js                  # smoke test
+node scripts/verify-map-clusters.js           # expect 0 same-country overlaps (D22)
 ```
 
 **There is no Python on this machine** — `python -m http.server` (the command
@@ -1065,22 +1116,22 @@ difference; `validate-data.js` still reports exactly 0 errors, 3 warnings.
 What needs checking is in the renderer, and none of it is covered by the
 validator. The table below is D15's **original** SVG-era invariant list,
 checked headlessly at 1x/2.6x/4.1x/6.6x/8x under the old equirectangular
-projection — **kept here as the spec of what "correct" means**, not as a
-claim that these exact numbers still hold. See §1c/D20 for what's actually
-been re-checked since the MapLibre migration (a single worked example) versus
-what still needs the same exhaustive treatment D15 originally gave it:
+projection — **kept here as the spec of what "correct" means**. Most rows are
+now re-confirmed under MapLibre (D22); the numbers that don't transfer across
+the projection change are recorded as such, not silently equated to the old
+ones:
 
 | invariant | expected (original, SVG/equirectangular) | status under MapLibre |
 |---|---|---|
 | sites represented across all marks | constant (363 for AL/falciparum) | unaffected — `sitesFor()` untouched; not re-run but no code path changed |
-| same-country overlapping pairs | **0 at every zoom** — the D15 regression test | **not re-run at full sweep** — one worked example only (§1c). Treat as open until it is |
-| cross-border overlapping pairs | 61 at 1x falling to 4 at 8x | **numbers do not transfer** (D20, different projection) — not yet re-measured under Mercator |
+| same-country overlapping pairs | **0 at every zoom** — the D15 regression test | **re-confirmed** (D22): 0 across all 45 populated cells at 6 zoom levels (270 checks), via `scripts/verify-map-clusters.js` |
+| cross-border overlapping pairs | 61 at 1x falling to 4 at 8x | **re-measured, different numbers as D20 predicted** (D22): 294 at 1x falling to 60 at 16x, summed across all 45 cells |
 | a mark's value vs an independent pool from `studies[]` | within 0.005 pp | unaffected — only `mark()`'s coordinate output changed, not its `v`/`n` arithmetic |
 | a site dot's measured screen radius | constant, ~10 px at every zoom | **simplifies to true by construction** — DOM `Marker` elements are never counter-scaled (D20); confirmed visually via screenshot at multiple zooms, not measured in px |
 | overlay off, then zoom | no dots return | confirmed — same `curSites = null` gate, now checked before the `zoomend` handler calls `drawMarks()` |
 | a real pointer click on a dot, at zoom, opens the panel | see D13's capture bug | **D13's specific bug no longer applies** (no `setPointerCapture` workaround exists to break — D19); confirmed via a scripted headless click (Puppeteer `ElementHandle.click()`, a real CDP input event, not `dispatchEvent`) that the panel opens with the correct D11 title. **Not yet tested:** a drag that starts elsewhere and ends on top of a marker — flagged in D20/§1c as a new, minor interaction difference (a marker can't *start* a drag, only be dragged *across*) |
 | the selection ring after a zoom change | still on the mark, panel still open | mechanism unchanged (`selKeys`/`applySelection`); not re-tested through an actual zoom-triggered rebuild since the migration |
-| Cambodia at max zoom, ASPY/falciparum | 8 marks for 8 sites, Pailin standalone at 18% | **not yet re-run** — the one worked example checked was a different cell (see §1c) |
+| Cambodia at max zoom, ASPY/falciparum | 8 marks for 8 sites, Pailin standalone at 18% | **re-confirmed exactly** (D22): 8 marks for Veun Sai, Kaoh Nheaek, Pailin, Veal Veng, Sesan, Tasanh, Siem Pang, Oral; Pailin standalone at 18% |
 
 New checks with no pre-migration precedent, and their status:
 
