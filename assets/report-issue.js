@@ -73,15 +73,14 @@
   var CSS = [
     /* floating opener */
     '.ri-pill{position:fixed;right:20px;bottom:20px;z-index:900;display:inline-flex;',
-    'align-items:center;gap:7px;padding:10px 15px;border:0;border-radius:999px;',
+    'align-items:center;padding:12px 22px;border:0;border-radius:999px;',
     'background:var(--accent);color:var(--accent-ink,#fff);font-family:inherit;',
-    'font-size:13px;font-weight:650;line-height:1;cursor:pointer;',
+    'font-size:13px;font-weight:650;letter-spacing:.01em;line-height:1;cursor:pointer;',
     'box-shadow:0 4px 14px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.12);',
     'transition:transform .15s ease,box-shadow .15s ease}',
     '.ri-pill:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.22),0 2px 5px rgba(0,0,0,.14)}',
     '.ri-pill:focus-visible{outline:2px solid var(--ink);outline-offset:3px}',
-    '.ri-pill svg{width:14px;height:14px;flex:none}',
-    '@media (max-width:560px){.ri-pill{right:12px;bottom:12px;padding:9px 13px;font-size:12px}}',
+    '@media (max-width:560px){.ri-pill{right:12px;bottom:12px;padding:10px 18px;font-size:12px}}',
     /* footer link */
     '.report-link{color:var(--accent);font-weight:650;text-decoration:underline;text-underline-offset:2px;cursor:pointer}',
     /* dialog shell */
@@ -156,10 +155,6 @@
     '@media (prefers-reduced-motion:reduce){.ri-pill{transition:none}.ri-spin{animation-duration:1.6s}}',
     '@media print{.ri-pill,.ri-dialog{display:none!important}}'
   ].join("");
-
-  var FLAG = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"' +
-             ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-             '<path d="M3.4 14.7V2"/><path d="M3.4 2.8h8.2l-1.5 2.7 1.5 2.7H3.4z"/></svg>';
 
   var TYPES = [
     ["correction", "A data point looks wrong"],
@@ -305,7 +300,7 @@
   pill.setAttribute("data-report-issue", "");
   pill.setAttribute("aria-haspopup", "dialog");
   pill.setAttribute("aria-label", COPY.pill);
-  pill.innerHTML = FLAG + "<span>" + esc(COPY.pill) + "</span>";
+  pill.innerHTML = "<span>" + esc(COPY.pill) + "</span>";
 
   function mount() {
     document.body.appendChild(dlg);
