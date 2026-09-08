@@ -21,17 +21,82 @@ expensive to reconstruct), §7 for what's left.
 | | |
 |---|---|
 | Branch | `feat/resistance-map-site-dots` (off `feat/resistance-map-country-dots` @ `f32384c`) |
-| Version | **2 of 2** — site-level dots on a pan/zoom map (see §1b) |
-| Commits | 19 — 16 inherited from V1, 3 new on this branch, all `DEV-13:` prefixed |
+| Version | **2 of 2** — site-level dots on a pan/zoom map (see §1b), **now MapLibre-rendered** (see §1c, D17–D21) |
+| Commits | 24 — 16 inherited from V1, 3 pre-migration on this branch, 5 for the MapLibre migration, all `DEV-13:` prefixed |
 | Working tree | clean |
 | Pushed | V1 yes (6 Sep 2026); **V2 not yet** |
 | V1 PR | **drafted, not yet opened** — see §7 |
-| CI locally | all green (0 errors, 3 warnings) |
+| CI locally | data pipeline re-verified unchanged (0 errors, 3 warnings) after the migration — see §1c |
 | Page affected | `illustrated-journey-dashboard.html` **only** |
 
 The ticket says *"add all 3 types of data on our map"*. **One of the three is
 built** (treatment failure). See §7 for the other two and why they differ
 wildly in cost.
+
+---
+
+## 1c. The MapLibre migration (D17–D21) — a mid-branch reversal, not a new version
+
+7–8 Sep 2026, landed as 5 commits (`70d3ec9`..`0686f67`). The same feature
+this document otherwise describes (site dots, country-scoped clustering,
+click-through panel) is unchanged in what it *shows*; what changed is the
+*rendering/interaction substrate* it runs on, at the explicit, informed
+request of the branch owner, who was shown the tradeoff first before any
+code changed.
+
+**D13 is superseded, not silently ignored.** D13 rejected any mapping-library
+dependency ("the first runtime dependency on a page that has none"). That
+reasoning was sound at the time and is recorded unchanged in §6 — it is
+*superseded*, specifically and only for this page, by **D18**. Read D13
+together with D18, not D13 alone, if you are deciding whether to add a
+library anywhere else on the site: D13's argument still holds everywhere it
+was made for. **D8** (the flat A–Z, 26-drug select) is untouched — a separate,
+smaller product-card UI elsewhere on the dashboard shows only 4 tracked
+drugs, and the two must not be conflated.
+
+**What is unchanged:** every data/math decision in §6 — D5 (nothing
+filtered), D6/D12 (patient-weighted pooled proportion, verified against WHO
+methodology), D9 (dictionary encoding), D10 (the TA→TZA fix), D14 (no
+country dots, every mark a site), D15's *clustering rule* (country-scoped,
+radius-converging merge), D16 (tooltip/selection-ring grammar). Confirmed
+post-migration: `data/resistance.js` regenerated with
+`node scripts/normalize-resistance.js` and diffed with `--ignore-cr-at-eol`
+— **zero content difference**; `validate-data.js` still reports exactly 0
+errors, 3 warnings.
+
+**What changed:** the renderer (D17–D21, in §6). New: `scripts/build-map-geo.js`
++ `data/world-map-geo.js` (a second, page-only 50m GeoJSON basemap), MapLibre
+GL JS loaded from cdnjs, DOM-`Marker`-based site/cluster marks, a
+keyboard-accessible country list standing in for canvas countries' lost
+per-feature focusability. See D20 in particular for why D13/D15's *measured
+collision numbers* (155/94/73/49/30 at 8x/12x/16x/20x/30x; 61→3 cross-border)
+do not transfer to this renderer even though the *invariant* they were
+proving still holds.
+
+**Verified, via a scripted headless-browser pass at each commit, not just at
+the end:** the map renders with no console errors beyond the page's own
+harmless `favicon.ico` 404; product-tab switching repaints the choropleth
+correctly; the resistance overlay produces coloured, clustered marks;
+clicking a mark opens the panel with the correct D11 title grammar
+(`"Forécariah, Kindia, Guinea · Artesunate-pyronaridine · P. falciparum — 1
+study at 1 site, 2011"`); zooming in on the ASPY/falciparum selection went
+from 13 marks to 24 as sites that were merged at world zoom separated;
+panning works; the keyboard-accessible country list reveals correctly on
+focus and stays in sync with the active product tab; **a live mid-session
+light/dark theme switch was emulated and screenshotted before/after — the
+map's background, country fill and NavigationControl icons all repainted in
+place, no reload.**
+
+**NOT yet done — flag this in review, do not let it slide:** the rigorous,
+full D15-style re-measurement this migration's own D20 promises (same-country
+overlap = 0 at a matched set of zoom levels, across **every** drug×species
+cell, not just the one worked example above; the cross-border overlap count
+at those zoom levels) has **not been run**. What's been verified is a smoke
+test proving the mechanism works, not the exhaustive sweep D15 originally did
+for the SVG renderer. This is real remaining work, tracked in §7, and the
+honest state of this branch until it's done. Also not yet done: telling the
+wider team — this was a mid-branch, out-of-ticket decision made explicitly
+with the branch owner, but nobody else has seen it yet.
 
 ---
 
@@ -803,9 +868,17 @@ NavigationControl icon colours all changed in place, no reload.
 
 ## 7. What's left
 
+**Read this section together with §1c.** Everything below describes what V2
+*does*; the renderer it originally shipped on (viewBox/SVG, described here)
+has since been replaced by MapLibre (§1c, D17–D21) without changing any of
+the behaviour this section documents. Where the two sections disagree on a
+mechanism (e.g. "capped at 8x by the 110m basemap" below vs. `ZMAX=16` against
+a 50m basemap per D17), §1c is current.
+
 ### V2 — what is built
 
-Done, in two commits:
+Done, in two commits (SVG-rendered at the time; see §1c for the current
+MapLibre renderer, which reproduces every point below):
 
 1. **Pan/zoom** (D13) — viewBox only, capped at 8x by the 110m basemap.
 2. **One dot per study site** (D14) — derived in the browser from `studies[]`,
@@ -829,12 +902,31 @@ layer is derived at render time from `studies[]`, which already shipped all
   aggregate — it is 274 values that no longer appear on the page.
 - **The legend band attribution** (below) applies unchanged; V2 reuses the same
   four bands.
-- **Cross-border overlap** — 3 pairs at maximum zoom. See D15 for why it is
-  left alone.
-- **A higher-detail basemap for this page only** — the one thing that would push
-  site separation past 96% and bring province borders, which is what WHO's map
-  shows. Costed in D13; it cannot be a swap of `data/world-map.js` because 12
-  pages load it.
+- ~~A higher-detail basemap for this page only~~ — **done** (D17):
+  `data/world-map-geo.js`, 50m, this page only.
+- **Cross-border overlap, and same-country overlap generally, need
+  re-measuring against the MapLibre/Mercator renderer.** D15's old numbers (3
+  cross-border pairs at max zoom; 0 same-country overlaps at 1x/2.6x/6.6x/8x)
+  were measured under the SVG renderer's equirectangular projection and do
+  not transfer (D20). Only a single worked example has been re-checked since
+  the migration (ASPY/falciparum, 13→24 marks across one zoom step). A full
+  sweep — every drug×species cell, a matched set of zoom levels — has not
+  been run. This is the single most important open item from the migration:
+  it is what D15's original work actually *proved*, and proving it again is
+  what makes the port trustworthy rather than merely working in the cases
+  someone happened to click.
+- **`scripts/validate-data.js` still checks undrawn countries against
+  `data/world-map.js` only** (94, not the new 100 — D17). Its "7 undrawn"
+  warning is accurate for what `sitesFor` actually draws (still gated on the
+  94-set by design) but doesn't reflect that geometry now exists for 6 more
+  of them. Leave as-is unless `sitesFor`'s filter itself moves to the
+  100-country set — the two should change together, not separately.
+- **Talk to the team about the MapLibre migration itself, separately from the
+  V1 PR conversation already flagged below.** The ticket asked for "all 3
+  study types on our map," not a rendering-engine change — the migration was
+  a mid-branch, out-of-ticket decision made explicitly with the branch owner
+  (§1c) but the wider team hasn't seen it yet. Not yet raised, by the branch
+  owner's own choice (iterating solo a bit longer first).
 
 ### V1 is frozen
 
@@ -954,27 +1046,51 @@ node scripts/normalize-resistance.js          # regenerate; output should be ide
 node scripts/validate-data.js                 # expect 0 errors, 3 warnings
 node scripts/validate-data.js data/products.synthetic.js   # expect 0/0
 node scripts/make-preview.js                  # smoke test
-python -m http.server 8000                    # then open illustrated-journey-dashboard.html
 ```
 
-**V2 changes no data**, so all four still pass untouched — a diff in
-`data/resistance.js` after a V2 change means something is wrong, not something
-new. What V2 needs checking instead is in the renderer, and none of it is
-covered by the validator. What was checked headlessly at 1x, 2.6x, 4.1x, 6.6x
-and 8x, and is worth rechecking after any change to the marks:
+**There is no Python on this machine** — `python -m http.server` (the command
+this section used to suggest) fails with "Python was not found" (a Windows
+Store alias stub, not a real absence-of-error). Use a one-line Node static
+server instead, e.g. serve the repo root with any tiny `http.createServer`
+script that maps `/` to `illustrated-journey-dashboard.html` — there's nothing
+in `package.json` for this today, worth adding a real dev script if this
+comes up again rather than re-improvising it.
 
-| invariant | expected |
+**Neither the MapLibre migration nor V2 before it change any data**, so all
+three commands above still pass untouched — a diff in `data/resistance.js`
+means something is wrong, not something new. Confirmed post-migration: ran
+`normalize-resistance.js` and diffed with `--ignore-cr-at-eol` — zero content
+difference; `validate-data.js` still reports exactly 0 errors, 3 warnings.
+
+What needs checking is in the renderer, and none of it is covered by the
+validator. The table below is D15's **original** SVG-era invariant list,
+checked headlessly at 1x/2.6x/4.1x/6.6x/8x under the old equirectangular
+projection — **kept here as the spec of what "correct" means**, not as a
+claim that these exact numbers still hold. See §1c/D20 for what's actually
+been re-checked since the MapLibre migration (a single worked example) versus
+what still needs the same exhaustive treatment D15 originally gave it:
+
+| invariant | expected (original, SVG/equirectangular) | status under MapLibre |
+|---|---|---|
+| sites represented across all marks | constant (363 for AL/falciparum) | unaffected — `sitesFor()` untouched; not re-run but no code path changed |
+| same-country overlapping pairs | **0 at every zoom** — the D15 regression test | **not re-run at full sweep** — one worked example only (§1c). Treat as open until it is |
+| cross-border overlapping pairs | 61 at 1x falling to 4 at 8x | **numbers do not transfer** (D20, different projection) — not yet re-measured under Mercator |
+| a mark's value vs an independent pool from `studies[]` | within 0.005 pp | unaffected — only `mark()`'s coordinate output changed, not its `v`/`n` arithmetic |
+| a site dot's measured screen radius | constant, ~10 px at every zoom | **simplifies to true by construction** — DOM `Marker` elements are never counter-scaled (D20); confirmed visually via screenshot at multiple zooms, not measured in px |
+| overlay off, then zoom | no dots return | confirmed — same `curSites = null` gate, now checked before the `zoomend` handler calls `drawMarks()` |
+| a real pointer click on a dot, at zoom, opens the panel | see D13's capture bug | **D13's specific bug no longer applies** (no `setPointerCapture` workaround exists to break — D19); confirmed via a scripted headless click (Puppeteer `ElementHandle.click()`, a real CDP input event, not `dispatchEvent`) that the panel opens with the correct D11 title. **Not yet tested:** a drag that starts elsewhere and ends on top of a marker — flagged in D20/§1c as a new, minor interaction difference (a marker can't *start* a drag, only be dragged *across*) |
+| the selection ring after a zoom change | still on the mark, panel still open | mechanism unchanged (`selKeys`/`applySelection`); not re-tested through an actual zoom-triggered rebuild since the migration |
+| Cambodia at max zoom, ASPY/falciparum | 8 marks for 8 sites, Pailin standalone at 18% | **not yet re-run** — the one worked example checked was a different cell (see §1c) |
+
+New checks with no pre-migration precedent, and their status:
+
+| new invariant | status |
 |---|---|
-| sites represented across all marks | constant (363 for AL/falciparum — 376 minus 13 in undrawn countries) |
-| same-country overlapping pairs | **0 at every zoom** — the D15 regression test |
-| cross-border overlapping pairs | 61 at 1x falling to 4 at 8x (see D15) |
-| a mark's value vs an independent pool from `studies[]` | within 0.005 pp |
-| a site dot's measured screen radius | constant, ~10 px at every zoom |
-| overlay off, then zoom | no dots return (see the `curSites = null` comment) |
-| **a real pointer click on a dot, at zoom** | the panel opens — see D13's capture bug. A synthetic `dispatchEvent` click cannot detect this; the dot must be scrolled into the viewport and pressed with a real pointer |
-| a press-and-release that never moves 4 px | opens the panel rather than panning |
-| the selection ring after a zoom change | still on the mark, panel still open |
-| Cambodia at max zoom, ASPY/falciparum | 8 marks for 8 sites, Pailin standalone at 18% |
+| map never rotates/tilts under any gesture (mouse or keyboard) | `dragRotate`/`pitchWithRotate`/`touchPitch`/`keyboard` all disabled at construction (D19) — not separately fuzz-tested, but the handlers that would cause rotation are off, not merely unbound |
+| `cooperativeGestures` blocks a bare wheel scroll | not explicitly tested; the option is MapLibre's own, standard behaviour |
+| light/dark theme switch mid-session repaints the country layer | **verified live** — emulated a mid-session `prefers-color-scheme` flip in a headless browser and screenshotted before/after; background, country fill and the NavigationControl icons all repainted in place |
+| keyboard-accessible country list stays in sync with `byIso` after every `selectMap()` call | confirmed for one product tab (button text/level updates on focus) — not checked across every tab |
+| keyboard focus reveals a country-list button without being clipped by an ancestor | confirmed — a bug where the list container itself clipped a focused button was caught and fixed before this was written down |
 
 ---
 
