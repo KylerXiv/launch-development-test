@@ -586,6 +586,25 @@
   .res-panel-head h3 { margin: 0; font-size: 13.5px; }
   .res-close { font: inherit; font-size: 12px; background: none; border: 1px solid var(--map-border);
                border-radius: 6px; padding: 2px 10px; cursor: pointer; color: var(--ink-2); }
+  /* D25 — a quick visual comparison above the exact, sortable, sourced table
+     below it; never a replacement for it. Fixed 0-100% domain (not rescaled
+     to the current click's own max) so a bar's length means the same thing
+     on every panel a reader opens; the printed value at the tip and the
+     existing b1-b4 band colour (identical swatches to the map/legend) carry
+     the precision a self-scaling bar can't. */
+  .res-panel-chart { padding: 8px 12px 2px; border-bottom: 1px solid var(--map-border); }
+  .chart-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .chart-label { width: 100px; flex: none; font-size: 11.5px; color: var(--ink-2);
+                  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chart-track { flex: 1; height: 16px; background: var(--surface); border-radius: 3px; }
+  /* Rounded at the data end (away from the 0% baseline), square at the
+     baseline itself, per the mark spec — never a full pill. */
+  .chart-bar { height: 100%; border-radius: 0 4px 4px 0; cursor: help; }
+  .chart-value { width: 32px; flex: none; text-align: right; font-size: 11.5px;
+                  font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .chart-bar:focus { outline: none; }
+  .chart-bar:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
   .res-panel-scroll { max-height: 340px; overflow: auto; padding: 0 12px 12px; }
   /* A cluster can carry dozens of rows across 6 columns (Myanmar's history
      runs past 100) — min-width keeps every column legible and lets
@@ -605,10 +624,10 @@
      the tooltip's and the panel's counts look like they disagreed. */
   .res-rule { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 4px 0 0; max-width: 92ch; }
   .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 6px 0 0; max-width: 92ch; }
-  .resdot.b1 { background: #FDCFA6; }
-  .resdot.b2 { background: #FB9A50; }
-  .resdot.b3 { background: #EF5F13; }
-  .resdot.b4 { background: #C21807; }
+  .resdot.b1, .chart-bar.b1 { background: #FDCFA6; }
+  .resdot.b2, .chart-bar.b2 { background: #FB9A50; }
+  .resdot.b3, .chart-bar.b3 { background: #EF5F13; }
+  .resdot.b4, .chart-bar.b4 { background: #C21807; }
   /* Marks are MapLibre DOM Markers now (DEV-13 D20), not SVG circles — a real
      <div role="button">, sized constant on screen at every zoom (no
      counter-scaling needed: a DOM element never inherits the map's own zoom
@@ -802,6 +821,7 @@
               <h3 id="res-panel-title"></h3>
               <button type="button" class="res-close" id="res-close" aria-label="Close study list">Close</button>
             </div>
+            <div class="res-panel-chart" id="res-panel-chart" hidden></div>
             <div class="res-panel-scroll"><table class="res-table" id="res-table"></table></div>
           </div>
         </div>
@@ -1428,6 +1448,13 @@
     // panel, the tooltip grammar — is untouched; only the rendering/pan/zoom
     // substrate changes.
     const LON0 = -120, LON1 = 155, LAT0 = -40, LAT1 = 42;   // same window build-map-geo.js fits to
+    // ZMAX is a LINEAR multiplier (D13's original meaning: "16x magnified").
+    // MapLibre's own zoom is exponential (each +1 level doubles the scale),
+    // so the map option below must be log2(ZMAX), not ZMAX itself — passing
+    // 16 there means a 2^16 = 65536x cap, not 16x (D26: found via the
+    // mzLvl readout showing "65536×" and the map collapsing to a single flat
+    // colour at that zoom; D13's basemap-detail reasoning was never wrong,
+    // it just never reached the map option it was meant to bound).
     const ZMAX = 16;   // D13's basemap-detail reasoning still applies, now against a sharper 50m basemap
     const DOT_R = 10, CLUSTER_R = 17, MARK_GAP = 2;         // CSS px — matches .res-dot/.res-cluster sizes
     const CPASS = 20;    // clustering convergence bound, unchanged from D15
@@ -1903,10 +1930,86 @@
       if (typeof applySelection === "function") applySelection();
     }
 
+    // ---- chart above the study table (D25) ---------------------------------
+    // The table is the exact, sortable, WHO-sourced record and stays; the
+    // chart is a faster way in, not a different answer. Two shapes, picked by
+    // what's actually behind the mark clicked — never both, never neither
+    // when one has something real to say:
+    //   - a cluster (>1 distinct site): one bar per site, that site's own
+    //     most recent study — the same rule its map dot already uses, so the
+    //     chart never disagrees with what the dot showed.
+    //   - a single site with more than one study: one bar per row, in
+    //     chronological order. Bars, not a connected line: WHO's studies land
+    //     in whatever years a team happened to visit (2011, then 2018, say),
+    //     and a line drawn between them would claim a gradual change across
+    //     years with zero data — bars make no claim about anything but the
+    //     years actually studied.
+    // A single row on its own has nothing to compare or trend, so no chart.
+    const CHART_MAX_ITEMS = 20;   // past this many bars a chart is clutter, not a shortcut
+    function chartPlan(rows) {
+      const bySite = new Map();
+      rows.forEach((r) => {
+        const key = (r.site || "—") + "|" + (r.region || "");
+        if (!bySite.has(key)) bySite.set(key, []);
+        bySite.get(key).push(r);
+      });
+      if (bySite.size > 1) {
+        if (bySite.size > CHART_MAX_ITEMS) return null;
+        const items = [...bySite.values()].map((rs) => rs.reduce((a, r) => (r.year > a.year ? r : a)));
+        items.sort((a, b) => b.v - a.v);
+        return { mode: "compare", items };
+      }
+      if (rows.length > 1) {
+        if (rows.length > CHART_MAX_ITEMS) return null;
+        return { mode: "trend", items: rows.slice().sort((a, b) => a.year - b.year) };
+      }
+      return null;
+    }
+
+    // Fixed 0-100% domain, not rescaled to this click's own max — a bar's
+    // length must mean the same thing on every panel a reader opens, not
+    // become misleading once a different cluster's own max redefines "full".
+    // Colour is the same b1-b4 band the map dot and legend already use, so
+    // the chart is never a second vocabulary; the printed value at the tip
+    // carries the precision a fixed-domain bar alone can't.
+    function renderChart(rows) {
+      const el = document.getElementById("res-panel-chart");
+      const plan = chartPlan(rows);
+      if (!plan) { el.hidden = true; el.innerHTML = ""; return; }
+      el.hidden = false;
+      el.innerHTML = plan.items.map((r) => {
+        const band = bandOf(r.v);
+        const label = plan.mode === "compare" ? (r.site || "—") : String(r.year);
+        const pct = Math.max(1, Math.min(100, r.v));   // a 1% floor so a 0% bar still shows a sliver
+        return `<div class="chart-row">
+          <span class="chart-label" title="${esc(label)}">${esc(label)}</span>
+          <div class="chart-track"><div class="chart-bar ${band}" tabindex="0" style="width:${pct}%"></div></div>
+          <span class="chart-value">${r.v}%</span>
+        </div>`;
+      }).join("");
+      el.querySelectorAll(".chart-bar").forEach((bar, i) => {
+        const r = plan.items[i];
+        const where = plan.mode === "compare"
+          ? esc(r.site || "—") + (r.region ? ", " + esc(r.region) : "")
+          : "Study year " + r.year;
+        const html = "<b>" + where + "</b>" +
+          '<div class="trow"><span>Treatment failure</span><span>' + r.v + "%</span></div>" +
+          (plan.mode === "compare" ? '<div class="trow"><span>Year</span><span>' + r.year + "</span></div>" : "") +
+          '<div class="trow"><span>Patients</span><span>' + (r.n == null ? "—" : r.n) + "</span></div>";
+        const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
+        bar.addEventListener("mouseenter", track);
+        bar.addEventListener("mousemove", track);
+        bar.addEventListener("mouseleave", hideTip);
+        bar.addEventListener("focus", () => showTipAt(bar, html));
+        bar.addEventListener("blur", hideTip);
+      });
+    }
+
     function renderPanel() {
       const panel = document.getElementById("res-panel");
       const table = document.getElementById("res-table");
       if (!panelRows.length) { panel.hidden = true; return; }
+      renderChart(panelRows);   // fixed ordering of its own — independent of the table's sort state
       const COLS = [
         { k: "year",   t: "Year",     num: true },
         { k: "site",   t: "Site" },

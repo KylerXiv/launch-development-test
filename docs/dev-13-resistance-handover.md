@@ -252,7 +252,7 @@ did not count the two CSVs.)
 | `scripts/normalize-resistance.js` | Reads that CSV → writes the two outputs below. Zero dependencies, no network. |
 | `sourcing/staging/resistance_tes.csv` | Auditable intermediate: every study, one row each. |
 | `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **Unchanged by V2 — byte-identical to V1.** |
-| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom, theme), `---- keyboard-accessible country list` for D21. The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. The map's surrounding chrome (`#mapsec`'s HTML, the `.map-dock`/`.dock-section` CSS) is the "Dock" layout, D23 — a separate change from the renderer, touching only markup/CSS, not the JS this row otherwise describes. |
+| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom, theme), `---- keyboard-accessible country list` for D21. The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. The map's surrounding chrome (`#mapsec`'s HTML, the `.map-dock`/`.dock-section` CSS) is the "Dock" layout, D23 — a separate change from the renderer, touching only markup/CSS, not the JS this row otherwise describes. `---- click-through: every study behind one country dot` covers `openMarkPanel`/`renderPanel`/`chartPlan`/`renderChart` (D25) and `bindDrug`/`curBoundDrug` (D24). |
 | `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). Still checks resistance `iso3` values against `data/world-map.js` only (D17) — unaware of `data/world-map-geo.js` below. |
 | `scripts/build-map-geo.js` | **New.** Sibling to `scripts/build-map.js`, same dev-only-deps/`NODE_PATH` convention. Emits GeoJSON (not SVG paths) at Natural Earth **50m** from the identical `NUM_TO_A3` country table — this page's basemap only (D17). |
 | `data/world-map-geo.js` | **New**, generated output of the above. `window.LAUNCH_MAP_GEO = {type:"FeatureCollection", features:[{properties:{iso3,name}, geometry}]}`. 100 countries (6 more than `data/world-map.js`'s 94 — see D17 for the exact accounting). Not yet loaded by any page as of this commit. |
@@ -1068,6 +1068,50 @@ enable species selection exactly as before; GanLum (no drug) shows the new
 "not yet in clinical use" message, empty disabled species select, hidden
 legend, zero dots; switching between all 4 repeatedly leaves no stale state
 behind. No console errors.
+
+**D25 — A chart above the click-through table, not instead of it.** Branch
+owner's request: the table alone buries the one thing worth seeing at a
+glance. Two shapes, picked by what the click actually returned, never both
+and never a third:
+
+- **Cluster (>1 distinct site):** one bar per site, that site's own most
+  recent study — the identical rule its map dot already uses (D14), so the
+  chart can never disagree with what the dot showed.
+- **Single site, >1 study:** one bar per row, chronological. **Bars, not a
+  connected line** — the loaded `dataviz` skill's own default for
+  "trend over time" is a line, deliberately not followed here: WHO's studies
+  land in whatever years a team happened to visit a site (2011, then 2018,
+  say), and a line drawn between two distant points claims a gradual change
+  across years with zero data behind it. A bar per observed year makes no
+  claim about anything but the years actually studied — the right call for
+  this dataset's irregularity, not a generic stylistic choice.
+- **A single row:** no chart — nothing to compare or trend. Also skipped
+  past **`CHART_MAX_ITEMS = 20`** bars (a big cluster becomes clutter, not a
+  shortcut) — the table remains the only view there, as it always was.
+
+**Fixed 0–100% domain, not rescaled to the current click's own max.** A real
+tension, resolved deliberately: rescaling to the local max would make small
+bars easier to tell apart, but a bar's length would then mean something
+different on every panel a reader opens — one cluster's "18%" bar could be
+half-length while another's "18%" bar reads full, purely because of what
+else happened to be in each cluster. Chosen instead: colour (the *same*
+b1–b4 bands the map dots and legend already use — literally the same CSS
+classes, `.chart-bar.b1..b4` beside `.res-dot.b1..b4` and `.resdot.b1..b4`)
+carries the severity read at a glance, the fixed-domain bar length is an
+honest, always-comparable secondary cue, and the printed value at every
+bar's tip carries the precision neither can. A 1% floor keeps a genuine 0%
+value visible as a sliver rather than invisible.
+
+Hover/focus reuses the page's existing tooltip engine (`showTipAtPoint`/
+`showTipAt`/`hideTip`) — no new tooltip mechanism, same one every other mark
+on this page already uses. The table stays the exact, sortable, WHO-sourced
+record underneath; the chart's own ordering (by value, or chronological) is
+independent of whatever column the reader has the table sorted by.
+
+**Verified:** a cluster (Mali, DHA-PPQ, 4 sites, 2011) renders 4 bars sorted
+by failure %, correct value labels, correct band colours; a single site with
+real history (Veal Veng, Cambodia, ASPY, falciparum, 2014 & 2018) renders a
+2-bar trend showing 10.2% → 0%, matching the table below it exactly.
 
 ---
 
