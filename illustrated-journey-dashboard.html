@@ -189,6 +189,12 @@
   }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
   .pathnode svg { width: 30px; height: 30px; display: block; margin: 0 auto; color: var(--accent); }
+  /* The WHO emblem sits in the same box as a glyph but keeps its own colour and
+     its own 1.13:1 ratio, so it is contained rather than stretched. */
+  /* Slightly larger than the line glyphs beside it: a solid mark reads smaller
+     than an outline at the same box size, and the emblem is intricate. */
+  .pathnode .whoemb { width: 33px; height: 33px; display: block; margin: 0 auto; object-fit: contain; }
+  .stage .whoemb { width: 29px; height: 29px; object-fit: contain; }
   .pathnode .pill {
     display: inline-flex; align-items: center; justify-content: center;
     width: 44px; height: 44px; border-radius: 50%;
@@ -776,13 +782,57 @@
   }
   .dl-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .strip .legend { margin-left: 0; }
+  /* Subscribe sits with Download CSV — the strip is where this page keeps its
+     actions. Outlined rather than filled, so the two read as peers without two
+     solid accent blocks competing. `margin-left:auto` lives on .dl-btn, so the
+     pair is pushed right together by putting this one first. */
+  .sub-btn {
+    margin-left: auto; background: transparent; color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 8px; padding: 6px 13px;
+    font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
+  }
+  .sub-btn:hover { background: var(--accent-soft); }
+  .sub-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .strip .sub-btn + .dl-btn { margin-left: 0; }
+
+  /* The panel it opens. Front end only for now — see the seam in the script. */
+  .subwrap {
+    margin: -12px 0 22px; padding: 14px 18px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-top: 3px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow);
+  }
+  .subwrap[hidden] { display: none; }
+  .subwrap h2 { margin: 0 0 3px; font-size: 15px; font-weight: 700; }
+  .subwrap p { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-2); max-width: 64ch; }
+  .subrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+  .subrow input {
+    flex: 1 1 260px; max-width: 340px; box-sizing: border-box; padding: 8px 11px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+    color: var(--ink); font: inherit; font-size: 13.5px;
+  }
+  .subrow input:focus { outline: 0; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .subrow input[aria-invalid="true"] { border-color: var(--crit); }
+  .sub-go {
+    background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px;
+    padding: 8px 15px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
+  }
+  .sub-go:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .sub-msg { margin: 9px 0 0; font-size: 12.5px; font-weight: 600; }
+  .sub-msg.bad { color: var(--crit); }
+  .sub-msg.ok { color: var(--good); }
+  .sub-note { margin: 9px 0 0; font-size: 11.5px; color: var(--ink-3); }
+  @media print { .subwrap { display: none !important; } }
 
   /* print view */
   @media print {
     body { background: #fff; }
     .product .detail { display: block !important; }
     .product { break-inside: avoid; box-shadow: none; }
-    .dl-btn, #tip, .gp-close, .gw-jump { display: none !important; }
+    .dl-btn, .sub-btn, #tip, .gp-close, .gw-jump { display: none !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
     .gatepanel[hidden], .gatewrap[hidden] { display: none !important; }
     .gatepanel, .gatewrap { break-inside: avoid; box-shadow: none; }
@@ -800,7 +850,7 @@
     .pathway { padding: 12px 12px 10px; }
     .pathnode { min-width: 72px; }
     .pathnode .pill { width: 38px; height: 38px; }
-    .pathnode svg { width: 25px; height: 25px; }
+    .pathnode svg, .pathnode .whoemb { width: 25px; height: 25px; }
     .dl-btn { margin-left: 0; }
     .detail { padding: 14px; }
     .timing-axis { margin-left: 110px; }
@@ -846,8 +896,24 @@
       <span class="key"><span class="tgap-key g-warn" aria-hidden="true">+3 yrs</span> Years taken to get from one gate to the next</span>
       <span class="key"><span class="tgap-key g-back" aria-hidden="true">−1 yr</span> Gate reached before the one ahead of it in the pathway</span>
     </div>
+    <button class="sub-btn" id="sub-open" type="button" aria-expanded="false" aria-controls="subwrap">Subscribe for more information</button>
     <button class="dl-btn" id="dl-csv" type="button">Download CSV</button>
   </div>
+
+  <section class="subwrap" id="subwrap" hidden aria-labelledby="sub-title">
+    <h2 id="sub-title">Subscribe for more information</h2>
+    <p>Get an email when the data on this page is updated — new milestones, corrected figures
+      and newly verified country registrations.</p>
+    <form class="subrow" id="sub-form" novalidate>
+      <label class="visually-hidden" for="sub-email">Your email address</label>
+      <input id="sub-email" name="email" type="email" autocomplete="email"
+             placeholder="you@organisation.org" aria-describedby="sub-msg">
+      <button class="sub-go" type="submit">Notify me</button>
+    </form>
+    <p class="sub-msg" id="sub-msg" role="status" hidden></p>
+    <p class="sub-note">Not switched on yet — the mailing list has no home to send to, so nothing
+      leaves your browser when you press Notify me. The button is here so the page is ready for it.</p>
+  </section>
 
   <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway — choose a gate to see every medicine at it" hidden></div>
   <div class="gatewrap" id="gatewrap" hidden></div>
@@ -1000,6 +1066,7 @@
 <script src="data/world-map-geo.js"></script>
 <script src="data/resistance.js"></script>
 <script src="assets/journey-icons/icons.js"></script>
+<script src="assets/journey-icons/icons-solid.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.js"
         integrity="sha512-hoXlvOdSmh58mppUyZHZsscHkR/yXl6zLpTMTNwA6IZ61DpeaCNjosRu1WJ2DeIpkfW5MsJJ9H89zjV4IBGqRw=="
         crossorigin="anonymous"></script>
@@ -1023,9 +1090,26 @@
   // Illustrated stage glyphs (assets/journey-icons/icons.js), one per stage in
   // stage order. Injected once as a sprite; each marker references it by <use>,
   // so the glyph inherits its marker's status colour and the page theme.
-  const JI = window.LaunchJourneyIcons;
+  // The solid set (assets/journey-icons/icons-solid.js) is this page's own —
+  // filled glyphs sized to sit beside the WHO emblem. It falls back to the
+  // shared outline set if that file fails to load, so the markers never
+  // come up empty.
+  const JI = window.LaunchJourneyIconsSolid || window.LaunchJourneyIcons;
   if (JI) document.body.insertAdjacentHTML("afterbegin", JI.sprite());
-  const stageIconImg = (i, cls) => JI ? JI.use(i, cls) : "";
+
+  // The two WHO gates carry the WHO emblem instead of a LAUNCH glyph. It is an
+  // <img> rather than a sprite <use> because it is the one icon on the page that
+  // must keep its own colour: the sprite wraps every symbol in
+  // stroke="currentColor", which is exactly what an official emblem may not do.
+  // Kept local to this page — assets/journey-icons/icons.js is shared by four
+  // other editions and none of them asked for this.
+  // Only the guidelines gate carries the emblem. Prequalification has its own
+  // glyph in the solid set — the board gives it a check, and two identical
+  // emblems side by side read as a duplicate rather than as two gates.
+  const WHO_STAGES = { 2: true };            // WHO guidelines
+  const stageIconImg = (i, cls) => WHO_STAGES[i]
+    ? `<img class="${cls} whoemb" src="assets/who-emblem.svg" alt="" width="205" height="181">`
+    : (JI ? JI.use(i, cls) : "");
 
   // header + banner from meta
   const dt = new Date(DATA.meta.lastUpdated + "T00:00:00");
@@ -2589,6 +2673,59 @@
 
   // CSV download — stages and milestones for every tracked product
   function csvCell(v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  // ---- subscribe for more information ---------------------------------------
+  // Front end only, deliberately: this is a static site with no backend, so the
+  // button, the panel and the validation are all there is. There is exactly one
+  // seam — replace the body of subscribeEmail() with a call to the list provider
+  // and nothing else has to change; the panel already renders the pending,
+  // success and failure states around it.
+  async function subscribeEmail(email) {
+    // TODO: POST { email, page: location.href } to the mailing-list endpoint and
+    // resolve on success, throw on failure. Until one exists the address is kept
+    // in memory only (LAUNCH_SUBSCRIBERS) so a demo can show what would be sent.
+    (window.LAUNCH_SUBSCRIBERS = window.LAUNCH_SUBSCRIBERS || []).push(email);
+    return { ok: false, pending: true };   // pending: no endpoint wired yet
+  }
+
+  const subOpen = document.getElementById("sub-open");
+  const subWrap = document.getElementById("subwrap");
+  const subForm = document.getElementById("sub-form");
+  const subMail = document.getElementById("sub-email");
+  const subMsg  = document.getElementById("sub-msg");
+
+  subOpen.addEventListener("click", () => {
+    const open = subWrap.hidden;
+    subWrap.hidden = !open;
+    subOpen.setAttribute("aria-expanded", String(open));
+    if (open) subMail.focus();
+  });
+
+  function subSay(text, cls) {
+    subMsg.hidden = !text;
+    subMsg.textContent = text || "";
+    subMsg.className = "sub-msg" + (cls ? " " + cls : "");
+  }
+
+  subForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = subMail.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      subMail.setAttribute("aria-invalid", "true");
+      subSay("Please enter an email address we can reach you at.", "bad");
+      subMail.focus();
+      return;
+    }
+    subMail.removeAttribute("aria-invalid");
+    const res = await subscribeEmail(email);
+    // Says what actually happened. Claiming "you are subscribed" with no list to
+    // join would be the one thing a transparency dashboard must not do.
+    subSay(res && res.ok
+      ? "Thank you — you are on the list."
+      : "Noted, but not sent: email alerts are not switched on yet. Nothing left your browser.",
+      res && res.ok ? "ok" : null);
+    subForm.reset();
+  });
+
   document.getElementById("dl-csv").addEventListener("click", () => {
     const rows = [["Product", "Record", "Item", "Status", "Detail", "Date", "Next step", "Anticipated", "Source", "As of"]];
     tracked.forEach(p => {
