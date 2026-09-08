@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Unitaid logo mark (the bird), lifted verbatim from unitaid/assets/unitaid-logo.svg
+     with the "unitaid" wordmark paths left behind. Official colours unchanged:
+     #212E92 dark blue, #0066FF blue, #CC0033 red. viewBox is the mark's own
+     bounding box, so it sits flush in whatever box it is given. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 388 251" role="img" aria-label="Unitaid">
+  <title>Unitaid</title>
+  <style type="text/css">
+    .st0{fill:#212E92;}
+    .st1{fill:#0066FF;}
+    .st2{fill:#CC0033;}
+  </style>
+  <path class="st1" d="M119.53,85.25L1.59,161.29c-2.99,1.93-1.46,6.56,2.09,6.34l179.04-11.6"/>
+  <path class="st0" d="M123.71,75.22L12.37,96.43c-3.53,0.67-3.8,5.62-0.38,6.68l170.73,52.9"/>
+  <path class="st2" d="M255.85,79.7c-23.39-6.03-37.74-16.02-42.81-20.02c-0.75-0.59-0.82-1.71-0.19-2.43l26.91-31.31
+  c2.89-3.37,7.23-5.14,11.65-4.75l134.92,11.66c2.06,0.18,2.11,3.18,0.05,3.43l-80.43,9.57c-5.11,1.06-7.48,1.98-11.21,6.08
+  L130.19,249.37c-2.43,2.85-7.02,0.35-5.93-3.24l32.89-102.56c0.48-1.59-0.2-3.29-1.68-4.04c-16-8.33-103.44-57.09-122.72-137.29
+  c-0.35-1.48,1.28-2.67,2.59-1.89c24.08,14.33,155.5,90.28,216.62,82.55C251.96,82.89,258.4,81.94,255.85,79.7"/>
+</svg>

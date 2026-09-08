@@ -19,6 +19,10 @@
  *  that is how a per-row "report an issue with this product" link would hook
  *  in later, with no change to this file.
  *
+ *  A page may retitle the whole widget by setting window.LAUNCH_FEEDBACK_COPY
+ *  to an object of overrides BEFORE this script tag — see the COPY block below
+ *  for the keys. The illustrated journey page runs it as "Send feedback".
+ *
  *  ── WIRING A REAL BACKEND ───────────────────────────────────────────────
  *  There is exactly one seam: submitIssueReport() immediately below. Replace
  *  its body with a call to the intake endpoint and nothing else changes —
@@ -163,6 +167,49 @@
     ["suggestion", "Suggestion or feature request"],
     ["other",      "Something else"]
   ];
+  // Same four values, relabelled per page via COPY.types below — the value is
+  // what a backend keys on, so only the label may be overridden.
+
+  /* ── wording ───────────────────────────────────────────────────────────
+   *  Every visible string lives here so a page can retitle the widget with
+   *  no fork of this file: set window.LAUNCH_FEEDBACK_COPY = { … } BEFORE
+   *  the <script src="assets/report-issue.js"> tag and only the keys given
+   *  are overridden. The illustrated journey page uses it to run the same
+   *  widget as "Send feedback".
+   */
+  var COPY = {
+    pill:        "Report an issue",
+    title:       "Report an issue",
+    intro:       "Spotted a figure that looks wrong, a source we have missed, or something " +
+                 "that could work better? Tell the LAUNCH team.",
+    typeLabel:   "What kind of issue is it?",
+    messageLabel:"What is wrong, and what should it say?",
+    messagePlaceholder:
+                 "e.g. Country registration for ALAQ shows Tanzania as pending, but TMDA " +
+                 "listed it on 12 June 2026 — register entry TZ/…",
+    note:        "An email address is only used to come back to you about this report. We also " +
+                 "record which page you are on and the version of the data you are looking at, " +
+                 "so the team can trace what you saw.",
+    submit:      "Send report",
+    sending:     "Sending…",
+    failed:      "Sorry — that report could not be sent just now. Please try again in a moment.",
+    doneTitle:   "Thank you — your report has been received.",
+    doneMessage: "The LAUNCH data team reviews reports alongside the regular source scan. " +
+                 "Corrections that check out against a public source are applied in the next " +
+                 "data update, and appear in <em>Recent updates</em>.",
+    again:       "Report something else"
+  };
+  (function (over) {
+    if (!over) return;
+    Object.keys(COPY).forEach(function (k) {
+      if (typeof over[k] === "string" && over[k]) COPY[k] = over[k];
+    });
+    if (over.types) {
+      TYPES.forEach(function (t) {
+        if (typeof over.types[t[0]] === "string" && over.types[t[0]]) t[1] = over.types[t[0]];
+      });
+    }
+  })(window.LAUNCH_FEEDBACK_COPY);
 
   /* ── helpers ───────────────────────────────────────────────────────── */
 
@@ -192,15 +239,14 @@
   dlg.innerHTML =
     '<form class="ri-form" novalidate>' +
       '<div class="ri-head">' +
-        '<h2 id="ri-title">Report an issue</h2>' +
-        '<p>Spotted a figure that looks wrong, a source we have missed, or something ' +
-           'that could work better? Tell the LAUNCH team.</p>' +
+        '<h2 id="ri-title">' + esc(COPY.title) + '</h2>' +
+        '<p>' + esc(COPY.intro) + '</p>' +
         '<button type="button" class="ri-x" data-ri-close aria-label="Close">&times;</button>' +
       '</div>' +
       '<div class="ri-body">' +
         '<p class="ri-alert" id="ri-alert" role="alert"></p>' +
         '<div class="ri-field">' +
-          '<label for="ri-type">What kind of issue is it?</label>' +
+          '<label for="ri-type">' + esc(COPY.typeLabel) + '</label>' +
           '<select class="ri-select" id="ri-type" name="type">' +
             TYPES.map(function (t) {
               return '<option value="' + t[0] + '">' + esc(t[1]) + '</option>';
@@ -212,10 +258,10 @@
           '<select class="ri-select" id="ri-product" name="product"></select>' +
         '</div>' +
         '<div class="ri-field" id="ri-f-message">' +
-          '<label for="ri-message">What is wrong, and what should it say?</label>' +
+          '<label for="ri-message">' + esc(COPY.messageLabel) + '</label>' +
           '<textarea class="ri-textarea" id="ri-message" name="message" maxlength="2000" ' +
             'required aria-describedby="ri-e-message" ' +
-            'placeholder="e.g. Country registration for ALAQ shows Tanzania as pending, but TMDA listed it on 12 June 2026 — register entry TZ/…"></textarea>' +
+            'placeholder="' + esc(COPY.messagePlaceholder) + '"></textarea>' +
           '<p class="ri-err" id="ri-e-message"></p>' +
         '</div>' +
         '<div class="ri-row">' +
@@ -235,24 +281,20 @@
           '<input class="ri-input" id="ri-org" name="organisation" type="text" ' +
             'autocomplete="organization" placeholder="Ministry of health, manufacturer, partner…">' +
         '</div>' +
-        '<p class="ri-note">An email address is only used to come back to you about this ' +
-          'report. We also record which page you are on and the version of the data you are ' +
-          'looking at, so the team can trace what you saw.</p>' +
+        '<p class="ri-note">' + esc(COPY.note) + '</p>' +
       '</div>' +
       '<div class="ri-foot">' +
         '<button type="button" class="ri-btn ri-ghost" data-ri-close>Cancel</button>' +
-        '<button type="submit" class="ri-btn ri-primary" id="ri-send">Send report</button>' +
+        '<button type="submit" class="ri-btn ri-primary" id="ri-send">' + esc(COPY.submit) + '</button>' +
       '</div>' +
     '</form>' +
     '<div class="ri-done" id="ri-done" role="status" hidden>' +
       '<div class="ri-check" aria-hidden="true">&#10003;</div>' +
-      '<h3>Thank you — your report has been received.</h3>' +
-      '<p id="ri-done-msg">The LAUNCH data team reviews reports alongside the regular ' +
-        'source scan. Corrections that check out against a public source are applied in the ' +
-        'next data update, and appear in <em>Recent updates</em>.</p>' +
+      '<h3>' + esc(COPY.doneTitle) + '</h3>' +
+      '<p id="ri-done-msg">' + COPY.doneMessage + '</p>' +
       '<p><span class="ri-ref" id="ri-ref"></span></p>' +
       '<div class="ri-foot" style="justify-content:center;background:none;border:0;padding-top:6px">' +
-        '<button type="button" class="ri-again" id="ri-again">Report something else</button>' +
+        '<button type="button" class="ri-again" id="ri-again">' + esc(COPY.again) + '</button>' +
         '<button type="button" class="ri-btn ri-primary" data-ri-close>Close</button>' +
       '</div>' +
     '</div>';
@@ -262,7 +304,8 @@
   pill.className = "ri-pill";
   pill.setAttribute("data-report-issue", "");
   pill.setAttribute("aria-haspopup", "dialog");
-  pill.innerHTML = FLAG + "<span>Report an issue</span>";
+  pill.setAttribute("aria-label", COPY.pill);
+  pill.innerHTML = FLAG + "<span>" + esc(COPY.pill) + "</span>";
 
   function mount() {
     document.body.appendChild(dlg);
@@ -411,7 +454,7 @@
     busy = true;
     alertEl.classList.remove("is-on");
     btnSend.disabled = true;
-    btnSend.innerHTML = '<span class="ri-spin"></span>Sending…';
+    btnSend.innerHTML = '<span class="ri-spin"></span>' + esc(COPY.sending);
 
     Promise.resolve(API.submit(payload)).then(function (res) {
       dlg.querySelector("#ri-ref").textContent = "Reference " + ((res && res.ref) || "—");
@@ -420,15 +463,14 @@
       done.scrollTop = 0;
       dlg.querySelector("#ri-again").focus();
     }).catch(function (err) {
-      alertEl.textContent = "Sorry — that report could not be sent just now. " +
-                            "Please try again in a moment.";
+      alertEl.textContent = COPY.failed;
       alertEl.classList.add("is-on");
       alertEl.scrollIntoView({ block: "nearest" });
       if (window.console && console.warn) console.warn("[LAUNCH] report failed:", err);
     }).then(function () {
       busy = false;
       btnSend.disabled = false;
-      btnSend.textContent = "Send report";
+      btnSend.textContent = COPY.submit;
     });
   });
 
