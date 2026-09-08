@@ -11,10 +11,13 @@
 //   node scripts/verify-map-clusters.js [path-to-node_modules]
 //
 // Drives the real page in a headless browser: sets each drug/species pair via
-// the actual <select> controls (not internal function calls, so the real
-// wiring is exercised too), zooms the real map via the map instance exposed
-// at window.__DEV13_MAP__ (test-only hook, see illustrated-journey-dashboard.html),
-// and reads the ACTUAL rendered .res-dot marker positions/sizes from the DOM --
+// window.__DEV13_MAP__.setDrugSpecies() (test-only hook, see
+// illustrated-journey-dashboard.html) rather than the real Drug picker --
+// D24 restricted that picker to the 4 tracked products, but D5 still ships
+// all 26 drugs' data, and this sweep exists to verify the CLUSTERING
+// ALGORITHM against everything RES.studies carries, independent of what any
+// given day's UI happens to expose. Zooms the real map via the same hook, and
+// reads the ACTUAL rendered .res-dot marker positions/sizes from the DOM --
 // not a reimplementation of the clustering math, so there is nothing here to
 // drift out of sync with what a reader actually sees.
 //
@@ -72,11 +75,10 @@ function countOverlaps(marks) {
 
   await page.goto(PAGE_URL, { waitUntil: "networkidle2", timeout: 30000 });
   await page.waitForFunction("window.__DEV13_MAP__ && window.__DEV13_MAP__.getMap().isStyleLoaded()", { timeout: 15000 });
-  await page.evaluate(() => document.querySelector('input[name="reslayer"][value="treatmentFailure"]').click());
 
-  // Populated (drug, species) cells -- same traversal fillDrugList/speciesFor
-  // use internally, done here against the plain data global so the test
-  // doesn't need access to the page's own closures.
+  // Populated (drug, species) cells -- same traversal allDrugs/speciesFor use
+  // internally, done here against the plain data global so the test doesn't
+  // need access to the page's own closures.
   const cells = await page.evaluate(() => {
     const RES = window.LAUNCH_RESISTANCE;
     const layer = RES.treatmentFailure || {};
@@ -96,17 +98,7 @@ function countOverlaps(marks) {
   const crossBorderByZoom = {};
 
   for (const [drug, species] of cells) {
-    const ok = await page.evaluate((drug, species) => {
-      const sel = document.getElementById("res-drug"), spSel = document.getElementById("res-species");
-      if (![...sel.options].some((o) => o.value === drug)) return false;
-      sel.value = drug;
-      sel.dispatchEvent(new Event("change"));
-      if (![...spSel.options].some((o) => o.value === species && !o.disabled)) return false;
-      spSel.value = species;
-      spSel.dispatchEvent(new Event("change"));
-      return true;
-    }, drug, species);
-    if (!ok) continue;   // drug/species not independently selectable (D7) -- skip, not a failure
+    await page.evaluate((drug, species) => window.__DEV13_MAP__.setDrugSpecies(drug, species), drug, species);
 
     for (const z of ZOOMS) {
       await page.evaluate((z) => window.__DEV13_MAP__.getMap().setZoom(z), z);

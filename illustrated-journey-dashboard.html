@@ -744,25 +744,29 @@
   <section class="viz" id="mapsec" hidden>
     <h2>Country access map</h2>
     <p class="viznote" id="mapnote">Each country is shaded by the furthest stage it has reached — a country counted in MFT plans is registered too. Counts are of the countries drawn on this map.</p>
-    <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
     <div class="map-dock">
-      <aside class="map-dock-rail map-dock-left" id="res-controls" hidden>
+      <aside class="map-dock-rail map-dock-left">
         <div class="dock-section">
-          <h3>Study result</h3>
-          <fieldset class="res-layer">
-            <legend>Study result</legend>
-            <label><input type="radio" name="reslayer" value="off" checked> Off</label>
-            <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
-            <label class="res-soon"><input type="radio" name="reslayer" value="delayedClearance" disabled>
-              <span class="res-soon-body"><span>Delayed parasite clearance</span><span class="res-soon-tag">Not yet available</span></span></label>
-            <label class="res-soon"><input type="radio" name="reslayer" value="molecularMarkers" disabled>
-              <span class="res-soon-body"><span>Molecular markers of drug resistance</span><span class="res-soon-tag">Not yet available</span></span></label>
-          </fieldset>
+          <h3>Drug</h3>
+          <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
         </div>
-        <div class="dock-section">
-          <h3>Filters</h3>
-          <label class="res-pick">Drug <select id="res-drug" aria-label="Select drug for the resistance overlay"></select></label>
-          <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
+        <div id="res-controls" hidden>
+          <div class="dock-section">
+            <h3>Study result</h3>
+            <fieldset class="res-layer">
+              <legend>Study result</legend>
+              <label><input type="radio" name="reslayer" value="off" checked> Off</label>
+              <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
+              <label class="res-soon"><input type="radio" name="reslayer" value="delayedClearance" disabled>
+                <span class="res-soon-body"><span>Delayed parasite clearance</span><span class="res-soon-tag">Not yet available</span></span></label>
+              <label class="res-soon"><input type="radio" name="reslayer" value="molecularMarkers" disabled>
+                <span class="res-soon-body"><span>Molecular markers of drug resistance</span><span class="res-soon-tag">Not yet available</span></span></label>
+            </fieldset>
+          </div>
+          <div class="dock-section">
+            <h3>Species</h3>
+            <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
+          </div>
         </div>
       </aside>
 
@@ -1429,7 +1433,10 @@
     const CPASS = 20;    // clustering convergence bound, unchanged from D15
 
     let curSites = null, curMarks = [], curDrug = "", curSpecies = "";
-    let curUndrawn = 0, curFallback = false;
+    let curUndrawn = 0;
+    // The drug bound to the currently selected product (PRODUCT_DRUG), or
+    // null when that product has no WHO resistance data of its own (D24).
+    let curBoundDrug = null;
     // the site keys behind the open study panel, so the map can say which dot
     // the panel belongs to — and keep saying it after a zoom rebuilds the marks
     let selKeys = null;
@@ -1479,12 +1486,6 @@
     });
     map.getCanvas().setAttribute("aria-label", "World map, pan and zoom with the mouse or arrow keys");
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
-
-    // Test/verification hook only — read by scripts/verify-map-clusters.js to
-    // re-check D15's clustering invariants (same-country overlap, cross-border
-    // overlap) by script instead of by hand after any change to the marks.
-    // No cost to real users; not part of the app's own behaviour.
-    window.__DEV13_MAP__ = { getMap: () => map, getMarks: () => curMarks };
 
     // Keyboard parity for pan (D13's arrow-key affordance) — MapLibre's own
     // keyboard handler is off (see above), so arrows are hand-wired to a
@@ -1653,7 +1654,6 @@
     const BANDS = [{ lt: 5, cls: "b1" }, { lt: 10, cls: "b2" }, { lt: 20, cls: "b3" }, { lt: Infinity, cls: "b4" }];
     const bandOf = (v) => (BANDS.find((b) => v < b.lt) || BANDS[3]).cls;
     const PRODUCT_DRUG = { pyramax: "Artesunate-pyronaridine", dhappq: "Dihydroartemisinin-piperaquine" };
-    const FALLBACK_DRUG = "Artemether-lumefantrine";
     const FALLBACK_SPECIES = "P. falciparum";
     const LAYER = "treatmentFailure";
 
@@ -1850,38 +1850,17 @@
       allDrugs().forEach((d) => speciesFor(d).forEach((s) => set.add(s)));
       return [...set].sort();
     };
-    const drugCoverage = (drug) => {
-      const set = new Set();
-      speciesFor(drug).forEach((sp) => Object.keys(cellsFor(drug, sp))
-        .forEach((i) => { if (i in M.countries) set.add(i); }));
-      return set.size;
-    };
-
-    // One plain A–Z list — every drug is one click away and every entry reads
-    // the same. The country count earns its place more here than it did under
-    // the old coverage sort: 11 of the 17 drugs cover fewer than five countries
-    // and alphabetical order scatters them through the list rather than sinking
-    // them, so the count is the only warning that an entry paints one or two
-    // dots. Which drugs belong to tracked products is carried by PRODUCT_DRUG
-    // and the auto-bind below, not by the ordering.
-    function fillDrugList(keep) {
-      const sel = document.getElementById("res-drug");
-      const every = allDrugs().slice().sort((a, b) => a.localeCompare(b));
-      sel.innerHTML = every.map((d) => {
-        const n = drugCoverage(d);
-        return `<option value="${esc(d)}">${esc(d)} (${n} ${n === 1 ? "country" : "countries"})</option>`;
-      }).join("");
-      sel.value = keep && every.indexOf(keep) >= 0 ? keep : FALLBACK_DRUG;
-      return sel.value;
-    }
-
     // Species and drug are not independent: chloroquine has no P. falciparum
     // studies at all (that resistance is decades old), and most ACTs have
     // little vivax data because they are not the vivax treatment. Pairings with
     // nothing behind them are DISABLED rather than merely empty, so a blank map
-    // can never be misread as "no resistance here".
+    // can never be misread as "no resistance here". A null drug (D24 — the
+    // product has no WHO resistance data of its own, see bindDrug) empties the
+    // list outright rather than showing every species disabled, since there is
+    // no pairing to even offer.
     function fillSpeciesList(drug, keep) {
       const sel = document.getElementById("res-species");
+      if (!drug) { sel.innerHTML = ""; sel.disabled = true; return ""; }
       const list = allSpecies();
       sel.innerHTML = list.map((sp) => {
         const n = drawnCount(drug, sp);
@@ -1896,14 +1875,19 @@
       return sel.value;
     }
 
+    // D24 — the map's drug is now driven entirely by which of the 4 tracked
+    // products is selected (PRODUCT_DRUG), not by an independent picker: the
+    // old flat A-Z drug <select> and its "fallback to Artemether-lumefantrine
+    // for a product with no studies of its own" behaviour are both gone. A
+    // product with no PRODUCT_DRUG entry (GanLum, ALAQ — pre-launch, no WHO
+    // resistance surveillance exists for them yet) now binds to no drug at
+    // all; drawResistance() reads that as "not yet available", not as a
+    // reference-drug substitute.
     function bindDrug(productId) {
       if (!RES) return;
-      const sel = document.getElementById("res-drug");
       const want = PRODUCT_DRUG[productId];
-      const every = allDrugs();
-      const drug = fillDrugList(want && every.indexOf(want) >= 0 ? want : FALLBACK_DRUG);
-      sel.dataset.bound = want && every.indexOf(want) >= 0 ? "own" : "fallback";
-      fillSpeciesList(drug, document.getElementById("res-species").value);
+      curBoundDrug = want && allDrugs().indexOf(want) >= 0 ? want : null;
+      fillSpeciesList(curBoundDrug, document.getElementById("res-species").value);
       closePanel();
       drawResistance();
     }
@@ -2043,8 +2027,6 @@
       const bits = [];
       if (!curSites || !curSites.length)
         bits.push(`No WHO study results for ${curDrug} against ${curSpecies}.`);
-      if (curFallback)
-        bits.push(`${mapProduct} has no efficacy studies of its own; ${FALLBACK_DRUG} is shown as the reference treatment.`);
       if (curSites && curSites.length) {
         const nS = curSites.length, nM = curMarks.length;
         bits.push(nS === nM
@@ -2118,21 +2100,39 @@
       return marks;
     }
 
+    // Test/verification hook only — read by scripts/verify-map-clusters.js to
+    // re-check D15's clustering invariants (same-country overlap, cross-border
+    // overlap) by script instead of by hand after any change to the marks.
+    // No cost to real users; not part of the app's own behaviour.
+    // setDrugSpecies bypasses the UI deliberately (D24 restricted the real
+    // Drug picker to the 4 tracked products) so this can still sweep every
+    // drug×species cell RES.studies actually carries — D5 ships all 26 drugs
+    // in the data regardless of what the UI currently exposes, and that is
+    // what this regression test is verifying.
+    window.__DEV13_MAP__ = {
+      getMap: () => map,
+      getMarks: () => curMarks,
+      setDrugSpecies: (drug, species) => {
+        curDrug = drug; curSpecies = species;
+        curSites = sitesFor(drug, species);
+        drawMarks();
+      },
+    };
+
     function drawResistance() {
       if (!RES) return;
       document.getElementById("res-controls").hidden = false;
       const legend = document.getElementById("res-legend");
       const ruleEl = document.getElementById("res-rule");
       const note = document.getElementById("res-note");
-      const sel = document.getElementById("res-drug");
       const spSel = document.getElementById("res-species");
       clearMarkers();
 
       const checked = document.querySelector('input[name="reslayer"]:checked');
       const on = checked && checked.value !== "off";
-      const drug = sel.value, species = spSel.value;
+      const drug = curBoundDrug, species = spSel.value;
       if (!on || !drug || !species) {
-        legend.hidden = true; ruleEl.hidden = true; note.hidden = true;
+        legend.hidden = true; ruleEl.hidden = true;
         // the zoomend handler only rebuilds marks while curSites is set —
         // leaving it behind would repaint the dots after the overlay was
         // switched off, the next time the reader zoomed
@@ -2140,6 +2140,15 @@
         closePanel();
         const em = document.getElementById("map-empty");
         if (em) em.classList.remove("demoted");   // map is blank again — recentre
+        // D24 — a product with no WHO drug of its own (GanLum, ALAQ: not yet in
+        // clinical use) reads as "not yet available", never as a silent blank
+        // or a substituted reference drug's numbers.
+        if (on && !drug) {
+          note.hidden = false;
+          note.textContent = `${mapProduct} is not yet in clinical use — WHO has no resistance surveillance for it yet.`;
+        } else {
+          note.hidden = true;
+        }
         return;
       }
 
@@ -2149,7 +2158,6 @@
       // countries WHO covers that this basemap does not draw — counted from the
       // country index rather than from the sites, which are already filtered out
       curUndrawn = Object.keys(cells).filter((i) => !(i in M.countries)).length;
-      curFallback = sel.dataset.bound === "fallback";
       drawMarks();                 // writes the note, which needs the two above
 
       // the map is no longer blank once dots are on it — move the access
@@ -2176,12 +2184,6 @@
 
     document.querySelectorAll('input[name="reslayer"]').forEach((r) =>
       r.addEventListener("change", () => { closePanel(); drawResistance(); }));
-    document.getElementById("res-drug").addEventListener("change", () => {
-      fillSpeciesList(document.getElementById("res-drug").value,
-                      document.getElementById("res-species").value);
-      closePanel();
-      drawResistance();
-    });
     document.getElementById("res-species").addEventListener("change", () => {
       closePanel(); drawResistance();
     });

@@ -50,9 +50,12 @@ reasoning was sound at the time and is recorded unchanged in §6 — it is
 *superseded*, specifically and only for this page, by **D18**. Read D13
 together with D18, not D13 alone, if you are deciding whether to add a
 library anywhere else on the site: D13's argument still holds everywhere it
-was made for. **D8** (the flat A–Z, 26-drug select) is untouched — a separate,
-smaller product-card UI elsewhere on the dashboard shows only 4 tracked
-drugs, and the two must not be conflated.
+was made for. **D8 was later reversed for real by D24** — at the time this
+was written, D8's flat A–Z 26-drug select was still standing; the branch
+owner explicitly asked for it to be replaced by the 4-tracked-drug picker
+D8 itself had rejected once already. See D24 for the actual change and why
+this second time was a deliberate, direct instruction rather than a mockup
+exploration.
 
 **What is unchanged:** every data/math decision in §6 — D5 (nothing
 filtered), D6/D12 (patient-weighted pooled proportion, verified against WHO
@@ -160,23 +163,22 @@ They are deliberately on different visual channels, with separate tooltips and
 separate provenance lines. See decision **D2** — this is the single most
 important thing not to accidentally undo.
 
-Controls added under the product tabs: an **overlay** radio (Off / Treatment
-failure), a **drug** select, and a **species** select. Clicking any dot opens a
-panel listing every study behind it.
+Controls: a **drug** picker (4 tracked products — GanLum/ALAQ/ASPY/DHA-PPQ,
+D24), an **overlay** radio (Off / Treatment failure), and a **species**
+select. Clicking any dot opens a panel listing every study behind it.
 
 **Layout (D23): the "Dock" arrangement**, applied 8 Sep 2026 — the map's own
-UI chrome, not the rendering engine (that was D17–D22). Left rail: "Study
-result" (the overlay radio, now shown as vertical rows — all 3 study types
-listed, Delayed parasite clearance and Molecular markers of drug resistance
-**disabled** and labeled "Not yet available" per D7's existing
-disabled-not-blank convention, since only Treatment failure has real data)
-and "Filters" (the same drug/species `<select>` elements, unchanged — D8's
-flat A–Z drug list stays; the dock does **not** use the curated 4-drug picker
-an earlier mockup explored, that was tried and rejected once already on this
-feature). Right rail: "Legend" (access swatches + resistance bands + the
-WHO-rule sentence, always visible) and "Detail" below it (the provenance
-note, replaced by the click-through study table when a mark is clicked) —
-legend and detail are two separate, persistently-positioned sections, not one
+UI chrome, not the rendering engine (that was D17–D22). Left rail: "Drug"
+(D24 — now the single selector driving both the country-access map and the
+resistance overlay's drug), "Study result" (the overlay radio, vertical rows —
+all 3 study types listed, Delayed parasite clearance and Molecular markers of
+drug resistance **disabled** and labeled "Not yet available" per D7's
+existing disabled-not-blank convention, since only Treatment failure has real
+data), and "Species" (the select, narrowing within the bound drug). Right
+rail: "Legend" (access swatches + resistance bands + the WHO-rule sentence,
+always visible) and "Detail" below it (the provenance note, replaced by the
+click-through study table when a mark is clicked) — legend and detail are two
+separate, persistently-positioned sections, not one
 slot that swaps. Pure HTML/CSS repositioning of existing elements (found by
 `id`, not by DOM position) — no JS changes. See D23 in §6 for why the right
 rail is 340px, not the 260px an earlier mockup used.
@@ -956,7 +958,9 @@ already decided against on this feature before the mockups existed:
    different, earlier product-card UI (GanLum/ALAQ/ASPY/DHA-PPQ) — porting
    that scope restriction into the real drug filter would silently redo D8,
    which already tried and rejected exactly this (a curated list hid
-   coverage gaps for the other 22 drugs).
+   coverage gaps for the other 22 drugs). **This held only briefly — see
+   D24, decided the same day**, where the branch owner directly instructed
+   the 4-drug restriction rather than it being inferred from a mockup.
 2. *All 3 "Study result" options are shown; 2 are disabled, not fabricated.*
    The mockup used placeholder data for Delayed parasite clearance and
    Molecular markers of drug resistance because it was a design exploration.
@@ -1000,6 +1004,70 @@ and a mark click opens the panel in the right rail's detail section with the
 full un-clipped table, closing correctly. No JS was changed to make any of
 this work, matching the design's own premise that this was a pure
 HTML/CSS repositioning of elements the JS already finds by `id`.
+
+**D24 — Reverse D8 for real; one Drug picker (4 tracked products) replaces
+both the product tabs and the resistance drug select.** Same day as D23,
+direct instruction from the branch owner rather than inferred from a
+mockup. The old top `#maptabs` product tabs (driving `selectMap()`, the
+country-access choropleth) and the Filters section's flat A–Z `<select
+id="res-drug">` (driving the resistance overlay) were two separate controls
+for what was, for 2 of the 4 tracked products, already the *same* choice —
+`selectMap()` already called `bindDrug()` at its end, auto-binding
+`PRODUCT_DRUG`'s mapped WHO drug name. Unifying them is mostly deletion: the
+tabs (`.tabs`/`.tab`, unchanged CSS) moved into the left rail's new "Drug"
+section verbatim, `fillDrugList()`/`drugCoverage()`/`FALLBACK_DRUG` are gone,
+and `bindDrug(productId)` now just sets a module-level `curBoundDrug` (the
+mapped WHO drug, or `null`) instead of populating a 26-option dropdown.
+`drawResistance()` reads `curBoundDrug` directly — there is no more
+independent override to read from a `<select>`.
+
+**Consequence, decided alongside this, not discovered after:** GanLum and
+ALAQ are pre-launch pipeline products with no `PRODUCT_DRUG` entry — WHO has
+no resistance surveillance for a drug that is not yet in clinical use. D8's
+era papered over this with a fallback (silently substituting
+Artemether-lumefantrine's data as "the reference treatment"). Asked directly
+which behaviour to keep, the branch owner chose neither silence nor
+substitution: selecting a pipeline product now shows an explicit state —
+"{product} is not yet in clinical use — WHO has no resistance surveillance
+for it yet" — no dots, legend hidden, species `<select>` emptied and
+disabled (D7's disabled-not-blank principle, extended to "this pairing
+doesn't exist yet" rather than only "this pairing has zero studies"). `sel`
+itself is gone; `fillSpeciesList(null, ...)` short-circuits to this state
+directly rather than trying to compute coverage for a drug that isn't there.
+
+**What this closes off, stated plainly:** `data/resistance.js` still ships
+all 26 WHO drugs (D5 — nothing is filtered at the data layer), but 22 of
+them are now **unreachable through this page's UI** — there is no longer any
+control that can select them. This is a real, deliberate narrowing of what a
+reader of this page can see, not a bug. If a future need resurfaces for
+browsing the other 22 drugs' resistance data, D8's flat-list UI pattern is
+still the right one to reach for; it would need to come back as a genuinely
+separate control (e.g., an "all WHO drugs" mode), not a silent revert of
+this decision.
+
+**`scripts/verify-map-clusters.js` needed a matching fix, not a scope cut.**
+The exhaustive 45-cell sweep (D22) drove drug/species selection through
+`#res-drug`/`#res-species` — both selects that either don't exist
+(`#res-drug`) or no longer offer most drugs (`#res-species`, now empty
+whenever no drug is bound) after this change. Rather than shrinking the
+regression test to the 2 UI-reachable drugs, `window.__DEV13_MAP__` gained a
+`setDrugSpecies(drug, species)` method that sets `curSites`/`curDrug`/
+`curSpecies` and calls `drawMarks()` directly, bypassing the UI on purpose —
+the sweep's job is verifying the **clustering algorithm** against everything
+`RES.studies` carries (D5), independent of what any given day's UI happens
+to expose. Re-run after this change: still **45 cells, 0 same-country
+overlaps across 270 checks** — the cross-border table's absolute numbers
+shifted slightly from D22's run (e.g. 294→477 at zoom 0) without changing
+the shrinks-with-zoom pattern or the invariant; this is measurement noise
+from the map's pan position drifting slightly between test runs (never
+explicitly reset), not a regression, and is exactly the kind of thing worth
+naming rather than letting a future reader wonder about.
+
+**Verified:** ASPY (own drug) and DHA-PPQ (own drug) both still draw dots and
+enable species selection exactly as before; GanLum (no drug) shows the new
+"not yet in clinical use" message, empty disabled species select, hidden
+legend, zero dots; switching between all 4 repeatedly leaves no stale state
+behind. No console errors.
 
 ---
 
@@ -1051,12 +1119,16 @@ layer is derived at render time from `studies[]`, which already shipped all
   94-set by design) but doesn't reflect that geometry now exists for 6 more
   of them. Leave as-is unless `sitesFor`'s filter itself moves to the
   100-country set — the two should change together, not separately.
-- **Talk to the team about the MapLibre migration itself, separately from the
-  V1 PR conversation already flagged below.** The ticket asked for "all 3
-  study types on our map," not a rendering-engine change — the migration was
-  a mid-branch, out-of-ticket decision made explicitly with the branch owner
-  (§1c) but the wider team hasn't seen it yet. Not yet raised, by the branch
-  owner's own choice (iterating solo a bit longer first).
+- **Talk to the team about the MapLibre migration and the Dock/drug-picker UI
+  changes, separately from the V1 PR conversation already flagged below.**
+  The ticket asked for "all 3 study types on our map," not a rendering-engine
+  change or a UI redesign — D17–D24 were all mid-branch, out-of-ticket
+  decisions made explicitly with the branch owner but the wider team hasn't
+  seen any of them yet. Not yet raised, by the branch owner's own choice
+  (iterating solo a bit longer first). Worth flagging specifically:
+  **D24 is a real, user-facing scope narrowing** (22 of 26 WHO drugs'
+  resistance data become unreachable through this page's UI) that a reviewer
+  who only reads the ticket would have no reason to expect.
 
 ### V1 is frozen
 
