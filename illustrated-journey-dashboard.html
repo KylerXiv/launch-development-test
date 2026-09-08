@@ -3,6 +3,15 @@
 <meta charset="utf-8">
 <title>LAUNCH Transparency Dashboard — Illustrated journey</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- MapLibre GL JS: the resistance/access map's rendering engine (DEV-13 D18,
+     superseding D13's no-mapping-library decision — this is the one dependency
+     on this page; the other 11 pages sharing data/world-map.js are unaffected).
+     Loaded before this page's own <style> so our control-theming overrides
+     below win the cascade against MapLibre's own default (light) control CSS.
+     Not yet used by the renderer as of this commit — the page still renders
+     the old SVG map; this commit only loads the library. -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.css"
+      integrity="sha512-KIMsMWIdnoG9OwZa+oaIafmbDonqck1UCmq+/zcUi2aaZ97N9QE6TqpTM+n36EO40HGh64hU/375zxtjx7WTyQ==" crossorigin="anonymous">
 <style>
   :root {
     --ground: #F5F7F8;
@@ -524,6 +533,29 @@
   .viz h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.005em; }
   .viz .viznote { margin: 3px 0 12px; font-size: 12.5px; color: var(--ink-3); }
   .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+  /* ---------- map dock layout (left filter rail / map / right legend+detail rail) ---------- */
+  .map-dock { display: grid; grid-template-columns: 220px minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  .map-dock-center { min-width: 0; }   /* lets the grid track shrink below the map's content size */
+  .map-dock-rail {
+    background: var(--surface-2); border: 1px solid var(--map-border); border-radius: 10px;
+    padding: 12px 14px; max-height: 480px; overflow-y: auto;
+  }
+  /* `display` on .map-dock-rail is an author rule and so outranks the browser's
+     [hidden] { display: none } — same trap .map-empty already carries a fix for. */
+  .map-dock-rail[hidden] { display: none; }
+  .dock-section { margin-bottom: 18px; }
+  .dock-section:last-child { margin-bottom: 0; }
+  /* Direct child only — .res-panel-head's own <h3> (the panel title) sits two
+     levels deeper inside .dock-detail and must not pick up this label style. */
+  .dock-section > h3 {
+    margin: 0 0 8px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--ink-3);
+  }
+  @media (max-width: 760px) {
+    .map-dock { grid-template-columns: 1fr; }
+    .map-dock-rail { max-height: none; }
+  }
   .tab {
     background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
     padding: 5px 14px; font: inherit; font-size: 13px; font-weight: 650; color: var(--ink-2); cursor: pointer;
@@ -531,30 +563,51 @@
   .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  .mapwrap { position: relative; overflow-x: auto; }
-  .mapwrap svg { display: block; width: 100%; min-width: 640px; height: auto; background: var(--surface-2); border-radius: 10px; }
-  .mapwrap path { fill: var(--map-nodata); stroke: var(--map-border); stroke-width: .75; cursor: help; }
-  /* One hue per stage, 60 deg apart, each clearing 3:1 against the no-data fill
-     and the ocean, and all three clear of the status ramp (green / amber / red)
-     so a colour never reads as good-or-bad. Lightness still descends across the
-     three, so the order survives greyscale and print. */
-  .mapwrap path.lvl-registered { fill: var(--map-registered); }
-  .mapwrap path.lvl-guidelines { fill: var(--map-guidelines); }
-  .mapwrap path.lvl-mft { fill: var(--map-mft); }
-  /* a country with data is outlined in the no-data ground, so neighbours at the
-     same level stay separable */
-  .mapwrap path.haslvl { stroke: var(--map-nodata); stroke-width: .7; }
-  /* Chrome's default focus ring is an `outline`, and an outline on an SVG path is
-     drawn around its BOUNDING BOX — a meaningless rectangle over an irregular
-     country, in the browser's blue rather than ours. Indicate the shape itself,
-     from the map's own tokens. */
-  .mapwrap path:focus { outline: none; }
-  .mapwrap path:focus-visible {
-    outline: none;
-    stroke: var(--map-nodata); stroke-width: 2.6; stroke-linejoin: round;
-    /* the ring itself is the no-data ground, which in light theme matches the
-       no-data countries next door — so the accent halo defines the outer edge */
-    filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 1.5px var(--accent));
+  .mapwrap { position: relative; }
+  /* MapLibre's canvas has no viewBox/height:auto equivalent — an explicit
+     aspect-ratio keeps the same responsive width-drives-height behaviour the
+     old SVG had (960x420, the fitted lon/lat window build-map-geo.js shares
+     with build-map.js). */
+  #mapwrap-gl { width: 100%; min-height: 320px; aspect-ratio: 960 / 420; background: var(--surface-2); border-radius: 10px; }
+  #mapwrap-gl .maplibregl-canvas { border-radius: 10px; }
+  /* Rotation/pitch are locked off in the map's own options (DEV-13 D19) — the
+     choropleth has always read north-up and fixed, and nothing asked for that
+     to change. */
+  .maplibregl-ctrl-group { background: var(--surface); border: 1px solid var(--map-border); box-shadow: none; }
+  .maplibregl-ctrl-group button + button { border-top: 1px solid var(--map-border); }
+  /* MapLibre's stock zoom-icon SVGs are dark-on-transparent; dark theme needs
+     them inverted the same way the rest of this page swaps its own tokens. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .maplibregl-ctrl-icon { filter: invert(1) brightness(1.5); }
+  }
+  :root[data-theme="dark"] .maplibregl-ctrl-icon { filter: invert(1) brightness(1.5); }
+  .maplibregl-ctrl-attrib, .maplibregl-ctrl-bottom-right .maplibregl-ctrl { display: none; }
+  /* Custom zoom-level readout beside MapLibre's own NavigationControl — the
+     control draws +/- buttons but no "2.6x" readout, which D13's affordance
+     line and aria-live behaviour depended on. */
+  .map-zoom-lvl {
+    position: absolute; top: 8px; right: 46px; z-index: 2; font-size: 11.5px;
+    font-variant-numeric: tabular-nums; color: var(--ink-3); background: var(--surface);
+    border: 1px solid var(--map-border); border-radius: 6px; padding: 4px 8px; line-height: 1;
+  }
+  /* Countries have no per-feature DOM node on a canvas map to tab through
+     (DEV-13 D21) — this list is the keyboard/screen-reader equivalent of the
+     old focusable <path> elements: visually hidden until one of its buttons
+     is focused, at which point it reads and behaves exactly like the old
+     per-country tooltip-on-focus did. The list itself must NOT clip — only
+     each button hides itself (the standard visually-hidden-until-focus
+     pattern); a clipped ancestor would cut off a focused button trying to
+     reveal itself, defeating the point. */
+  .map-country-list { position: absolute; top: 0; left: 0; z-index: 3; margin: 0; padding: 0; list-style: none; }
+  .map-country-list button {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);
+    margin: -1px; white-space: nowrap;
+    font: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+  }
+  .map-country-list button:focus-visible {
+    position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal;
+    display: block; margin: 2px 4px; padding: 4px 8px; background: var(--surface); color: var(--ink);
+    border: 1px solid var(--accent); border-radius: 6px; outline: 2px solid var(--accent); outline-offset: 2px;
   }
   .map-overlay {
     margin-top: 10px; background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn);
@@ -579,6 +632,124 @@
   .mapsw.none { background: var(--map-nodata); }
   .map-legend .ct { font-variant-numeric: tabular-nums; font-weight: 650; color: var(--ink); }
   .map-legend .ct.zero { color: var(--ink-3); font-weight: 400; }
+  /* Resistance overlay — a second, independent dimension over the same
+     geography. Band fills mirror the WHO Malaria Threat Map bands and are
+     fixed; the halo stroke picks up the basemap colour so dots stay legible
+     against both the light and dark map. */
+  /* The dock-section's own <h3> already shows "Study result" visually — the
+     <fieldset><legend> stays for its native a11y grouping, just visually
+     hidden rather than doubled. */
+  .res-layer { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .res-layer legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .res-layer label {
+    display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px;
+    cursor: pointer; font-size: 12.5px; color: var(--ink-2);
+  }
+  .res-layer label:has(input:checked) { background: var(--surface); color: var(--ink); font-weight: 650; }
+  .res-layer label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .res-layer label.res-soon { cursor: default; align-items: flex-start; opacity: .6; }
+  .res-soon-body { display: flex; flex-direction: column; gap: 2px; }
+  .res-soon-tag {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--ink-3);
+  }
+  .res-pick { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--ink-2); margin-bottom: 10px; }
+  .res-pick:last-child { margin-bottom: 0; }
+  .res-pick select { font: inherit; padding: 5px 6px; width: 100%; }
+  .res-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-top: 8px; font-size: 12.5px; color: var(--ink-2); }
+  .res-legend .res-t { font-weight: 650; color: var(--ink); }
+  .res-legend .resdot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; margin-right: 5px; vertical-align: -1px; }
+  /* The "no country access yet" message is centred over the map only while the
+     map really is empty. Once the resistance overlay draws dots the map is no
+     longer blank, so the message drops to a line beneath it rather than sitting
+     on top of the data (and asserting something that is no longer true).
+     Deliberately does not set `display`, so .map-empty[hidden] still wins. */
+  .map-empty.demoted { position: static; inset: auto; justify-content: flex-start;
+                       text-align: left; padding: 8px 2px 0; }
+  /* click-through panel: every study behind a country dot. Lives below the map
+     so it can hold Myanmar's 108 rows without covering anything. */
+  .res-panel { margin-top: 12px; border: 1px solid var(--map-border); border-radius: 10px; background: var(--surface-2); }
+  .res-panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 10px 12px 6px; }
+  .res-panel-head h3 { margin: 0; font-size: 13.5px; }
+  .res-close { font: inherit; font-size: 12px; background: none; border: 1px solid var(--map-border);
+               border-radius: 6px; padding: 2px 10px; cursor: pointer; color: var(--ink-2); }
+  /* D25 — a quick visual comparison above the exact, sortable, sourced table
+     below it; never a replacement for it. Fixed 0-100% domain (not rescaled
+     to the current click's own max) so a bar's length means the same thing
+     on every panel a reader opens; the printed value at the tip and the
+     existing b1-b4 band colour (identical swatches to the map/legend) carry
+     the precision a self-scaling bar can't. */
+  .res-panel-chart { padding: 8px 12px 2px; border-bottom: 1px solid var(--map-border); }
+  .chart-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .chart-label { width: 100px; flex: none; font-size: 11.5px; color: var(--ink-2);
+                  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chart-track { flex: 1; height: 16px; background: var(--surface); border-radius: 3px; }
+  /* Rounded at the data end (away from the 0% baseline), square at the
+     baseline itself, per the mark spec — never a full pill. */
+  .chart-bar { height: 100%; border-radius: 0 4px 4px 0; cursor: help; }
+  .chart-value { width: 32px; flex: none; text-align: right; font-size: 11.5px;
+                  font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .chart-bar:focus { outline: none; }
+  .chart-bar:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .res-panel-scroll { max-height: 340px; overflow: auto; padding: 0 12px 12px; }
+  /* A cluster can carry dozens of rows across 6 columns (Myanmar's history
+     runs past 100) — min-width keeps every column legible and lets
+     .res-panel-scroll's own overflow:auto scroll it horizontally inside the
+     dock's right rail, rather than squeezing columns unreadably thin. */
+  .res-table { width: 100%; min-width: 460px; border-collapse: collapse; font-size: 12px; }
+  .res-table th, .res-table td { text-align: left; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--map-border); vertical-align: top; }
+  .res-table th { position: sticky; top: 0; background: var(--surface-2); font-weight: 650; cursor: pointer; white-space: nowrap; }
+  .res-table th[aria-sort="ascending"]::after { content: " \2191"; }
+  .res-table th[aria-sort="descending"]::after { content: " \2193"; }
+  .res-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .res-table tr.small td { opacity: .65; }
+  .res-table .yr { font-variant-numeric: tabular-nums; }
+  /* Three scopes, three blocks, following the WHO threat map's split: the rule
+     sits with the legend it explains, the summary counts the whole selection,
+     and provenance stands on its own. Mixing them in one paragraph is what made
+     the tooltip's and the panel's counts look like they disagreed. */
+  .res-rule { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 4px 0 0; max-width: 92ch; }
+  .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 6px 0 0; max-width: 92ch; }
+  .resdot.b1, .chart-bar.b1 { background: #FDCFA6; }
+  .resdot.b2, .chart-bar.b2 { background: #FB9A50; }
+  .resdot.b3, .chart-bar.b3 { background: #EF5F13; }
+  .resdot.b4, .chart-bar.b4 { background: #C21807; }
+  /* Marks are MapLibre DOM Markers now (DEV-13 D20), not SVG circles — a real
+     <div role="button">, sized constant on screen at every zoom (no
+     counter-scaling needed: a DOM element never inherits the map's own zoom
+     transform the way an SVG child of a scaled viewBox did). */
+  .res-dot {
+    width: 20px; height: 20px; border-radius: 50%; box-sizing: border-box;
+    border: 1px solid var(--map-nodata, #FFFFFF); cursor: help;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 11px; font-family: inherit; color: #1A0A00;
+    background: #FDCFA6; /* b1 default; band class below overrides */
+  }
+  .res-dot.b1 { background: #FDCFA6; }
+  .res-dot.b2 { background: #FB9A50; }
+  .res-dot.b3 { background: #EF5F13; }
+  .res-dot.b4 { background: #C21807; color: #FFFFFF; }
+  /* A cluster stands for several sites, so it must not read as one. It is
+     larger, carries its member count, and takes a heavier halo so the
+     difference survives at a glance and in greyscale. */
+  .res-dot.res-cluster { width: 34px; height: 34px; border-width: 2px; cursor: pointer; }
+  .map-hint { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 6px 0 0; }
+  /* A CSS `outline` on a round element still draws around its rectangular
+     border box — the same bounding-box problem the country paths solved with
+     a filter/box-shadow instead of `outline`. box-shadow respects
+     border-radius, so the ring stays circular. */
+  .res-dot:focus { outline: none; }
+  .res-dot:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
+  /* The dot whose study panel is open, so the map says which one you are
+     reading below. A ring drawn OUTSIDE the dot rather than a recolour of its
+     own border: that border is --map-nodata, which in dark theme holds the
+     same value as --ink, so recolouring it made a selected dot indistinguishable
+     from an unselected one there. --accent is saturated in both themes and
+     reads on every fill this basemap uses — white, teal, blue, purple and dark
+     ocean. */
+  .res-dot.is-selected { box-shadow: 0 0 0 3px var(--accent); }
+  .res-dot.is-selected:focus-visible { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent), 0 0 0 3px var(--accent); }
 
   .timing-axis { position: relative; height: 18px; margin-left: 150px; }
   .timing-axis span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -686,14 +857,69 @@
   <section class="viz" id="mapsec" hidden>
     <h2>Country access map</h2>
     <p class="viznote" id="mapnote">Each country is shaded by the furthest stage it has reached — a country counted in MFT plans is registered too. Counts are of the countries drawn on this map.</p>
-    <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
-    <div class="mapwrap" id="mapwrap"></div>
-    <div class="map-overlay" id="map-overlay" hidden></div>
-    <div class="map-legend">
-      <span class="key"><span class="mapsw registered"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
-      <span class="key"><span class="mapsw guidelines"></span> In national guidelines <span class="ct" id="mapct-guidelines">–</span></span>
-      <span class="key"><span class="mapsw mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
-      <span class="key"><span class="mapsw none"></span> No data <span class="ct" id="mapct-none">–</span></span>
+    <div class="map-dock">
+      <aside class="map-dock-rail map-dock-left">
+        <div class="dock-section">
+          <h3>Drug</h3>
+          <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
+        </div>
+        <div id="res-controls" hidden>
+          <div class="dock-section">
+            <h3>Study result</h3>
+            <fieldset class="res-layer">
+              <legend>Study result</legend>
+              <label><input type="radio" name="reslayer" value="off" checked> Off</label>
+              <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
+              <label class="res-soon"><input type="radio" name="reslayer" value="delayedClearance" disabled>
+                <span class="res-soon-body"><span>Delayed parasite clearance</span><span class="res-soon-tag">Not yet available</span></span></label>
+              <label class="res-soon"><input type="radio" name="reslayer" value="molecularMarkers" disabled>
+                <span class="res-soon-body"><span>Molecular markers of drug resistance</span><span class="res-soon-tag">Not yet available</span></span></label>
+            </fieldset>
+          </div>
+          <div class="dock-section">
+            <h3>Species</h3>
+            <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
+          </div>
+        </div>
+      </aside>
+
+      <div class="map-dock-center">
+        <div class="mapwrap" id="mapwrap"></div>
+        <p class="map-hint" id="map-hint">Drag to pan · Ctrl + scroll or double-click to zoom · arrow keys pan when the map has focus</p>
+        <div class="map-overlay" id="map-overlay" hidden></div>
+      </div>
+
+      <aside class="map-dock-rail map-dock-right">
+        <div class="dock-section">
+          <h3>Legend</h3>
+          <div class="map-legend">
+            <span class="key"><span class="mapsw registered"></span> Registered <span class="ct" id="mapct-registered">–</span></span>
+            <span class="key"><span class="mapsw guidelines"></span> In national guidelines <span class="ct" id="mapct-guidelines">–</span></span>
+            <span class="key"><span class="mapsw mft"></span> In MFT plans <span class="ct" id="mapct-mft">–</span></span>
+            <span class="key"><span class="mapsw none"></span> No data <span class="ct" id="mapct-none">–</span></span>
+          </div>
+          <div class="res-legend" id="res-legend" hidden>
+            <span class="res-t">Treatment failure</span>
+            <span class="key"><span class="resdot b1"></span>&lt; 5%</span>
+            <span class="key"><span class="resdot b2"></span>5–10%</span>
+            <span class="key"><span class="resdot b3"></span>10–20%</span>
+            <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
+          </div>
+          <p class="res-rule" id="res-rule" hidden></p>
+        </div>
+        <div class="dock-section dock-detail">
+          <h3>Detail</h3>
+          <p class="res-note" id="res-note" hidden></p>
+          <div class="res-panel" id="res-panel" hidden>
+            <div class="res-panel-head">
+              <h3 id="res-panel-title"></h3>
+              <button type="button" class="res-close" id="res-close" aria-label="Close study list">Close</button>
+            </div>
+            <div class="res-panel-chart" id="res-panel-chart" hidden></div>
+            <div class="res-panel-scroll"><table class="res-table" id="res-table"></table></div>
+          </div>
+        </div>
+      </aside>
     </div>
   </section>
 
@@ -771,7 +997,12 @@
 
 <script src="data/products.js"></script>
 <script src="data/world-map.js"></script>
+<script src="data/world-map-geo.js"></script>
+<script src="data/resistance.js"></script>
 <script src="assets/journey-icons/icons.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.js"
+        integrity="sha512-hoXlvOdSmh58mppUyZHZsscHkR/yXl6zLpTMTNwA6IZ61DpeaCNjosRu1WJ2DeIpkfW5MsJJ9H89zjV4IBGqRw=="
+        crossorigin="anonymous"></script>
 <script>
 (function () {
   const board = document.getElementById("board");
@@ -1410,21 +1641,208 @@
   // ---- country access map ----
   const LEVEL_LABEL = { registered: "Registered", guidelines: "In national guidelines",
                         mft: "In MFT plans", none: "No data" };
-  if (window.LAUNCH_MAP) {
+  if (window.LAUNCH_MAP && window.LAUNCH_MAP_GEO && window.maplibregl) {
     const mapsec = document.getElementById("mapsec");
     mapsec.hidden = false;
     const wrap = document.getElementById("mapwrap");
+    // LAUNCH_MAP (94 countries, data/world-map.js) stays the single source of
+    // truth for "which countries count as drawn" — sitesFor's filter,
+    // drawnCount, curUndrawn, the legend counts and the validator's
+    // undrawn-country warning all read it, unchanged by this migration
+    // (DEV-13 D17). LAUNCH_MAP_GEO (100 countries, 50m, this page only)
+    // supplies geometry for the MapLibre fill/line layer — a strict superset,
+    // so nothing that used to be undrawn becomes wrongly paintable.
     const M = window.LAUNCH_MAP;
-    const paths = Object.entries(M.countries).map(([iso3, c]) =>
-      `<path data-iso3="${iso3}" data-name="${esc(c.n)}" d="${c.d}"></path>`).join("");
-    wrap.innerHTML = `<svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="World map of country access">${paths}</svg>
-      <div class="map-empty" id="map-empty" hidden></div>`;
+    const GEO = window.LAUNCH_MAP_GEO;
+
+    wrap.innerHTML = `<div id="mapwrap-gl"></div>
+      <div class="map-empty" id="map-empty" hidden></div>
+      <span class="map-zoom-lvl" id="mz-lvl" aria-live="polite" hidden></span>
+      <ul class="map-country-list" id="map-country-list" aria-label="Countries on this map, list form"></ul>`;
+
+    // ---- MapLibre init (DEV-13 D18/D19 — supersedes D13) -------------------
+    // D13 rejected any mapping library ("the first runtime dependency on a
+    // page that has none"). Overridden here, deliberately, for this page
+    // only: see dev-13-resistance-handover.md D18 for the full reasoning.
+    // Everything downstream of this block — sitesFor, pooled, the click-through
+    // panel, the tooltip grammar — is untouched; only the rendering/pan/zoom
+    // substrate changes.
+    const LON0 = -120, LON1 = 155, LAT0 = -40, LAT1 = 42;   // same window build-map-geo.js fits to
+    // ZMAX is a LINEAR multiplier (D13's original meaning: "16x magnified").
+    // MapLibre's own zoom is exponential (each +1 level doubles the scale),
+    // so the map option below must be log2(ZMAX), not ZMAX itself — passing
+    // 16 there means a 2^16 = 65536x cap, not 16x (D26: found via the
+    // mzLvl readout showing "65536×" and the map collapsing to a single flat
+    // colour at that zoom; D13's basemap-detail reasoning was never wrong,
+    // it just never reached the map option it was meant to bound).
+    const ZMAX = 16;   // D13's basemap-detail reasoning still applies, now against a sharper 50m basemap
+    const DOT_R = 10, CLUSTER_R = 17, MARK_GAP = 2;         // CSS px — matches .res-dot/.res-cluster sizes
+    const CPASS = 20;    // clustering convergence bound, unchanged from D15
+
+    let curSites = null, curMarks = [], curDrug = "", curSpecies = "";
+    let curUndrawn = 0;
+    // The drug bound to the currently selected product (PRODUCT_DRUG), or
+    // null when that product has no WHO resistance data of its own (D24).
+    let curBoundDrug = null;
+    // the site keys behind the open study panel, so the map can say which dot
+    // the panel belongs to — and keep saying it after a zoom rebuilds the marks
+    let selKeys = null;
+    let drawnZoom = null;   // the zoom level marks were last built at (D20's
+                             // equivalent of D13's drawnK) — rebuilt on zoomend
+                             // only, never on pan
+
+    const TOKEN = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    let mapColors = {};
+    function readMapColors() {
+      mapColors = {
+        registered: TOKEN("--map-registered") || TOKEN("--map1"),
+        guidelines: TOKEN("--map-guidelines") || TOKEN("--map2"),
+        mft: TOKEN("--map-mft") || TOKEN("--map3"),
+        nodata: TOKEN("--map-nodata"),
+        border: TOKEN("--map-border"),
+        surface2: TOKEN("--surface-2"),
+      };
+    }
+    readMapColors();
+
+    const map = new maplibregl.Map({
+      container: "mapwrap-gl",
+      style: {
+        version: 8,
+        sources: { world: { type: "geojson", data: GEO, promoteId: "iso3" } },
+        layers: [
+          { id: "bg", type: "background", paint: { "background-color": mapColors.surface2 } },
+          { id: "country-fill", type: "fill", source: "world", paint: { "fill-color": mapColors.nodata } },
+          { id: "country-line", type: "line", source: "world", paint: { "line-color": mapColors.border, "line-width": .75 } },
+        ],
+      },
+      center: [(LON0 + LON1) / 2, (LAT0 + LAT1) / 2], zoom: 0,
+      minZoom: 0, maxZoom: Math.log2(ZMAX),   // ZMAX is linear (D13); MapLibre zoom is log2 (D26)
+      maxBounds: [[LON0 - 20, LAT0 - 15], [LON1 + 20, LAT1 + 15]],
+      // Locked to 2D, north-up — the SVG map this replaces never rotated or
+      // tilted, and nothing asked for that to change (DEV-13 D19). MapLibre's
+      // default keyboard handler binds Shift+arrow to rotate/pitch, which
+      // dragRotate:false does NOT itself disable — keyboard:false turns off
+      // its whole built-in scheme (arrows, +/-, shift+arrows) so a hand-rolled
+      // pan-only listener below can't be bypassed by it.
+      dragRotate: false, pitchWithRotate: false, touchPitch: false, keyboard: false,
+      // Native replacement for D13's hand-rolled "ctrl+wheel only" rule — the
+      // single most complained-about behaviour in embedded maps.
+      cooperativeGestures: true,
+      attributionControl: false,
+    });
+    map.getCanvas().setAttribute("aria-label", "World map, pan and zoom with the mouse or arrow keys");
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+
+    // Keyboard parity for pan (D13's arrow-key affordance) — MapLibre's own
+    // keyboard handler is off (see above), so arrows are hand-wired to a
+    // plain pan with no rotate/pitch/zoom path at all.
+    map.getCanvas().tabIndex = 0;
+    map.getCanvas().addEventListener("keydown", (ev) => {
+      const step = 80;
+      if (ev.key === "ArrowLeft") map.panBy([-step, 0]);
+      else if (ev.key === "ArrowRight") map.panBy([step, 0]);
+      else if (ev.key === "ArrowUp") map.panBy([0, -step]);
+      else if (ev.key === "ArrowDown") map.panBy([0, step]);
+      else return;
+      ev.preventDefault();
+    });
+
+    const mzLvl = document.getElementById("mz-lvl");
+    map.on("zoom", () => {
+      const z = map.getZoom();
+      mzLvl.hidden = z <= 0.05;
+      mzLvl.textContent = z > 0.05 ? Math.pow(2, z).toFixed(1).replace(/\.0$/, "") + "×" : "";
+    });
+
+    function paintCountries() {
+      map.setPaintProperty("country-fill", "fill-color", [
+        "case",
+        ["==", ["feature-state", "level"], "registered"], mapColors.registered,
+        ["==", ["feature-state", "level"], "guidelines"], mapColors.guidelines,
+        ["==", ["feature-state", "level"], "mft"], mapColors.mft,
+        mapColors.nodata,
+      ]);
+    }
+
+    // Theme change repaints only the two canvas layers — band colours are not
+    // theme-varying (see the CSS) and marker DOM elements resolve CSS live, so
+    // nothing about the resistance layer needs a JS-driven refresh here.
+    function repaintTheme() {
+      readMapColors();
+      if (!map.isStyleLoaded()) return;
+      map.setPaintProperty("bg", "background-color", mapColors.surface2);
+      map.setPaintProperty("country-line", "line-color", mapColors.border);
+      paintCountries();
+    }
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaintTheme);
+    // Defensive: no script on this page sets [data-theme] today, but the CSS
+    // carries a dark override for it (matching every other page's tokens) —
+    // cheap insurance against a future toggle silently going unrefreshed.
+    new MutationObserver(repaintTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+    // ---- keyboard-accessible country list (DEV-13 D21) ---------------------
+    // A canvas has no per-feature DOM node to tab through — this list is the
+    // equivalent of the old focusable <path> elements: visually hidden until
+    // one of its buttons is focused, wired to the same tooltip countries have
+    // always shown on hover/focus. Built once from the full 100-country
+    // GEO set (matching what's actually visible on the map, not the narrower
+    // 94-country LAUNCH_MAP that only gates which ones carry data — D17);
+    // selectMap() updates each button's level/label in place, exactly as it
+    // used to update each <path>'s class/dataset.
+    const LEVEL_ORDER = ["registered", "guidelines", "mft"];
+    const countryTip = el => {
+      const rank = LEVEL_ORDER.indexOf(el.dataset.lvl);
+      const foot = mapProduct
+        ? `<div class="tprod">${esc(mapProduct)}${mapStatus ? " · " + esc(mapStatus) + " data" : ""}</div>`
+        : "";
+      const rows = rank < 0
+        ? `<div class="tlvl"><span class="tmark">–</span><span class="mapsw none"></span>${LEVEL_LABEL.none}</div>`
+        : LEVEL_ORDER.map((k, i) => {
+            const on = i <= rank;
+            return `<div class="tlvl${on ? "" : " off"}"><span class="tmark">${on ? "✓" : "·"}</span>` +
+              `<span class="mapsw ${k}"></span>${LEVEL_LABEL[k]}</div>`;
+          }).join("");
+      return `<b>${esc(el.dataset.name)}</b>${rows}${foot}`;
+    };
+    const countryListEl = document.getElementById("map-country-list");
+    countryListEl.innerHTML = GEO.features.map((f) =>
+      `<li><button type="button" data-iso3="${esc(f.properties.iso3)}" data-name="${esc(f.properties.name)}" data-lvl="">` +
+      `${esc(f.properties.name)} — <span class="lvl-label">${LEVEL_LABEL.none}</span></button></li>`
+    ).join("");
+    const countryListEls = {};
+    countryListEl.querySelectorAll("button").forEach((btn) => {
+      countryListEls[btn.dataset.iso3] = btn;
+      const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, countryTip(btn));
+      btn.addEventListener("mouseenter", track);
+      btn.addEventListener("mousemove", track);
+      btn.addEventListener("focus", () => showTipAt(btn, countryTip(btn)));   // keyboard: no cursor
+      btn.addEventListener("mouseleave", hideTip);
+      btn.addEventListener("blur", hideTip);
+    });
+
+    // Paints the MapLibre fill layer and updates the country list in one
+    // pass. Only LAUNCH_MAP's 94 ever carry a level (D17) — the other 6
+    // GEO-only countries (COM, CPV, MUS, SGP, STP, SYC; see D17) render as
+    // plain no-data shapes and list entries, same as any other country with
+    // nothing behind it.
+    function applyCountryLevels(byIso) {
+      GEO.features.forEach((f) => {
+        const iso3 = f.properties.iso3;
+        const lvl = (iso3 in M.countries) ? (byIso[iso3] || null) : null;
+        map.setFeatureState({ source: "world", id: iso3 }, { level: lvl });
+        const btn = countryListEls[iso3];
+        if (btn) {
+          btn.dataset.lvl = lvl || "";
+          btn.querySelector(".lvl-label").textContent = LEVEL_LABEL[lvl] || LEVEL_LABEL.none;
+        }
+      });
+    }
 
     let mapProduct = "", mapStatus = "";
     const tabs = document.getElementById("maptabs");
     tabs.innerHTML = tracked.map((p, i) =>
       `<button class="tab" role="tab" data-id="${esc(p.id)}" aria-selected="false">${esc(p.name)}</button>`).join("");
-
     function selectMap(id) {
       const p = tracked.find(x => x.id === id);
       mapProduct = p.name;
@@ -1447,19 +1865,9 @@
         none.textContent = tot - withData;
         none.classList.toggle("zero", withData === tot);
       }
-      wrap.querySelectorAll("path").forEach(el => {
-        const lvl = byIso[el.dataset.iso3];
-        el.setAttribute("class", lvl ? "lvl-" + lvl + " haslvl" : "");
-        if (lvl) {
-          el.setAttribute("tabindex", "0");
-        } else {
-          el.removeAttribute("tabindex");
-          // switching medicine can take a country's data away; a focus ring left
-          // on a now-unfocusable "No data" country is what you saw around China
-          if (document.activeElement === el) { el.blur(); wrap.focus?.(); }
-        }
-        el.dataset.lvl = lvl || "";
-      });
+      // Paints the MapLibre fill layer via feature-state — the direct
+      // replacement for the old per-<path> class/dataset loop (D19).
+      applyCountryLevels(byIso);
       const overlay = document.getElementById("map-overlay");
       const empty = document.getElementById("map-empty");
       if (!p.detail.countries) {
@@ -1474,40 +1882,657 @@
         overlay.hidden = c.status === "verified";
         overlay.textContent = (c.status === "illustrative" ? "ILLUSTRATIVE — " : "DRAFT, NOT YET VERIFIED — ") + c.note;
       }
+      bindDrug(id);
     }
-    tabs.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => selectMap(t.dataset.id)));
-    // default to the first product that has country data
-    selectMap((tracked.find(p => p.detail.countries) || tracked[0]).id);
 
-    // Every country reports its stage on hover — including "No data", which is a
-    // finding in its own right. Large countries would put a bbox-centred tooltip
-    // a long way from the cursor, so the map tracks the pointer instead.
-    // Levels are cumulative — a country in MFT plans is registered and in national
-    // guidelines too — so the tooltip lists all three and ticks up to the furthest
-    // reached, rather than naming one stage and leaving the rest to inference.
-    const LEVEL_ORDER = ["registered", "guidelines", "mft"];
-    const countryTip = el => {
-      const rank = LEVEL_ORDER.indexOf(el.dataset.lvl);
-      const foot = mapProduct
-        ? `<div class="tprod">${esc(mapProduct)}${mapStatus ? " · " + esc(mapStatus) + " data" : ""}</div>`
-        : "";
-      const rows = rank < 0
-        ? `<div class="tlvl"><span class="tmark">–</span><span class="mapsw none"></span>${LEVEL_LABEL.none}</div>`
-        : LEVEL_ORDER.map((k, i) => {
-            const on = i <= rank;
-            return `<div class="tlvl${on ? "" : " off"}"><span class="tmark">${on ? "✓" : "·"}</span>` +
-              `<span class="mapsw ${k}"></span>${LEVEL_LABEL[k]}</div>`;
-          }).join("");
-      return `<b>${esc(el.dataset.name)}</b>${rows}${foot}`;
+    // ---- resistance overlay (WHO Malaria Threat Maps) ----------------------
+    // A second, independent dimension over the same geography: the fill
+    // describes the PRODUCT's access, these dots describe the PARASITE. They
+    // ride different visual channels, and each keeps its own provenance — the
+    // access layer is illustrative for most countries, while these are
+    // published WHO study results. The two readings are deliberately NOT
+    // merged on the page until the country survey is verified.
+    const RES = window.LAUNCH_RESISTANCE;
+    // Positioning is now MapLibre's job (DEV-13 D20) — mark() outputs a plain
+    // lon/lat centroid and the map projects it. LON0/LAT0 etc. (declared
+    // above, alongside the MapLibre init) still fix the same fitted window
+    // build-map-geo.js used, now for maxBounds instead of a hand-rolled
+    // equirectangular transform.
+    const BANDS = [{ lt: 5, cls: "b1" }, { lt: 10, cls: "b2" }, { lt: 20, cls: "b3" }, { lt: Infinity, cls: "b4" }];
+    const bandOf = (v) => (BANDS.find((b) => v < b.lt) || BANDS[3]).cls;
+    const PRODUCT_DRUG = { pyramax: "Artesunate-pyronaridine", dhappq: "Dihydroartemisinin-piperaquine" };
+    const FALLBACK_SPECIES = "P. falciparum";
+    const LAYER = "treatmentFailure";
+
+    // studies are stored as rows against RES.fields, with the repetitive
+    // columns (drug, species, country, source, citation) held as indices into
+    // RES.dict — decoded only for the rows a panel actually shows
+    const AT = {};
+    if (RES) RES.fields.forEach((f, i) => { AT[f] = i; });
+    const codeOf = (field, value) => RES.dict[field].indexOf(value);
+    const decode = (row) => {
+      const o = {};
+      RES.fields.forEach((f, i) => { o[f] = RES.coded.indexOf(f) >= 0 ? RES.dict[f][row[i]] : row[i]; });
+      return o;
     };
-    wrap.querySelectorAll("path").forEach(el => {
-      const track = e => showTipAtPoint(e.clientX, e.clientY, countryTip(el));
-      el.addEventListener("mouseenter", track);
-      el.addEventListener("mousemove", track);
-      el.addEventListener("focus", () => showTipAt(el, countryTip(el)));  // keyboard: no cursor
-      el.addEventListener("mouseleave", hideTip);
-      el.addEventListener("blur", hideTip);
+
+    const cellsFor = (drug, species) => ((RES[LAYER] || {})[drug] || {})[species] || {};
+
+    // ---- site-level marks (V2) --------------------------------------------
+    // WHO's unit is the study SITE, not the country: their status reports count
+    // studies against the 10% threshold rather than consolidating a country into
+    // one number (D12). V2 draws that unit. The sites are derived here from
+    // studies[], which already ships all 1,633 of them — so no new WHO extract,
+    // no normalizer change, and data/resistance.js is byte-identical to V1.
+    // `treatmentFailure` still backs the drug and species COUNTS; as of V2 it no
+    // longer positions or colours anything.
+    const siteKey = (r) => r[AT.iso3] + "|" + r[AT.site] + "|" + r[AT.lat] + "|" + r[AT.lon];
+
+    // WHO's decision quantity is a POOLED PROPORTION — failures over patients,
+    // never a mean of percentages and never a worst case (D12). Given only the
+    // percentage and its denominator, the patient-weighted mean IS that
+    // proportion; verified across all 274 V1 cells to within 0.005 pp.
+    function pooled(rows, val, num) {
+      let w = 0, vw = 0;
+      rows.forEach((r) => { const n = num(r) || 0; w += n; vw += val(r) * n; });
+      if (w > 0) return { v: +(vw / w).toFixed(2), n: w };
+      // defensive only: the extract carries a patient count on every study
+      return { v: +(rows.reduce((a, r) => a + val(r), 0) / rows.length).toFixed(2), n: 0 };
+    }
+
+    // One entry per site that studied this drug against this species. A site's
+    // value is its MOST RECENT year — "the most recent data in a site", as WHO's
+    // threat map puts it. That is the whole reason V2 needs no country
+    // aggregation rule where V1 did.
+    function sitesFor(drug, species) {
+      const di = codeOf("drug", drug), si = codeOf("species", species);
+      const by = {};
+      for (const r of RES.studies) {
+        if (r[AT.drug] !== di || r[AT.species] !== si) continue;
+        if (!(r[AT.iso3] in M.countries)) continue;      // basemap does not draw it
+        const k = siteKey(r);
+        (by[k] = by[k] || []).push(r);
+      }
+      return Object.keys(by).map((k) => {
+        const rows = by[k], first = rows[0];
+        const latest = Math.max.apply(null, rows.map((r) => r[AT.year]));
+        const cur = rows.filter((r) => r[AT.year] === latest);
+        const p = pooled(cur, (r) => r[AT.v], (r) => r[AT.n]);   // 24 sites need this
+        const older = rows.filter((r) => r[AT.year] !== latest);
+        const years = rows.map((r) => r[AT.year]);
+        return {
+          key: k, iso3: first[AT.iso3], site: first[AT.site], region: first[AT.region],
+          lat: first[AT.lat], lon: first[AT.lon],
+          v: p.v, n: p.n, year: latest, thisYear: cur.length, studies: rows.length,
+          from: Math.min.apply(null, years), to: Math.max.apply(null, years),
+          // the one thing a single dot cannot say for itself: this site has read
+          // worse before. 74 sites have changed colour band over their history.
+          peak: older.length
+            ? older.reduce((a, r) => (r[AT.v] > a[AT.v] ? r : a))
+            : null
+        };
+      });
+    }
+
+    // Sites collide. At 1x, 300 of the 376 Artemether-lumefantrine sites sit
+    // within a dot's width of another — so "one dot per site" is only honest
+    // if colliding sites visibly merge. Clusters are recomputed whenever the
+    // zoom changes and never on pan: what overlaps depends on the current
+    // zoom alone.
+    //
+    // A cluster never crosses a border. That is not cartography, it is the rest
+    // of the page: the fill layer, D11's tooltip grammar and the study panel are
+    // all country-scoped, and a mark spanning Kenya and Tanzania could not be
+    // labelled in any of them. At 1x a country's sites collapse to one mark, so
+    // the world view still reads as a country map.
+    // The separation two marks need is the sum of THEIR OWN radii plus a gap —
+    // not one fixed distance. A cluster is drawn much larger than a site dot,
+    // so a single threshold calibrated on site dots lets adjacent clusters
+    // pass the test and still overlap on screen (measured before this was
+    // fixed, under the old SVG renderer: 71 overlapping pairs at 1x).
+    const radiusOf = (m) => (m.one ? DOT_R : CLUSTER_R);
+
+    // A mark's position and value are the patient-weighted roll-up of its
+    // members' most recent studies (D14) — the same pooled proportion as a
+    // single site, so a cluster is exactly the sum of the dots it is hiding and
+    // the two zoom levels can never contradict each other. Position is a plain
+    // lon/lat centroid (DEV-13 D20) — MapLibre projects it; the old PX/PY
+    // pixel-space output is gone along with the equirectangular projection.
+    function mark(members) {
+      let w = 0, vw = 0, xs = 0, ys = 0;
+      members.forEach((s) => {
+        const n = s.n || 0;
+        w += n; vw += s.v * n; xs += s.lon * n; ys += s.lat * n;
+      });
+      const ok = w > 0;
+      const yrs = members.map((s) => s.year);
+      return {
+        members, iso3: members[0].iso3, one: members.length === 1,
+        lon: ok ? xs / w : members[0].lon,
+        lat: ok ? ys / w : members[0].lat,
+        v: ok ? +(vw / w).toFixed(2) : members[0].v,
+        n: w,
+        yearFrom: Math.min.apply(null, yrs), yearTo: Math.max.apply(null, yrs),
+        from: Math.min.apply(null, members.map((s) => s.from)),
+        to: Math.max.apply(null, members.map((s) => s.to)),
+        studies: members.reduce((a, s) => a + s.studies, 0)
+      };
+    }
+
+    // Merge-distance is measured in MapLibre's own screen pixels via
+    // map.project() (DEV-13 D20), which already encodes the current zoom —
+    // no /k division needed the way the old equirectangular-pixel version
+    // required. The old measured collision tables (D13/D15: 155/94/73/49/30
+    // "still merged" at 8x/12x/16x/20x/30x; 61→3 cross-border) were specific
+    // to that projection and do not transfer; see D20 for the re-measured
+    // numbers under Mercator.
+    function clusterSites(list) {
+      // Seeded biggest-study-first, so the result is deterministic between
+      // renders and a cluster settles on its heaviest evidence.
+      let marks = list.slice()
+        .sort((a, b) => (b.n - a.n) || a.key.localeCompare(b.key))
+        .map((s) => mark([s]));
+      for (let pass = 0; pass < CPASS; pass++) {
+        const taken = new Array(marks.length).fill(false);
+        const next = [];
+        let merged = false;
+        for (let i = 0; i < marks.length; i++) {
+          if (taken[i]) continue;
+          taken[i] = true;
+          let m = marks[i];
+          for (let j = i + 1; j < marks.length; j++) {
+            if (taken[j] || marks[j].iso3 !== m.iso3) continue;
+            // absorbing grows m, so the distance it needs grows with it —
+            // recomputed per pair rather than fixed for the whole pass
+            const need = radiusOf(m) + radiusOf(marks[j]) + MARK_GAP;
+            const p1 = map.project([m.lon, m.lat]);
+            const p2 = map.project([marks[j].lon, marks[j].lat]);
+            const dx = p1.x - p2.x, dy = p1.y - p2.y;
+            if (dx * dx + dy * dy < need * need) {
+              m = mark(m.members.concat(marks[j].members));   // centroid moves
+              taken[j] = true; merged = true;
+            }
+          }
+          next.push(m);
+        }
+        marks = next;
+        if (!merged) break;                 // a pass that merges nothing is stable
+      }
+      return marks;
+    }
+
+    // The rule is written here, not read from meta.rule, because as of V2 it is
+    // the RENDERER's rule. meta.rule still correctly describes the aggregated
+    // `treatmentFailure` structure in the data file — V2 simply no longer draws
+    // it, so quoting it beside the legend would describe the wrong thing.
+    const RULE_SITE =
+      "Each dot is one WHO study site, coloured by its most recent study there — the same unit WHO's own threat map uses. " +
+      "Sites too close to draw apart at this zoom merge into one numbered dot, pooled across them by patient count. Zoom in to separate them; click any dot for the studies behind it.";
+
+    // Marks are MapLibre DOM Markers now (D20) — each owns its own element,
+    // so there is no SVG layer group to lazily create/clear the way resLayer()
+    // used to; clearMarkers() below is the direct equivalent.
+    let liveMarkers = [];
+    function clearMarkers() {
+      liveMarkers.forEach((entry) => entry.marker.remove());
+      liveMarkers = [];
+    }
+
+    const prettyDate = (iso) => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+      if (!m) return iso || "";
+      const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      return `${+m[3]} ${MON[+m[2] - 1]} ${m[1]}`;
+    };
+    // countries a pairing would actually paint — the basemap does not draw
+    // every country WHO covers, so this counts what the reader will see
+    const drawnCount = (drug, species) => {
+      const c = cellsFor(drug, species);
+      return Object.keys(c).filter((i) => i in M.countries).length;
+    };
+    const allDrugs = () => (RES ? Object.keys(RES[LAYER] || {}) : []);
+    const speciesFor = (drug) => Object.keys((RES[LAYER] || {})[drug] || {});
+    const allSpecies = () => {
+      const set = new Set();
+      allDrugs().forEach((d) => speciesFor(d).forEach((s) => set.add(s)));
+      return [...set].sort();
+    };
+    // Species and drug are not independent: chloroquine has no P. falciparum
+    // studies at all (that resistance is decades old), and most ACTs have
+    // little vivax data because they are not the vivax treatment. Pairings with
+    // nothing behind them are DISABLED rather than merely empty, so a blank map
+    // can never be misread as "no resistance here". A null drug (D24 — the
+    // product has no WHO resistance data of its own, see bindDrug) empties the
+    // list outright rather than showing every species disabled, since there is
+    // no pairing to even offer.
+    function fillSpeciesList(drug, keep) {
+      const sel = document.getElementById("res-species");
+      if (!drug) { sel.innerHTML = ""; sel.disabled = true; return ""; }
+      const list = allSpecies();
+      sel.innerHTML = list.map((sp) => {
+        const n = drawnCount(drug, sp);
+        return `<option value="${esc(sp)}"${n ? "" : " disabled"}>` +
+               `${esc(sp)} (${n} ${n === 1 ? "country" : "countries"})</option>`;
+      }).join("");
+      const usable = list.filter((sp) => drawnCount(drug, sp) > 0);
+      sel.value = keep && usable.indexOf(keep) >= 0 ? keep
+        : usable.indexOf(FALLBACK_SPECIES) >= 0 ? FALLBACK_SPECIES
+        : (usable[0] || "");
+      sel.disabled = usable.length < 2;
+      return sel.value;
+    }
+
+    // D24 — the map's drug is now driven entirely by which of the 4 tracked
+    // products is selected (PRODUCT_DRUG), not by an independent picker: the
+    // old flat A-Z drug <select> and its "fallback to Artemether-lumefantrine
+    // for a product with no studies of its own" behaviour are both gone. A
+    // product with no PRODUCT_DRUG entry (GanLum, ALAQ — pre-launch, no WHO
+    // resistance surveillance exists for them yet) now binds to no drug at
+    // all; drawResistance() reads that as "not yet available", not as a
+    // reference-drug substitute.
+    function bindDrug(productId) {
+      if (!RES) return;
+      const want = PRODUCT_DRUG[productId];
+      curBoundDrug = want && allDrugs().indexOf(want) >= 0 ? want : null;
+      fillSpeciesList(curBoundDrug, document.getElementById("res-species").value);
+      closePanel();
+      drawResistance();
+    }
+
+    // ---- click-through: every study behind one country dot ------------------
+    let panelSort = { col: "year", dir: -1 };
+    let panelRows = [], panelTitle = "";
+
+    function closePanel() {
+      const p = document.getElementById("res-panel");
+      if (p) { p.hidden = true; panelRows = []; }
+      selKeys = null;
+      if (typeof applySelection === "function") applySelection();
+    }
+
+    // ---- chart above the study table (D25) ---------------------------------
+    // The table is the exact, sortable, WHO-sourced record and stays; the
+    // chart is a faster way in, not a different answer. Two shapes, picked by
+    // what's actually behind the mark clicked — never both, never neither
+    // when one has something real to say:
+    //   - a cluster (>1 distinct site): one bar per site, that site's own
+    //     most recent study — the same rule its map dot already uses, so the
+    //     chart never disagrees with what the dot showed.
+    //   - a single site with more than one study: one bar per row, in
+    //     chronological order. Bars, not a connected line: WHO's studies land
+    //     in whatever years a team happened to visit (2011, then 2018, say),
+    //     and a line drawn between them would claim a gradual change across
+    //     years with zero data — bars make no claim about anything but the
+    //     years actually studied.
+    // A single row on its own has nothing to compare or trend, so no chart.
+    const CHART_MAX_ITEMS = 20;   // past this many bars a chart is clutter, not a shortcut
+    function chartPlan(rows) {
+      const bySite = new Map();
+      rows.forEach((r) => {
+        const key = (r.site || "—") + "|" + (r.region || "");
+        if (!bySite.has(key)) bySite.set(key, []);
+        bySite.get(key).push(r);
+      });
+      if (bySite.size > 1) {
+        if (bySite.size > CHART_MAX_ITEMS) return null;
+        const items = [...bySite.values()].map((rs) => rs.reduce((a, r) => (r.year > a.year ? r : a)));
+        items.sort((a, b) => b.v - a.v);
+        return { mode: "compare", items };
+      }
+      if (rows.length > 1) {
+        if (rows.length > CHART_MAX_ITEMS) return null;
+        return { mode: "trend", items: rows.slice().sort((a, b) => a.year - b.year) };
+      }
+      return null;
+    }
+
+    // Fixed 0-100% domain, not rescaled to this click's own max — a bar's
+    // length must mean the same thing on every panel a reader opens, not
+    // become misleading once a different cluster's own max redefines "full".
+    // Colour is the same b1-b4 band the map dot and legend already use, so
+    // the chart is never a second vocabulary; the printed value at the tip
+    // carries the precision a fixed-domain bar alone can't.
+    function renderChart(rows) {
+      const el = document.getElementById("res-panel-chart");
+      const plan = chartPlan(rows);
+      if (!plan) { el.hidden = true; el.innerHTML = ""; return; }
+      el.hidden = false;
+      el.innerHTML = plan.items.map((r) => {
+        const band = bandOf(r.v);
+        const label = plan.mode === "compare" ? (r.site || "—") : String(r.year);
+        const pct = Math.max(1, Math.min(100, r.v));   // a 1% floor so a 0% bar still shows a sliver
+        return `<div class="chart-row">
+          <span class="chart-label" title="${esc(label)}">${esc(label)}</span>
+          <div class="chart-track"><div class="chart-bar ${band}" tabindex="0" style="width:${pct}%"></div></div>
+          <span class="chart-value">${r.v}%</span>
+        </div>`;
+      }).join("");
+      el.querySelectorAll(".chart-bar").forEach((bar, i) => {
+        const r = plan.items[i];
+        const where = plan.mode === "compare"
+          ? esc(r.site || "—") + (r.region ? ", " + esc(r.region) : "")
+          : "Study year " + r.year;
+        const html = "<b>" + where + "</b>" +
+          '<div class="trow"><span>Treatment failure</span><span>' + r.v + "%</span></div>" +
+          (plan.mode === "compare" ? '<div class="trow"><span>Year</span><span>' + r.year + "</span></div>" : "") +
+          '<div class="trow"><span>Patients</span><span>' + (r.n == null ? "—" : r.n) + "</span></div>";
+        const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
+        bar.addEventListener("mouseenter", track);
+        bar.addEventListener("mousemove", track);
+        bar.addEventListener("mouseleave", hideTip);
+        bar.addEventListener("focus", () => showTipAt(bar, html));
+        bar.addEventListener("blur", hideTip);
+      });
+    }
+
+    function renderPanel() {
+      const panel = document.getElementById("res-panel");
+      const table = document.getElementById("res-table");
+      if (!panelRows.length) { panel.hidden = true; return; }
+      renderChart(panelRows);   // fixed ordering of its own — independent of the table's sort state
+      const COLS = [
+        { k: "year",   t: "Year",     num: true },
+        { k: "site",   t: "Site" },
+        { k: "region", t: "Region" },
+        { k: "n",      t: "Patients", num: true },
+        { k: "v",      t: "Failure",  num: true },
+        { k: "source", t: "Study" }
+      ];
+      const dir = panelSort.dir, key = panelSort.col;
+      const sorted = panelRows.slice().sort((a, b) => {
+        const x = a[key], y = b[key];
+        if (x === y) return 0;
+        if (x === null || x === "") return 1;          // blanks last, either direction
+        if (y === null || y === "") return -1;
+        return (typeof x === "number" ? x - y : String(x).localeCompare(String(y))) * dir;
+      });
+      const small = RES.meta.smallStudy || 20;
+      table.innerHTML =
+        "<thead><tr>" + COLS.map((c) =>
+          `<th data-k="${c.k}" scope="col"${c.k === key ? ` aria-sort="${dir === 1 ? "ascending" : "descending"}"` : ""}>${esc(c.t)}</th>`
+        ).join("") + "</tr></thead><tbody>" +
+        sorted.map((r) => {
+          const cite = r.citation
+            ? `<a href="${esc(r.citation)}" target="_blank" rel="noopener">${esc(r.source || "study")}</a>`
+            : esc(r.source || "—");
+          return `<tr${Number.isInteger(r.n) && r.n < small ? ' class="small"' : ""}>` +
+            `<td class="yr">${r.year}</td><td>${esc(r.site || "—")}</td><td>${esc(r.region || "—")}</td>` +
+            `<td class="num">${r.n === null ? "—" : r.n}</td><td class="num">${r.v}%</td><td>${cite}</td></tr>`;
+        }).join("") + "</tbody>";
+      table.querySelectorAll("th").forEach((th) => th.addEventListener("click", () => {
+        const k = th.dataset.k;
+        panelSort = { col: k, dir: panelSort.col === k ? -panelSort.dir : (k === "year" || k === "n" || k === "v" ? -1 : 1) };
+        renderPanel();
+      }));
+      // The panel is the FULL history, not the dot's basis — say so, so the
+      // counts here can never be mistaken for the ones in the tooltip.
+      const n = panelRows.length;
+      const siteCount = new Set(panelRows.map((r) => r.site + "|" + r.region)).size;
+      const yrs = panelRows.map((r) => r.year);
+      const lo = Math.min(...yrs), hi = Math.max(...yrs);
+      document.getElementById("res-panel-title").textContent =
+        `${panelTitle} — ${n} ${n === 1 ? "study" : "studies"} at ` +
+        `${siteCount} ${siteCount === 1 ? "site" : "sites"}, ${lo === hi ? lo : lo + "–" + hi}`;
+      panel.hidden = false;
+    }
+
+
+    // Tooltips follow D11: one scope per line, and never the country's history
+    // dressed up as this mark's basis. At site level that discipline gets easier
+    // — the mark IS the site, so every line below the rows is about this site.
+    function siteTip(mk) {
+      const s = mk.members[0];
+      const cn = M.countries[s.iso3] ? M.countries[s.iso3].n : s.iso3;
+      const small = (RES.meta && RES.meta.smallStudy) || 20;
+      // Site, region, country on one line — the way WHO's threat map labels a
+      // dot. It also removes the guesswork from site names that are a bare
+      // district ("Kayin State", "Jowhar") or repeat across countries.
+      const where = [s.site || "Unnamed site", s.region, cn].filter(Boolean).join(", ");
+      // 194 of 1,136 site dots rest on fewer than 20 patients and the smallest
+      // on one. Nothing is filtered (D5) and nothing is re-weighted here — the
+      // colour is WHO's measured value — so the denominator is stated instead.
+      const pat = s.n ? esc(String(s.n)) + (s.n < small ? " · small study" : "") : "—";
+      const hist = s.studies > 1
+        ? esc(s.studies + " studies here, " + (s.from === s.to ? s.from : s.from + "–" + s.to))
+        : "The only study here";
+      // Only when an earlier study lands in a HIGHER BAND — the 74 sites whose
+      // colour has changed over their history. Any worse-than-now value would
+      // fire on differences the colour does not register ("Earlier here: 1%"
+      // under a 0% dot), which is noise in the one line that has to carry the
+      // Kenya problem: a dot reading 0% where the site once measured 11.5%.
+      const peak = s.peak && s.peak[AT.v] > s.v && bandOf(s.peak[AT.v]) !== bandOf(s.v)
+        ? "<br>Earlier here: " + esc(s.peak[AT.v] + "% in " + s.peak[AT.year]) : "";
+      return "<b>" + esc(where) + "</b>" +
+        '<div class="trow"><span>Treatment failure</span><span>' + s.v + "%</span></div>" +
+        '<div class="trow"><span>Study year</span><span>' + s.year +
+          (s.thisYear > 1 ? " · " + s.thisYear + " studies" : "") + "</span></div>" +
+        '<div class="trow"><span>Patients</span><span>' + pat + "</span></div>" +
+        '<div class="tprod">' + hist + peak +
+        "<br>" + esc(curDrug) + " · Click for this site's studies</div>";
+    }
+
+    function clusterTip(mk) {
+      const cn = M.countries[mk.iso3] ? M.countries[mk.iso3].n : mk.iso3;
+      const yr = mk.yearFrom === mk.yearTo ? String(mk.yearFrom) : mk.yearFrom + "–" + mk.yearTo;
+      return "<b>" + esc(cn + " — " + mk.members.length + " sites") + "</b>" +
+        '<div class="trow"><span>Treatment failure</span><span>' + mk.v + "%</span></div>" +
+        '<div class="trow"><span>' + (mk.yearFrom === mk.yearTo ? "Study year" : "Study years") +
+          "</span><span>" + yr + "</span></div>" +
+        '<div class="trow"><span>Patients</span><span>' + (mk.n || "—") + "</span></div>" +
+        '<div class="tprod">Pooled across these ' + mk.members.length +
+        " sites, each at its most recent study<br>Zoom in to separate them" +
+        "<br>" + esc(curDrug) + " · Click for every study here</div>";
+    }
+
+    // A site dot opens that site's own history; a cluster opens the sites it is
+    // hiding. D4 put every study behind a country in this panel — at site level
+    // the panel narrows with the dot, so what you clicked is what you get.
+    function openMarkPanel(mk) {
+      const di = codeOf("drug", curDrug), si = codeOf("species", curSpecies);
+      const keys = {};
+      mk.members.forEach((s) => { keys[s.key] = 1; });
+      panelRows = RES.studies
+        .filter((r) => r[AT.drug] === di && r[AT.species] === si && keys[siteKey(r)])
+        .map(decode);
+      const cn = M.countries[mk.iso3] ? M.countries[mk.iso3].n : mk.iso3;
+      panelTitle = (mk.one
+        ? (mk.members[0].site || "Unnamed site") + ", " + cn
+        : cn + " — " + mk.members.length + " sites") + " · " + curDrug + " · " + curSpecies;
+      panelSort = { col: "year", dir: -1 };
+      selKeys = new Set(mk.members.map((x) => x.key));
+      applySelection();
+      renderPanel();
+    }
+
+    function writeNote() {
+      const note = document.getElementById("res-note");
+      const m = RES.meta || {};
+      const bits = [];
+      if (!curSites || !curSites.length)
+        bits.push(`No WHO study results for ${curDrug} against ${curSpecies}.`);
+      if (curSites && curSites.length) {
+        const nS = curSites.length, nM = curMarks.length;
+        bits.push(nS === nM
+          ? `All ${nS} ${nS === 1 ? "site is" : "sites are"} drawn separately at this zoom.`
+          : `${nS} ${nS === 1 ? "site" : "sites"} in ${nM} ${nM === 1 ? "mark" : "marks"} at this zoom — zoom in to separate them.`);
+      }
+      if (curUndrawn)
+        bits.push(`${curUndrawn} further ${curUndrawn === 1 ? "country is" : "countries are"} not drawn on this basemap.`);
+      bits.push(`Source: ${m.source || "WHO"} — WHO last updated ${prettyDate(m.whoLastDataUpdate)}, extract ${prettyDate(m.extract)}. Each value is WHO's own study result; only the merging of nearby sites is ours.`);
+      note.textContent = bits.filter(Boolean).join(" ");
+      note.hidden = false;
+    }
+
+    // Reapplied after every redraw rather than set once on the clicked circle,
+    // because a zoom change rebuilds every mark. A selected cluster that splits
+    // marks all its parts: each new mark is entirely within the old selection.
+    // Unchanged mechanism from D16 — walks the live Marker array instead of
+    // <circle> elements, toggling a CSS class instead of drawing a sibling ring.
+    function applySelection() {
+      liveMarkers.forEach((entry) => {
+        const on = !!(selKeys && entry.mk.members.every((x) => selKeys.has(x.key)));
+        entry.el.classList.toggle("is-selected", on);
+      });
+    }
+
+    function drawMarks() {
+      if (!RES || !curSites) return;
+      drawnZoom = map.getZoom();
+      const marks = clusterSites(curSites);
+      curMarks = marks;
+      writeNote();                 // the mark count in it is zoom-dependent
+      clearMarkers();
+      // Within a country nothing overlaps (verified per release — see D20 for
+      // the re-measured counts under Mercator). Across a border it still can,
+      // because a cluster never crosses one. A small mark could be visually
+      // buried under a big one at low zoom; an explicit z-index (rather than
+      // DOM paint order, which drove this under the old SVG renderer) keeps
+      // single-site marks on top so both stay reachable by mouse. Keyboard
+      // already reaches both: every mark is focusable regardless of what is
+      // painted over it.
+      marks.forEach((mk) => {
+        const band = bandOf(mk.v);
+        const el = document.createElement("div");
+        el.className = "res-dot " + band + (mk.one ? "" : " res-cluster");
+        el.dataset.iso3 = mk.iso3;   // lets scripts/verify-map-clusters.js tell same-country
+                                     // overlap from cross-border overlap without internal access
+        el.tabIndex = 0;
+        el.setAttribute("role", "button");
+        el.style.zIndex = mk.one ? "2" : "1";
+        if (!mk.one) el.textContent = String(mk.members.length);   // the count is the
+                                                                    // only thing that says
+                                                                    // a mark is more than one site
+        const html = mk.one ? siteTip(mk) : clusterTip(mk);
+        const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
+        el.addEventListener("mouseenter", track);
+        el.addEventListener("mousemove", track);
+        el.addEventListener("focus", () => showTipAt(el, html));   // keyboard: no cursor
+        el.addEventListener("mouseleave", hideTip);
+        el.addEventListener("blur", hideTip);
+        el.addEventListener("click", () => openMarkPanel(mk));
+        el.addEventListener("keydown", (ev) => {
+          if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); openMarkPanel(mk); }
+        });
+        const marker = new maplibregl.Marker({ element: el, anchor: "center" })
+          .setLngLat([mk.lon, mk.lat]).addTo(map);
+        liveMarkers.push({ marker, el, mk });
+      });
+      // after the markers exist, not before — the ring has to be reapplied on
+      // every rebuild, and a zoom change rebuilds all of them
+      applySelection();
+      return marks;
+    }
+
+    // Test/verification hook only — read by scripts/verify-map-clusters.js to
+    // re-check D15's clustering invariants (same-country overlap, cross-border
+    // overlap) by script instead of by hand after any change to the marks.
+    // No cost to real users; not part of the app's own behaviour.
+    // setDrugSpecies bypasses the UI deliberately (D24 restricted the real
+    // Drug picker to the 4 tracked products) so this can still sweep every
+    // drug×species cell RES.studies actually carries — D5 ships all 26 drugs
+    // in the data regardless of what the UI currently exposes, and that is
+    // what this regression test is verifying.
+    window.__DEV13_MAP__ = {
+      getMap: () => map,
+      getMarks: () => curMarks,
+      setDrugSpecies: (drug, species) => {
+        curDrug = drug; curSpecies = species;
+        curSites = sitesFor(drug, species);
+        drawMarks();
+      },
+    };
+
+    function drawResistance() {
+      if (!RES) return;
+      document.getElementById("res-controls").hidden = false;
+      const legend = document.getElementById("res-legend");
+      const ruleEl = document.getElementById("res-rule");
+      const note = document.getElementById("res-note");
+      const spSel = document.getElementById("res-species");
+      clearMarkers();
+
+      const checked = document.querySelector('input[name="reslayer"]:checked');
+      const on = checked && checked.value !== "off";
+      const drug = curBoundDrug, species = spSel.value;
+      if (!on || !drug || !species) {
+        legend.hidden = true; ruleEl.hidden = true;
+        // the zoomend handler only rebuilds marks while curSites is set —
+        // leaving it behind would repaint the dots after the overlay was
+        // switched off, the next time the reader zoomed
+        curSites = null; curMarks = [];
+        closePanel();
+        const em = document.getElementById("map-empty");
+        if (em) em.classList.remove("demoted");   // map is blank again — recentre
+        // D24 — a product with no WHO drug of its own (GanLum, ALAQ: not yet in
+        // clinical use) reads as "not yet available", never as a silent blank
+        // or a substituted reference drug's numbers.
+        if (on && !drug) {
+          note.hidden = false;
+          note.textContent = `${mapProduct} is not yet in clinical use — WHO has no resistance surveillance for it yet.`;
+        } else {
+          note.hidden = true;
+        }
+        return;
+      }
+
+      curDrug = drug; curSpecies = species;
+      curSites = sitesFor(drug, species);
+      const cells = cellsFor(drug, species);
+      // countries WHO covers that this basemap does not draw — counted from the
+      // country index rather than from the sites, which are already filtered out
+      curUndrawn = Object.keys(cells).filter((i) => !(i in M.countries)).length;
+      drawMarks();                 // writes the note, which needs the two above
+
+      // the map is no longer blank once dots are on it — move the access
+      // empty-state out of the way rather than letting it sit over the data
+      const emptyMsg = document.getElementById("map-empty");
+      if (emptyMsg) emptyMsg.classList.toggle("demoted", curSites.length > 0);
+
+      legend.hidden = !curSites.length;
+      const m = RES.meta || {};
+
+      // 1. THE RULE — sits with the legend it explains, as WHO puts "determined
+      //    by the most recent data in a site" directly under theirs.
+      ruleEl.textContent = curSites.length ? RULE_SITE : "";
+      ruleEl.hidden = !curSites.length;
+
+      // 2. PROVENANCE — source, dates and caveats. Country and site totals are
+      //    NOT here: they belong to one country and live in the tooltip and the
+      //    panel title. Kept separate from the access layer's ILLUSTRATIVE
+      //    banner above, which describes entirely different data.
+      //    One sentence of it counts MARKS, which changes with the zoom, so the
+      //    note is rewritten by drawMarks rather than only on a drug change.
+      writeNote();                 // the rule and legend above may have changed too
+    }
+
+    document.querySelectorAll('input[name="reslayer"]').forEach((r) =>
+      r.addEventListener("change", () => { closePanel(); drawResistance(); }));
+    document.getElementById("res-species").addEventListener("change", () => {
+      closePanel(); drawResistance();
     });
+    document.getElementById("res-close").addEventListener("click", closePanel);
+
+    tabs.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => selectMap(t.dataset.id)));
+
+    // Clustering is recomputed on an actual zoom-LEVEL change only, never on
+    // pan (D13/D20's invariant) — bound to 'zoomend' rather than 'zoom' (fires
+    // every animation frame) or 'moveend' (fires on pan too).
+    map.on("zoomend", () => {
+      if (!curSites) return;
+      const z = map.getZoom();
+      if (Math.abs(z - drawnZoom) < 0.001) return;
+      drawMarks();
+    });
+
+    // Everything above only touches the map's style/sources once it exists,
+    // but setFeatureState/setPaintProperty need the style actually loaded —
+    // hence deferring the first paint and the initial product selection here.
+    map.on("load", () => {
+      paintCountries();
+      // default to the first product that has country data
+      selectMap((tracked.find(p => p.detail.countries) || tracked[0]).id);
+    });
+
   }
 
   // ---- cross-product pathway timing ----
