@@ -1497,7 +1497,7 @@
         ],
       },
       center: [(LON0 + LON1) / 2, (LAT0 + LAT1) / 2], zoom: 0,
-      minZoom: 0, maxZoom: ZMAX,
+      minZoom: 0, maxZoom: Math.log2(ZMAX),   // ZMAX is linear (D13); MapLibre zoom is log2 (D26)
       maxBounds: [[LON0 - 20, LAT0 - 15], [LON1 + 20, LAT1 + 15]],
       // Locked to 2D, north-up — the SVG map this replaces never rotated or
       // tilted, and nothing asked for that to change (DEV-13 D19). MapLibre's

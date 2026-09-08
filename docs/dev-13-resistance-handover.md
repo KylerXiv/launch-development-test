@@ -1113,6 +1113,27 @@ by failure %, correct value labels, correct band colours; a single site with
 real history (Veal Veng, Cambodia, ASPY, falciparum, 2014 & 2018) renders a
 2-bar trend showing 10.2% → 0%, matching the table below it exactly.
 
+**D26 — A real bug found while testing D25, unrelated to it, fixed in the
+same pass rather than left for later.** `ZMAX = 16` (D13) was always a
+**linear** multiplier ("16x magnified"); MapLibre's own zoom is
+**exponential** (each `+1` level doubles the scale). D19 passed `maxZoom:
+ZMAX` straight through to MapLibre without converting between the two, so
+the map's real cap was `2^16` ≈ **65,536×**, not 16×. Invisible in every
+manual test so far because reaching it meant zooming in far past what any of
+this branch's screenshots or scripted checks had pushed to (each earlier
+test stopped at MapLibre zoom ≈4, which — coincidentally correctly — the
+`verify-map-clusters.js` sweep and this feature's own tooltip-readout
+formula (`Math.pow(2, z)`) both already treated as "16x"). Found by chance
+while zoom-testing a `res-panel-chart` example: the map collapsed to a
+single flat colour and the zoom readout showed "65536×". Fixed:
+`maxZoom: Math.log2(ZMAX)`. Re-verified: `map.getMaxZoom()` now reports `4`;
+forcing `setZoom(999)` clamps to `4`; the readout at that cap correctly
+shows "16×", matching D13's original, actually-intended ceiling.
+`verify-map-clusters.js`'s own zoom sweep (`[0, 1.4, 2.0, 2.7, 3.0, 4.0]`)
+was already scoped correctly and needed no change — it re-ran with
+identical results before and after this fix, which is itself confirmation
+the sweep was never exercising the broken range.
+
 ---
 
 ## 7. What's left
