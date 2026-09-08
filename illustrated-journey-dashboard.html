@@ -453,40 +453,32 @@
   .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  .mapwrap { position: relative; overflow-x: auto; }
-  .mapwrap svg { display: block; width: 100%; min-width: 640px; height: auto; background: var(--surface-2); border-radius: 10px;
-                 /* vertical page scroll still belongs to the page; horizontal drag is ours */
-                 touch-action: pan-y; }
-  .mapwrap.zoomed svg { cursor: grab; }
-  .mapwrap.zoomed.panning svg { cursor: grabbing; }
-  /* Strokes and dot radii are screen furniture, not geography. The viewBox zoom
-     scales everything inside it, so at 8x a .75-unit border would render 6px
-     wide and swallow the small countries it is meant to separate.
-     non-scaling-stroke pins every stroke to the device; dot radii are
-     counter-scaled in applyZoom() for the same reason. */
-  .mapwrap path { fill: var(--map-nodata); stroke: var(--map-border); stroke-width: .75; cursor: help;
-                  vector-effect: non-scaling-stroke; }
-  /* One hue per stage, 60 deg apart, each clearing 3:1 against the no-data fill
-     and the ocean, and all three clear of the status ramp (green / amber / red)
-     so a colour never reads as good-or-bad. Lightness still descends across the
-     three, so the order survives greyscale and print. */
-  .mapwrap path.lvl-registered { fill: var(--map-registered); }
-  .mapwrap path.lvl-guidelines { fill: var(--map-guidelines); }
-  .mapwrap path.lvl-mft { fill: var(--map-mft); }
-  /* a country with data is outlined in the no-data ground, so neighbours at the
-     same level stay separable */
-  .mapwrap path.haslvl { stroke: var(--map-nodata); stroke-width: .7; }
-  /* Chrome's default focus ring is an `outline`, and an outline on an SVG path is
-     drawn around its BOUNDING BOX — a meaningless rectangle over an irregular
-     country, in the browser's blue rather than ours. Indicate the shape itself,
-     from the map's own tokens. */
-  .mapwrap path:focus { outline: none; }
-  .mapwrap path:focus-visible {
-    outline: none;
-    stroke: var(--map-nodata); stroke-width: 2.6; stroke-linejoin: round;
-    /* the ring itself is the no-data ground, which in light theme matches the
-       no-data countries next door — so the accent halo defines the outer edge */
-    filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 1.5px var(--accent));
+  .mapwrap { position: relative; }
+  /* MapLibre's canvas has no viewBox/height:auto equivalent — an explicit
+     aspect-ratio keeps the same responsive width-drives-height behaviour the
+     old SVG had (960x420, the fitted lon/lat window build-map-geo.js shares
+     with build-map.js). */
+  #mapwrap-gl { width: 100%; min-height: 320px; aspect-ratio: 960 / 420; background: var(--surface-2); border-radius: 10px; }
+  #mapwrap-gl .maplibregl-canvas { border-radius: 10px; }
+  /* Rotation/pitch are locked off in the map's own options (DEV-13 D19) — the
+     choropleth has always read north-up and fixed, and nothing asked for that
+     to change. */
+  .maplibregl-ctrl-group { background: var(--surface); border: 1px solid var(--map-border); box-shadow: none; }
+  .maplibregl-ctrl-group button + button { border-top: 1px solid var(--map-border); }
+  /* MapLibre's stock zoom-icon SVGs are dark-on-transparent; dark theme needs
+     them inverted the same way the rest of this page swaps its own tokens. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .maplibregl-ctrl-icon { filter: invert(1) brightness(1.5); }
+  }
+  :root[data-theme="dark"] .maplibregl-ctrl-icon { filter: invert(1) brightness(1.5); }
+  .maplibregl-ctrl-attrib, .maplibregl-ctrl-bottom-right .maplibregl-ctrl { display: none; }
+  /* Custom zoom-level readout beside MapLibre's own NavigationControl — the
+     control draws +/- buttons but no "2.6x" readout, which D13's affordance
+     line and aria-live behaviour depended on. */
+  .map-zoom-lvl {
+    position: absolute; top: 8px; right: 46px; z-index: 2; font-size: 11.5px;
+    font-variant-numeric: tabular-nums; color: var(--ink-3); background: var(--surface);
+    border: 1px solid var(--map-border); border-radius: 6px; padding: 4px 8px; line-height: 1;
   }
   .map-overlay {
     margin-top: 10px; background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn);
@@ -552,58 +544,45 @@
      the tooltip's and the panel's counts look like they disagreed. */
   .res-rule { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 4px 0 0; max-width: 92ch; }
   .res-note { font-size: 11.5px; line-height: 1.55; color: var(--ink-3); margin: 6px 0 0; max-width: 92ch; }
-  .resdot.b1, .mapwrap circle.b1 { background: #FDCFA6; fill: #FDCFA6; }
-  .resdot.b2, .mapwrap circle.b2 { background: #FB9A50; fill: #FB9A50; }
-  .resdot.b3, .mapwrap circle.b3 { background: #EF5F13; fill: #EF5F13; }
-  .resdot.b4, .mapwrap circle.b4 { background: #C21807; fill: #C21807; }
-  .mapwrap circle.res-dot { stroke: var(--map-nodata, #FFFFFF); stroke-width: 1; cursor: help;
-                            vector-effect: non-scaling-stroke; }
+  .resdot.b1 { background: #FDCFA6; }
+  .resdot.b2 { background: #FB9A50; }
+  .resdot.b3 { background: #EF5F13; }
+  .resdot.b4 { background: #C21807; }
+  /* Marks are MapLibre DOM Markers now (DEV-13 D20), not SVG circles — a real
+     <div role="button">, sized constant on screen at every zoom (no
+     counter-scaling needed: a DOM element never inherits the map's own zoom
+     transform the way an SVG child of a scaled viewBox did). */
+  .res-dot {
+    width: 20px; height: 20px; border-radius: 50%; box-sizing: border-box;
+    border: 1px solid var(--map-nodata, #FFFFFF); cursor: help;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 11px; font-family: inherit; color: #1A0A00;
+    background: #FDCFA6; /* b1 default; band class below overrides */
+  }
+  .res-dot.b1 { background: #FDCFA6; }
+  .res-dot.b2 { background: #FB9A50; }
+  .res-dot.b3 { background: #EF5F13; }
+  .res-dot.b4 { background: #C21807; color: #FFFFFF; }
   /* A cluster stands for several sites, so it must not read as one. It is
      larger, carries its member count, and takes a heavier halo so the
      difference survives at a glance and in greyscale. */
-  .mapwrap circle.res-cluster { stroke-width: 1.8; cursor: pointer; }
-  .mapwrap text.res-count {
-    text-anchor: middle; dominant-baseline: central; font-weight: 800;
-    font-family: inherit; pointer-events: none;   /* the circle owns the hover */
-    fill: #1A0A00;
-  }
-  /* Bands 1-3 are light enough to carry near-black at 4.5:1 or better; the
-     darkest band is the one that needs white instead. */
-  .mapwrap text.res-count.b4 { fill: #FFFFFF; }
-  /* Zoom controls sit over the map's top-right corner. .map-empty is inset:0
-     with pointer-events:none, so this only needs to out-stack it, not dodge it. */
-  .map-zoom { position: absolute; top: 8px; right: 8px; z-index: 2; display: flex; align-items: center; gap: 4px; }
-  .map-zoom button {
-    font: inherit; font-size: 12px; font-weight: 650; line-height: 1;
-    min-width: 26px; height: 26px; padding: 0 7px; cursor: pointer; color: var(--ink-2);
-    background: var(--surface); border: 1px solid var(--map-border); border-radius: 6px;
-  }
-  .map-zoom button:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-3); }
-  .map-zoom button:disabled { opacity: .4; cursor: default; }
-  .map-zoom button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .map-zoom .lvl { font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--ink-3);
-                   min-width: 2.6em; text-align: right; padding-right: 2px; }
+  .res-dot.res-cluster { width: 34px; height: 34px; border-width: 2px; cursor: pointer; }
   .map-hint { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 6px 0 0; }
-  /* An `outline` on an SVG circle is drawn around its BOUNDING BOX, in the
-     browser's own weight — against a 10px dot that reads as a heavy black
-     square ring several times the dot's size. Exactly the problem the country
-     paths have above, and it takes the same fix they do: keep the mark's own
-     halo and let an accent glow define the outer edge. */
-  .mapwrap circle.res-dot:focus { outline: none; }
-  .mapwrap circle.res-dot:focus-visible {
-    outline: none;
-    filter: drop-shadow(0 0 2px var(--accent)) drop-shadow(0 0 1.5px var(--accent));
-  }
+  /* A CSS `outline` on a round element still draws around its rectangular
+     border box — the same bounding-box problem the country paths solved with
+     a filter/box-shadow instead of `outline`. box-shadow respects
+     border-radius, so the ring stays circular. */
+  .res-dot:focus { outline: none; }
+  .res-dot:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
   /* The dot whose study panel is open, so the map says which one you are
      reading below. A ring drawn OUTSIDE the dot rather than a recolour of its
-     own stroke: that stroke is --map-nodata, which in dark theme holds the same
-     value as --ink, so restroking made a selected dot indistinguishable from an
-     unselected one there. --accent is saturated in both themes and reads on
-     every fill this basemap uses — white, teal, blue, purple and dark ocean. */
-  .mapwrap circle.res-ring {
-    fill: none; stroke: var(--accent); stroke-width: 2;
-    vector-effect: non-scaling-stroke; pointer-events: none;
-  }
+     own border: that border is --map-nodata, which in dark theme holds the
+     same value as --ink, so recolouring it made a selected dot indistinguishable
+     from an unselected one there. --accent is saturated in both themes and
+     reads on every fill this basemap uses — white, teal, blue, purple and dark
+     ocean. */
+  .res-dot.is-selected { box-shadow: 0 0 0 3px var(--accent); }
+  .res-dot.is-selected:focus-visible { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent), 0 0 0 3px var(--accent); }
 
   .timing-axis { position: relative; height: 18px; margin-left: 150px; }
   .timing-axis span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -1333,203 +1312,136 @@
   // ---- country access map ----
   const LEVEL_LABEL = { registered: "Registered", guidelines: "In national guidelines",
                         mft: "In MFT plans", none: "No data" };
-  if (window.LAUNCH_MAP) {
+  if (window.LAUNCH_MAP && window.LAUNCH_MAP_GEO && window.maplibregl) {
     const mapsec = document.getElementById("mapsec");
     mapsec.hidden = false;
     const wrap = document.getElementById("mapwrap");
+    // LAUNCH_MAP (94 countries, data/world-map.js) stays the single source of
+    // truth for "which countries count as drawn" — sitesFor's filter,
+    // drawnCount, curUndrawn, the legend counts and the validator's
+    // undrawn-country warning all read it, unchanged by this migration
+    // (DEV-13 D17). LAUNCH_MAP_GEO (100 countries, 50m, this page only)
+    // supplies geometry for the MapLibre fill/line layer — a strict superset,
+    // so nothing that used to be undrawn becomes wrongly paintable.
     const M = window.LAUNCH_MAP;
-    const paths = Object.entries(M.countries).map(([iso3, c]) =>
-      `<path data-iso3="${iso3}" data-name="${esc(c.n)}" d="${c.d}"></path>`).join("");
-    wrap.innerHTML = `<svg viewBox="0 0 ${M.w} ${M.h}" role="img" aria-label="World map of country access">${paths}</svg>
-      <div class="map-empty" id="map-empty" hidden></div>
-      <div class="map-zoom" role="group" aria-label="Map zoom">
-        <span class="lvl" id="mz-lvl" aria-live="polite"></span>
-        <button type="button" id="mz-out" aria-label="Zoom out" disabled>\u2212</button>
-        <button type="button" id="mz-in" aria-label="Zoom in">+</button>
-        <button type="button" id="mz-reset" aria-label="Reset zoom to whole map" disabled>Reset</button>
-      </div>`;
+    const GEO = window.LAUNCH_MAP_GEO;
 
-    // ---- map pan / zoom ---------------------------------------------------
-    // Built for V2. V1 draws one dot per country because this map cannot zoom:
-    // Myanmar is 26x54 pixels against 35 study sites, and plotting WHO's own
-    // unit — the study site — would put 84% of dots on top of another one.
-    // Zoom is the thing that makes a site-level layer legible, so it lands
-    // first and on its own. This block changes no data and no dot value.
-    //
-    // The projection below (PX/PY) is a linear equirectangular transform, so
-    // zooming is nothing more than a smaller viewBox — no reprojection, no
-    // library, in keeping with the rest of the page.
-    const Z = { k: 1, x: 0, y: 0 };
-    // ZMAX is chosen off the DATA, and it costs something. The 110m basemap's
-    // coastlines read as visible straight-line facets past ~8x, so this is a
-    // deliberate trade: faceted coastlines in exchange for sites that actually
-    // come apart. 8x left Pailin and Tasanh — 28 km apart, and the pair that
-    // hid Cambodia's 18% Pailin result behind a pooled 15.52% — permanently
-    // merged, because they need 11.6x.
-    //
-    // Same-country pairs that collide at 1x, and how many are still merged:
-    //   8x: 155 of 2007   12x: 94   16x: 73   20x: 49   30x: 30
-    // 16x separates 96% and clears Pailin/Tasanh with headroom. The returns
-    // past it are poor because most of the residue is WHO recording ONE place
-    // twice at different granularity — "Zaire Province" and M'Banza-Kongo its
-    // capital, "Kolkata" and "West Bengal", "Tamu" and "Kalay and Tamu" — and
-    // 3 pairs share identical coordinates outright. No zoom separates those,
-    // and merging them is the right answer rather than a limitation.
-    // Going further than this wants a 50m basemap, which is its own review:
-    // data/world-map.js is loaded by 12 pages, including the three design
-    // options under client review, so it cannot be swapped in place.
-    const ZMAX = 16, ZSTEP = 1.6, DOT_R = 4.4;
-    // Clustering depends on k and on nothing else, so marks are rebuilt when the
-    // zoom changes and never while panning. drawnK is the k they were built at.
-    let drawnK = 1, curSites = null, curMarks = [], curDrug = "", curSpecies = "";
+    wrap.innerHTML = `<div id="mapwrap-gl"></div>
+      <div class="map-empty" id="map-empty" hidden></div>
+      <span class="map-zoom-lvl" id="mz-lvl" aria-live="polite" hidden></span>`;
+
+    // ---- MapLibre init (DEV-13 D18/D19 — supersedes D13) -------------------
+    // D13 rejected any mapping library ("the first runtime dependency on a
+    // page that has none"). Overridden here, deliberately, for this page
+    // only: see dev-13-resistance-handover.md D18 for the full reasoning.
+    // Everything downstream of this block — sitesFor, pooled, the click-through
+    // panel, the tooltip grammar — is untouched; only the rendering/pan/zoom
+    // substrate changes.
+    const LON0 = -120, LON1 = 155, LAT0 = -40, LAT1 = 42;   // same window build-map-geo.js fits to
+    const ZMAX = 16;   // D13's basemap-detail reasoning still applies, now against a sharper 50m basemap
+    const DOT_R = 10, CLUSTER_R = 17, MARK_GAP = 2;         // CSS px — matches .res-dot/.res-cluster sizes
+    const CPASS = 20;    // clustering convergence bound, unchanged from D15
+
+    let curSites = null, curMarks = [], curDrug = "", curSpecies = "";
     let curUndrawn = 0, curFallback = false;
     // the site keys behind the open study panel, so the map can say which dot
     // the panel belongs to — and keep saying it after a zoom rebuilds the marks
     let selKeys = null;
+    let drawnZoom = null;   // the zoom level marks were last built at (D20's
+                             // equivalent of D13's drawnK) — rebuilt on zoomend
+                             // only, never on pan
 
-    function applyZoom() {
-      // clamp first: k within range, then the window inside the map, so the
-      // viewBox can never show ocean off the edge of the basemap
-      Z.k = Math.min(ZMAX, Math.max(1, Z.k));
-      const vw = M.w / Z.k, vh = M.h / Z.k;
-      Z.x = Math.min(M.w - vw, Math.max(0, Z.x));
-      Z.y = Math.min(M.h - vh, Math.max(0, Z.y));
-
-      const svg = wrap.querySelector("svg");
-      if (!svg) return;
-      svg.setAttribute("viewBox",
-        `${Z.x.toFixed(2)} ${Z.y.toFixed(2)} ${vw.toFixed(2)} ${vh.toFixed(2)}`);
-      // Which sites collide is a function of k, so a zoom change rebuilds the
-      // marks outright rather than just rescaling them — a cluster may split
-      // into several dots, or several may merge. Panning leaves k alone and so
-      // costs nothing. drawMarks re-counter-scales every radius as it draws.
-      if (curSites && Z.k !== drawnK) drawMarks();
-
-      wrap.classList.toggle("zoomed", Z.k > 1);
-      const btn = (id) => document.getElementById(id);
-      if (btn("mz-in")) btn("mz-in").disabled = Z.k >= ZMAX;
-      if (btn("mz-out")) btn("mz-out").disabled = Z.k <= 1;
-      if (btn("mz-reset")) btn("mz-reset").disabled = Z.k === 1;
-      if (btn("mz-lvl")) btn("mz-lvl").textContent =
-        Z.k > 1 ? Z.k.toFixed(1).replace(/\.0$/, "") + "\u00d7" : "";
-    }
-
-    // Zoom about a fixed point in MAP units: whatever sits under the cursor
-    // stays under it. Buttons pass the centre of the current view.
-    function zoomAt(k1, mx, my) {
-      const k0 = Z.k;
-      Z.k = Math.min(ZMAX, Math.max(1, k1));
-      Z.x = mx - (mx - Z.x) * (k0 / Z.k);
-      Z.y = my - (my - Z.y) * (k0 / Z.k);
-      applyZoom();
-    }
-    const viewCentre = () => ({ x: Z.x + M.w / Z.k / 2, y: Z.y + M.h / Z.k / 2 });
-
-    // client px -> map units. The viewBox aspect matches the rendered box
-    // (width:100%, height:auto), so there is no letterboxing to correct for.
-    function toMap(clientX, clientY) {
-      const r = wrap.querySelector("svg").getBoundingClientRect();
-      return {
-        x: Z.x + ((clientX - r.left) / r.width) * (M.w / Z.k),
-        y: Z.y + ((clientY - r.top) / r.height) * (M.h / Z.k)
+    const TOKEN = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    let mapColors = {};
+    function readMapColors() {
+      mapColors = {
+        registered: TOKEN("--map-registered") || TOKEN("--map1"),
+        guidelines: TOKEN("--map-guidelines") || TOKEN("--map2"),
+        mft: TOKEN("--map-mft") || TOKEN("--map3"),
+        nodata: TOKEN("--map-nodata"),
+        border: TOKEN("--map-border"),
+        surface2: TOKEN("--surface-2"),
       };
     }
+    readMapColors();
 
-    {
-      const svg = wrap.querySelector("svg");
+    const map = new maplibregl.Map({
+      container: "mapwrap-gl",
+      style: {
+        version: 8,
+        sources: { world: { type: "geojson", data: GEO, promoteId: "iso3" } },
+        layers: [
+          { id: "bg", type: "background", paint: { "background-color": mapColors.surface2 } },
+          { id: "country-fill", type: "fill", source: "world", paint: { "fill-color": mapColors.nodata } },
+          { id: "country-line", type: "line", source: "world", paint: { "line-color": mapColors.border, "line-width": .75 } },
+        ],
+      },
+      center: [(LON0 + LON1) / 2, (LAT0 + LAT1) / 2], zoom: 0,
+      minZoom: 0, maxZoom: ZMAX,
+      maxBounds: [[LON0 - 20, LAT0 - 15], [LON1 + 20, LAT1 + 15]],
+      // Locked to 2D, north-up — the SVG map this replaces never rotated or
+      // tilted, and nothing asked for that to change (DEV-13 D19). MapLibre's
+      // default keyboard handler binds Shift+arrow to rotate/pitch, which
+      // dragRotate:false does NOT itself disable — keyboard:false turns off
+      // its whole built-in scheme (arrows, +/-, shift+arrows) so a hand-rolled
+      // pan-only listener below can't be bypassed by it.
+      dragRotate: false, pitchWithRotate: false, touchPitch: false, keyboard: false,
+      // Native replacement for D13's hand-rolled "ctrl+wheel only" rule — the
+      // single most complained-about behaviour in embedded maps.
+      cooperativeGestures: true,
+      attributionControl: false,
+    });
+    map.getCanvas().setAttribute("aria-label", "World map, pan and zoom with the mouse or arrow keys");
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
-      document.getElementById("mz-in").addEventListener("click", () => {
-        const c = viewCentre(); zoomAt(Z.k * ZSTEP, c.x, c.y);
-      });
-      document.getElementById("mz-out").addEventListener("click", () => {
-        const c = viewCentre(); zoomAt(Z.k / ZSTEP, c.x, c.y);
-      });
-      document.getElementById("mz-reset").addEventListener("click", () => {
-        Z.k = 1; Z.x = 0; Z.y = 0; applyZoom();
-      });
+    // Keyboard parity for pan (D13's arrow-key affordance) — MapLibre's own
+    // keyboard handler is off (see above), so arrows are hand-wired to a
+    // plain pan with no rotate/pitch/zoom path at all.
+    map.getCanvas().tabIndex = 0;
+    map.getCanvas().addEventListener("keydown", (ev) => {
+      const step = 80;
+      if (ev.key === "ArrowLeft") map.panBy([-step, 0]);
+      else if (ev.key === "ArrowRight") map.panBy([step, 0]);
+      else if (ev.key === "ArrowUp") map.panBy([0, -step]);
+      else if (ev.key === "ArrowDown") map.panBy([0, step]);
+      else return;
+      ev.preventDefault();
+    });
 
-      // Ctrl/Cmd + wheel, never a bare wheel: this map is mid-page, and
-      // swallowing the page's scroll to zoom it is the single most complained-
-      // about behaviour in embedded maps. The affordance line says so.
-      svg.addEventListener("wheel", (ev) => {
-        if (!ev.ctrlKey && !ev.metaKey) return;
-        ev.preventDefault();
-        const m = toMap(ev.clientX, ev.clientY);
-        zoomAt(Z.k * (ev.deltaY < 0 ? ZSTEP : 1 / ZSTEP), m.x, m.y);
-      }, { passive: false });
+    const mzLvl = document.getElementById("mz-lvl");
+    map.on("zoom", () => {
+      const z = map.getZoom();
+      mzLvl.hidden = z <= 0.05;
+      mzLvl.textContent = z > 0.05 ? Math.pow(2, z).toFixed(1).replace(/\.0$/, "") + "×" : "";
+    });
 
-      svg.addEventListener("dblclick", (ev) => {
-        if (ev.target.classList.contains("res-dot")) return;   // that click opens the panel
-        const m = toMap(ev.clientX, ev.clientY);
-        zoomAt(Z.k * ZSTEP, m.x, m.y);
-      });
+    function paintCountries() {
+      map.setPaintProperty("country-fill", "fill-color", [
+        "case",
+        ["==", ["feature-state", "level"], "registered"], mapColors.registered,
+        ["==", ["feature-state", "level"], "guidelines"], mapColors.guidelines,
+        ["==", ["feature-state", "level"], "mft"], mapColors.mft,
+        mapColors.nodata,
+      ]);
+    }
 
-      // Drag to pan, but only once zoomed — at 1x the map fits, and leaving
-      // drag alone keeps .mapwrap's own horizontal scroll working on narrow
-      // screens, which is how this map has always behaved.
-      let drag = null, moved = false;
-      svg.addEventListener("pointerdown", (ev) => {
-        if (Z.k <= 1 || ev.button !== 0 || ev.target.closest(".map-zoom")) return;
-        drag = { cx: ev.clientX, cy: ev.clientY, x: Z.x, y: Z.y, id: ev.pointerId, held: false };
-        moved = false;
-        // NOTHING is captured here, and that is the point. setPointerCapture on
-        // pointerdown retargets the following `click` to the capturing element,
-        // so a dot's own click listener never fired and the study panel would
-        // not open at all once the map was zoomed in. Capture is taken below,
-        // only once the pointer has actually travelled far enough to be a pan.
+    // Paints the MapLibre fill layer from the same byIso lookup selectMap()
+    // has always built. Only LAUNCH_MAP's 94 ever carry a level (D17) — the
+    // other 6 GEO-only countries (COM, CPV, MUS, SGP, STP, SYC; see D17)
+    // render as plain no-data shapes, same as any other country with nothing
+    // behind it.
+    function applyCountryLevels(byIso) {
+      GEO.features.forEach((f) => {
+        const iso3 = f.properties.iso3;
+        const lvl = (iso3 in M.countries) ? (byIso[iso3] || null) : null;
+        map.setFeatureState({ source: "world", id: iso3 }, { level: lvl });
       });
-      svg.addEventListener("pointermove", (ev) => {
-        if (!drag) return;
-        if (!moved) {
-          // a press that has not travelled 4 px is still a click, not a pan
-          if (Math.abs(ev.clientX - drag.cx) <= 4 && Math.abs(ev.clientY - drag.cy) <= 4) return;
-          moved = true;
-          try { svg.setPointerCapture(drag.id); drag.held = true; } catch (e) {}
-          wrap.classList.add("panning");
-        }
-        const r = svg.getBoundingClientRect();
-        const dx = (ev.clientX - drag.cx) / r.width * (M.w / Z.k);
-        const dy = (ev.clientY - drag.cy) / r.height * (M.h / Z.k);
-        Z.x = drag.x - dx; Z.y = drag.y - dy;
-        applyZoom();
-      });
-      const endDrag = () => {
-        if (!drag) return;
-        wrap.classList.remove("panning");
-        if (drag.held) { try { svg.releasePointerCapture(drag.id); } catch (e) {} }
-        drag = null;
-      };
-      svg.addEventListener("pointerup", endDrag);
-      svg.addEventListener("pointercancel", endDrag);
-      // A drag that happens to finish over a dot must not also open that dot's
-      // study panel. Capture phase, so this runs before the circle's own
-      // click listener rather than after it.
-      svg.addEventListener("click", (ev) => {
-        if (moved) { moved = false; ev.stopPropagation(); ev.preventDefault(); }
-      }, true);
-
-      // Keyboard parity: the buttons cover zoom, arrows cover pan. Country
-      // paths are focusable, so this fires with a country selected too.
-      wrap.addEventListener("keydown", (ev) => {
-        if (Z.k <= 1 || ev.ctrlKey || ev.metaKey || ev.altKey) return;
-        const step = (M.w / Z.k) * 0.12;
-        if (ev.key === "ArrowLeft") Z.x -= step;
-        else if (ev.key === "ArrowRight") Z.x += step;
-        else if (ev.key === "ArrowUp") Z.y -= step * (M.h / M.w);
-        else if (ev.key === "ArrowDown") Z.y += step * (M.h / M.w);
-        else return;
-        ev.preventDefault();
-        applyZoom();
-      });
-
-      applyZoom();
     }
 
     let mapProduct = "", mapStatus = "";
     const tabs = document.getElementById("maptabs");
     tabs.innerHTML = tracked.map((p, i) =>
       `<button class="tab" role="tab" data-id="${esc(p.id)}" aria-selected="false">${esc(p.name)}</button>`).join("");
-
     function selectMap(id) {
       const p = tracked.find(x => x.id === id);
       mapProduct = p.name;
@@ -1552,19 +1464,9 @@
         none.textContent = tot - withData;
         none.classList.toggle("zero", withData === tot);
       }
-      wrap.querySelectorAll("path").forEach(el => {
-        const lvl = byIso[el.dataset.iso3];
-        el.setAttribute("class", lvl ? "lvl-" + lvl + " haslvl" : "");
-        if (lvl) {
-          el.setAttribute("tabindex", "0");
-        } else {
-          el.removeAttribute("tabindex");
-          // switching medicine can take a country's data away; a focus ring left
-          // on a now-unfocusable "No data" country is what you saw around China
-          if (document.activeElement === el) { el.blur(); wrap.focus?.(); }
-        }
-        el.dataset.lvl = lvl || "";
-      });
+      // Paints the MapLibre fill layer via feature-state — the direct
+      // replacement for the old per-<path> class/dataset loop (D19).
+      applyCountryLevels(byIso);
       const overlay = document.getElementById("map-overlay");
       const empty = document.getElementById("map-empty");
       if (!p.detail.countries) {
@@ -1590,14 +1492,11 @@
     // published WHO study results. The two readings are deliberately NOT
     // merged on the page until the country survey is verified.
     const RES = window.LAUNCH_RESISTANCE;
-    // Equirectangular projection reproduced from scripts/build-map.js: the
-    // basemap is fitted to lon -120..155 / lat -40..42, so placing a study is
-    // a linear transform — no projection library needed.
-    const LON0 = -120, LON1 = 155, LAT0 = -40, LAT1 = 42;
-    const PK = Math.min(M.w / (LON1 - LON0), M.h / (LAT1 - LAT0));
-    const PY0 = (M.h - (LAT1 - LAT0) * PK) / 2;
-    const PX = (lon) => (lon - LON0) * PK;
-    const PY = (lat) => (LAT1 - lat) * PK + PY0;
+    // Positioning is now MapLibre's job (DEV-13 D20) — mark() outputs a plain
+    // lon/lat centroid and the map projects it. LON0/LAT0 etc. (declared
+    // above, alongside the MapLibre init) still fix the same fitted window
+    // build-map-geo.js used, now for maxBounds instead of a hand-rolled
+    // equirectangular transform.
     const BANDS = [{ lt: 5, cls: "b1" }, { lt: 10, cls: "b2" }, { lt: 20, cls: "b3" }, { lt: Infinity, cls: "b4" }];
     const bandOf = (v) => (BANDS.find((b) => v < b.lt) || BANDS[3]).cls;
     const PRODUCT_DRUG = { pyramax: "Artesunate-pyronaridine", dhappq: "Dihydroartemisinin-piperaquine" };
@@ -1676,41 +1575,41 @@
     }
 
     // Sites collide. At 1x, 300 of the 376 Artemether-lumefantrine sites sit
-    // within a dot's width of another, and even at the 8x cap 56 still do — so
-    // "one dot per site" is only honest if colliding sites visibly merge.
-    // Clusters are recomputed whenever the zoom changes and never on pan: what
-    // overlaps depends on k alone.
+    // within a dot's width of another — so "one dot per site" is only honest
+    // if colliding sites visibly merge. Clusters are recomputed whenever the
+    // zoom changes and never on pan: what overlaps depends on the current
+    // zoom alone.
     //
     // A cluster never crosses a border. That is not cartography, it is the rest
     // of the page: the fill layer, D11's tooltip grammar and the study panel are
     // all country-scoped, and a mark spanning Kenya and Tanzania could not be
     // labelled in any of them. At 1x a country's sites collapse to one mark, so
     // the world view still reads as a country map.
-    // Radii in map units at 1x. The separation two marks need is the sum of
-    // THEIR OWN radii plus a gap — not one fixed distance. A cluster is drawn
-    // much larger than a site dot, so a single threshold calibrated on site dots
-    // lets adjacent clusters pass the test and still overlap on screen.
-    // Measured before this was fixed: 71 overlapping pairs at 1x, tightest -12 px.
-    const CLUSTER_R = 7.4, MARK_GAP = 1.6;
-    const CPASS = 20;         // safety bound; converges in 2-4 passes in practice
+    // The separation two marks need is the sum of THEIR OWN radii plus a gap —
+    // not one fixed distance. A cluster is drawn much larger than a site dot,
+    // so a single threshold calibrated on site dots lets adjacent clusters
+    // pass the test and still overlap on screen (measured before this was
+    // fixed, under the old SVG renderer: 71 overlapping pairs at 1x).
     const radiusOf = (m) => (m.one ? DOT_R : CLUSTER_R);
 
     // A mark's position and value are the patient-weighted roll-up of its
     // members' most recent studies (D14) — the same pooled proportion as a
     // single site, so a cluster is exactly the sum of the dots it is hiding and
-    // the two zoom levels can never contradict each other.
+    // the two zoom levels can never contradict each other. Position is a plain
+    // lon/lat centroid (DEV-13 D20) — MapLibre projects it; the old PX/PY
+    // pixel-space output is gone along with the equirectangular projection.
     function mark(members) {
       let w = 0, vw = 0, xs = 0, ys = 0;
       members.forEach((s) => {
         const n = s.n || 0;
-        w += n; vw += s.v * n; xs += PX(s.lon) * n; ys += PY(s.lat) * n;
+        w += n; vw += s.v * n; xs += s.lon * n; ys += s.lat * n;
       });
       const ok = w > 0;
       const yrs = members.map((s) => s.year);
       return {
         members, iso3: members[0].iso3, one: members.length === 1,
-        x: ok ? xs / w : PX(members[0].lon),
-        y: ok ? ys / w : PY(members[0].lat),
+        lon: ok ? xs / w : members[0].lon,
+        lat: ok ? ys / w : members[0].lat,
         v: ok ? +(vw / w).toFixed(2) : members[0].v,
         n: w,
         yearFrom: Math.min.apply(null, yrs), yearTo: Math.max.apply(null, yrs),
@@ -1720,7 +1619,14 @@
       };
     }
 
-    function clusterSites(list, k) {
+    // Merge-distance is measured in MapLibre's own screen pixels via
+    // map.project() (DEV-13 D20), which already encodes the current zoom —
+    // no /k division needed the way the old equirectangular-pixel version
+    // required. The old measured collision tables (D13/D15: 155/94/73/49/30
+    // "still merged" at 8x/12x/16x/20x/30x; 61→3 cross-border) were specific
+    // to that projection and do not transfer; see D20 for the re-measured
+    // numbers under Mercator.
+    function clusterSites(list) {
       // Seeded biggest-study-first, so the result is deterministic between
       // renders and a cluster settles on its heaviest evidence.
       let marks = list.slice()
@@ -1738,8 +1644,10 @@
             if (taken[j] || marks[j].iso3 !== m.iso3) continue;
             // absorbing grows m, so the distance it needs grows with it —
             // recomputed per pair rather than fixed for the whole pass
-            const need = (radiusOf(m) + radiusOf(marks[j]) + MARK_GAP) / k;
-            const dx = m.x - marks[j].x, dy = m.y - marks[j].y;
+            const need = radiusOf(m) + radiusOf(marks[j]) + MARK_GAP;
+            const p1 = map.project([m.lon, m.lat]);
+            const p2 = map.project([marks[j].lon, marks[j].lat]);
+            const dx = p1.x - p2.x, dy = p1.y - p2.y;
             if (dx * dx + dy * dy < need * need) {
               m = mark(m.members.concat(marks[j].members));   // centroid moves
               taken[j] = true; merged = true;
@@ -1761,16 +1669,13 @@
       "Each dot is one WHO study site, coloured by its most recent study there — the same unit WHO's own threat map uses. " +
       "Sites too close to draw apart at this zoom merge into one numbered dot, pooled across them by patient count. Zoom in to separate them; click any dot for the studies behind it.";
 
-    function resLayer(clear) {
-      const svg = wrap.querySelector("svg");
-      let g = svg.querySelector("g.res-layer");
-      if (!g) {
-        g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        g.setAttribute("class", "res-layer");
-        svg.appendChild(g);                  // after the paths, so dots sit on top
-      }
-      if (clear) while (g.firstChild) g.removeChild(g.firstChild);
-      return g;
+    // Marks are MapLibre DOM Markers now (D20) — each owns its own element,
+    // so there is no SVG layer group to lazily create/clear the way resLayer()
+    // used to; clearMarkers() below is the direct equivalent.
+    let liveMarkers = [];
+    function clearMarkers() {
+      liveMarkers.forEach((entry) => entry.marker.remove());
+      liveMarkers = [];
     }
 
     const prettyDate = (iso) => {
@@ -2003,76 +1908,56 @@
     // Reapplied after every redraw rather than set once on the clicked circle,
     // because a zoom change rebuilds every mark. A selected cluster that splits
     // marks all its parts: each new mark is entirely within the old selection.
+    // Unchanged mechanism from D16 — walks the live Marker array instead of
+    // <circle> elements, toggling a CSS class instead of drawing a sibling ring.
     function applySelection() {
-      const g = wrap.querySelector("svg g.res-layer");
-      if (!g) return;
-      g.querySelectorAll("circle.res-ring").forEach((r) => r.remove());
-      if (!selKeys) return;
-      g.querySelectorAll("circle.res-dot").forEach((c) => {
-        const mk = c.__mark;
-        if (!(mk && mk.members.every((x) => selKeys.has(x.key)))) return;
-        const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        ring.setAttribute("class", "res-ring");
-        ring.setAttribute("cx", c.getAttribute("cx"));
-        ring.setAttribute("cy", c.getAttribute("cy"));
-        ring.setAttribute("r", (+c.getAttribute("r") + 3.2 / Z.k).toFixed(3));
-        g.appendChild(ring);       // last, so it is never painted over
+      liveMarkers.forEach((entry) => {
+        const on = !!(selKeys && entry.mk.members.every((x) => selKeys.has(x.key)));
+        entry.el.classList.toggle("is-selected", on);
       });
     }
 
     function drawMarks() {
       if (!RES || !curSites) return;
-      const g = resLayer(true);
-      drawnK = Z.k;
-      const NS = "http://www.w3.org/2000/svg";
-      const marks = clusterSites(curSites, Z.k);
+      drawnZoom = map.getZoom();
+      const marks = clusterSites(curSites);
       curMarks = marks;
-      // Within a country nothing overlaps (verified: 0 same-country overlaps at
-      // every zoom). Across a border it still can, because a cluster never
-      // crosses one — Myanmar/Thailand and DRC/Congo sit closer than a dot is
-      // wide. Zoom resolves it (61 overlapping pairs at 1x, 4 at 8x), but at
-      // low zoom a small mark could be buried under a big one and unhoverable.
-      // Drawing biggest-first puts the smaller mark on top, so both stay
-      // reachable by mouse. Keyboard already reached both: every mark is
-      // focusable regardless of what is painted over it.
-      marks.sort((a, b) => (b.one ? 0 : 1) - (a.one ? 0 : 1));
       writeNote();                 // the mark count in it is zoom-dependent
-      // counter-scaled so a mark holds its screen size at every zoom (D13)
-      const rSite = DOT_R / Z.k, rCluster = CLUSTER_R / Z.k, fs = 8.2 / Z.k;
+      clearMarkers();
+      // Within a country nothing overlaps (verified per release — see D20 for
+      // the re-measured counts under Mercator). Across a border it still can,
+      // because a cluster never crosses one. A small mark could be visually
+      // buried under a big one at low zoom; an explicit z-index (rather than
+      // DOM paint order, which drove this under the old SVG renderer) keeps
+      // single-site marks on top so both stay reachable by mouse. Keyboard
+      // already reaches both: every mark is focusable regardless of what is
+      // painted over it.
       marks.forEach((mk) => {
         const band = bandOf(mk.v);
-        const c = document.createElementNS(NS, "circle");
-        c.setAttribute("class", "res-dot " + band + (mk.one ? "" : " res-cluster"));
-        c.setAttribute("cx", mk.x.toFixed(2));
-        c.setAttribute("cy", mk.y.toFixed(2));
-        c.setAttribute("r", (mk.one ? rSite : rCluster).toFixed(3));
-        c.setAttribute("tabindex", "0");
-        c.setAttribute("role", "button");
-        c.__mark = mk;                 // applySelection needs it after a rebuild
+        const el = document.createElement("div");
+        el.className = "res-dot " + band + (mk.one ? "" : " res-cluster");
+        el.tabIndex = 0;
+        el.setAttribute("role", "button");
+        el.style.zIndex = mk.one ? "2" : "1";
+        if (!mk.one) el.textContent = String(mk.members.length);   // the count is the
+                                                                    // only thing that says
+                                                                    // a mark is more than one site
         const html = mk.one ? siteTip(mk) : clusterTip(mk);
         const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
-        c.addEventListener("mouseenter", track);
-        c.addEventListener("mousemove", track);
-        c.addEventListener("focus", () => showTipAt(c, html));   // keyboard: no cursor
-        c.addEventListener("mouseleave", hideTip);
-        c.addEventListener("blur", hideTip);
-        c.addEventListener("click", () => openMarkPanel(mk));
-        c.addEventListener("keydown", (ev) => {
+        el.addEventListener("mouseenter", track);
+        el.addEventListener("mousemove", track);
+        el.addEventListener("focus", () => showTipAt(el, html));   // keyboard: no cursor
+        el.addEventListener("mouseleave", hideTip);
+        el.addEventListener("blur", hideTip);
+        el.addEventListener("click", () => openMarkPanel(mk));
+        el.addEventListener("keydown", (ev) => {
           if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); openMarkPanel(mk); }
         });
-        g.appendChild(c);
-        if (!mk.one) {
-          // the count is the only thing that says a mark is more than one site
-          const t = document.createElementNS(NS, "text");
-          t.setAttribute("class", "res-count " + band);
-          t.setAttribute("x", mk.x.toFixed(2));
-          t.setAttribute("y", mk.y.toFixed(2));
-          t.setAttribute("font-size", fs.toFixed(3));
-          t.textContent = String(mk.members.length);
-          g.appendChild(t);
-        }
+        const marker = new maplibregl.Marker({ element: el, anchor: "center" })
+          .setLngLat([mk.lon, mk.lat]).addTo(map);
+        liveMarkers.push({ marker, el, mk });
       });
-      // after the circles exist, not before — the ring has to be reapplied on
+      // after the markers exist, not before — the ring has to be reapplied on
       // every rebuild, and a zoom change rebuilds all of them
       applySelection();
       return marks;
@@ -2086,14 +1971,14 @@
       const note = document.getElementById("res-note");
       const sel = document.getElementById("res-drug");
       const spSel = document.getElementById("res-species");
-      resLayer(true);
+      clearMarkers();
 
       const checked = document.querySelector('input[name="reslayer"]:checked');
       const on = checked && checked.value !== "off";
       const drug = sel.value, species = spSel.value;
       if (!on || !drug || !species) {
         legend.hidden = true; ruleEl.hidden = true; note.hidden = true;
-        // applyZoom redraws on a zoom change only while curSites is set —
+        // the zoomend handler only rebuilds marks while curSites is set —
         // leaving it behind would repaint the dots after the overlay was
         // switched off, the next time the reader zoomed
         curSites = null; curMarks = [];
@@ -2148,8 +2033,25 @@
     document.getElementById("res-close").addEventListener("click", closePanel);
 
     tabs.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => selectMap(t.dataset.id)));
-    // default to the first product that has country data
-    selectMap((tracked.find(p => p.detail.countries) || tracked[0]).id);
+
+    // Clustering is recomputed on an actual zoom-LEVEL change only, never on
+    // pan (D13/D20's invariant) — bound to 'zoomend' rather than 'zoom' (fires
+    // every animation frame) or 'moveend' (fires on pan too).
+    map.on("zoomend", () => {
+      if (!curSites) return;
+      const z = map.getZoom();
+      if (Math.abs(z - drawnZoom) < 0.001) return;
+      drawMarks();
+    });
+
+    // Everything above only touches the map's style/sources once it exists,
+    // but setFeatureState/setPaintProperty need the style actually loaded —
+    // hence deferring the first paint and the initial product selection here.
+    map.on("load", () => {
+      paintCountries();
+      // default to the first product that has country data
+      selectMap((tracked.find(p => p.detail.countries) || tracked[0]).id);
+    });
 
     // Every country reports its stage on hover — including "No data", which is a
     // finding in its own right. Large countries would put a bbox-centred tooltip

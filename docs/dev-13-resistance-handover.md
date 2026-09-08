@@ -168,7 +168,7 @@ did not count the two CSVs.)
 | `scripts/normalize-resistance.js` | Reads that CSV → writes the two outputs below. Zero dependencies, no network. |
 | `sourcing/staging/resistance_tes.csv` | Auditable intermediate: every study, one row each. |
 | `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **Unchanged by V2 — byte-identical to V1.** |
-| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer, `---- map pan / zoom` for D13, and `---- site-level marks` for D14/D15. The only file V2 changes. |
+| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom). The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. |
 | `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). Still checks resistance `iso3` values against `data/world-map.js` only (D17) — unaware of `data/world-map-geo.js` below. |
 | `scripts/build-map-geo.js` | **New.** Sibling to `scripts/build-map.js`, same dev-only-deps/`NODE_PATH` convention. Emits GeoJSON (not SVG paths) at Natural Earth **50m** from the identical `NUM_TO_A3` country table — this page's basemap only (D17). |
 | `data/world-map-geo.js` | **New**, generated output of the above. `window.LAUNCH_MAP_GEO = {type:"FeatureCollection", features:[{properties:{iso3,name}, geometry}]}`. 100 countries (6 more than `data/world-map.js`'s 94 — see D17 for the exact accounting). Not yet loaded by any page as of this commit. |
@@ -674,6 +674,78 @@ page and must say so, not go stale.
 This commit only loads the library (`<link>`/`<script>` tags, plus the
 `data/world-map-geo.js` script tag) — the page still renders the old SVG map
 unchanged. Nothing yet reads `window.maplibregl` or `window.LAUNCH_MAP_GEO`.
+
+**D19 — Native MapLibre pan/zoom, choropleth fill and marks replace D13's
+hand-rolled viewBox code outright; not ported, deleted.** The whole
+`Z`/`applyZoom`/`zoomAt`/`toMap` block, including the pointer-capture
+workaround (`setPointerCapture` on `pointerdown` breaking a dot's `click` at
+zoom — D13's "bug that cost the whole click-through") is gone. That bug has
+no MapLibre equivalent to carry forward: it was purely a consequence of
+hand-rolling drag-vs-click disambiguation on top of raw pointer events, which
+MapLibre's own marker/map click handling does not need. The `<path>`-per-
+country bootstrap and `wrap.querySelectorAll("path")` styling loop are
+likewise gone, replaced by a MapLibre `geojson` source (`LAUNCH_MAP_GEO`,
+`promoteId:'iso3'`) with `fill`/`line` layers painted via `setFeatureState`.
+
+Native replacements chosen for each hand-rolled piece:
+
+| D13 built | replaced by |
+|---|---|
+| `Z.k` clamped to `[1, ZMAX]`, viewBox recomputed by hand | `map.minZoom`/`maxZoom` (`ZMAX` kept at 16 — D13's reasoning, coastline facet quality, is about basemap detail and still applies, now against a sharper 50m source) |
+| viewBox clamped inside the basemap so panning never shows ocean past the edge | `maxBounds`, set to the same lon/lat window `build-map-geo.js` fits to |
+| "Ctrl/Cmd+wheel only, never a bare wheel" hand-written listener | `cooperativeGestures: true` — MapLibre's built-in equivalent of the exact same rule |
+| custom `#mz-in`/`#mz-out`/`#mz-reset` buttons | `maplibregl.NavigationControl` (zoom buttons only, `showCompass:false`) |
+| custom arrow-key pan handler | **not** MapLibre's own default keyboard scheme — see below |
+| a mark's radius counter-scaled by `1/Z.k` so it holds constant screen size | not needed: DOM `Marker` elements never inherit the map's zoom transform (D20) |
+
+**Rotation/pitch are explicitly locked off** (`dragRotate: false,
+pitchWithRotate: false, touchPitch: false, keyboard: false`, with a hand-
+written arrow-key-only pan listener replacing MapLibre's own keyboard scheme
+entirely). Found during implementation, not anticipated going in: MapLibre's
+default keyboard handler binds Shift+arrow to rotate and Shift+Up/Down to
+pitch, and `dragRotate:false` does **not** also disable that — only
+mouse-drag rotation. A north-up 2D choropleth that could be rotated by
+Shift+arrow on a canvas the user didn't ask to rotate would be a real, silent
+behaviour change, so the built-in scheme is off entirely and a 4-direction,
+pan-only listener (`map.panBy`) stands in for it.
+
+**D20 — Marks reposition to lon/lat; the clustering merge-distance test
+moves to MapLibre's own screen pixels.** The crux of the whole migration,
+and worth stating precisely because it is easy to get subtly wrong: D13's
+`PX(lon)`/`PY(lat)` were a **linear equirectangular** projection fitted to
+this basemap's fixed 960×420 canvas. MapLibre projects in **Web Mercator**,
+which is not linear in latitude. Two consequences, both implemented:
+
+1. `mark()` no longer computes `x`/`y` in pixel space at all — it outputs a
+   plain patient-weighted **`{lon, lat}`** centroid (same weighting
+   arithmetic as before; only the output coordinate space changed) and
+   MapLibre projects it via the `Marker`'s `setLngLat`.
+2. `clusterSites()`'s merge test — "do these two marks need to combine" —
+   moves from comparing static `PX`/`PY` deltas divided by the old `Z.k`, to
+   comparing `map.project([lon,lat])` screen-pixel distances directly. No
+   `/k` division is needed: `map.project()` already encodes the current
+   zoom. Recomputed per pair, same as before, because absorbing a member
+   grows the merged mark and the distance it needs grows with it.
+
+**D13/D15's measured collision tables do not transfer, and must not be
+assumed.** The numbers "155/94/73/49/30 still merged at 8x/12x/16x/20x/30x"
+and "61→3 cross-border overlaps" were measured under the old equirectangular
+projection at those specific zoom multipliers. Mercator's north–south
+stretch means the *same* real-world distance in km projects to a *different*
+number of screen pixels depending on latitude and MapLibre's zoom level is
+not the same quantity as the old `Z.k`. **The invariant those numbers were
+proving — zero same-country overlaps at every zoom a reader can reach — must
+still hold, but the numbers proving it have to be re-measured against this
+renderer, not copied over.** That re-measurement is flagged in §7 as
+outstanding: what's been verified so far is a single worked example
+(ASPY/falciparum: 13 marks at world zoom → 24 once zoomed onto the merged
+Central-Africa cluster, matching the expected direction and rough
+magnitude), not the exhaustive per-drug×species sweep D15 originally ran.
+
+Marks are drawn as MapLibre DOM `Marker`s (a plain `<div>`, not an SVG
+`<circle>` or a canvas symbol layer) — the accessibility and theming
+consequences of that choice are D21's, landing with the country-list commit
+next; this commit only carries the geometry/positioning change.
 
 ---
 
