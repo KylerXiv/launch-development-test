@@ -25,6 +25,12 @@
     --accent: #0F5A72;
     --accent-ink: #FFFFFF;
     --accent-soft: #E6F1F4;
+    /* The WHO emblem (assets/who-emblem.svg) can't be recoloured — its blue
+       is WHO's own, fixed by their usage policy. So the other journey glyphs
+       take that same blue instead, everywhere they appear (the overview
+       pathway strip and each product's stage markers) — every other use of
+       --accent on the page (buttons, links, chips) is unaffected. */
+    --journey-icon: #009EDB;
     --good: #1E8A5A;
     --good-soft: #E2F2EA;
     --warn: #B87500;
@@ -78,7 +84,6 @@
   .attrib a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .attrib .ptxt { font-size: 12.5px; line-height: 1.3; color: var(--ink-3); }
   .attrib img { display: block; width: 40px; height: auto; }
-  @media (max-width: 760px) { .attrib { justify-content: flex-start; } }
   .brand h1 { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.01em; }
   .brand h1 span { color: var(--accent); }
   .brand h1 span.proto-badge {
@@ -92,6 +97,17 @@
   .brand p { margin: 4px 0 0; color: var(--ink-2); font-size: 15px; max-width: 60ch; }
   .meta { margin-left: auto; text-align: right; font-size: 12.5px; color: var(--ink-3); line-height: 1.6; }
   .meta b { color: var(--ink-2); font-weight: 600; }
+  /* The header wraps at about 1180px, well above the 760px phone breakpoint,
+     and .meta then lands on a line of its own where `margin-left:auto` held it
+     against a wide empty gutter — a void beside the Unitaid mark, the date and
+     now the two buttons. Once it has its own line it should read as a
+     continuation of the brand block, so it left-aligns from the width it
+     actually starts wrapping at. */
+  @media (max-width: 1180px) {
+    .meta { margin-left: 0; text-align: left; }
+    .attrib { justify-content: flex-start; }
+    .hdr-actions { justify-content: flex-start; }
+  }
   .demo-banner {
     margin: 18px 0 20px; padding: 9px 14px; border-radius: 8px;
     background: var(--accent-soft); color: var(--ink-2); font-size: 13px;
@@ -117,11 +133,12 @@
 
   /* ---------- summary + legend strip ---------- */
   .strip {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 26px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px;
     padding: 12px 18px; margin-bottom: 22px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
   .stat { display: flex; align-items: baseline; gap: 7px; }
+  .stat:not(:first-child) { padding-left: 20px; border-left: 1px solid var(--line); }
   .stat .n { font-size: 22px; font-weight: 750; font-variant-numeric: tabular-nums; }
   .stat .n.crit-n { color: var(--crit); }
   .stat .l { font-size: 12.5px; color: var(--ink-2); }
@@ -142,7 +159,7 @@
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
-  .pathnode svg { width: 30px; height: 30px; display: block; margin: 0 auto; color: var(--accent); }
+  .pathnode svg { width: 30px; height: 30px; display: block; margin: 0 auto; color: var(--journey-icon); }
   /* The WHO emblem sits in the same box as a glyph but keeps its own colour and
      its own 1.13:1 ratio, so it is contained rather than stretched. */
   /* Slightly larger than the line glyphs beside it: a solid mark reads smaller
@@ -246,6 +263,7 @@
     font-variant-numeric: tabular-nums; background: var(--good-soft); color: var(--good);
   }
   .tgap-key.g-back { background: var(--surface-2); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
+  .tl-key { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 8px; font-size: 10.5px; color: var(--ink-3); }
 
   /* illustrated stage marker: journey icon + status badge overlay */
   .stage .smark {
@@ -260,10 +278,25 @@
   .stage .smark[aria-expanded="true"] { box-shadow: 0 0 0 3px var(--accent); }
   .stage .smark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .stage .sicon { width: 26px; height: 26px; display: block; }
-  .stage.s-done .smark { background: var(--good-soft); color: var(--good); }
-  .stage.s-prog .smark { background: var(--warn-soft); color: var(--warn); }
-  .stage.s-late .smark { background: var(--crit-soft); color: var(--crit); }
+  /* Reached gates all share the icon row's blue (matching the WHO emblem,
+     which can't take a status colour) — status lives in the background tint
+     and the corner .dot badge instead, same split the WHO gates always used,
+     now applied to every gate so the icon colour itself doesn't fight the
+     emblem's fixed blue. Green pairs fine with blue (good-soft stays), but
+     amber/red pastels read as a clash next to a blue icon, so in-progress and
+     delayed go neutral instead — the corner badge alone still carries amber
+     or red clearly. */
+  .stage.s-done .smark { background: var(--good-soft); color: var(--journey-icon); }
+  .stage.s-prog .smark { background: var(--surface-2); color: var(--journey-icon); border: 2px solid var(--warn); }
+  .stage.s-late .smark { background: var(--surface-2); color: var(--journey-icon); border: 2px solid var(--crit); }
   .stage.s-idle .smark { background: none; border: 1px dashed var(--line); opacity: .55; }
+  /* The WHO emblem can't take the idle grey tint the other glyphs get from
+     `color` — it's an image with WHO's own fixed blue (assets/who-emblem.svg),
+     not a currentColor stroke. Left alone it reads as active/blue against
+     siblings that have faded to grey. Grayscale plus extra fade neutralises
+     that only for a not-yet-reached gate; a reached WHO gate keeps its normal
+     colour like the emblem does everywhere else on the page. */
+  .stage.s-idle .whoemb { filter: grayscale(1) opacity(.8); }
   .stage .smark .dot { position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; font-size: 9.5px; box-shadow: 0 0 0 2px var(--surface); cursor: help; }
   .stage.s-idle .smark .dot { display: none; }
   .stage.cur .smark { box-shadow: 0 0 0 4px var(--accent-soft); }
@@ -761,33 +794,80 @@
   .timing-scroll { overflow-x: auto; }
   .timing-inner { min-width: 640px; }
 
-  /* download button */
-  .dl-btn {
-    margin-left: auto; background: var(--accent); color: var(--accent-ink); border: 0;
-    border-radius: 8px; padding: 7px 14px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
-  }
-  .dl-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .strip .legend { margin-left: 0; }
-  /* Subscribe sits with Download CSV — the strip is where this page keeps its
-     actions. Outlined rather than filled, so the two read as peers without two
-     solid accent blocks competing. `margin-left:auto` lives on .dl-btn, so the
-     pair is pushed right together by putting this one first. */
-  .sub-btn {
-    margin-left: auto; background: transparent; color: var(--accent);
-    border: 1px solid var(--accent); border-radius: 8px; padding: 6px 13px;
-    font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
-  }
-  .sub-btn:hover { background: var(--accent-soft); }
-  .sub-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .strip .sub-btn + .dl-btn { margin-left: 0; }
+  /* header actions — Download CSV + Subscribe -------------------------------
+     These used to be the last two flex items of .strip, alongside the three
+     stats and the six legend keys. That could not hold: the strip wraps, the
+     legend is wide enough to fill its row at most widths, so Download CSV was
+     pushed onto a line of its own while `margin-left:auto` kept Subscribe up
+     with the legend — the two actions read as unrelated things. Here they are
+     one flex group in the header rail, so they wrap as a unit or not at all,
+     and the strip is left doing one job (numbers + legend).
 
-  /* The panel it opens. Front end only for now — see the seam in the script. */
+     Emphasis is the reverse of what it was. Subscribe is the only conversion
+     point on the page and now takes the solid accent block; Download CSV is a
+     utility and is outlined beside it. */
+  .hdr-actions { position: relative; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+  .hdr-actions button { display: inline-flex; align-items: center; gap: 7px; }
+  /* The glyph is an anchor for the eye, never the label — both buttons keep
+     their words — so it is aria-hidden and is not allowed to shrink. */
+  .hdr-actions svg { flex: none; width: 14px; height: 14px; }
+  .dl-btn {
+    background: transparent; color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 6px 13px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
+  }
+  .dl-btn:hover { background: var(--accent-soft); }
+  .dl-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .sub-btn {
+    background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 6px 13px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
+  }
+  .sub-btn:hover { background: #0C4A5E; border-color: #0C4A5E; }
+  .sub-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  /* .legend's own `margin-left:auto` is for the map legend; in the strip it
+     should sit on its own line under the stats instead. */
+  .strip .legend { margin-left: 0; flex-basis: 100%; padding-top: 8px; border-top: 1px dashed var(--line); }
+
+  /* The panel it opens. Front end only for now — see the seam in the script.
+     Anchored to .hdr-actions rather than sitting inline in the document: an
+     inline panel pushed the whole pathway section down and opened two blocks
+     away from the button that triggered it. This floats directly under
+     Subscribe instead, so the dashboard underneath never shifts. Closes on
+     Escape and on a click outside it — see the script. */
   .subwrap {
-    margin: -12px 0 22px; padding: 14px 18px;
+    position: absolute; top: calc(100% + 10px); right: 0; z-index: 20;
+    width: 380px; max-width: calc(100vw - 48px);
+    padding: 14px 18px;
     background: var(--surface); border: 1px solid var(--line);
     border-top: 3px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow);
+    /* .meta, its new parent, sets text-align:right for the date/attribution
+       line — undo that here so the form reads left-to-right like everywhere
+       else on the page. */
+    text-align: left; color: var(--ink);
+  }
+  /* Pointer tail: a 10px square rotated 45deg, same fill and side borders as
+     the panel, clipped so only its top-left edge (now pointing up) shows a
+     border — the other three sides sit under the panel body and must stay
+     seamless. */
+  .subwrap::before {
+    content: ""; position: absolute; top: -6px; right: 24px;
+    width: 10px; height: 10px; background: var(--surface);
+    border: 1px solid var(--line); border-bottom: 0; border-right: 0;
+    transform: rotate(45deg);
   }
   .subwrap[hidden] { display: none; }
+  @media (max-width: 1180px) {
+    /* .hdr-actions left-aligns at this width (see the header query above), so
+       the dropdown and its tail follow it to the left edge instead of the
+       right. */
+    .subwrap { right: auto; left: 0; }
+    .subwrap::before { right: auto; left: 24px; }
+  }
+  @media (max-width: 760px) {
+    /* Full-width sheet: at phone widths a 380px card would either overflow or
+       leave awkward margins on both sides, so it spans the header instead. */
+    .subwrap { left: 0; right: 0; width: auto; max-width: none; }
+    .subwrap::before { left: 24px; right: auto; }
+  }
   .subwrap h2 { margin: 0 0 3px; font-size: 15px; font-weight: 700; }
   .subwrap p { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-2); max-width: 64ch; }
   .subrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
@@ -818,7 +898,7 @@
     body { background: #fff; }
     .product .detail { display: block !important; }
     .product { break-inside: avoid; box-shadow: none; }
-    .dl-btn, .sub-btn, #tip, .gp-close, .gw-jump { display: none !important; }
+    .hdr-actions, #tip, .gp-close, .gw-jump { display: none !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
     .gatepanel[hidden], .gatewrap[hidden] { display: none !important; }
     .gatepanel, .gatewrap { break-inside: avoid; box-shadow: none; }
@@ -831,14 +911,13 @@
     .brand h1 { font-size: 21px; line-height: 1.25; }
     .prow { grid-template-columns: 1fr; padding: 14px 14px; }
     .flagnote { margin-left: 14px; margin-right: 14px; }
-    .meta { text-align: left; margin-left: 0; }
     .updates li { flex-wrap: wrap; gap: 4px 12px; }
     .strip { padding: 10px 14px; }
+    .hdr-actions button { padding: 10px 15px; }
     .pathway { padding: 12px 12px 10px; }
     .pathnode { min-width: 72px; }
     .pathnode .pill { width: 38px; height: 38px; }
     .pathnode svg, .pathnode .whoemb { width: 25px; height: 25px; }
-    .dl-btn { margin-left: 0; }
     .detail { padding: 14px; }
     .timing-axis { margin-left: 110px; }
     .trow2 .tname { width: 110px; font-size: 12px; }
@@ -860,7 +939,25 @@
           <img src="assets/unitaid-mark.svg" alt="Unitaid" width="388" height="251">
         </a>
       </div>
-      <span id="updated"></span><span id="meta-note"></span><br>
+      <span id="updated"></span><span id="meta-note"></span>
+      <div class="hdr-actions">
+        <button class="dl-btn" id="dl-csv" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v7.5M4.75 6.75 8 10l3.25-3.25M2.5 13h11"/></svg> Download CSV</button>
+        <button class="sub-btn" id="sub-open" type="button" aria-expanded="false" aria-controls="subwrap"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.75" y="3.25" width="12.5" height="9.5" rx="1.5"/><path d="m2.25 4.6 5.05 3.85a1.15 1.15 0 0 0 1.4 0L13.75 4.6"/></svg> Subscribe for updates</button>
+        <section class="subwrap" id="subwrap" hidden aria-labelledby="sub-title">
+          <h2 id="sub-title">Subscribe for updates</h2>
+          <p>Get an email when the data on this page is updated — new milestones, corrected figures
+            and newly verified country registrations.</p>
+          <form class="subrow" id="sub-form" novalidate>
+            <label class="visually-hidden" for="sub-email">Your email address</label>
+            <input id="sub-email" name="email" type="email" autocomplete="email"
+                   placeholder="you@organisation.org" aria-describedby="sub-msg">
+            <button class="sub-go" type="submit">Notify me</button>
+          </form>
+          <p class="sub-msg" id="sub-msg" role="status" hidden></p>
+          <p class="sub-note">Not switched on yet — the mailing list has no home to send to, so nothing
+            leaves your browser when you press Notify me. The button is here so the page is ready for it.</p>
+        </section>
+      </div>
     </div>
   </header>
 
@@ -875,27 +972,8 @@
       <span class="key"><span class="dot prog" aria-hidden="true">›</span> In progress</span>
       <span class="key"><span class="dot late" aria-hidden="true">!</span> Delayed / bottleneck</span>
       <span class="key"><span class="dot idle" aria-hidden="true"></span> Not started (stage glyph dimmed, no badge)</span>
-      <span class="key"><span class="tgap-key" aria-hidden="true">●</span> Gate's real year — see the timeline below each pathway</span>
-      <span class="key"><span class="tgap-key g-back" aria-hidden="true">↩</span> Reached before the gate ahead of it in the pathway (line dips back)</span>
     </div>
-    <button class="sub-btn" id="sub-open" type="button" aria-expanded="false" aria-controls="subwrap">Subscribe for more information</button>
-    <button class="dl-btn" id="dl-csv" type="button">Download CSV</button>
   </div>
-
-  <section class="subwrap" id="subwrap" hidden aria-labelledby="sub-title">
-    <h2 id="sub-title">Subscribe for more information</h2>
-    <p>Get an email when the data on this page is updated — new milestones, corrected figures
-      and newly verified country registrations.</p>
-    <form class="subrow" id="sub-form" novalidate>
-      <label class="visually-hidden" for="sub-email">Your email address</label>
-      <input id="sub-email" name="email" type="email" autocomplete="email"
-             placeholder="you@organisation.org" aria-describedby="sub-msg">
-      <button class="sub-go" type="submit">Notify me</button>
-    </form>
-    <p class="sub-msg" id="sub-msg" role="status" hidden></p>
-    <p class="sub-note">Not switched on yet — the mailing list has no home to send to, so nothing
-      leaves your browser when you press Notify me. The button is here so the page is ready for it.</p>
-  </section>
 
   <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway — choose a gate to see every medicine at it" hidden></div>
   <div class="gatewrap" id="gatewrap" hidden></div>
@@ -1080,10 +1158,10 @@
   // Illustrated stage glyphs (assets/journey-icons/icons.js), one per stage in
   // stage order. Injected once as a sprite; each marker references it by <use>,
   // so the glyph inherits its marker's status colour and the page theme.
-  // The solid set (assets/journey-icons/icons-solid.js) is this page's own —
-  // filled glyphs sized to sit beside the WHO emblem. It falls back to the
-  // shared outline set if that file fails to load, so the markers never
-  // come up empty.
+  // This page's own set (assets/journey-icons/icons-solid.js) — six gates
+  // drawn in the same monoline system as icons.js, one (national policy)
+  // kept solid by request. It falls back to the shared outline set if that
+  // file fails to load, so the markers never come up empty.
   const JI = window.LaunchJourneyIconsSolid || window.LaunchJourneyIcons;
   if (JI) document.body.insertAdjacentHTML("afterbegin", JI.sprite());
 
@@ -1312,12 +1390,21 @@
 
     const items = [];
     STAGES.forEach((label, i) => {
-      let x = null, yearLine = null, isCurrent = false;
+      let x = null, yearLine = null, isCurrent = false, curColor = null;
       if (years[i] != null) { x = scale(years[i]); yearLine = String(years[i]); }
-      else if (i === p.currentStage) { x = todayX; yearLine = "in progress"; isCurrent = true; }
+      else if (i === p.currentStage) {
+        x = todayX; isCurrent = true;
+        // Same split as the stage marker's ring: on-track reads amber and says
+        // "in progress"; an actually-late current stage reads red and says
+        // "delayed" instead — the red dot with an "in progress" label was
+        // reading as a contradiction.
+        const isLate = p.stages[i].status === "late";
+        yearLine = isLate ? "delayed" : "in progress";
+        curColor = isLate ? "var(--crit)" : "var(--warn)";
+      }
       if (x == null) return;
       const nameLines = wrapLabel(label);
-      items.push({ idx: i, x, isCurrent, nameLines, yearLine, halfW: estHalfWidth(nameLines.concat([yearLine])) });
+      items.push({ idx: i, x, isCurrent, curColor, nameLines, yearLine, halfW: estHalfWidth(nameLines.concat([yearLine])) });
     });
     if (!items.length) return "";
     items.sort((a, b) => a.x - b.x);
@@ -1367,8 +1454,9 @@
 
     items.forEach(it => {
       if (it.isCurrent) {
-        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="9" fill="var(--crit-soft)"/>`);
-        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="5" fill="var(--crit)"/>`);
+        const softColor = it.curColor === "var(--crit)" ? "var(--crit-soft)" : "var(--warn-soft)";
+        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="9" fill="${softColor}"/>`);
+        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="5" fill="${it.curColor}"/>`);
       } else {
         parts.push(`<circle cx="${it.x}" cy="${dotY}" r="4" fill="var(--good)"/>`);
       }
@@ -1379,7 +1467,7 @@
         parts.push(`<text x="${it.x}" y="${ly}" text-anchor="middle" font-size="11" fill="var(--ink-2)">${esc(ln)}</text>`);
         ly += 13;
       });
-      parts.push(`<text x="${it.x}" y="${ly}" text-anchor="middle" font-size="11" font-weight="700" font-variant-numeric="tabular-nums" fill="${it.isCurrent ? "var(--crit)" : "var(--ink)"}">${esc(it.yearLine)}</text>`);
+      parts.push(`<text x="${it.x}" y="${ly}" text-anchor="middle" font-size="11" font-weight="700" font-variant-numeric="tabular-nums" fill="${it.isCurrent ? it.curColor : "var(--ink)"}">${esc(it.yearLine)}</text>`);
     });
 
     // total elapsed time so far — first real gate to today (still ongoing,
@@ -1393,6 +1481,7 @@
 
     return `<div class="tlbox"><div class="tl-caption"><span>Actual timeline</span>${totalLabel ? `<span class="tl-total">${esc(totalLabel)}</span>` : ""}</div>
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Real timing of gates reached for ${esc(p.name)}">${parts.join("")}</svg>
+      <div class="tl-key"><span class="tgap-key" aria-hidden="true">●</span> gate's real year <span class="tgap-key g-back" aria-hidden="true">↩</span> reached out of order (line dips back)</div>
     </div>`;
   }
 
@@ -3039,11 +3128,32 @@
   const subMail = document.getElementById("sub-email");
   const subMsg  = document.getElementById("sub-msg");
 
+  function openSub() {
+    subWrap.hidden = false;
+    subOpen.setAttribute("aria-expanded", "true");
+    subMail.focus();
+  }
+  function closeSub(opts) {
+    opts = opts || {};
+    if (subWrap.hidden) return;
+    subWrap.hidden = true;
+    subOpen.setAttribute("aria-expanded", "false");
+    if (opts.returnFocus) subOpen.focus();
+  }
+
   subOpen.addEventListener("click", () => {
-    const open = subWrap.hidden;
-    subWrap.hidden = !open;
-    subOpen.setAttribute("aria-expanded", String(open));
-    if (open) subMail.focus();
+    if (subWrap.hidden) openSub(); else closeSub();
+  });
+
+  // A floating panel — unlike the old inline one — needs its own dismissal:
+  // nothing else on the page tells you it is still open once you look away.
+  document.addEventListener("pointerdown", e => {
+    if (!subWrap.hidden && !subWrap.contains(e.target) && e.target !== subOpen && !subOpen.contains(e.target)) {
+      closeSub();
+    }
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && !subWrap.hidden) closeSub({ returnFocus: true });
   });
 
   function subSay(text, cls) {
