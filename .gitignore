@@ -1,4 +1,5 @@
 node_modules/
+public-site/
 .claude/settings.local.json
 preview.html
 __pycache__/
