@@ -17,13 +17,12 @@
 // Uses Natural Earth 50m (public domain) via the world-atlas package — one
 // resolution step up from build-map.js's 110m, chosen because a page-specific
 // basemap can carry more detail without the 12-page blast radius a change to
-// data/world-map.js would have (see dev-13-resistance-handover.md D17).
+// data/world-map.js would have.
 //
 // Country set: EVERY country/territory world-atlas's topology can resolve to an
 // ISO 3166-1 alpha-3 code (via i18n-iso-countries' numeric->alpha3 table) — this
-// reverses D17's original "identical to build-map.js's NUM_TO_A3, not a
-// superset" choice, specifically and only for this file (see the later
-// decision recorded in dev-13-resistance-handover.md — the Location filter's
+// reverses this file's original "identical to build-map.js's NUM_TO_A3, not a
+// superset" choice, specifically and only for this file (the Location filter's
 // "Region" picker needs every WHO region to actually have country shapes to
 // show, including regions like Europe with no WHO malaria-resistance tracking
 // at all, the same way WHO's own threat map always draws the full world and

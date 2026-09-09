@@ -1,13 +1,12 @@
 # Illustrated journey UI — working notes
 
-Companion to [dev-13-resistance-handover.md](dev-13-resistance-handover.md).
-That document owns the resistance/access map; this one owns everything else on
+This document owns the non-map furniture of
 `illustrated-journey-dashboard.html` — the draft-data warning, the feedback
 widget's framing, the changelog panel, the stage-marker icon set including the
 WHO emblem, the "Powered by" attribution, the sources footer and the subscribe
 button.
 
-Same shape as the DEV-13 document, same rule: §10 says which kind of change
+Same rule as [CLAUDE.md](../CLAUDE.md) states: §10 says which kind of change
 touches which section, and the update belongs in the same commit as the change
 it describes.
 

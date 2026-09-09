@@ -197,8 +197,7 @@ No test framework by design; two layers instead:
   warning overlay unless `countries.status === "verified"` — the map can never
   silently present unverified coverage. Self-contained by design: no tiles, no
   CDN — **except `illustrated-journey-dashboard.html`**, which loads MapLibre
-  GL JS from a CDN for its own map rendering only (see below and
-  `docs/dev-13-resistance-handover.md` D17–D21); the other 11 pages sharing
+  GL JS from a CDN for its own map rendering only (see below); the other 11 pages sharing
   `data/world-map.js` are unaffected and remain fully self-contained.
 - **Resistance overlay** (implemented, `illustrated-journey-dashboard.html`
   only): WHO Malaria Threat Map treatment-failure results drawn as graduated,
@@ -210,12 +209,13 @@ No test framework by design; two layers instead:
   channel. Data is the committed `data/resistance.js`
   (`scripts/normalize-resistance.js`; manual export step in
   `sourcing/README.md`), validated by a `validate-data.js` pass that runs only
-  on the default invocation, unchanged by the rendering engine. Full decision
-  history for the MapLibre migration — including why it overrides an earlier
-  no-mapping-library decision — is in `docs/dev-13-resistance-handover.md` §1c
-  and D17–D21; the bullets below describe the *feature*, not the current
-  renderer, and predate that migration (kept for the data/methodology
-  decisions they still document correctly — D5, D6/D12, D9, D10 in that file).
+  on the default invocation, unchanged by the rendering engine. The MapLibre
+  dependency deliberately overrides this repo's otherwise strict
+  no-runtime-dependency rule, for this one page only, because a pan/zoom map
+  with per-site dots could not be built on the hand-rolled SVG renderer it
+  replaced; the reasoning is kept in the page's own `---- MapLibre init`
+  comment block. The bullets below describe the *feature*, not the current
+  renderer, and predate that migration.
   - **Nothing is filtered.** All five *Plasmodium* species and studies of every
     size are shipped. Only rows WHO publishes with no usable value (a literal
     `NaN`) or no coordinates are dropped, and the normalizer counts them aloud.
@@ -224,7 +224,9 @@ No test framework by design; two layers instead:
     border). A site's own dot is its most recent study; a cluster is its
     members' most recent studies, **patient-weighted** so one small study
     cannot decide the colour. (Superseded from an earlier one-dot-per-country
-    model — see `dev-13-resistance-handover.md` D14 for why.)
+    model, which let a country's most recent year be decided by a handful of
+    patients — Kenya read 0% off 44 patients while ignoring 883 including
+    Siaya at 11.5%.)
   - **Click a dot** for every study behind it — a sortable panel below the map
     (site, region, year, patients, failure %, linked source). That is where the
     site-level detail lives instead of zoom.

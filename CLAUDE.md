@@ -10,10 +10,9 @@ Every task that changes a feature branch also updates that branch's
 working-notes document in `docs/`, **in the same commit as the change it
 describes**. A separate "update the docs" commit is a promise to forget.
 
-For DEV-13 that document is
-[docs/dev-13-resistance-handover.md](docs/dev-13-resistance-handover.md); its
-§10 lists which kind of change touches which section. A new feature branch
-starts its own equivalent document and keeps the same shape.
+DEV-13's own handover document was deliberately removed once the work landed,
+so that branch has none; the rule above still governs any new feature branch,
+which starts its own.
 
 What goes in it, in order of how expensive it is to reconstruct later:
 
@@ -31,10 +30,28 @@ explicitly rather than skipping the update silently.
 
 ## Before committing
 
-Run the branch document's own verify block — for DEV-13, §8 "Verify before
-committing". Generated data files are regenerated and expected to come back
-byte-identical; the validator is expected to report a specific error/warning
-count, not merely to exit cleanly.
+Run the verify block. Generated data files are regenerated and expected to come
+back **byte-identical**; the validator is expected to report a **specific**
+error/warning count, not merely to exit cleanly.
+
+```bash
+node scripts/normalize-resistance.js          # regenerate; expect byte-identical
+node scripts/normalize-molecular-markers.js   # ditto
+node scripts/validate-data.js                 # expect 0 errors, 5 warnings
+node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 warnings
+node scripts/make-preview.js                  # smoke test
+```
+
+The 5 warnings are 3 + 2: three long-standing `resistance:` ones (1 unnamed
+site, 730 uncited studies, 12 undrawn country values) and two
+`molecular markers:` ones (625 uncited surveys, 9 undrawn country values). Any
+other split means something moved.
+
+`scripts/verify-map-clusters.js` also exists but needs puppeteer, which is not
+installed here. Headless Chrome additionally needs a software GL backend or
+MapLibre never finishes initialising and the whole page looks broken — add
+`--enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader` and drop
+`--disable-gpu`.
 
 Review diffs with `git diff --ignore-cr-at-eol`. Files on disk are CRLF and the
 repo stores LF, so a raw `git diff` shows whole-file churn that is not real.

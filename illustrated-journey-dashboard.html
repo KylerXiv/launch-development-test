@@ -1956,8 +1956,7 @@
     // always has real shapes to show — including regions like Europe with no
     // WHO malaria-resistance tracking at all — the same way WHO's own threat
     // map always draws the full world and greys out whatever has no data
-    // (see the Location-filter decision recorded after D17 in
-    // dev-13-resistance-handover.md). Nothing that used to be undrawn becomes
+    // Nothing that used to be undrawn becomes
     // wrongly paintable: a country only ever gets a real access colour when
     // byIso has an entry for it, which still only ever comes from a
     // product's real WHO data.
@@ -2029,9 +2028,12 @@
       <ul class="map-country-list" id="map-country-list" aria-label="Countries on this map, list form"></ul>`;
 
     // ---- MapLibre init (DEV-13 D18/D19 — supersedes D13) -------------------
-    // D13 rejected any mapping library ("the first runtime dependency on a
-    // page that has none"). Overridden here, deliberately, for this page
-    // only: see dev-13-resistance-handover.md D18 for the full reasoning.
+    // An earlier decision rejected any mapping library ("the first runtime
+    // dependency on a page that has none"). Overridden here, deliberately, and
+    // for this page only: the pan/zoom, per-site-dot map the feature needs
+    // could not be built on the hand-rolled viewBox/SVG renderer it replaced —
+    // clustering, projection and hit-testing were all being reinvented badly.
+    // That argument does NOT extend to any other page in this repo.
     // Everything downstream of this block — sitesFor, pooled, the click-through
     // panel, the tooltip grammar — is untouched; only the rendering/pan/zoom
     // substrate changes.

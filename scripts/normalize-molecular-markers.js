@@ -95,7 +95,13 @@ const SMALL_STUDY = 20;   // same threshold the TES layers use
 //   Source: WHO, "Report on antimalarial drug efficacy, resistance and
 //   response: 10 years of surveillance (2010-2019)" and subsequent WHO
 //   malaria threats/status reporting.
-//   >>> FLAGGED FOR DOMAIN REVIEW — see docs/dev-13-resistance-handover.md D32.
+//   >>> FLAGGED FOR DOMAIN REVIEW. Nothing on the molecular-marker map is
+//   trustworthy beyond this list. Counting any non-WT genotype instead of
+//   these 13 would move 359 of 2,869 surveys off zero — mostly A578S, the
+//   commonest Pfkelch13 mutation in Africa here (138 surveys), which WHO
+//   states is NOT associated with artemisinin partial resistance and which is
+//   the only non-WT genotype present in 52 of them (Uganda 9, Comoros 5,
+//   Kenya 5, Angola 4, Mali 4). That is why meta.status is "draft".
 const K13_VALIDATED = new Set([
   "F446I", "N458Y", "C469Y", "M476I", "Y493H", "R539T", "I543T",
   "P553L", "R561H", "P574L", "C580Y", "R622I", "A675V"
