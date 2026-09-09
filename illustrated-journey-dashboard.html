@@ -563,7 +563,11 @@
      [hidden] { display: none } — same trap .map-empty already carries a fix for. */
   .map-dock-rail[hidden] { display: none; }
   .dock-section { margin-bottom: 18px; }
-  .dock-section:last-child { margin-bottom: 0; }
+  /* Scoped to direct children of the rail, not just-any dock-section's own
+     parent — #species-controls sits last inside the #res-controls wrapper
+     div (after #marker-controls) even when Location still follows it, and an
+     unscoped :last-child was zeroing its margin only in that state. */
+  .map-dock-rail > .dock-section:last-child { margin-bottom: 0; }
   /* Direct child only — .res-panel-head's own <h3> (the panel title) sits two
      levels deeper inside .dock-detail and must not pick up this label style. */
   .dock-section > h3 {
@@ -1429,6 +1433,10 @@
     items.forEach(it => {
       if (it.isCurrent) {
         const softColor = it.curColor === "var(--crit)" ? "var(--crit-soft)" : "var(--warn-soft)";
+        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="5" fill="none" stroke="${it.curColor}" stroke-width="2" opacity="0.6">
+          <animate attributeName="r" values="5;16" dur="1.8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0" dur="1.8s" repeatCount="indefinite"/>
+        </circle>`);
         parts.push(`<circle cx="${it.x}" cy="${dotY}" r="9" fill="${softColor}"/>`);
         parts.push(`<circle cx="${it.x}" cy="${dotY}" r="5" fill="${it.curColor}"/>`);
       } else {
