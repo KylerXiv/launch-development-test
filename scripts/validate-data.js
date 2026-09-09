@@ -220,110 +220,145 @@ if (!Array.isArray(data.products) || data.products.length === 0) {
   });
 }
 
-// ---- resistance layer (data/resistance.js) ---------------------------------
-// Governance for the WHO-derived map overlay. Runs only on the default (real)
-// invocation: resistance is a single global dataset, not one per product data
-// file, so re-checking it on the synthetic run would only double the output.
+// ---- WHO study-result layers -----------------------------------------------
+// Governance for the WHO-derived map overlays. Runs only on the default (real)
+// invocation: these are single global datasets, not one per product data file,
+// so re-checking them on the synthetic run would only double the output.
+//
+// Two files are checked, not one, and they are checked by the SAME function:
+//   data/resistance.js         treatment failure + delayed parasite clearance
+//   data/molecular-markers.js  molecular markers of drug resistance
+// Their normalizers emit a deliberately identical envelope
+// (meta/fields/coded/dict/studies/<layer>), so anything that is true of one
+// file's shape must be true of the other's. Checking them through one code
+// path is what keeps that promise honest — a divergence shows up here rather
+// than in the browser.
 if (!process.argv[2]) {
-  const RES_FILE = path.join(__dirname, "..", "data", "resistance.js");
   const MAP_FILE = path.join(__dirname, "..", "data", "world-map.js");
-  if (!fs.existsSync(RES_FILE)) {
-    warn('data/resistance.js is missing — run "node scripts/normalize-resistance.js"');
-  } else {
+  const mapBox = {};
+  try {
+    new Function("window", fs.readFileSync(MAP_FILE, "utf8"))(mapBox);
+  } catch (e) {
+    err("data/world-map.js could not be evaluated: " + e.message);
+  }
+  const drawn = (mapBox.LAUNCH_MAP && mapBox.LAUNCH_MAP.countries) || {};
+
+  // `value` names the studies[] column the dots are built from — "v" for the
+  // TES layers, "p" for molecular markers. `dim` names the first key of the
+  // aggregated layers, which is a drug for one dataset and a marker for the
+  // other. Everything else about the two files is the same.
+  const DATASETS = [
+    { file: "data/resistance.js", global: "LAUNCH_RESISTANCE", tag: "resistance",
+      normalizer: "normalize-resistance.js", value: "v", dim: "drug", unit: "studies" },
+    { file: "data/molecular-markers.js", global: "LAUNCH_MOLECULAR_MARKERS", tag: "molecular markers",
+      normalizer: "normalize-molecular-markers.js", value: "p", dim: "marker", unit: "surveys" }
+  ];
+
+  for (const DS of DATASETS) {
+    const FILE = path.join(__dirname, "..", DS.file);
+    if (!fs.existsSync(FILE)) {
+      warn(`${DS.file} is missing — run "node scripts/${DS.normalizer}"`);
+      continue;
+    }
     const box = {};
     try {
-      new Function("window", fs.readFileSync(RES_FILE, "utf8"))(box);
-      new Function("window", fs.readFileSync(MAP_FILE, "utf8"))(box);
+      new Function("window", fs.readFileSync(FILE, "utf8"))(box);
     } catch (e) {
-      err("data/resistance.js could not be evaluated: " + e.message);
+      err(`${DS.file} could not be evaluated: ` + e.message);
+      continue;
     }
-    const R = box.LAUNCH_RESISTANCE;
-    const drawn = (box.LAUNCH_MAP && box.LAUNCH_MAP.countries) || {};
+    const R = box[DS.global];
     if (!R || typeof R !== "object") {
-      err("data/resistance.js did not define window.LAUNCH_RESISTANCE");
-    } else {
-      const m = R.meta || {};
-      for (const k of ["source", "sourceUrl", "extract", "metric", "rule", "status"])
-        if (!m[k] || !String(m[k]).trim()) err(`resistance meta: "${k}" is required`);
-      if (!["illustrative", "draft", "verified"].includes(m.status))
-        err(`resistance meta.status must be illustrative/draft/verified (got "${m.status}")`);
-      // The rule is printed under the map. A vague one is a governance failure:
-      // an aggregated dot the reader cannot interpret is worse than no dot.
-      if (m.rule && String(m.rule).trim().length < 40)
-        err("resistance meta.rule must spell out how site studies were reduced to one country value");
+      err(`${DS.file} did not define window.${DS.global}`);
+      continue;
+    }
+    const m = R.meta || {};
+    for (const k of ["source", "sourceUrl", "extract", "metric", "rule", "status"])
+      if (!m[k] || !String(m[k]).trim()) err(`${DS.tag} meta: "${k}" is required`);
+    if (!["illustrative", "draft", "verified"].includes(m.status))
+      err(`${DS.tag} meta.status must be illustrative/draft/verified (got "${m.status}")`);
+    // The rule is printed under the map. A vague one is a governance failure:
+    // an aggregated dot the reader cannot interpret is worse than no dot.
+    if (m.rule && String(m.rule).trim().length < 40)
+      err(`${DS.tag} meta.rule must spell out how site studies were reduced to one country value`);
 
-      // ---- the study table that backs the click-through panel ----
-      const FIELDS = Array.isArray(R.fields) ? R.fields : [];
-      const CODED = Array.isArray(R.coded) ? R.coded : [];
-      if (!FIELDS.length) err("resistance: fields[] is required to decode studies[]");
-      for (const c of CODED)
-        if (!R.dict || !Array.isArray(R.dict[c]))
-          err(`resistance: coded column "${c}" has no dict[] to decode against`);
-      const studies = Array.isArray(R.studies) ? R.studies : [];
-      if (!studies.length) err("resistance: studies[] is empty — the drill-down panel would have nothing to show");
-      const at = {}; FIELDS.forEach((f, i) => { at[f] = i; });
-      let badRow = 0, badCode = 0, uncited = 0, unnamed = 0;
-      studies.forEach((row, i) => {
-        if (!Array.isArray(row) || row.length !== FIELDS.length) { if (badRow++ < 3) err(`resistance studies[${i}]: expected ${FIELDS.length} values, got ${row && row.length}`); return; }
-        for (const c of CODED) {
-          const v = row[at[c]];
-          if (!Number.isInteger(v) || !R.dict[c] || v < 0 || v >= R.dict[c].length) {
-            if (badCode++ < 3) err(`resistance studies[${i}]: "${c}" index ${v} is outside dict.${c}`);
-          }
+    // ---- the study table that backs the click-through panel ----
+    const FIELDS = Array.isArray(R.fields) ? R.fields : [];
+    const CODED = Array.isArray(R.coded) ? R.coded : [];
+    if (!FIELDS.length) err(`${DS.tag}: fields[] is required to decode studies[]`);
+    for (const c of CODED)
+      if (!R.dict || !Array.isArray(R.dict[c]))
+        err(`${DS.tag}: coded column "${c}" has no dict[] to decode against`);
+    const studies = Array.isArray(R.studies) ? R.studies : [];
+    if (!studies.length) err(`${DS.tag}: studies[] is empty — the drill-down panel would have nothing to show`);
+    const at = {}; FIELDS.forEach((f, i) => { at[f] = i; });
+    if (!(DS.value in at))
+      err(`${DS.tag}: fields[] has no "${DS.value}" column — the dots have no value to draw from`);
+    let badRow = 0, badCode = 0, uncited = 0, unnamed = 0;
+    studies.forEach((row, i) => {
+      if (!Array.isArray(row) || row.length !== FIELDS.length) { if (badRow++ < 3) err(`${DS.tag} studies[${i}]: expected ${FIELDS.length} values, got ${row && row.length}`); return; }
+      for (const c of CODED) {
+        const v = row[at[c]];
+        if (!Number.isInteger(v) || !R.dict[c] || v < 0 || v >= R.dict[c].length) {
+          if (badCode++ < 3) err(`${DS.tag} studies[${i}]: "${c}" index ${v} is outside dict.${c}`);
         }
-        const v = row[at.v], yr = row[at.year];
-        if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 100)
-          err(`resistance studies[${i}]: value must be a number 0–100 (got ${JSON.stringify(v)})`);
-        if (!Number.isInteger(yr) || yr < 1990 || yr > new Date().getUTCFullYear() + 1)
-          err(`resistance studies[${i}]: implausible year ${JSON.stringify(yr)}`);
-        // WHO itself publishes the occasional study with no site or region
-        // named. Nothing is filtered out of this dataset, so that is recorded
-        // as provenance debt, not treated as a failure — the panel renders it
-        // as "—" and the coordinates still place the dot.
-        if (!row[at.site] || !String(row[at.site]).trim()) unnamed++;
-        if (!row[at.citation] && !String(R.dict.citation[row[at.citation]] || "").trim()) uncited++;
-      });
-      if (Number.isInteger(m.studyCount) && m.studyCount !== studies.length)
-        err(`resistance meta.studyCount says ${m.studyCount} but studies[] holds ${studies.length} — rerun the normalizer`);
+      }
+      const v = row[at[DS.value]], yr = row[at.year];
+      if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 100)
+        err(`${DS.tag} studies[${i}]: value must be a number 0–100 (got ${JSON.stringify(v)})`);
+      if (!Number.isInteger(yr) || yr < 1990 || yr > new Date().getUTCFullYear() + 1)
+        err(`${DS.tag} studies[${i}]: implausible year ${JSON.stringify(yr)}`);
+      // WHO itself publishes the occasional study with no site or region
+      // named. Nothing is filtered out of this dataset, so that is recorded
+      // as provenance debt, not treated as a failure — the panel renders it
+      // as "—" and the coordinates still place the dot.
+      if (!row[at.site] || !String(row[at.site]).trim()) unnamed++;
+      // Decode before testing: the citation is an index into dict.citation,
+      // and index 0 is a perfectly good index. Testing the index for
+      // truthiness only worked because "" happens to sort first.
+      if (!String((R.dict.citation || [])[row[at.citation]] || "").trim()) uncited++;
+    });
+    if (Number.isInteger(m.studyCount) && m.studyCount !== studies.length)
+      err(`${DS.tag} meta.studyCount says ${m.studyCount} but studies[] holds ${studies.length} — rerun the normalizer`);
 
-      // ---- the aggregated dots ----
-      const layers = Object.keys(R).filter((k) => !["meta", "fields", "coded", "dict", "studies"].includes(k));
-      if (!layers.length) err("data/resistance.js has no resistance layers");
-      const thisYear = new Date().getUTCFullYear();
-      let cells = 0, undrawn = 0;
-      for (const layer of layers) {
-        for (const [drug, bySpecies] of Object.entries(R[layer] || {})) {
-          if (!drug.trim()) err(`resistance.${layer}: a drug key is empty`);
-          for (const [species, countries] of Object.entries(bySpecies || {})) {
-            if (!species.trim()) err(`resistance.${layer} ${drug}: a species key is empty`);
-            for (const [iso3, e] of Object.entries(countries)) {
-              const tag = `resistance.${layer} ${drug} ${species} ${iso3}`;
-              cells++;
-              if (!/^[A-Z]{3}$/.test(iso3)) err(`${tag}: iso3 must be 3 uppercase letters`);
-              // Not an error: WHO covers small island states the 110m basemap
-              // does not draw. But it is silently dropped data, so say so.
-              else if (!(iso3 in drawn)) { undrawn++; }
-              if (typeof e.v !== "number" || !Number.isFinite(e.v) || e.v < 0 || e.v > 100)
-                err(`${tag}: v must be a number between 0 and 100 (got ${JSON.stringify(e.v)})`);
-              if (!Number.isInteger(e.year) || e.year < 1990 || e.year > thisYear + 1)
-                err(`${tag}: year must be an integer between 1990 and ${thisYear + 1}`);
-              if (!Number.isInteger(e.sites) || e.sites < 1)
-                err(`${tag}: sites must say how many studies the dot averages`);
-              if (!Number.isFinite(e.lat) || e.lat < -90 || e.lat > 90 ||
-                  !Number.isFinite(e.lon) || e.lon < -180 || e.lon > 180)
-                err(`${tag}: lat/lon are required and must be valid coordinates`);
-            }
+    // ---- the aggregated dots ----
+    const layers = Object.keys(R).filter((k) => !["meta", "fields", "coded", "dict", "studies"].includes(k));
+    if (!layers.length) err(`${DS.file} has no study-result layers`);
+    const thisYear = new Date().getUTCFullYear();
+    let cells = 0, undrawn = 0;
+    for (const layer of layers) {
+      for (const [dim, bySpecies] of Object.entries(R[layer] || {})) {
+        if (!dim.trim()) err(`${DS.tag}.${layer}: a ${DS.dim} key is empty`);
+        for (const [species, countries] of Object.entries(bySpecies || {})) {
+          if (!species.trim()) err(`${DS.tag}.${layer} ${dim}: a species key is empty`);
+          for (const [iso3, e] of Object.entries(countries)) {
+            const tag = `${DS.tag}.${layer} ${dim} ${species} ${iso3}`;
+            cells++;
+            if (!/^[A-Z]{3}$/.test(iso3)) err(`${tag}: iso3 must be 3 uppercase letters`);
+            // Not an error: WHO covers small island states the 110m basemap
+            // does not draw. But it is silently dropped data, so say so.
+            else if (!(iso3 in drawn)) { undrawn++; }
+            if (typeof e.v !== "number" || !Number.isFinite(e.v) || e.v < 0 || e.v > 100)
+              err(`${tag}: v must be a number between 0 and 100 (got ${JSON.stringify(e.v)})`);
+            if (!Number.isInteger(e.year) || e.year < 1990 || e.year > thisYear + 1)
+              err(`${tag}: year must be an integer between 1990 and ${thisYear + 1}`);
+            if (!Number.isInteger(e.sites) || e.sites < 1)
+              err(`${tag}: sites must say how many studies the dot averages`);
+            if (!Number.isFinite(e.lat) || e.lat < -90 || e.lat > 90 ||
+                !Number.isFinite(e.lon) || e.lon < -180 || e.lon > 180)
+              err(`${tag}: lat/lon are required and must be valid coordinates`);
           }
         }
       }
-      if (Number.isInteger(m.cellCount) && m.cellCount !== cells)
-        err(`resistance meta.cellCount says ${m.cellCount} but ${cells} were found — rerun the normalizer`);
-      if (unnamed) warn(`resistance: ${unnamed} of ${studies.length} studies name no site in the source data`);
-      if (uncited) warn(`resistance: ${uncited} of ${studies.length} studies have no citation URL (WHO publishes many without one)`);
-      if (undrawn) warn(`resistance: ${undrawn} country value(s) fall outside the drawn basemap and are invisible on the map`);
     }
+    if (Number.isInteger(m.cellCount) && m.cellCount !== cells)
+      err(`${DS.tag} meta.cellCount says ${m.cellCount} but ${cells} were found — rerun the normalizer`);
+    if (unnamed) warn(`${DS.tag}: ${unnamed} of ${studies.length} ${DS.unit} name no site in the source data`);
+    if (uncited) warn(`${DS.tag}: ${uncited} of ${studies.length} ${DS.unit} have no citation URL (WHO publishes many without one)`);
+    if (undrawn) warn(`${DS.tag}: ${undrawn} country value(s) fall outside the drawn basemap and are invisible on the map`);
   }
 }
+
 
 // ---- report -----------------------------------------------------------------
 for (const w of warnings) console.log("WARN  " + w);

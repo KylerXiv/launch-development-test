@@ -776,24 +776,6 @@
   .res-dot.is-selected { box-shadow: 0 0 0 3px var(--accent); }
   .res-dot.is-selected:focus-visible { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent), 0 0 0 3px var(--accent); }
 
-  .timing-axis { position: relative; height: 18px; margin-left: 150px; }
-  .timing-axis span { position: absolute; transform: translateX(-50%); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-  .trow2 { display: flex; align-items: center; gap: 0; margin: 10px 0; }
-  .trow2 .tname { flex: none; width: 150px; font-size: 13px; font-weight: 650; padding-right: 10px; }
-  .trow2 .tbar { position: relative; flex: 1; height: 26px; }
-  .trow2 .tbase { position: absolute; top: 12px; left: 0; right: 0; height: 2px; background: var(--line); }
-  .tseg { position: absolute; top: 8px; height: 10px; border-radius: 5px; }
-  .tseg.g-good { background: var(--good); }
-  .tseg.g-warn { background: var(--warn); }
-  .tseg.g-crit { background: var(--crit); }
-  .tseg.g-tbc { background: repeating-linear-gradient(90deg, var(--idle) 0 6px, transparent 6px 12px); height: 4px; top: 11px; border-radius: 2px; }
-  .tgate { position: absolute; top: 6px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--surface); border: 3px solid var(--ink-2); cursor: help; z-index: 1; }
-  .tgate:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .ttotal { flex: none; width: 96px; padding-left: 10px; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-  .timing-pending { font-size: 12.5px; color: var(--ink-3); margin: 8px 0 0 150px; }
-  .timing-scroll { overflow-x: auto; }
-  .timing-inner { min-width: 640px; }
-
   /* header actions — Download CSV + Subscribe -------------------------------
      These used to be the last two flex items of .strip, alongside the three
      stats and the six legend keys. That could not hold: the strip wraps, the
@@ -919,10 +901,6 @@
     .pathnode .pill { width: 38px; height: 38px; }
     .pathnode svg, .pathnode .whoemb { width: 25px; height: 25px; }
     .detail { padding: 14px; }
-    .timing-axis { margin-left: 110px; }
-    .trow2 .tname { width: 110px; font-size: 12px; }
-    .ttotal { width: 78px; font-size: 11px; }
-    .timing-pending { margin-left: 0; }
   }
 </style>
 
@@ -997,11 +975,14 @@
               <label><input type="radio" name="reslayer" value="off" checked> Off</label>
               <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
               <label><input type="radio" name="reslayer" value="delayedClearance"> Delayed parasite clearance</label>
-              <label class="res-soon"><input type="radio" name="reslayer" value="molecularMarkers" disabled>
-                <span class="res-soon-body"><span>Molecular markers of drug resistance</span><span class="res-soon-tag">Not yet available</span></span></label>
+              <label><input type="radio" name="reslayer" value="molecularMarkers"> Molecular markers of drug resistance</label>
             </fieldset>
           </div>
-          <div class="dock-section">
+          <div class="dock-section" id="marker-controls" hidden>
+            <h3>Marker</h3>
+            <label class="res-pick">Marker <select id="res-marker" aria-label="Select molecular marker for the resistance overlay"></select></label>
+          </div>
+          <div class="dock-section" id="species-controls">
             <h3>Species</h3>
             <label class="res-pick">Species <select id="res-species" aria-label="Select Plasmodium species for the resistance overlay"></select></label>
           </div>
@@ -1055,13 +1036,6 @@
         </div>
       </aside>
     </div>
-  </section>
-
-  <section class="viz" id="timingsec" hidden>
-    <h2>Pathway timing across products</h2>
-    <p class="viznote">Actual years between access gates, from each product's first milestone. LAUNCH best-practice benchmark (draft): ≤ 2 years per gate — green ≤ 2, amber 3–5, red over 5. Dashes run to today where the next gate is still pending.</p>
-    <div class="timing-scroll"><div class="timing-inner" id="timing"></div></div>
-    <div class="timing-pending" id="timing-pending"></div>
   </section>
 
   <details class="updates changes" id="updates" hidden>
@@ -1132,6 +1106,7 @@
 <script src="data/world-map.js"></script>
 <script src="data/world-map-geo.js"></script>
 <script src="data/resistance.js"></script>
+<script src="data/molecular-markers.js"></script>
 <script src="assets/journey-icons/icons.js"></script>
 <script src="assets/journey-icons/icons-solid.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.js"
@@ -2072,7 +2047,8 @@
     const DOT_R = 10, CLUSTER_R = 17, MARK_GAP = 2;         // CSS px — matches .res-dot/.res-cluster sizes
     const CPASS = 20;    // clustering convergence bound, unchanged from D15
 
-    let curSites = null, curMarks = [], curDrug = "", curSpecies = "";
+    // curDim is the drug on the two TES layers and the marker on the third.
+    let curSites = null, curMarks = [], curDim = "", curSpecies = "";
     let curUndrawn = 0;
     // baseSites is sitesFor(drug, species) before the Location filter narrows
     // it to curSites — kept separate so the Site dropdown can always offer
@@ -2083,6 +2059,9 @@
     // The drug bound to the currently selected product (PRODUCT_DRUG), or
     // null when that product has no WHO resistance data of its own (D24).
     let curBoundDrug = null;
+    // The marker the third layer is showing. Owned by the Marker select, not
+    // by the product tabs — see fillMarkerList.
+    let curMarker = "";
     // the site keys behind the open study panel, so the map can say which dot
     // the panel belongs to — and keep saying it after a zoom rebuilds the marks
     let selKeys = null;
@@ -2295,6 +2274,7 @@
     // published WHO study results. The two readings are deliberately NOT
     // merged on the page until the country survey is verified.
     const RES = window.LAUNCH_RESISTANCE;
+    const MM = window.LAUNCH_MOLECULAR_MARKERS;
     // Positioning is now MapLibre's job (DEV-13 D20) — mark() outputs a plain
     // lon/lat centroid and the map projects it. LON0/LAT0 etc. (declared
     // above, alongside the MapLibre init) still fix the same fitted window
@@ -2305,28 +2285,65 @@
     const PRODUCT_DRUG = { pyramax: "Artesunate-pyronaridine", dhappq: "Dihydroartemisinin-piperaquine" };
     const FALLBACK_SPECIES = "P. falciparum";
     // Which study result is showing. Set from the radio on every draw rather
-    // than fixed, and it selects TWO things: the aggregated layer that backs the
-    // drug/species pickers, and the studies[] column the site marks are pooled
-    // from. Both must move together or the pickers would offer a pairing the
-    // marks cannot draw.
+    // than fixed, and it now selects THREE things: which DATASET the dots come
+    // from, the studies[] column they are pooled from, and what the first key
+    // of the aggregated layer means. All three must move together or the
+    // pickers would offer a pairing the marks cannot draw.
+    //
+    // The third layer (D32) lives in a SECOND FILE with a deliberately
+    // identical envelope, because it is a different population of studies:
+    // 2,869 genotype surveys against the TES extract's 1,633 efficacy studies,
+    // sharing no rows and keyed on a marker rather than a drug. Merging them
+    // into one studies[] would have meant every TES row carrying null marker
+    // columns and every survey carrying null efficacy columns.
+    //
+    //   ds     which dataset's studies[] and dict[] to read
+    //   value  the studies[] column this layer's dots are built from
+    //   dim    what the first key of the aggregated layer means
+    //   unit   what SAMPLE_SIZE counts — patients treated vs samples genotyped
+    const LAYERS = {
+      treatmentFailure: { ds: RES, value: "v",  dim: "drug",   unit: "Patients", unitLc: "patients" },
+      delayedClearance: { ds: RES, value: "d3", dim: "drug",   unit: "Patients", unitLc: "patients" },
+      molecularMarkers: { ds: MM,  value: "p",  dim: "marker", unit: "Samples",  unitLc: "samples" }
+    };
     let LAYER = "treatmentFailure";
-    const VALUE_FIELD = { treatmentFailure: "v", delayedClearance: "d3" };
-    const layerLabel = (k) => ((RES.meta.metrics || {})[k] || {}).short ||
-                              (k === "delayedClearance" ? "Delayed parasite clearance" : "Treatment failure");
+    const L = () => LAYERS[LAYER] || LAYERS.treatmentFailure;
+    const DS = () => L().ds;
+    const VALUE_FIELD = { treatmentFailure: "v", delayedClearance: "d3", molecularMarkers: "p" };
+    const DEFAULT_LABEL = { delayedClearance: "Delayed parasite clearance",
+                            molecularMarkers: "Molecular markers" };
+    const layerLabel = (k) => (((DS().meta || {}).metrics || {})[k] || {}).short ||
+                              DEFAULT_LABEL[k] || "Treatment failure";
 
-    // studies are stored as rows against RES.fields, with the repetitive
-    // columns (drug, species, country, source, citation) held as indices into
-    // RES.dict — decoded only for the rows a panel actually shows
-    const AT = {};
-    if (RES) RES.fields.forEach((f, i) => { AT[f] = i; });
-    const codeOf = (field, value) => RES.dict[field].indexOf(value);
+    // studies are stored as rows against <dataset>.fields, with the repetitive
+    // columns (drug/marker, species, country, source, citation) held as indices
+    // into <dataset>.dict — decoded only for the rows a panel actually shows.
+    // AT is rebuilt whenever the layer changes rather than being read through
+    // an accessor everywhere: the two files order their columns differently, so
+    // a stale AT would silently read the wrong column rather than throw.
+    let AT = {};
+    function useLayer(k) {
+      if (LAYERS[k]) LAYER = k;
+      AT = {};
+      const ds = DS();
+      if (ds) ds.fields.forEach((f, i) => { AT[f] = i; });
+    }
+    useLayer(LAYER);
+    // The studies[] column holding this layer's dimension — drug, or marker.
+    const dimAt = () => AT[L().dim];
+    const codeOf = (field, value) => DS().dict[field].indexOf(value);
     const decode = (row) => {
-      const o = {};
-      RES.fields.forEach((f, i) => { o[f] = RES.coded.indexOf(f) >= 0 ? RES.dict[f][row[i]] : row[i]; });
+      const ds = DS(), o = {};
+      ds.fields.forEach((f, i) => { o[f] = ds.coded.indexOf(f) >= 0 ? ds.dict[f][row[i]] : row[i]; });
+      // Everything downstream of a click — the panel cards, the chart, its
+      // tooltips — reads `.v`. Normalising here means those three never learn
+      // which layer is showing. Before this existed the panel and chart read
+      // the treatment-failure column no matter which layer was on.
+      o.v = o[L().value];
       return o;
     };
 
-    const cellsFor = (drug, species) => ((RES[LAYER] || {})[drug] || {})[species] || {};
+    const cellsFor = (dim, species) => ((DS()[LAYER] || {})[dim] || {})[species] || {};
 
     // ---- site-level marks (V2) --------------------------------------------
     // WHO's unit is the study SITE, not the country: their status reports count
@@ -2355,14 +2372,15 @@
     // threat map puts it. That is the whole reason V2 needs no country
     // aggregation rule where V1 did.
     function sitesFor(drug, species) {
-      const di = codeOf("drug", drug), si = codeOf("species", species);
+      const di = codeOf(L().dim, drug), si = codeOf("species", species);
       // The column this layer measures. A study can report a failure rate and
       // no day-3 count, so rows with no value for THIS metric are dropped here
       // rather than pooled as zero — "not measured" is not "measured at 0%".
       const vf = AT[VALUE_FIELD[LAYER] || "v"];
       const by = {};
-      for (const r of RES.studies) {
-        if (r[AT.drug] !== di || r[AT.species] !== si) continue;
+      const dAt = dimAt();
+      for (const r of DS().studies) {
+        if (r[dAt] !== di || r[AT.species] !== si) continue;
         if (!(r[AT.iso3] in M.countries)) continue;      // basemap does not draw it
         if (typeof r[vf] !== "number") continue;         // this metric not measured
         const k = siteKey(r);
@@ -2508,11 +2526,13 @@
       const c = cellsFor(drug, species);
       return Object.keys(c).filter((i) => i in M.countries).length;
     };
-    const allDrugs = () => (RES ? Object.keys(RES[LAYER] || {}) : []);
-    const speciesFor = (drug) => Object.keys((RES[LAYER] || {})[drug] || {});
+    // "Dims" because the first key is a drug on two layers and a marker on the
+    // third; everything below works the same either way.
+    const allDims = () => (DS() ? Object.keys(DS()[LAYER] || {}) : []);
+    const speciesFor = (dim) => Object.keys((DS()[LAYER] || {})[dim] || {});
     const allSpecies = () => {
       const set = new Set();
-      allDrugs().forEach((d) => speciesFor(d).forEach((s) => set.add(s)));
+      allDims().forEach((d) => speciesFor(d).forEach((s) => set.add(s)));
       return [...set].sort();
     };
     // Species and drug are not independent: chloroquine has no P. falciparum
@@ -2540,6 +2560,63 @@
       return sel.value;
     }
 
+    // The marker list is NOT scoped to the selected product, unlike the drug
+    // (D24). A marker is a property of the parasite population: Pfkelch13
+    // prevalence means the same thing whether or not the product in the tabs
+    // has launched, so all four markers stay reachable and there is no "not yet
+    // in clinical use" state on this layer. The product picks only the DEFAULT
+    // — DHA-PPQ opens on Pfplasmepsin 2-3 (piperaquine, its distinguishing
+    // partner drug) and ASPY on Pfkelch13 — and an explicit choice survives a
+    // product change, the way the species select already behaves.
+    const PRODUCT_MARKER = { pyramax: "Pfkelch13", dhappq: "Pfplasmepsin 2-3 amplifications" };
+    const FALLBACK_MARKER = "Pfkelch13";
+    function fillMarkerList(keep) {
+      const sel = document.getElementById("res-marker");
+      // The drug each marker predicts resistance to comes from the data file,
+      // not from a table here: it is WHO's biology, not the page's.
+      const drugOf = ((MM && MM.meta) || {}).markerDrug || {};
+      const list = allDims().slice().sort();
+      sel.innerHTML = list.map((mk) => {
+        const n = drawnCount(mk, FALLBACK_SPECIES);
+        // Not lower-cased: "ACTs" is an acronym and reads as a typo in lower case.
+        const d = drugOf[mk] ? " — " + drugOf[mk] : "";
+        return `<option value="${esc(mk)}"${n ? "" : " disabled"}>` +
+               `${esc(mk + d)} (${n} ${n === 1 ? "country" : "countries"})</option>`;
+      }).join("");
+      const usable = list.filter((mk) => drawnCount(mk, FALLBACK_SPECIES) > 0);
+      const want = PRODUCT_MARKER[mapProduct] || FALLBACK_MARKER;
+      sel.value = keep && usable.indexOf(keep) >= 0 ? keep
+        : usable.indexOf(want) >= 0 ? want
+        : (usable[0] || "");
+      sel.disabled = usable.length < 2;
+      return sel.value;
+    }
+
+    // Swapping layers swaps which control owns the dimension: the product tabs
+    // for a drug (D24), the Marker select for a marker. Both are re-filled
+    // here and the one that does not apply is hidden, rather than left on
+    // screen showing a value the map is not using.
+    function syncDimControls() {
+      const mmOn = LAYER === "molecularMarkers";
+      const box = document.getElementById("marker-controls");
+      if (box) box.hidden = !mmOn;
+      if (mmOn) curMarker = fillMarkerList(curMarker);
+      // Still filled while hidden: drawResistance reads the select's value, and
+      // the value is what pairs the marker with its (single) species.
+      fillSpeciesList(mmOn ? curMarker : curBoundDrug,
+                      document.getElementById("res-species").value);
+      // Species is HIDDEN on the molecular-marker layer, not merely disabled.
+      // D7's disabled-not-blank convention exists so a reader can tell "this
+      // pairing has no studies" from "this control does not apply" — and on the
+      // TES layers a disabled species select still carries that first meaning
+      // (this drug was only studied against one species, which is a finding).
+      // Here it carries neither: every survey in the extract is P. falciparum,
+      // so species is not a dimension of this dataset at all. A permanently
+      // disabled control that can never do anything is furniture, so it goes.
+      const spBox = document.getElementById("species-controls");
+      if (spBox) spBox.hidden = mmOn;
+    }
+
     // D24 — the map's drug is now driven entirely by which of the 4 tracked
     // products is selected (PRODUCT_DRUG), not by an independent picker: the
     // old flat A-Z drug <select> and its "fallback to Artemether-lumefantrine
@@ -2551,8 +2628,12 @@
     function bindDrug(productId) {
       if (!RES) return;
       const want = PRODUCT_DRUG[productId];
-      curBoundDrug = want && allDrugs().indexOf(want) >= 0 ? want : null;
-      fillSpeciesList(curBoundDrug, document.getElementById("res-species").value);
+      // Resolved against a TES layer explicitly: when the molecular-marker
+      // layer is showing, allDims() lists markers, and testing a drug name
+      // against that list would null out every product's binding.
+      const drugs = Object.keys(RES[LAYER === "molecularMarkers" ? "treatmentFailure" : LAYER] || {});
+      curBoundDrug = want && drugs.indexOf(want) >= 0 ? want : null;
+      syncDimControls();
       closePanel();
       drawResistance();
     }
@@ -2630,9 +2711,9 @@
           ? esc(r.site || "—") + (r.region ? ", " + esc(r.region) : "")
           : "Study year " + r.year;
         const html = "<b>" + where + "</b>" +
-          '<div class="trow"><span>Treatment failure</span><span>' + r.v + "%</span></div>" +
+          '<div class="trow"><span>' + esc(layerLabel(LAYER)) + '</span><span>' + r.v + "%</span></div>" +
           (plan.mode === "compare" ? '<div class="trow"><span>Year</span><span>' + r.year + "</span></div>" : "") +
-          '<div class="trow"><span>Patients</span><span>' + (r.n == null ? "—" : r.n) + "</span></div>";
+          '<div class="trow"><span>' + L().unit + '</span><span>' + (r.n == null ? "—" : r.n) + "</span></div>";
         const track = (ev) => showTipAtPoint(ev.clientX, ev.clientY, html);
         bar.addEventListener("mouseenter", track);
         bar.addEventListener("mousemove", track);
@@ -2648,7 +2729,7 @@
       if (!panelRows.length) { panel.hidden = true; return; }
       renderChart(panelRows);   // fixed ordering of its own — independent of the list below
       const sorted = panelRows.slice().sort((a, b) => b.year - a.year);   // most recent study first
-      const small = RES.meta.smallStudy || 20;
+      const small = (DS().meta || {}).smallStudy || 20;
 
       cards.innerHTML = sorted.map((r) => {
         const cite = r.citation
@@ -2659,7 +2740,7 @@
         return `<div class="res-card${isSmall ? " small" : ""}">` +
           `<div class="res-card-head"><span class="res-card-year">${r.year}</span><span class="res-card-fail">${r.v}%</span></div>` +
           `<div class="res-card-loc">${esc(loc)}</div>` +
-          `<div class="res-card-meta"><span>${r.n === null ? "—" : r.n} patients${isSmall ? " · small study" : ""}</span><span>${cite}</span></div>` +
+          `<div class="res-card-meta"><span>${r.n === null ? "—" : r.n} ${L().unitLc}${isSmall ? " · small study" : ""}</span><span>${cite}</span></div>` +
           "</div>";
       }).join("");
       // The panel is the FULL history, not the dot's basis — say so, so the
@@ -2681,7 +2762,7 @@
     function siteTip(mk) {
       const s = mk.members[0];
       const cn = M.countries[s.iso3] ? M.countries[s.iso3].n : s.iso3;
-      const small = (RES.meta && RES.meta.smallStudy) || 20;
+      const small = (DS().meta || {}).smallStudy || 20;
       // Site, region, country on one line — the way WHO's threat map labels a
       // dot. It also removes the guesswork from site names that are a bare
       // district ("Kayin State", "Jowhar") or repeat across countries.
@@ -2704,38 +2785,43 @@
         '<div class="trow"><span>' + esc(layerLabel(LAYER)) + '</span><span>' + s.v + "%</span></div>" +
         '<div class="trow"><span>Study year</span><span>' + s.year +
           (s.thisYear > 1 ? " · " + s.thisYear + " studies" : "") + "</span></div>" +
-        '<div class="trow"><span>Patients</span><span>' + pat + "</span></div>" +
+        '<div class="trow"><span>' + L().unit + '</span><span>' + pat + "</span></div>" +
         '<div class="tprod">' + hist + peak +
-        "<br>" + esc(curDrug) + " · Click for this site's studies</div>";
+        "<br>" + esc(curDim) + " · Click for this site's studies</div>";
     }
 
     function clusterTip(mk) {
       const cn = M.countries[mk.iso3] ? M.countries[mk.iso3].n : mk.iso3;
       const yr = mk.yearFrom === mk.yearTo ? String(mk.yearFrom) : mk.yearFrom + "–" + mk.yearTo;
       return "<b>" + esc(cn + " — " + mk.members.length + " sites") + "</b>" +
-        '<div class="trow"><span>Treatment failure</span><span>' + mk.v + "%</span></div>" +
+        '<div class="trow"><span>' + esc(layerLabel(LAYER)) + '</span><span>' + mk.v + "%</span></div>" +
         '<div class="trow"><span>' + (mk.yearFrom === mk.yearTo ? "Study year" : "Study years") +
           "</span><span>" + yr + "</span></div>" +
-        '<div class="trow"><span>Patients</span><span>' + (mk.n || "—") + "</span></div>" +
+        '<div class="trow"><span>' + L().unit + '</span><span>' + (mk.n || "—") + "</span></div>" +
         '<div class="tprod">Pooled across these ' + mk.members.length +
         " sites, each at its most recent study<br>Zoom in to separate them" +
-        "<br>" + esc(curDrug) + " · Click for every study here</div>";
+        "<br>" + esc(curDim) + " · Click for every study here</div>";
     }
 
     // A site dot opens that site's own history; a cluster opens the sites it is
     // hiding. D4 put every study behind a country in this panel — at site level
     // the panel narrows with the dot, so what you clicked is what you get.
     function openMarkPanel(mk) {
-      const di = codeOf("drug", curDrug), si = codeOf("species", curSpecies);
+      const di = codeOf(L().dim, curDim), si = codeOf("species", curSpecies);
+      const dAt = dimAt(), vf = AT[L().value];
       const keys = {};
       mk.members.forEach((s) => { keys[s.key] = 1; });
-      panelRows = RES.studies
-        .filter((r) => r[AT.drug] === di && r[AT.species] === si && keys[siteKey(r)])
+      panelRows = DS().studies
+        // The same "not measured is not measured at 0%" rule sitesFor applies.
+        // A study can report a failure rate and no day-3 count; including it
+        // here would put a blank row in the history of a dot it never fed.
+        .filter((r) => r[dAt] === di && r[AT.species] === si && keys[siteKey(r)] &&
+                       typeof r[vf] === "number")
         .map(decode);
       const cn = M.countries[mk.iso3] ? M.countries[mk.iso3].n : mk.iso3;
       panelTitle = (mk.one
         ? (mk.members[0].site || "Unnamed site") + ", " + cn
-        : cn + " — " + mk.members.length + " sites") + " · " + curDrug + " · " + curSpecies;
+        : cn + " — " + mk.members.length + " sites") + " · " + curDim + " · " + curSpecies;
       selKeys = new Set(mk.members.map((x) => x.key));
       applySelection();
       renderPanel();
@@ -2743,10 +2829,10 @@
 
     function writeNote() {
       const note = document.getElementById("res-note");
-      const m = RES.meta || {};
+      const m = DS().meta || {};
       const bits = [];
       if (!curSites || !curSites.length)
-        bits.push(`No WHO results for ${curDrug} vs ${curSpecies}.`);
+        bits.push(`No WHO results for ${curDim} vs ${curSpecies}.`);
       if (curSites && curSites.length) {
         const nS = curSites.length, nM = curMarks.length;
         bits.push(nS === nM
@@ -2775,7 +2861,7 @@
     }
 
     function drawMarks() {
-      if (!RES || !curSites) return;
+      if (!DS() || !curSites) return;
       drawnZoom = map.getZoom();
       const marks = clusterSites(curSites);
       curMarks = marks;
@@ -2835,7 +2921,7 @@
       getMap: () => map,
       getMarks: () => curMarks,
       setDrugSpecies: (drug, species) => {
-        curDrug = drug; curSpecies = species;
+        curDim = drug; curSpecies = species;
         curSites = sitesFor(drug, species);
         drawMarks();
       },
@@ -2878,7 +2964,7 @@
       if (!locCountry) {
         placeholder = "Select a country first";
       } else if (!baseSites) {
-        placeholder = "Turn on Treatment failure to see sites";
+        placeholder = "Turn on a study result to see sites";
       } else {
         sites = baseSites.filter((s) => s.iso3 === locCountry);
         if (!sites.length) placeholder = "No WHO sites here";
@@ -2989,8 +3075,16 @@
       // Before anything reads it: the pickers, sitesFor and the legend all key
       // off LAYER, so it is set first and left alone on "off" (the last layer
       // stays selected in the pickers rather than resetting under the reader).
-      if (on && VALUE_FIELD[checked.value]) LAYER = checked.value;
-      const drug = curBoundDrug, species = spSel.value;
+      // useLayer() also reindexes AT: the two datasets order their columns
+      // differently, so a stale AT would read the wrong column rather than
+      // throw. The controls follow, because which one owns the dimension
+      // changes with the layer.
+      if (on && VALUE_FIELD[checked.value] && checked.value !== LAYER) {
+        useLayer(checked.value);
+        syncDimControls();
+      }
+      const drug = LAYER === "molecularMarkers" ? curMarker : curBoundDrug;
+      const species = spSel.value;
       if (!on || !drug || !species) {
         legend.hidden = true; ruleEl.hidden = true;
         // the zoomend handler only rebuilds marks while curSites is set —
@@ -3013,7 +3107,7 @@
         return;
       }
 
-      curDrug = drug; curSpecies = species;
+      curDim = drug; curSpecies = species;
       baseSites = sitesFor(drug, species);
       fillSiteList();
       curSites = applyLocFilter(baseSites);
@@ -3031,7 +3125,7 @@
       legend.hidden = !curSites.length;
       const legendTitle = legend.querySelector(".res-t");
       if (legendTitle) legendTitle.textContent = layerLabel(LAYER);
-      const m = RES.meta || {};
+      const m = DS().meta || {};
 
       // 1. THE RULE — sits with the legend it explains, as WHO puts "determined
       //    by the most recent data in a site" directly under theirs.
@@ -3050,6 +3144,13 @@
     document.querySelectorAll('input[name="reslayer"]').forEach((r) =>
       r.addEventListener("change", () => { closePanel(); drawResistance(); }));
     document.getElementById("res-species").addEventListener("change", () => {
+      closePanel(); drawResistance();
+    });
+    document.getElementById("res-marker").addEventListener("change", () => {
+      curMarker = document.getElementById("res-marker").value;
+      // A marker change can change which species are populated, the same way a
+      // drug change does — so the species list is refilled before the draw.
+      fillSpeciesList(curMarker, document.getElementById("res-species").value);
       closePanel(); drawResistance();
     });
     document.getElementById("res-close").addEventListener("click", closePanel);
@@ -3077,57 +3178,6 @@
 
   }
 
-  // ---- cross-product pathway timing ----
-  (function renderTiming() {
-    const nowYear = parseInt(DATA.meta.lastUpdated.slice(0, 4), 10);
-    const withJourney = tracked.filter(p => p.detail.journey && p.detail.journey.filter(g => Number.isInteger(g.year)).length >= 2);
-    const without = tracked.filter(p => !withJourney.includes(p));
-    if (!withJourney.length) return;
-    document.getElementById("timingsec").hidden = false;
-
-    let minY = Infinity, maxY = nowYear;
-    withJourney.forEach(p => p.detail.journey.forEach(g => { if (Number.isInteger(g.year)) minY = Math.min(minY, g.year); }));
-    const span = maxY - minY || 1;
-    const px = y => ((y - minY) / span * 100);
-
-    const rows = withJourney.map(p => {
-      const gates = p.detail.journey;
-      const dated = gates.filter(g => Number.isInteger(g.year));
-      const last = dated[dated.length - 1];
-      const hasPending = gates.some(g => g.year === "TBC");
-      let segs = "";
-      for (let i = 1; i < dated.length; i++) {
-        const a = dated[i - 1].year, b = dated[i].year, gap = b - a;
-        if (gap === 0) continue;
-        const cls = gap <= 2 ? "g-good" : gap <= 5 ? "g-warn" : "g-crit";
-        segs += `<div class="tseg ${cls}" style="left:${px(a)}%;width:${px(b) - px(a)}%" title="+${gap} yr${gap === 1 ? "" : "s"}"></div>`;
-      }
-      if (hasPending && last.year < nowYear)
-        segs += `<div class="tseg g-tbc" style="left:${px(last.year)}%;width:${px(nowYear) - px(last.year)}%" title="Next gate still pending"></div>`;
-      const markers = dated.map(g =>
-        `<span class="tgate" tabindex="0" style="left:${px(g.year)}%" data-lbl="${esc(g.label)}" data-yr="${g.year}"></span>`).join("");
-      const totalYrs = (hasPending ? nowYear : last.year) - dated[0].year;
-      const total = hasPending ? totalYrs + " yrs, ongoing" : totalYrs + " yrs";
-      return `<div class="trow2"><div class="tname">${esc(p.name)}</div><div class="tbar"><div class="tbase"></div>${segs}${markers}</div><div class="ttotal">${total}</div></div>`;
-    }).join("");
-
-    const step = span > 12 ? 4 : 3;
-    let axis = "";
-    for (let y = minY; y <= maxY; y += step) axis += `<span style="left:${px(y)}%">${y}</span>`;
-    document.getElementById("timing").innerHTML =
-      `<div class="timing-axis" style="margin-right:96px">${axis}</div>${rows}`;
-    if (without.length)
-      document.getElementById("timing-pending").textContent =
-        "Not yet plotted (pathway starting): " + without.map(p => p.name).join(", ") + ".";
-
-    document.querySelectorAll(".tgate").forEach(g => {
-      const show = () => showTipAt(g, `<b>${esc(g.dataset.yr)}</b>${esc(g.dataset.lbl)}`);
-      g.addEventListener("mouseenter", show);
-      g.addEventListener("focus", show);
-      g.addEventListener("mouseleave", hideTip);
-      g.addEventListener("blur", hideTip);
-    });
-  })();
 
   // CSV download — stages and milestones for every tracked product
   function csvCell(v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }

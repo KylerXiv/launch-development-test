@@ -20,19 +20,27 @@ expensive to reconstruct), §7 for what's left.
 
 | | |
 |---|---|
-| Branch | `feat/resistance-map-site-dots` (off `feat/resistance-map-country-dots` @ `f32384c`) |
+| Branch | **`main`** — D31 landed there directly as `503a58b` (9 Sep 2026) rather than on `feat/resistance-map-site-dots`, and D32 below is uncommitted on top of it. The feature-branch history in this table below `Commits` describes where the work came from, not where it now is. |
 | Version | **2 of 2** — site-level dots on a pan/zoom map (see §1b), **now MapLibre-rendered** (see §1c, D17–D21) |
 | Commits | 24 — 16 inherited from V1, 3 pre-migration on this branch, 5 for the MapLibre migration, all `DEV-13:` prefixed |
 | Working tree | clean |
 | Pushed | V1 yes (6 Sep 2026); **V2 not yet** |
 | V1 PR | **drafted, not yet opened** — see §7 |
-| CI locally | data pipeline re-verified unchanged (0 errors, 3 warnings) after the migration — see §1c |
+| CI locally | **0 errors, 5 warnings** — the 3 long-standing resistance warnings, unchanged, plus 2 new ones for the second data file (D32). `data/resistance.js` and `sourcing/staging/resistance_tes.csv` regenerate **byte-identical to `503a58b`**. |
 | Page affected | `illustrated-journey-dashboard.html` **only** |
+| Headless check | Real Chrome over CDP: all three layers draw, switch, and click through with **0 JS errors**; D15's same-country-overlap invariant holds at **0** across 4 markers × 5 zooms (D32) |
 
-The ticket says *"add all 3 types of data on our map"*. **Two of the three are
-built** — treatment failure, and delayed parasite clearance (added 9 Sep 2026,
-D31 below). Molecular markers remain unbuilt; see §7 for why it is a different
-order of cost from the other two.
+The ticket says *"add all 3 types of data on our map"*. **All three are now
+built** — treatment failure, delayed parasite clearance (9 Sep 2026, D31) and
+molecular markers of drug resistance (9 Sep 2026, **D32**). The ticket's data
+scope is complete; what is *not* complete is everything D17–D24 added around it
+without being asked, which the wider team still has not seen (§7).
+
+**D32 carries one open dependency a reviewer must not skip:** the map's
+molecular-marker metric is *derived*, not published by WHO, and the derivation
+rests on WHO's list of validated Pfkelch13 markers **transcribed by hand** into
+`scripts/normalize-molecular-markers.js`. That list is not in the extract and
+changes between WHO reports. It needs domain sign-off. See D32.
 
 ---
 
@@ -155,33 +163,54 @@ The country access map on the illustrated dashboard now carries a second,
 independent layer: WHO Malaria Threat Map drug-resistance results, drawn as
 coloured dots on top of the existing access shading.
 
-Two study results are selectable in the STUDY RESULT control — **treatment
-failure** and **delayed parasite clearance** (D31). They share every mechanism:
-the same site marks, the same clustering, the same four colour bands, the same
-click-through panel. Only the studies[] column being pooled differs. The third,
-molecular markers, stays disabled.
+All three study results are selectable in the STUDY RESULT control —
+**treatment failure**, **delayed parasite clearance** (D31) and **molecular
+markers of drug resistance** (D32). They share every mechanism: the same site
+marks, the same clustering, the same four colour bands, the same click-through
+panel.
+
+The first two differ only in which `studies[]` column is pooled. The third also
+changes **which file** the rows come from (`data/molecular-markers.js`, a
+separate 2,869-survey population) and **what the dimension means** — a marker
+rather than a drug. A reviewer should read that as one substrate serving three
+layers, not as a special case bolted on: `LAYERS` names the dataset, the value
+column, the dimension and the sample unit for each, and every other function
+reads those four things rather than knowing which layer is on.
 
 - **Fill = the product.** Which countries have registered / adopted / MFT'd it.
   Unchanged from before.
-- **Dots = the parasite.** Treatment-failure rates from WHO therapeutic
-  efficacy studies.
+- **Dots = the parasite.** Treatment failure or day-3 positivity from WHO
+  therapeutic efficacy studies, or — on the third layer — the share of
+  genotyped samples carrying a resistance-associated marker.
 
 They are deliberately on different visual channels, with separate tooltips and
 separate provenance lines. See decision **D2** — this is the single most
 important thing not to accidentally undo.
 
 Controls: a **drug** picker (4 tracked products — GanLum/ALAQ/ASPY/DHA-PPQ,
-D24), an **overlay** radio (Off / Treatment failure), and a **species**
-select. Clicking any dot opens a panel listing every study behind it.
+D24), a **study result** radio (Off / Treatment failure / Delayed parasite
+clearance / Molecular markers), a **marker** select that appears only on the
+third layer (D32), and a **species** select. Clicking any dot opens a panel
+listing every study behind it.
+
+On the molecular-marker layer the two selects swap outright: **Species
+disappears** (D33) and **Marker** is the control that changes the map. All four
+markers stay reachable whichever product is selected — see D32 for why that is
+deliberate rather than an oversight of D24's product-scoping.
+
+The page no longer carries a **"Pathway timing across products"** section
+below the map — removed 9 Sep 2026 at the branch owner's request (D33). It is
+still present on `index.html` and `option-b.html`.
 
 **Layout (D23): the "Dock" arrangement**, applied 8 Sep 2026 — the map's own
 UI chrome, not the rendering engine (that was D17–D22). Left rail: "Drug"
 (D24 — now the single selector driving both the country-access map and the
 resistance overlay's drug), "Study result" (the overlay radio, vertical rows —
-all 3 study types listed, Delayed parasite clearance and Molecular markers of
-drug resistance **disabled** and labeled "Not yet available" per D7's
-existing disabled-not-blank convention, since only Treatment failure has real
-data), and "Species" (the select, narrowing within the bound drug). Right
+all 3 study types listed and, as of D32, **all 3 enabled**; the "Not yet
+available" disabled rows D23 described were retired as D31 and D32 filled them
+in), "Marker" (D32 — present only while the molecular-marker layer is on) and
+"Species" (the select, narrowing within the bound drug — **hidden entirely on
+the molecular-marker layer**, D33). Right
 rail: "Legend" (access swatches + resistance bands + the WHO-rule sentence,
 always visible) and "Detail" below it (the provenance note, replaced by the
 click-through study table when a mark is clicked) — legend and detail are two
@@ -259,8 +288,15 @@ did not count the two CSVs.)
 | `scripts/normalize-resistance.js` | Reads that CSV → writes the two outputs below. Zero dependencies, no network. |
 | `sourcing/staging/resistance_tes.csv` | Auditable intermediate: every study, one row each. Gained a `day3_positive_pct` column in D31. |
 | `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **`treatmentFailure` is byte-identical through V2 and D31** — verified by diffing the serialised layer against the previous commit (33,707 chars both). D31 adds `delayedClearance` (166 country values) and a `d3` column to `studies[]`; `meta.cellCount` is now the sum across layers (440), with `meta.cellCountByLayer` giving the split, and `meta.metrics` carrying the per-layer legend/note labels. |
-| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom, theme), `---- keyboard-accessible country list` for D21. The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. The map's surrounding chrome (`#mapsec`'s HTML, the `.map-dock`/`.dock-section` CSS) is the "Dock" layout, D23 — a separate change from the renderer, touching only markup/CSS, not the JS this row otherwise describes. `---- click-through: every study behind one country dot` covers `openMarkPanel`/`renderPanel`/`chartPlan`/`renderChart` (D25) and `bindDrug`/`curBoundDrug` (D24). |
-| `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). Still checks resistance `iso3` values against `data/world-map.js` only (D17) — unaware of `data/world-map-geo.js` below. |
+| `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom, theme), `---- keyboard-accessible country list` for D21. The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. The map's surrounding chrome (`#mapsec`'s HTML, the `.map-dock`/`.dock-section` CSS) is the "Dock" layout, D23 — a separate change from the renderer, touching only markup/CSS, not the JS this row otherwise describes. `---- click-through: every study behind one country dot` covers `openMarkPanel`/`renderPanel`/`chartPlan`/`renderChart` (D25) and `bindDrug`/`curBoundDrug` (D24). D32 added `LAYERS`/`useLayer`/`dimAt`/`fillMarkerList`/`syncDimControls` and made `AT`, `decode`, `codeOf`, `cellsFor`, `sitesFor` and both tooltips dataset-aware. D33 deleted the `renderTiming()` IIFE and every `.timing-*`/`.trow2`/`.tseg`/`.tgate` rule. |
+| `sourcing/raw/mtm/2026-09-09-mm-studyinfo.csv` | WHO molecular-marker extract, survey sheet, verbatim. 2,869 surveys. |
+| `sourcing/raw/mtm/2026-09-09-mm-genemutations.csv` | Same extract, genotype sheet. 5,573 rows, joined to the above on `ID`. |
+| `sourcing/raw/mtm/2026-09-09-disclaimer.csv`, `-glossary.csv` | WHO's own terms of use and column definitions, archived beside the data they describe. 2 KB the TES extract does not have an equivalent of. |
+| `scripts/mtm-xlsx-to-csv.py` | Splits a WHO `.xlsx` export into one CSV per sheet. Python stdlib only (an `.xlsx` is a zip of XML). **Removes the manual Excel step** `normalize-resistance.js` still documents for the TES extract — see D32. |
+| `scripts/normalize-molecular-markers.js` | Reads the two CSVs above → writes the two outputs below. Zero dependencies, no network. Holds the derivation decision and WHO's validated-marker list. |
+| `sourcing/staging/resistance_mm.csv` | Auditable intermediate: every survey, one row, with **both** candidate metrics resolved side by side (`resistant_pct`, `any_mutation_pct`) so the derivation can be re-argued without rerunning anything. |
+| `data/molecular-markers.js` | `window.LAUNCH_MOLECULAR_MARKERS`, 277 KB. Deliberately the **same envelope** as `data/resistance.js` (meta/fields/coded/dict/studies/layer) so one validator path and one renderer path serve both. 2,869 surveys, 155 aggregated country values across 4 markers. |
+| `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). **D32 rewrote this block to loop over both data files** rather than hardcoding `data/resistance.js` — same checks, parameterised by which studies[] column holds the value (`v` vs `p`) and what the layer's first key means (drug vs marker). Still checks `iso3` values against `data/world-map.js` only (D17) — unaware of `data/world-map-geo.js` below. |
 | `scripts/build-map-geo.js` | Sibling to `scripts/build-map.js`, same dev-only-deps/`NODE_PATH` convention (now also needs `i18n-iso-countries` and `antimeridian-ts`). Emits GeoJSON (not SVG paths) at Natural Earth **50m** — originally from the identical 100-country `NUM_TO_A3` table (D17), now from every ID `i18n-iso-countries` can resolve to an ISO3 code, i.e. the whole world (D27), antimeridian-cut per feature via `fixGeoJson` (D28 — `geoStitch` tried first, replaced same day), Antarctica dropped outright (D30) — this page's basemap only. |
 | `data/world-map-geo.js` | Generated output of the above. `window.LAUNCH_MAP_GEO = {type:"FeatureCollection", features:[{properties:{iso3,name}, geometry}]}`. **235 countries/territories** (D27 widened from the original 100; D30 later dropped Antarctica — see D27/D30 for why). Loaded only by `illustrated-journey-dashboard.html`. |
 
@@ -269,6 +305,12 @@ did not count the two CSVs.)
 - **1,633 studies** shipped (1,642 raw minus 9 WHO publishes with a literal `NaN`)
 - **26 drugs × 5 species → 274 country dots**
 - `data/resistance.js` is **183 KB**
+- **2,869 molecular-marker surveys** shipped — *nothing dropped at all*: every
+  row has coordinates, a year, a mappable ISO2 and at least one usable genotype
+  proportion. Only 10 lack a sample size. This extract is markedly cleaner than
+  the TES one.
+- **4 markers × 1 species (P. falciparum only) → 155 country dots**
+- `data/molecular-markers.js` is **277 KB**
 - `data/world-map-geo.js` is **~1.55 MB** (D27 widened it from ~620 KB when it carried only the 100 WHO-tracked countries, to ~1.6 MB for the whole world; D30 then dropped Antarctica, ~1.55 MB; 50m detail costs more than `data/world-map.js`'s 110m; not minified beyond 3-decimal coordinate rounding — untested whether further simplification is worth it)
 
 ---
@@ -1385,6 +1427,264 @@ provenance debt as before, now counted across two layers.
 
 ---
 
+**D32 — Molecular markers of drug resistance, the third and last of the
+ticket's study results. A second data file, and one derivation decision that
+matters more than all the code.** 9 Sep 2026, on the extract the branch owner
+supplied that morning (`MTM_MOLECULAR_MARKER_STUDY_20260909.xlsx`, 2.4 MB).
+
+§7's estimate called this "expensive" and was right about *why* but wrong about
+*where* the cost sat. The files, the join and the renderer were cheap. The
+expensive part was deciding what a dot means, because **WHO does not publish a
+"percent resistant" for this dataset at all**.
+
+*The shape of the extract, which is not the TES shape.* Four sheets, and the
+data is **relational, not flat**: `MM_StudyInfo` (2,869 surveys) joined on `ID`
+to `MM_geneMutations` (5,573 rows, one per survey × genotype). Also present and
+archived: WHO's Disclaimer and Glossary. Every survey is *P. falciparum*; the
+species dimension that carries five values on the TES layers carries exactly
+one here.
+
+Four marker types, and only one of them has a complicated vocabulary:
+
+| marker | surveys | genotypes | predicts resistance to |
+|---|---|---|---|
+| Pfkelch13 | 1,731 | `WT` + **508** distinct mutations | artemisinin (all ACTs) |
+| Pfmdr1 amplifications | 475 | `WT` (1 copy) / `MC` (multiple) | mefloquine, lumefantrine |
+| Pfplasmepsin 2-3 amplifications | 453 | `WT` / `MC` | piperaquine |
+| Pfcrt K76T | 210 | `WT` / `Pfcrt` (the mutant) | chloroquine |
+
+*The extract is unusually clean.* Nothing was dropped: 0 rows lack coordinates,
+a year, a mappable ISO2 or a usable proportion; 10 lack a sample size. Compare
+the TES extract, where 9 rows carry a literal `NaN`. It reaches **12 countries
+the TES extract never does** (BW CV EC GF GT HN HT NI SA SS YT ZA — mostly the
+Americas and southern Africa, chloroquine-era Pfcrt surveys with no recent
+efficacy study), and it carries **no `TA` anomaly**: Tanzania is `TZ`
+throughout, so `normalize-resistance.js`'s TA→TZA correction has no counterpart.
+
+---
+
+**The decision: what counts as "resistant".**
+
+WHO publishes the proportion of genotyped samples carrying each genotype,
+against a wild-type row. The map metric has to be derived, and the two obvious
+derivations give materially different maps:
+
+| rule | surveys reading above zero |
+|---|---|
+| any non-WT genotype | **1,633** of 2,869 |
+| WHO-**validated** markers only | **1,274** of 2,869 |
+
+**359 surveys flip.** That gap is not noise, and it is not evenly spread. The
+single largest contributor is **A578S** — the most common Pfkelch13 mutation in
+Africa in this extract (138 surveys) — which **WHO states explicitly is not
+associated with artemisinin partial resistance**. In **52 surveys A578S is the
+only non-WT genotype present**: Uganda 9, Comoros 5, Kenya 5, Angola 4, Mali 4,
+Equatorial Guinea 3, DRC 2, Ghana 2, India 2, Sierra Leone 2.
+
+Counting "any mutation" would have painted those countries as artemisinin
+resistance hotspots on the strength of a mutation WHO has ruled out. **Chosen:
+validated markers only** — put to the branch owner with these numbers before
+any of it was wired up, and confirmed. `pAny` (any non-WT genotype) is carried
+on **every study row** alongside `p`, so the looser number is one line away and
+nothing has to be re-derived to argue the point again.
+
+Sanity-checked against known epidemiology rather than only against itself:
+Cambodia and Vietnam read **100%** (C580Y is fixed in the Greater Mekong),
+Rwanda **14.7%**, Uganda **19.6%**, Eritrea **23.4%**, Tanzania **5.6%** — the
+four recognised African foci — and Comoros **0%**, which is precisely the A578S
+effect working as intended.
+
+*The WT rule, and why it needs two branches.* `pAny` prefers `100 − WT` and
+falls back to summing the mutant rows. Neither alone is sufficient:
+
+- **1,201 surveys list only a `WT` row.** Summing mutants reads 0% for all of
+  them. `100 − WT` is right — and for one (South Sudan 2019, WT 98%) it is 2%,
+  not 0%.
+- **295 surveys list no `WT` row.** `100 − WT` is unavailable; the listed
+  genotypes *are* the mutant fraction and sum to 100 in 281 of them.
+- Where both are available (1,373 surveys) they agree within 0.5 pp in **1,346**.
+  The 27 that disagree are mixed infections counted under two genotypes, and
+  `100 − WT` is the one that cannot exceed 100.
+
+*Compound genotype labels, nearly missed.* 69 Pfkelch13 rows carry labels like
+`R539T/C580Y`, `Y493H&C580Y`, `V603I&WT`. Exact string matching against the
+validated list would have scored **1,141** rows; splitting on `/ & + ,` and
+testing each component scores **1,173** — **32 rows, ~97 percentage-points of
+proportion mass**, that carry a validated marker and would otherwise have been
+counted as susceptible. An isolate carrying C580Y carries C580Y whatever else
+it carries.
+
+*Genotypes that cannot be classified.* 41 Pfkelch13 rows are labelled
+`unspecified` or `others` — WHO recording that a mutation was found without
+saying which. They count toward `pAny` and can never count toward `p`. Counted
+and reported by the normalizer rather than silently absorbed either way.
+
+---
+
+**>>> OPEN, AND THE ONE THING A REVIEWER MUST CHECK: the validated-marker list
+is transcribed by hand and has had no domain review.**
+
+`K13_VALIDATED` in `scripts/normalize-molecular-markers.js` holds 13 markers —
+F446I, N458Y, C469Y, M476I, Y493H, R539T, I543T, P553L, R561H, P574L, C580Y,
+R622I, A675V. **This list is not in the extract**; the extract carries no
+classification column at all. It is WHO's, sourced from the *Report on
+antimalarial drug efficacy, resistance and response: 10 years of surveillance
+(2010–2019)* and subsequent WHO status reporting, and it **changes between
+reports** — C469Y, R622I and A675V were *candidates* before they were
+validated. It must be re-checked against the current WHO report whenever the
+extract is refreshed. `meta.status` is `"draft"`, not `"verified"`, for exactly
+this reason, and `meta.validatedK13` ships the list so a reviewer can diff it
+without reading the normalizer.
+
+---
+
+*A second file, not a third layer in the first one.* The two datasets share no
+rows and are keyed differently — 2,869 genotype surveys on a marker, against
+1,633 efficacy studies on a drug. Merging them into one `studies[]` would have
+meant every TES row carrying null marker columns and every survey carrying null
+efficacy columns, plus a normalizer reading two unrelated extracts. Instead
+`data/molecular-markers.js` uses a **deliberately identical envelope**
+(`meta`/`fields`/`coded`/`dict`/`studies`/`<layer>`), which is what makes the
+next two decisions cheap.
+
+*One validator path, not two.* The `data/resistance.js` block in
+`scripts/validate-data.js` was rewritten to loop over both files, parameterised
+by which `studies[]` column carries the value (`v` vs `p`) and what a layer's
+first key means (drug vs marker). Checking them through one path is what keeps
+the "identical envelope" promise honest — a divergence fails here rather than in
+the browser. **The three pre-existing warnings came through unchanged (1 / 730 /
+12)**, which is the evidence the rewrite is behaviour-preserving; the two new
+ones are the new file's own (625 surveys with no citation URL, 9 country values
+outside the drawn basemap — COM, CPV, GUF, MYT, SLB, STP).
+
+*One renderer path.* `LAYERS` now maps each layer to `{ds, value, dim, unit}`.
+`AT` is **rebuilt on every layer change** rather than read through an accessor:
+the two files order their columns differently, so a stale `AT` would silently
+read the wrong column rather than throw.
+
+*The Marker picker is not scoped to the product, and that is deliberate.* D24
+made the product tabs drive the drug. A marker is a property of the *parasite
+population*, not of a product: Pfkelch13 prevalence means the same thing whether
+or not the product in the tabs has launched. So **all four markers stay
+reachable**, there is no "not yet in clinical use" state on this layer (D24's
+GanLum/ALAQ case does not arise), and the product picks only the *default* —
+DHA-PPQ opens on Pfplasmepsin 2-3 (piperaquine, its distinguishing partner
+drug), ASPY on Pfkelch13. An explicit choice survives a product change, the way
+the species select already behaves. The alternative — scoping markers to the
+product the way drugs are scoped — was considered and rejected: it would have
+made Pfcrt K76T and Pfmdr1 unreachable, a *further* narrowing on top of the one
+§7 already flags D24 for.
+
+Species becomes the degenerate control on this layer — one value, initially
+auto-disabled by `fillSpeciesList`'s existing `usable.length < 2` rule, and
+**hidden outright as of D33**. That is why Marker sits above it in the rail.
+
+*The `.xlsx` step is now scripted.* `normalize-resistance.js` documents the
+Excel→CSV conversion as manual because "`.xlsx` cannot be read without a
+dependency and this repo has none". True of Node here; **not true of Python**,
+whose stdlib reads both zip and XML — and `scripts/check-shapes.py` already
+established Python scripts are acceptable in this repo.
+`scripts/mtm-xlsx-to-csv.py` is stdlib-only and adds no dependency. The
+archived CSVs remain the reproducible input; only the trip through Excel is
+gone. *Not* retro-applied to the TES extract — that would rewrite a committed
+input file for no gain.
+
+---
+
+**Three bugs in D31 found and fixed while wiring this, none of them mine.**
+All three were live in `503a58b`:
+
+1. **The panel and chart showed treatment-failure numbers under the
+   delayed-clearance layer.** `openMarkPanel` decoded rows and `renderPanel` /
+   `chartPlan` / `renderChart` all read `.v` without consulting `LAYER`. Fixed
+   at the source: `decode()` now sets `o.v = o[L().value]`, so those three
+   never learn which layer is showing. Proven on Forécariah, Guinea 2011 ·
+   ASPY, which has three rows — `v=0.5% d3=0`, and two with `d3=null`. The
+   panel now shows **1 study at 0%**; before, it showed **3 studies at 0.5%**.
+2. **`openMarkPanel` did not apply the "not measured is not measured at 0%"
+   rule** that `sitesFor` applies, so studies with no day-3 value appeared as
+   blank rows in the history of a dot they never fed. Same Forécariah case: the
+   two `d3=null` rows are now filtered out.
+3. **Two tooltips named the metric in a string literal** — the cluster tooltip
+   and the chart-bar tooltip both said "Treatment failure" whatever layer was
+   on. `siteTip` had already been made layer-aware in D31; these two were
+   missed. Both now use `layerLabel(LAYER)`.
+
+Also corrected in passing: the site-filter placeholder said "Turn on Treatment
+failure to see sites" when there are now three study results to turn on, and
+the "Patients" row label is wrong for a layer whose denominator is samples
+genotyped — `LAYERS[...].unit` now supplies "Patients" or "Samples".
+
+*A latent validator bug, fixed while the block was being rewritten.* The
+uncited-study count tested `row[at.citation]` — a **dict index** — for
+truthiness. It gave the right answer only because `""` happens to sort to index
+0. Any dictionary without an empty citation would have counted a real URL as
+missing. It now decodes before testing; the count is unchanged at 730, which is
+the proof the two agree today.
+
+---
+
+*Output.* **155 country dots** across 4 markers from 2,869 surveys (88 average
+several sites, 0 lack sample sizes). At render time Pfkelch13 draws **781 sites
+in 69 marks** at world zoom, fully separating into 632 marks by z6.
+
+*Verified in a real browser, not only in the arithmetic.* There is **no
+puppeteer on this machine**, so `scripts/verify-map-clusters.js` could not be
+run — see §9 for how this was driven instead (Chrome over CDP, no dependency).
+All three layers draw, switch and click through with **0 JS errors**, and
+**D15's same-country-overlap invariant holds at 0 across all 4 markers × 5 zoom
+levels (20 checks)**; cross-border overlaps fall 164 → 4 with zoom for
+Pfkelch13, the same shape the TES layers show.
+
+---
+
+**D33 — Two removals asked for directly: the Species control on the
+molecular-marker layer, and the "Pathway timing across products" section.**
+9 Sep 2026, both direct instructions from the branch owner on seeing D32 on
+screen, not inferred.
+
+*Species is hidden on the molecular-marker layer, not merely disabled.* This
+looks like it contradicts **D7**'s disabled-not-blank convention, and it is
+worth being precise about why it does not. D7 exists so a reader can tell "this
+pairing has no studies behind it" from "this control does not apply here" — and
+on the TES layers a disabled Species select still carries the first meaning: it
+says *this drug was only ever studied against one species*, which is a finding
+about the data. On the molecular-marker layer it carries neither meaning.
+**Every one of the 2,869 surveys is *P. falciparum*** — species is not a
+dimension of this dataset at all, and a control that can never do anything for
+any marker is furniture. D7 still governs the TES layers untouched.
+
+The select is still *filled* while hidden, because `drawResistance` reads its
+value to pair the marker with its species; only the enclosing
+`#species-controls` section is hidden. Confirmed on screen: hidden under
+molecular markers, and back with all five species (`P. falciparum` 12,
+`knowlesi` 0, `malariae` 3, `ovale` 3, `vivax` 5 countries) on switching back
+to treatment failure.
+
+*"Pathway timing across products" is gone from this page, completely.* Removed
+in full rather than hidden: the `<section id="timingsec">` markup, the
+`renderTiming()` IIFE (2,856 characters), the 17 CSS rules
+(`.timing-*`/`.trow2`/`.tseg`/`.tgate`/`.ttotal`/`.g-good|warn|crit|tbc`) and
+their 4 responsive overrides. Verified by grepping every one of those
+identifiers back out of the file: zero residue, and the page still parses and
+runs with 0 JS errors.
+
+**Out of ticket, and worth saying so.** DEV-13 is about resistance study types.
+This section had nothing to do with it — the removal is recorded here only
+because this document is the branch's written record and the change rode along
+in the same working tree.
+
+**Left standing deliberately: `index.html` and `option-b.html` still carry the
+same section**, with their own copies of the markup, CSS and `renderTiming()`.
+The instruction was given while looking at
+`illustrated-journey-dashboard.html`, and this branch's stated blast radius has
+been that one page since §1. `docs/developer-guide.md` §10 and
+`docs/user-guide.md` both still describe the timing chart, and remain accurate
+for those two pages. If the section is meant to go site-wide, that is three more
+files and those two doc entries — see §7.
+
+---
+
 ## 7. What's left
 
 **Read this section together with §1c.** Everything below describes what V2
@@ -1513,13 +1813,55 @@ still not reachable by a reader.
   from the aggregated layer — so the change had to reach `sitesFor`, `pooled`
   and the tooltip's `peak` comparison, not just a radio button. The validator
   *was* already layer-agnostic and needed no change at all.
-- **Molecular markers — expensive.** The two MM CSVs are **not in the repo**
-  (deliberately — Phase 1 didn't use them; the source `.xlsx` is in the 5 Sep
-  chat). Beyond the files it needs real decisions: the metric must be *derived*
-  as `100 − WT%` (the file stores genotype proportions against a wild-type
-  baseline), 295 studies have no WT row and need a rule, and WHO distinguishes
-  **validated** from **candidate** Pfkelch13 markers — treating all 511
-  genotypes as "resistant" would overstate it. Own ticket.
+- **Molecular markers — BUILT, 9 Sep 2026.** See D32 in §6. This estimate was
+  accurate on every specific — the derivation, the 295 WT-less studies, the
+  validated/candidate distinction — and wrong only about where the cost landed:
+  the code was cheap, the *decision* was the work. Two things it did not
+  anticipate: the extract is **relational** (two sheets joined on `ID`), and
+  **compound genotype labels** (`R539T/C580Y`) mean the validated-marker test
+  cannot be an exact string match.
+
+### Opened by D32
+
+- **>>> The validated-marker list needs domain sign-off.** Highest-value open
+  item on the branch. 13 Pfkelch13 markers transcribed by hand from WHO
+  reporting into `K13_VALIDATED`; not derivable from the extract; changes
+  between WHO reports. Everything the molecular-marker map shows rests on it.
+  `meta.status` stays `"draft"` until someone qualified confirms it.
+- **`scripts/verify-map-clusters.js` does not sweep the molecular-marker
+  dataset.** It hardcodes `RES.studies` via `__DEV13_MAP__.setDrugSpecies`. The
+  invariant *was* re-proved for all 4 markers (D32), but by an ad-hoc CDP
+  driver, not by the repo's own test — so it is not protected against
+  regression. Extending it needs the hook to take a dataset as well as a
+  drug/species, and needs puppeteer, which is not installed here (§9).
+- **`pAny` ships on every row and nothing reads it.** Deliberate — it is what
+  makes the derivation decision reversible without regenerating — but it is 2,869
+  values the page does not use. Either surface it in the panel (it is genuinely
+  informative next to `p`: "8% validated, 31% any mutation") or document it as
+  reversal insurance. Do not quietly delete it.
+- **`meta.markerDrug` is a biology claim living in a data file.** The Marker
+  select labels each marker with the drug it predicts resistance to. Correct as
+  far as it goes, but it is WHO's biology asserted by this repo, and Pfmdr1
+  amplification's relationship to lumefantrine is more equivocal than the label
+  suggests. Worth a domain eye alongside the validated list.
+- **1,080 of 2,869 surveys have fewer than 20 samples** — 38%, against a much
+  smaller share on the TES layers. They are kept and flagged (`small`), same as
+  everywhere else, but the flag is doing much more work on this layer and the
+  small-study threshold was inherited, not re-derived for genotyping.
+- **The country-level aggregate has the same "most recent year" weakness V1
+  had**, and it is sharper here: Cambodia's Pfkelch13 cell rests on a 2023
+  survey of **9 samples**, Thailand's on 9. As on the TES layers the dots come
+  from `studies[]` so no reader sees these numbers, but `cellsFor` still backs
+  the country counts in the Marker and Species selects.
+
+### Opened by D33
+
+- **"Pathway timing across products" was removed from this page only.**
+  `index.html` and `option-b.html` still have it, each with its own copy of the
+  markup, CSS and `renderTiming()`. If the removal is meant to be site-wide,
+  those two files plus `docs/developer-guide.md` §10 and `docs/user-guide.md`
+  need the same treatment. Ask before doing it — a page-scoped instruction was
+  taken page-scoped.
 
 ### Smaller / optional
 - Panel number alignment — Patients and Failure are right-aligned and can read
@@ -1560,21 +1902,71 @@ Not yet pushed. `publish.yml` does not fire on it either (§9).
 
 ### Verify before committing
 
-```powershell
+```bash
 node scripts/normalize-resistance.js          # regenerate; output should be identical
-node scripts/validate-data.js                 # expect 0 errors, 3 warnings
+node scripts/normalize-molecular-markers.js   # ditto (D32)
+node scripts/validate-data.js                 # expect 0 errors, 5 warnings
 node scripts/validate-data.js data/products.synthetic.js   # expect 0/0
 node scripts/make-preview.js                  # smoke test
 node scripts/verify-map-clusters.js           # expect 0 same-country overlaps (D22, extended D29)
 ```
 
-**There is no Python on this machine** — `python -m http.server` (the command
-this section used to suggest) fails with "Python was not found" (a Windows
-Store alias stub, not a real absence-of-error). Use a one-line Node static
-server instead, e.g. serve the repo root with any tiny `http.createServer`
-script that maps `/` to `illustrated-journey-dashboard.html` — there's nothing
-in `package.json` for this today, worth adding a real dev script if this
-comes up again rather than re-improvising it.
+**The 5 warnings are 3 + 2 and the split matters.** The first three are the
+long-standing resistance ones (1 unnamed site, 730 uncited studies, 12 undrawn
+country values) and must come through *unchanged* — they are the evidence that
+D32's validator rewrite is behaviour-preserving. The last two belong to
+`data/molecular-markers.js` (625 uncited surveys, 9 undrawn country values). Any
+other split means something moved.
+
+Both data files are expected back **byte-identical**; a diff means something is
+wrong, not something new. Regenerating the molecular-marker file from the
+`.xlsx` rather than from the archived CSVs is a separate, rarer step:
+
+```bash
+python3 scripts/mtm-xlsx-to-csv.py <download>.xlsx sourcing/raw/mtm --prefix <date>
+```
+
+`scripts/verify-map-clusters.js` **needs puppeteer, which is not installed on
+this machine** (§9) — it did not run for D32. The invariant it protects was
+re-proved for all four markers by driving Chrome over CDP instead; that is
+recorded in D32 but is not a committed test, which §7 lists as open.
+
+**Python: the note below was written on the Windows machine and no longer
+holds.** Work moved to macOS (Darwin 25.5.0) between D31 and D32, where
+`python3` is real (Homebrew, 3.13). D32 depends on that — `mtm-xlsx-to-csv.py`
+is stdlib-only Python. The original note, kept because it is still true of the
+Windows box: *"`python -m http.server` fails with 'Python was not found' — a
+Windows Store alias stub, not a real absence-of-error."* On either machine, a
+one-line Node `http.createServer` serving the repo root works; there is still
+nothing in `package.json` for it, and it is still worth adding rather than
+re-improvising each time.
+
+**Headless Chrome needs SwiftShader or MapLibre dies before the page
+initialises.** The single most time-wasting trap found in D32. A default
+`--headless=new` Chrome has no WebGL, so `new maplibregl.Map()` throws
+*"Could not create a WebGL context ... GL_VENDOR = Disabled, Sandboxed = yes"*
+— and because that throw happens during init, **nothing downstream exists**:
+no `__DEV13_MAP__`, no dots, `#res-controls` still hidden, 0 product tabs. It
+presents as "the whole page is broken", not as "WebGL is off". The flags that
+fix it:
+
+```bash
+--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader \
+--enable-webgl --ignore-gpu-blocklist
+```
+
+Note `--disable-gpu`, which is otherwise the reflex flag for headless, makes
+this *worse* — drop it. This applies to `scripts/verify-map-clusters.js` too if
+it is ever run on a machine without a GPU.
+
+**Puppeteer is not installed here, and is not needed to drive the page.**
+`scripts/verify-map-clusters.js` asks for it. Node 22 ships a global
+`WebSocket`, so Chrome's DevTools Protocol can be driven directly: launch
+Chrome with `--remote-debugging-port`, `GET /json/list` for the page target,
+connect to its `webSocketDebuggerUrl`, and use `Runtime.evaluate` with
+`returnByValue`. About 40 lines, no dependency. Worth folding into
+`verify-map-clusters.js` so the repo's own test stops needing an uninstalled
+package (§7).
 
 **Neither the MapLibre migration nor V2 before it change any data**, so all
 three commands above still pass untouched — a diff in `data/resistance.js`
