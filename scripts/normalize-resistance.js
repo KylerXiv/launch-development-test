@@ -20,6 +20,9 @@
 //   data/resistance.js                    window.LAUNCH_RESISTANCE, committed:
 //                                           .studies  every study (drill-down)
 //                                           .treatmentFailure  aggregated dots
+//                                           .delayedClearance  aggregated dots,
+//                                             day-3 positivity from the SAME
+//                                             extract — no second download
 //
 // NOTHING is filtered out. Every Plasmodium species is kept, and studies of
 // any size are kept — the map flags small ones rather than hiding them. The
@@ -65,6 +68,26 @@ const SMALL_STUDY = 20;
 // ("Percentage of patients with treatment failure"); the Kaplan-Meier estimate
 // is carried alongside for reference but is not what the dot is built from.
 const METRIC = "TREATMENT_FAILURE_PP";
+
+// Delayed parasite clearance comes out of the SAME extract, a different column:
+// the percentage of patients still parasitaemic on day 3 (72h after the first
+// dose). No second download exists or is needed.
+//
+// It is aggregated by the identical rule and drawn with the identical four
+// bands. That is not laziness — WHO's own alert threshold for suspected
+// artemisinin partial resistance is >10% day-3 positivity, which falls exactly
+// on an existing band edge (b2/b3), so the treatment-failure legend already
+// puts the line where a reader needs it.
+//
+// Coverage differs from treatment failure and the difference is one-directional:
+// of 1,642 rows, 1,633 carry a usable failure value and 1,188 a usable day-3
+// value, 1,179 carry both. The 9 rows with day-3 but no failure value are the
+// same 9 this script already drops, so they stay dropped and the row-keeping
+// rule below is unchanged — keeping treatmentFailure and studies[] identical to
+// before this layer existed. Checked before deciding: all 9 are older than the
+// most recent year of the country x drug x species cell they belong to, so none
+// creates a cell and none sets a cell's latest year. Excluding them moves no dot.
+const METRIC_D3 = "POSITIVE_DAY_3 (days)";
 
 // ---- ISO2 -> ISO3 -----------------------------------------------------------
 // Embedded rather than pulled from a package, matching scripts/build-map.js.
@@ -159,6 +182,11 @@ for (let r = 1; r < table.length; r++) {
   if (Number.isFinite(n) && n < SMALL_STUDY) stats.small++;
   stats.kept++;
   const km = parseFloat(get(KM));
+  // Nullable: a study can report a failure rate and no day-3 count. Rows whose
+  // d3 is null are skipped by the delayedClearance aggregation, not zeroed —
+  // "not measured" and "measured at 0%" are different findings.
+  const d3raw = METRIC_D3 in idx ? parseFloat(get(METRIC_D3)) : NaN;
+  const d3 = Number.isFinite(d3raw) && d3raw >= 0 && d3raw <= 100 ? round(d3raw, 2) : null;
   studies.push({
     iso3,
     country: a2 === "TA" ? "Tanzania" : get("COUNTRY_NAME"),
@@ -166,6 +194,7 @@ for (let r = 1; r < table.length; r++) {
     species: get("PLASMODIUM_SPECIES"),
     year, v: round(v, 2),
     km: Number.isFinite(km) ? round(km, 2) : null,
+    d3,
     n: Number.isFinite(n) ? n : null,
     site: get("SITE_NAME"),
     region: get("ADMIN2"),
@@ -184,54 +213,71 @@ studies.sort((a, b) =>
 // patient-weighted mean, so one tiny study cannot decide a country's colour.
 // The dot's position is the patient-weighted centroid of those same sites, so
 // it sits among the studies it summarises rather than at an arbitrary one.
-const byCell = new Map();
-for (const s of studies) {
-  const key = s.drug + " " + s.species + " " + s.iso3;
-  if (!byCell.has(key)) byCell.set(key, []);
-  byCell.get(key).push(s);
+// One function, called once per metric, so the two layers cannot drift apart:
+// the same latest-year selection, the same patient weighting and the same
+// centroid. `valueOf` returns the metric for a study, or null where that study
+// did not measure it — nulls are excluded before the year is chosen, so a
+// cell's "most recent year" is the most recent year THIS metric was measured,
+// not the most recent year anything was.
+function aggregate(rows, valueOf) {
+  const byCell = new Map();
+  for (const s of rows) {
+    if (valueOf(s) === null) continue;
+    const key = s.drug + " " + s.species + " " + s.iso3;
+    if (!byCell.has(key)) byCell.set(key, []);
+    byCell.get(key).push(s);
+  }
+  const layer = {};
+  const stat = { cells: 0, weightedCells: 0, unweighted: 0 };
+  for (const group of byCell.values()) {
+    const year = Math.max(...group.map(s => s.year));
+    const inYear = group.filter(s => s.year === year);
+    // weight by patients; rows with no sample size fall back to equal weight so
+    // they still contribute rather than vanishing
+    const anyN = inYear.some(s => Number.isInteger(s.n) && s.n > 0);
+    const wOf = (s) => (anyN ? (Number.isInteger(s.n) && s.n > 0 ? s.n : 0) : 1);
+    const W = inYear.reduce((a, s) => a + wOf(s), 0) || inYear.length;
+    const v = inYear.reduce((a, s) => a + valueOf(s) * wOf(s), 0) / W;
+    const lat = inYear.reduce((a, s) => a + s.lat * wOf(s), 0) / W;
+    const lon = inYear.reduce((a, s) => a + s.lon * wOf(s), 0) / W;
+    const patients = inYear.reduce((a, s) => a + (Number.isInteger(s.n) ? s.n : 0), 0);
+    if (inYear.length > 1) stat.weightedCells++;
+    if (!anyN) stat.unweighted++;
+    const s0 = inYear[0];
+    ((layer[s0.drug] = layer[s0.drug] || {})[s0.species] =
+      layer[s0.drug][s0.species] || {})[s0.iso3] = {
+        v: round(v, 2), year, n: patients, sites: inYear.length,
+        lat: round(lat, 4), lon: round(lon, 4),
+        // the single site is worth naming when the dot rests on exactly one study
+        site: inYear.length === 1 ? s0.site : "", region: inYear.length === 1 ? s0.region : "",
+        small: patients > 0 && patients < SMALL_STUDY
+      };
+    stat.cells++;
+  }
+  return { layer, ...stat };
 }
-const layer = {};
-let cells = 0, weightedCells = 0, unweighted = 0;
-for (const group of byCell.values()) {
-  const year = Math.max(...group.map(s => s.year));
-  const inYear = group.filter(s => s.year === year);
-  // weight by patients; rows with no sample size fall back to equal weight so
-  // they still contribute rather than vanishing
-  const anyN = inYear.some(s => Number.isInteger(s.n) && s.n > 0);
-  const wOf = (s) => (anyN ? (Number.isInteger(s.n) && s.n > 0 ? s.n : 0) : 1);
-  const W = inYear.reduce((a, s) => a + wOf(s), 0) || inYear.length;
-  const v = inYear.reduce((a, s) => a + s.v * wOf(s), 0) / W;
-  const lat = inYear.reduce((a, s) => a + s.lat * wOf(s), 0) / W;
-  const lon = inYear.reduce((a, s) => a + s.lon * wOf(s), 0) / W;
-  const patients = inYear.reduce((a, s) => a + (Number.isInteger(s.n) ? s.n : 0), 0);
-  if (inYear.length > 1) weightedCells++;
-  if (!anyN) unweighted++;
-  const s0 = inYear[0];
-  ((layer[s0.drug] = layer[s0.drug] || {})[s0.species] =
-    layer[s0.drug][s0.species] || {})[s0.iso3] = {
-      v: round(v, 2), year, n: patients, sites: inYear.length,
-      lat: round(lat, 4), lon: round(lon, 4),
-      // the single site is worth naming when the dot rests on exactly one study
-      site: inYear.length === 1 ? s0.site : "", region: inYear.length === 1 ? s0.region : "",
-      small: patients > 0 && patients < SMALL_STUDY
-    };
-  cells++;
-}
+
+const tf = aggregate(studies, s => s.v);
+const dc = aggregate(studies, s => s.d3);
+const layer = tf.layer;
+const cells = tf.cells, weightedCells = tf.weightedCells, unweighted = tf.unweighted;
 
 // ---- staging CSV ------------------------------------------------------------
 const cols = ["iso3","country","drug","species","year","value_pct","value_km_pct",
-              "sample_size","site","region","latitude","longitude","data_source","citation_url"];
+              "day3_positive_pct","sample_size","site","region","latitude","longitude",
+              "data_source","citation_url"];
 fs.mkdirSync(path.dirname(STAGING), { recursive: true });
 fs.writeFileSync(STAGING,
   cols.join(",") + "\n" +
   studies.map(s => [s.iso3, s.country, s.drug, s.species, s.year, s.v, s.km === null ? "" : s.km,
+                    s.d3 === null ? "" : s.d3,
                     s.n === null ? "" : s.n, s.site, s.region, s.lat, s.lon, s.source, s.citation]
                     .map(csvCell).join(",")).join("\n") + "\n");
 
 // ---- data/resistance.js -----------------------------------------------------
 // `studies` is stored as rows against a field list rather than as objects —
 // the same 1,600 keys repeated 14 times each would roughly triple the file.
-const FIELDS = ["iso3","country","drug","species","year","v","km","n","site","region","lat","lon","source","citation"];
+const FIELDS = ["iso3","country","drug","species","year","v","km","d3","n","site","region","lat","lon","source","citation"];
 // These five columns repeat a handful of values across every row — the study
 // institution alone is 112 KB of the raw file for 224 distinct strings. Storing
 // them as indices into a lookup roughly halves the committed file, which
@@ -250,17 +296,34 @@ const payload = {
     extract: EXTRACT,
     whoLastDataUpdate: WHO_LAST_UPDATE,
     metric: "Treatment failure (per-protocol), % of evaluable patients",
+    // Per-layer labels, keyed by the layer name the page's radio uses. `metric`
+    // above is kept because the validator requires it and it names the default
+    // layer; the page reads `metrics` so the legend title and the note follow
+    // whichever layer is showing.
+    metrics: {
+      treatmentFailure: {
+        short: "Treatment failure",
+        full: "Treatment failure (per-protocol), % of evaluable patients"
+      },
+      delayedClearance: {
+        short: "Delayed parasite clearance",
+        full: "Patients still parasitaemic on day 3, % of those tested — WHO treats over 10% as a signal of suspected artemisinin partial resistance"
+      }
+    },
     status: "draft",
     rule: RULE,
     smallStudy: SMALL_STUDY,
     studyCount: studies.length,
-    cellCount: cells
+    // Summed across every layer, because that is what the validator counts.
+    cellCount: cells + dc.cells,
+    cellCountByLayer: { treatmentFailure: cells, delayedClearance: dc.cells }
   },
   fields: FIELDS,
   coded: CODED,          // these columns hold an index into dict[<column>]
   dict,
   studies: studies.map(encode),
-  treatmentFailure: layer
+  treatmentFailure: layer,
+  delayedClearance: dc.layer
 };
 
 const file =
@@ -286,6 +349,11 @@ console.log(`  dropped ${stats.noValue} with no usable value (WHO writes "NaN"),
 console.log(`  "TA" -> TZA correction applied to ${stats.taFixed}; ` +
             `${stats.small} studies have fewer than ${SMALL_STUDY} patients (kept, flagged on the map)`);
 console.log(`Wrote ${path.relative(root, STAGING)} — ${studies.length} studies`);
+const d3Studies = studies.filter(s => s.d3 !== null).length;
 console.log(`Wrote ${path.relative(root, OUT)} — ${drugs} drugs x ${species.size} species, ` +
-            `${cells} country dots (${weightedCells} average several sites, ${unweighted} have no sample sizes), ` +
             `${Math.round(file.length / 1024)} KB`);
+console.log(`  treatmentFailure: ${cells} country dots ` +
+            `(${weightedCells} average several sites, ${unweighted} have no sample sizes)`);
+console.log(`  delayedClearance: ${dc.cells} country dots from ${d3Studies} studies ` +
+            `that report day-3 positivity (${dc.weightedCells} average several sites, ` +
+            `${dc.unweighted} have no sample sizes)`);

@@ -29,9 +29,10 @@ expensive to reconstruct), §7 for what's left.
 | CI locally | data pipeline re-verified unchanged (0 errors, 3 warnings) after the migration — see §1c |
 | Page affected | `illustrated-journey-dashboard.html` **only** |
 
-The ticket says *"add all 3 types of data on our map"*. **One of the three is
-built** (treatment failure). See §7 for the other two and why they differ
-wildly in cost.
+The ticket says *"add all 3 types of data on our map"*. **Two of the three are
+built** — treatment failure, and delayed parasite clearance (added 9 Sep 2026,
+D31 below). Molecular markers remain unbuilt; see §7 for why it is a different
+order of cost from the other two.
 
 ---
 
@@ -154,6 +155,12 @@ The country access map on the illustrated dashboard now carries a second,
 independent layer: WHO Malaria Threat Map drug-resistance results, drawn as
 coloured dots on top of the existing access shading.
 
+Two study results are selectable in the STUDY RESULT control — **treatment
+failure** and **delayed parasite clearance** (D31). They share every mechanism:
+the same site marks, the same clustering, the same four colour bands, the same
+click-through panel. Only the studies[] column being pooled differs. The third,
+molecular markers, stays disabled.
+
 - **Fill = the product.** Which countries have registered / adopted / MFT'd it.
   Unchanged from before.
 - **Dots = the parasite.** Treatment-failure rates from WHO therapeutic
@@ -250,8 +257,8 @@ did not count the two CSVs.)
 |---|---|
 | `sourcing/raw/mtm/2026-09-05-tes.csv` | The WHO extract, verbatim. 1,642 rows. Committed so CI and teammates never touch Excel. |
 | `scripts/normalize-resistance.js` | Reads that CSV → writes the two outputs below. Zero dependencies, no network. |
-| `sourcing/staging/resistance_tes.csv` | Auditable intermediate: every study, one row each. |
-| `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **Unchanged by V2 — byte-identical to V1.** |
+| `sourcing/staging/resistance_tes.csv` | Auditable intermediate: every study, one row each. Gained a `day3_positive_pct` column in D31. |
+| `data/resistance.js` | Committed data the page reads. `studies[]` (all 1,633) now backs the **dots as well as** the panel — V2 derives every site from it at render time. `treatmentFailure` (274 aggregated country values) is, as of V2, only the index behind the drug and species country counts; it positions and colours nothing. **`treatmentFailure` is byte-identical through V2 and D31** — verified by diffing the serialised layer against the previous commit (33,707 chars both). D31 adds `delayedClearance` (166 country values) and a `d3` column to `studies[]`; `meta.cellCount` is now the sum across layers (440), with `meta.cellCountByLayer` giving the split, and `meta.metrics` carrying the per-layer legend/note labels. |
 | `illustrated-journey-dashboard.html` | The renderer. Search for `---- resistance overlay` for the layer (data/math, untouched), `---- site-level marks` for D14/D15 (`sitesFor`/`pooled`/`mark`/`clusterSites`), `---- MapLibre init` for D18/D19 (map construction, pan/zoom, theme), `---- keyboard-accessible country list` for D21. The old `---- map pan / zoom` banner (D13's hand-rolled viewBox code) is gone — deleted, not archived, per D19. The map's surrounding chrome (`#mapsec`'s HTML, the `.map-dock`/`.dock-section` CSS) is the "Dock" layout, D23 — a separate change from the renderer, touching only markup/CSS, not the JS this row otherwise describes. `---- click-through: every study behind one country dot` covers `openMarkPanel`/`renderPanel`/`chartPlan`/`renderChart` (D25) and `bindDrug`/`curBoundDrug` (D24). |
 | `scripts/validate-data.js` | Resistance rules run only on the default invocation (not the synthetic run). Still checks resistance `iso3` values against `data/world-map.js` only (D17) — unaware of `data/world-map-geo.js` below. |
 | `scripts/build-map-geo.js` | Sibling to `scripts/build-map.js`, same dev-only-deps/`NODE_PATH` convention (now also needs `i18n-iso-countries` and `antimeridian-ts`). Emits GeoJSON (not SVG paths) at Natural Earth **50m** — originally from the identical 100-country `NUM_TO_A3` table (D17), now from every ID `i18n-iso-countries` can resolve to an ISO3 code, i.e. the whole world (D27), antimeridian-cut per feature via `fixGeoJson` (D28 — `geoStitch` tried first, replaced same day), Antarctica dropped outright (D30) — this page's basemap only. |
@@ -1314,6 +1321,70 @@ spanning more than 170° of longitude.
 
 ---
 
+**D31 — Delayed parasite clearance, the second of the ticket's three study
+results. No new WHO extract; a second metric out of the same file.**
+
+WHO's day-3 positivity — the share of patients still parasitaemic 72h after
+the first dose — is already a column in the committed extract
+(`POSITIVE_DAY_3 (days)`). There was never a download to do.
+
+*Coverage, measured before deciding anything.* Of the extract's 1,642 rows:
+1,633 carry a usable treatment-failure value (the existing keep rule), 1,188
+carry a usable day-3 value, and **1,179 carry both**. The 9 rows with a day-3
+value but no failure value are exactly the 9 this script already drops.
+
+*The decision that mattered: leave the row-keeping rule alone.* Widening it to
+"keep a row if either metric is usable" would have recovered those 9 rows, at
+the cost of changing `studies[]` from 1,633 to 1,642, making `v` nullable, and
+touching the panel and the validator. Rejected on a measurement rather than on
+taste — of those 9 rows:
+
+| | |
+|---|---|
+| create a country×drug×species cell that would not otherwise exist | **0** |
+| set the most recent year of a cell they belong to | **0** |
+| are older than their cell's latest year anyway, so contribute nothing | **9** |
+
+All 9 are Cambodia DHA-PPQ 2012–13 and Chad AL/ASAQ 2020–21, and every one of
+them sits behind a more recent study for the same cell. Excluding them moves no
+dot and changes no colour. So `treatmentFailure` and `studies[]` came through
+**byte-identical** — verified by serialising the layer from the previous commit
+and diffing: 33,707 characters both ways.
+
+*Why the same four bands and not new ones.* WHO's own alert threshold for
+suspected artemisinin partial resistance is **>10% day-3 positivity**, and 10%
+is already a band edge (b2/b3) in the treatment-failure legend. The existing
+colours therefore put the line exactly where a reader needs it, so nothing was
+re-cut. The legend *title* changes with the layer; the bands do not.
+
+*Nulls are skipped, never zeroed.* A study can report a failure rate and no
+day-3 count. `d3` is nullable, `aggregate()` drops null rows before choosing the
+cell's most recent year, and `sitesFor` skips them before pooling — so a cell's
+"latest year" is the latest year *this metric* was measured, not the latest year
+anything was. Zero-filling would have read as "0% still parasitaemic", which is
+a finding, not an absence.
+
+*One function, called twice.* The aggregation was extracted into
+`aggregate(rows, valueOf)` rather than copied, so the two layers cannot drift on
+the latest-year rule, the patient weighting or the centroid. Output:
+**166 country dots across 18 drugs** from 1,179 studies (92 average several
+sites). Note this corrects §7's earlier estimate of 159 cells across 15 drugs.
+
+*Where the earlier estimate was wrong about the code.* §7 predicted the renderer
+was layer-agnostic. It was not: `LAYER` was a hardcoded `const`, and since V2
+the dots are derived from `studies[]` rather than from the aggregated layer, so
+the metric's column had to reach `sitesFor`, `pooled` and the tooltip's `peak`
+comparison. `VALUE_FIELD` maps layer → studies[] column and `LAYER` is now set
+from the radio on each draw. The **validator** genuinely was layer-agnostic and
+needed no edit — it discovers layers by filtering non-meta keys.
+
+*Validator consequence, expected.* Still 0 errors / 3 warnings, but the undrawn
+count in the third warning rose **7 → 12**: the new layer contributes 5 more
+country values that WHO covers and the 110m basemap does not draw. Same
+provenance debt as before, now counted across two layers.
+
+---
+
 ## 7. What's left
 
 **Read this section together with §1c.** Everything below describes what V2
@@ -1433,12 +1504,15 @@ still not reachable by a reader.
    or agree it lands as partial.
 
 ### The other two study types
-- **Delayed parasite clearance — cheap.** *Same CSV you already have*, different
-  column (`POSITIVE_DAY_3 (days)`). 159 country×drug cells across 15 drugs. The
-  renderer and validator are already layer-agnostic (`drawResistance` reads
-  `RES[layer]`, the validator loops every non-meta key), so it needs the
-  normalizer to emit a second metric plus one extra radio button. Roughly an
-  hour. WHO uses the **same four bands**, so legend and colours are reused.
+- **Delayed parasite clearance — BUILT, 9 Sep 2026.** See D31 in §6. The
+  estimate here was right about the cost and wrong about two specifics, both
+  worth correcting for whoever costs molecular markers: the cell count is
+  **166 across 18 drugs**, not 159 across 15; and the renderer was **not**
+  layer-agnostic. `drawResistance` did read `RES[layer]`, but `LAYER` was a
+  hardcoded `const`, and since V2 the dots come from `studies[]` rather than
+  from the aggregated layer — so the change had to reach `sitesFor`, `pooled`
+  and the tooltip's `peak` comparison, not just a radio button. The validator
+  *was* already layer-agnostic and needed no change at all.
 - **Molecular markers — expensive.** The two MM CSVs are **not in the repo**
   (deliberately — Phase 1 didn't use them; the source `.xlsx` is in the 5 Sep
   chat). Beyond the files it needs real decisions: the metric must be *derived*
@@ -1541,6 +1615,21 @@ New checks with no pre-migration precedent, and their status:
 ---
 
 ## 9. Environment gotchas
+
+**Headless Chrome cannot load MapLibre without a software GL backend.** The map
+constructs and a `<canvas>` appears, so it looks like it worked — but
+`map.on("load")` never fires, which means `selectMap()` never runs, the drug
+tabs stay empty and `#res-controls` stays hidden. Anything driving the map from
+a headless run therefore sees zero marks and reads as a broken feature when it
+is a broken harness. Add:
+
+```
+--enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader
+```
+
+Then `document.createElement("canvas").getContext("webgl")` is truthy, the tabs
+populate and the layer radios can be driven. Found while verifying D31. Also
+allow ~6s after `load` before touching the map, and drop `--disable-gpu`.
 
 **Line endings.** Files on disk are CRLF; the repo stores LF. `core.autocrlf`
 is set to `input` locally, so `git status` is clean and commits normalise

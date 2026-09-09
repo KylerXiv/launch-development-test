@@ -996,8 +996,7 @@
               <legend>Study result</legend>
               <label><input type="radio" name="reslayer" value="off" checked> Off</label>
               <label><input type="radio" name="reslayer" value="treatmentFailure"> Treatment failure</label>
-              <label class="res-soon"><input type="radio" name="reslayer" value="delayedClearance" disabled>
-                <span class="res-soon-body"><span>Delayed parasite clearance</span><span class="res-soon-tag">Not yet available</span></span></label>
+              <label><input type="radio" name="reslayer" value="delayedClearance"> Delayed parasite clearance</label>
               <label class="res-soon"><input type="radio" name="reslayer" value="molecularMarkers" disabled>
                 <span class="res-soon-body"><span>Molecular markers of drug resistance</span><span class="res-soon-tag">Not yet available</span></span></label>
             </fieldset>
@@ -2305,7 +2304,15 @@
     const bandOf = (v) => (BANDS.find((b) => v < b.lt) || BANDS[3]).cls;
     const PRODUCT_DRUG = { pyramax: "Artesunate-pyronaridine", dhappq: "Dihydroartemisinin-piperaquine" };
     const FALLBACK_SPECIES = "P. falciparum";
-    const LAYER = "treatmentFailure";
+    // Which study result is showing. Set from the radio on every draw rather
+    // than fixed, and it selects TWO things: the aggregated layer that backs the
+    // drug/species pickers, and the studies[] column the site marks are pooled
+    // from. Both must move together or the pickers would offer a pairing the
+    // marks cannot draw.
+    let LAYER = "treatmentFailure";
+    const VALUE_FIELD = { treatmentFailure: "v", delayedClearance: "d3" };
+    const layerLabel = (k) => ((RES.meta.metrics || {})[k] || {}).short ||
+                              (k === "delayedClearance" ? "Delayed parasite clearance" : "Treatment failure");
 
     // studies are stored as rows against RES.fields, with the repetitive
     // columns (drug, species, country, source, citation) held as indices into
@@ -2349,10 +2356,15 @@
     // aggregation rule where V1 did.
     function sitesFor(drug, species) {
       const di = codeOf("drug", drug), si = codeOf("species", species);
+      // The column this layer measures. A study can report a failure rate and
+      // no day-3 count, so rows with no value for THIS metric are dropped here
+      // rather than pooled as zero — "not measured" is not "measured at 0%".
+      const vf = AT[VALUE_FIELD[LAYER] || "v"];
       const by = {};
       for (const r of RES.studies) {
         if (r[AT.drug] !== di || r[AT.species] !== si) continue;
         if (!(r[AT.iso3] in M.countries)) continue;      // basemap does not draw it
+        if (typeof r[vf] !== "number") continue;         // this metric not measured
         const k = siteKey(r);
         (by[k] = by[k] || []).push(r);
       }
@@ -2360,7 +2372,7 @@
         const rows = by[k], first = rows[0];
         const latest = Math.max.apply(null, rows.map((r) => r[AT.year]));
         const cur = rows.filter((r) => r[AT.year] === latest);
-        const p = pooled(cur, (r) => r[AT.v], (r) => r[AT.n]);   // 24 sites need this
+        const p = pooled(cur, (r) => r[vf], (r) => r[AT.n]);   // 24 sites need this
         const older = rows.filter((r) => r[AT.year] !== latest);
         const years = rows.map((r) => r[AT.year]);
         return {
@@ -2371,8 +2383,11 @@
           // the one thing a single dot cannot say for itself: this site has read
           // worse before. 74 sites have changed colour band over their history.
           peak: older.length
-            ? older.reduce((a, r) => (r[AT.v] > a[AT.v] ? r : a))
-            : null
+            ? older.reduce((a, r) => (r[vf] > a[vf] ? r : a))
+            : null,
+          // resolved here, where the metric's column is known, so the tooltip
+          // does not have to re-derive it
+          peakV: older.length ? Math.max.apply(null, older.map((r) => r[vf])) : null
         };
       });
     }
@@ -2683,10 +2698,10 @@
       // fire on differences the colour does not register ("Earlier here: 1%"
       // under a 0% dot), which is noise in the one line that has to carry the
       // Kenya problem: a dot reading 0% where the site once measured 11.5%.
-      const peak = s.peak && s.peak[AT.v] > s.v && bandOf(s.peak[AT.v]) !== bandOf(s.v)
-        ? "<br>Earlier here: " + esc(s.peak[AT.v] + "% in " + s.peak[AT.year]) : "";
+      const peak = s.peak && s.peakV > s.v && bandOf(s.peakV) !== bandOf(s.v)
+        ? "<br>Earlier here: " + esc(s.peakV + "% in " + s.peak[AT.year]) : "";
       return "<b>" + esc(where) + "</b>" +
-        '<div class="trow"><span>Treatment failure</span><span>' + s.v + "%</span></div>" +
+        '<div class="trow"><span>' + esc(layerLabel(LAYER)) + '</span><span>' + s.v + "%</span></div>" +
         '<div class="trow"><span>Study year</span><span>' + s.year +
           (s.thisYear > 1 ? " · " + s.thisYear + " studies" : "") + "</span></div>" +
         '<div class="trow"><span>Patients</span><span>' + pat + "</span></div>" +
@@ -2740,6 +2755,8 @@
       }
       if (curUndrawn)
         bits.push(`${curUndrawn} more ${curUndrawn === 1 ? "country" : "countries"} not shown.`);
+      const full = ((m.metrics || {})[LAYER] || {}).full;
+      if (full) bits.push(`Showing: ${full}.`);
       bits.push(`Source: WHO Malaria Threat Maps, updated ${prettyDate(m.whoLastDataUpdate)}. Values are WHO's; site-merging is ours.`);
       note.textContent = bits.filter(Boolean).join(" ");
       note.hidden = false;
@@ -2969,6 +2986,10 @@
 
       const checked = document.querySelector('input[name="reslayer"]:checked');
       const on = checked && checked.value !== "off";
+      // Before anything reads it: the pickers, sitesFor and the legend all key
+      // off LAYER, so it is set first and left alone on "off" (the last layer
+      // stays selected in the pickers rather than resetting under the reader).
+      if (on && VALUE_FIELD[checked.value]) LAYER = checked.value;
       const drug = curBoundDrug, species = spSel.value;
       if (!on || !drug || !species) {
         legend.hidden = true; ruleEl.hidden = true;
@@ -3008,6 +3029,8 @@
       if (emptyMsg) emptyMsg.classList.toggle("demoted", curSites.length > 0);
 
       legend.hidden = !curSites.length;
+      const legendTitle = legend.querySelector(".res-t");
+      if (legendTitle) legendTitle.textContent = layerLabel(LAYER);
       const m = RES.meta || {};
 
       // 1. THE RULE — sits with the legend it explains, as WHO puts "determined
