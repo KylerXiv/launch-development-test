@@ -911,20 +911,13 @@
      utility and is outlined beside it. */
   .hdr-actions { position: relative; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
   .hdr-actions button { display: inline-flex; align-items: center; gap: 7px; }
-  /* Subscribe's own mock flag used to live here too, always visible in the
-     header. Moved inside .subwrap as .sub-note's text instead, 10 Sep
-     2026 — it now shows only when the Subscribe panel is open, not on the
-     dashboard itself. .mock-flag survives as Send feedback's own flag,
-     which has nowhere equivalent to live inside — see its markup, beside
-     report-issue.js's floating pill, near the end of the file. */
-  .mock-flag {
-    position: fixed; right: 20px; bottom: 76px; z-index: 899; margin: 0;
-    font-size: 12px; font-weight: 700; color: var(--crit);
-    background: var(--surface); padding: 3px 9px; border-radius: 999px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.12);
-  }
-  @media (max-width: 560px) { .mock-flag { right: 12px; bottom: 64px; font-size: 11px; } }
-  @media print { .mock-flag { display: none !important; } }
+  /* Both buttons' mock flags used to float here in the header (Subscribe)
+     and beside the feedback pill (Send feedback), always visible whether or
+     not either panel was open. Both moved inside their own panel instead,
+     10 Sep 2026 — Subscribe's as .sub-note's text, Send feedback's as
+     LAUNCH_FEEDBACK_COPY.note (below, page-local override) styled red by
+     .ri-dialog .ri-note further down this stylesheet. Neither shows on the
+     dashboard itself any more; both show once their button is pressed. */
   /* The glyph is an anchor for the eye, never the label — both buttons keep
      their words — so it is aria-hidden and is not allowed to shrink. */
   .hdr-actions svg { flex: none; width: 14px; height: 14px; }
@@ -1021,7 +1014,7 @@
     body { background: #fff; }
     .product .detail { display: block !important; }
     .product { break-inside: avoid; box-shadow: none; }
-    .hdr-actions, .mock-flag, #tip, .gp-close, .gw-jump { display: none !important; }
+    .hdr-actions, #tip, .gp-close, .gw-jump { display: none !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
     .gatepanel[hidden], .gatewrap[hidden] { display: none !important; }
     .gatepanel, .gatewrap { break-inside: avoid; box-shadow: none; }
@@ -3646,13 +3639,17 @@
      form and same seam, friendlier framing for a general visitor. Must be set
      before the widget script runs.
 
-     note/doneTitle/doneMessage were rewritten 10 Sep 2026 to say plainly that
-     the form isn't wired to anywhere yet (see report-issue.js's own comment,
-     "no endpoint wired yet (DEV-04b)" — the front end confirms on its own,
-     which used to read as a real confirmation with no such caveat). The old
-     doneMessage also pointed to "Recent dashboard updates", which is hidden
-     for now (see the changelog code above) — replaced rather than left
-     pointing at a section a visitor can no longer see. */
+     `note` is the same short line Subscribe's own mock flag uses (10 Sep
+     2026) — plain and in red (see .ri-dialog .ri-note below), shown only
+     inside the dialog when it's open, not anywhere on the dashboard itself.
+     It replaces a longer explanation that covered the same ground; that
+     ground is still covered, just not spelled out at this length any more.
+     doneTitle/doneMessage keep saying plainly that nothing was actually
+     sent once you do press Send feedback — see report-issue.js's own
+     comment, "no endpoint wired yet (DEV-04b)". The old doneMessage also
+     pointed to "Recent dashboard updates", which is hidden for now (see the
+     changelog code above) — replaced rather than left pointing at a
+     section a visitor can no longer see. */
   window.LAUNCH_FEEDBACK_COPY = {
     pill:         "Send feedback",
     title:        "Send feedback",
@@ -3667,10 +3664,7 @@
     messageLabel: "What would you like to tell us?",
     messagePlaceholder:
       "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026.",
-    note: "This form is not connected to an inbox yet, so nothing you write here is sent or saved right now — " +
-          "the confirmation after Send feedback says the same. Once it is connected, an email address left here " +
-          "would only be used to come back to you about this message; we would also note which page and data " +
-          "version you saw, so the team can find what you found.",
+    note: "Mock only — Send feedback isn't connected yet.",
     submit:       "Send feedback",
     sending:      "Sending…",
     failed:       "Sorry — your feedback could not be sent just now. Please try again in a moment.",
@@ -3682,11 +3676,14 @@
   };
 </script>
 
-<!-- report-issue.js appends its own floating pill (.ri-pill) to the end of
-     body, fixed at right:20px/bottom:20px (right:12px/bottom:12px under
-     560px — see its own CSS). This flag sits just above it at a matching
-     right offset; it is page-local markup, not a change to that shared
-     script, so it says nothing about the other eight pages that load it. -->
-<p class="mock-flag">Mock only — Send feedback isn't connected yet.</p>
+<!-- report-issue.js builds its own <style> at runtime (document.head.
+     appendChild, once the script itself runs) and defines .ri-note in it as
+     var(--ink-3) — inserted after this page's own <style> block, so a
+     same-specificity .ri-note rule here would lose to it regardless of
+     which one reads first in the file. .ri-dialog .ri-note is one selector
+     more specific, which wins on its own terms rather than needing
+     !important. Page-local: this says nothing about the other eight pages
+     that load the same script. -->
+<style>.ri-dialog .ri-note { color: var(--crit); font-weight: 700; }</style>
 
 <script src="assets/report-issue.js" defer></script>
