@@ -148,12 +148,16 @@
   /* ---------- pathway legend strip (illustrated journey) ---------- */
   .pathway {
     display: flex; align-items: flex-start; gap: 2px;
-    /* padding-top carries --pg-lift (see alignPathGroup): .pathgroup is
-       translated up by that amount so its two-icon midpoint lines up with
-       every single icon's centre, and the strip needs the matching extra
-       room at the top or the lifted bracket would clip against the
-       overflow-x:auto box — the same trick .track/--sg-lift already uses. */
-    padding: calc(14px + var(--pg-lift, 0px)) 18px 12px; margin-bottom: 22px; overflow-x: auto;
+    /* Equal fallback for the instant before JS runs (or if it can't) — see
+       centerPathwayCard(). That function overwrites both values inline once
+       the row (WHO stack included) is laid out, because the right split
+       isn't a constant: .pathgroup's bracket is the tallest thing in the
+       row and sits translated up by --pg-lift (alignPathGroup, above), so
+       how much of the card's own height ends up above the bracket versus
+       below it shifts with that same lift. Setting equal padding here and
+       measuring the true rendered gap afterwards is what keeps the two
+       matching instead of just assuming a formula stays right forever. */
+    padding: 14px 18px; margin-bottom: 22px; overflow-x: auto;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
@@ -1019,7 +1023,7 @@
     .updates li { flex-wrap: wrap; gap: 4px 12px; }
     .strip { padding: 10px 14px; }
     .hdr-actions button { padding: 10px 15px; }
-    .pathway { padding: 12px 12px 10px; }
+    .pathway { padding: 12px 12px; }
     .pathnode { min-width: 72px; }
     .pathnode .pill { width: 38px; height: 38px; }
     .pathnode svg, .pathnode .whoemb { width: 25px; height: 25px; }
@@ -1924,9 +1928,38 @@
     pathway.style.setProperty("--pg-lift", lift.toFixed(2) + "px");
   }
 
-  // align first, then draw: the fork strokes are measured off the markers, so
-  // the three passes always run together
-  function layoutJourney() { alignStageForks(); drawStageForks(); alignPathGroup(); }
+  // ---- legend strip: even out the card's own top/bottom padding -------------
+  // .pathgroup's bracket is the tallest thing in the row (align-self:stretch
+  // sizes it to the row's own height, top edge to bottom edge, same as every
+  // other stretched item would be), and alignPathGroup() shifts that whole
+  // box upward by --pg-lift with a `transform` so its two icons line up with
+  // every other gate — necessary, and left alone here, per the stack staying
+  // exactly as it is. A transform moves paint, not layout: the box's TOP and
+  // BOTTOM both shift up by the same lift, which is why one card-level fix
+  // and not two — it takes lift off the gap above the bracket and adds that
+  // same amount to the gap below it. Concretely, with G the padding this rule
+  // would give with no lift at all:
+  //   gap above bracket = padding-top    - lift
+  //   gap below bracket = padding-bottom + lift
+  // A first attempt measured both gaps directly and tried to average them —
+  // it doesn't converge: gap-below has a floor of exactly `lift` (padding
+  // can't go negative), so once padding-bottom hits 0 the measured gap stops
+  // moving and there is nothing left to average against. Solving the two
+  // equations above for equal gaps instead — padding-top = G + 2·lift,
+  // padding-bottom = G — has no such floor, because it never asks the
+  // bottom to shrink past where it naturally sits.
+  function centerPathwayCard() {
+    const G = 14;    // the base gap either side would get if there were no lift at all
+    const lift = parseFloat(getComputedStyle(pathway).getPropertyValue("--pg-lift")) || 0;
+    pathway.style.paddingTop = (G + 2 * lift).toFixed(2) + "px";
+    pathway.style.paddingBottom = G.toFixed(2) + "px";
+  }
+
+  // align first, then draw, then even out the card around whatever that
+  // produced — each pass depends on the one before it
+  function layoutJourney() {
+    alignStageForks(); drawStageForks(); alignPathGroup(); centerPathwayCard();
+  }
 
   fitTimelines();
   layoutJourney();
