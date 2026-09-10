@@ -124,20 +124,17 @@
     font-weight: 700; color: var(--warn);
   }
 
-  /* ---------- summary + legend strip ---------- */
+  /* ---------- legend strip ----------
+     Used to be a summary strip too: three portfolio-wide numbers (medicines
+     tracked, gates cleared, current access barriers) ahead of the legend
+     below. Removed by request, 10 Sep 2026 — see .strip .legend just below
+     for what that leaves of the layout. The JS that computed them (reading
+     `tracked`, which the rest of the page still needs) went with them. */
   .strip {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px;
     padding: 12px 18px; margin-bottom: 22px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
-  .stat { display: flex; align-items: baseline; gap: 7px; }
-  .stat:not(:first-child) { padding-left: 20px; border-left: 1px solid var(--line); }
-  .stat .n { font-size: 22px; font-weight: 750; font-variant-numeric: tabular-nums; }
-  .stat .n.crit-n { color: var(--crit); }
-  /* the cleared-gates figure is the positive half of the same pair, so it takes
-     the same green the legend already uses for a completed gate */
-  .stat .n.good-n { color: var(--good); }
-  .stat .l { font-size: 12.5px; color: var(--ink-2); }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-left: auto; font-size: 12.5px; color: var(--ink-2); }
   .legend .key { display: inline-flex; align-items: center; gap: 6px; }
 
@@ -905,7 +902,9 @@
      pushed onto a line of its own while `margin-left:auto` kept Subscribe up
      with the legend — the two actions read as unrelated things. Here they are
      one flex group in the header rail, so they wrap as a unit or not at all,
-     and the strip is left doing one job (numbers + legend).
+     and the strip is left doing one job: the status legend. (It carried three
+     portfolio-summary numbers alongside the legend until 10 Sep 2026, when
+     they were removed by request — see .strip below.)
 
      Emphasis is the reverse of what it was. Subscribe is the only conversion
      point on the page and now takes the solid accent block; Download CSV is a
@@ -927,9 +926,10 @@
   }
   .sub-btn:hover { background: #0C4A5E; border-color: #0C4A5E; }
   .sub-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  /* .legend's own `margin-left:auto` is for the map legend; in the strip it
-     should sit on its own line under the stats instead. */
-  .strip .legend { margin-left: 0; flex-basis: 100%; padding-top: 8px; border-top: 1px dashed var(--line); }
+  /* .legend's own `margin-left:auto` is for the map legend, where it is one
+     item among several and needs pushing to the far edge; here it is the
+     strip's only content, so it sits at the strip's own start instead. */
+  .strip .legend { margin-left: 0; }
 
   /* The panel it opens. Front end only for now — see the seam in the script.
      Anchored to .hdr-actions rather than sitting inline in the document: an
@@ -1063,10 +1063,7 @@
 
   <div class="demo-banner" id="banner" hidden></div>
 
-  <div class="strip" role="group" aria-label="Portfolio summary">
-    <div class="stat"><span class="n" id="stat-tracked">–</span><span class="l">medicines tracked</span></div>
-    <div class="stat"><span class="n good-n" id="stat-cleared">–</span><span class="l" id="stat-cleared-l">access gates cleared</span></div>
-    <div class="stat"><span class="n crit-n" id="stat-barriers">–</span><span class="l">current access barriers</span></div>
+  <div class="strip" role="group" aria-label="Status legend">
     <div class="legend" aria-label="Status legend">
       <span class="key"><span class="dot done" aria-hidden="true">✓</span> Complete</span>
       <span class="key"><span class="dot prog" aria-hidden="true">›</span> In progress</span>
@@ -1334,50 +1331,9 @@
     ).join("");
   }
 
-  // summary stats derived from the data, never hand-typed
+  // Every render below filters to real, non-placeholder products — this is
+  // that filter, used throughout the rest of the script.
   const tracked = PRODUCTS.filter(p => !p.placeholder);
-  // ---- portfolio summary strip ----------------------------------------------
-  // Every figure here aggregates ALL tracked products, so the strip stays a
-  // portfolio summary as medicines are added rather than quietly becoming a
-  // statement about whichever product happens to dominate.
-  document.getElementById("stat-tracked").textContent = tracked.length;
-
-  // An access barrier is a GATE a product is held at — the `late` status the
-  // legend labels "Delayed / access barrier".
-  //
-  // This counts barriers, not the products carrying them. The figure it
-  // replaces counted products with at least one late stage while being
-  // labelled a barrier count: identical at 2 today only because each affected
-  // product happens to be blocked at exactly one gate, and wrong the moment
-  // one product is blocked at two.
-  const lateStages = tracked.reduce(
-    (a, p) => a + p.stages.filter(s => s.status === "late").length, 0);
-  document.getElementById("stat-barriers").textContent = lateStages;
-
-  // The positive half of the pair, and the strongest claim this data actually
-  // supports: gates cleared (`done`) out of every gate the portfolio has to
-  // clear. The denominator is carried in the label so the number cannot read as
-  // a bare score with no scale.
-  //
-  // TODO — "access barriers OVERCOME" was the wording asked for, and it is a
-  // different, stronger claim: a gate that WAS `late` and has since been
-  // cleared. Deliberately not shown, because the data cannot support it and a
-  // fabricated figure here would be worse than its absence. A stage carries
-  // only its current state (status/note/date/next/nextDate/source/asOf) with no
-  // memory of having been a barrier, and diffing all three history/ snapshots
-  // against the live file finds ZERO late -> cleared transitions, so the honest
-  // value today is 0 — which reads as "nothing has been achieved" and is an
-  // artefact of the record, not of the programme.
-  // To make it real, one of:
-  //   a) persist a per-stage marker (`wasDelayed`, or `barrierClearedOn`) when
-  //      an analyst moves a stage off `late` — see docs/data-analyst-guide.md;
-  //   b) have scripts/make-brief.js, which already diffs stage status against
-  //      history/, write those transitions back into data/products.js.
-  const doneStages = tracked.reduce(
-    (a, p) => a + p.stages.filter(s => s.status === "done").length, 0);
-  document.getElementById("stat-cleared").textContent = doneStages;
-  document.getElementById("stat-cleared-l").textContent =
-    `of ${tracked.length * STAGES.length} access gates cleared`;
 
   // schema.org structured data for search engines and knowledge-graph crawlers.
   // Derived from the data at render time, never stored; @id ties each product to
