@@ -911,6 +911,31 @@
      utility and is outlined beside it. */
   .hdr-actions { position: relative; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
   .hdr-actions button { display: inline-flex; align-items: center; gap: 7px; }
+  /* Plain statement, not a styled callout: this is telling a visitor a real
+     button doesn't do anything yet, so it reads as a warning even at a
+     glance, not as more of the page's usual chrome. Download CSV is real and
+     not named here; only Subscribe is a mock among the header buttons. The
+     matching flag for Send feedback lives beside its own floating pill,
+     added directly in this page's CSS below rather than in the shared
+     report-issue.js — see .mock-flag.feedback. */
+  .mock-flag { margin: 6px 0 0; font-size: 12px; font-weight: 700; color: var(--crit); text-align: right; }
+  /* .meta itself flips to left-aligned under this same width (see the
+     1180px query far above, next to .attrib/.hdr-actions) — this has to be
+     declared AFTER the base rule above, or the unconditional text-align:right
+     there simply wins the cascade at every width, media query or not. */
+  @media (max-width: 1180px) { .mock-flag { text-align: left; } }
+  /* Positioned just above where report-issue.js's own .ri-pill floats
+     itself (right:20px/bottom:20px, ~37px tall — see the HTML comment by
+     the markup), rather than inside it: that pill is rebuilt fresh by the
+     shared script on every load, so anything appended into it would be
+     wiped out, not just overwritten. */
+  .mock-flag.feedback {
+    position: fixed; right: 20px; bottom: 76px; z-index: 899; margin: 0;
+    background: var(--surface); padding: 3px 9px; border-radius: 999px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+  }
+  @media (max-width: 560px) { .mock-flag.feedback { right: 12px; bottom: 64px; font-size: 11px; } }
+  @media print { .mock-flag.feedback { display: none !important; } }
   /* The glyph is an anchor for the eye, never the label — both buttons keep
      their words — so it is aria-hidden and is not allowed to shrink. */
   .hdr-actions svg { flex: none; width: 14px; height: 14px; }
@@ -1002,7 +1027,7 @@
     body { background: #fff; }
     .product .detail { display: block !important; }
     .product { break-inside: avoid; box-shadow: none; }
-    .hdr-actions, #tip, .gp-close, .gw-jump { display: none !important; }
+    .hdr-actions, .mock-flag, #tip, .gp-close, .gw-jump { display: none !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
     .gatepanel[hidden], .gatewrap[hidden] { display: none !important; }
     .gatepanel, .gatewrap { break-inside: avoid; box-shadow: none; }
@@ -1063,6 +1088,7 @@
             leaves your browser when you press Notify me. The button is here so the page is ready for it.</p>
         </section>
       </div>
+      <p class="mock-flag">Mock only — Subscribe for updates isn't connected yet.</p>
     </div>
   </header>
 
@@ -1616,7 +1642,7 @@
 
     return `<div class="tlbox"><div class="tl-caption"><span>Actual timeline</span>${totalLabel ? `<span class="tl-total">${esc(totalLabel)}</span>` : ""}</div>
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Real timing of gates reached for ${esc(p.name)}">${parts.join("")}</svg>
-      <div class="tl-key"><span class="tgap-key" aria-hidden="true">●</span> gate's real year <span class="tgap-key g-back" aria-hidden="true">↩</span> reached out of order (line dips back)</div>
+      <div class="tl-key"><span class="tgap-key" aria-hidden="true">●</span> actual milestone <span class="tgap-key g-back" aria-hidden="true">↩</span> reached out of order (line dips back)</div>
     </div>`;
   }
 
@@ -3663,4 +3689,12 @@
     again:        "Send more feedback"
   };
 </script>
+
+<!-- report-issue.js appends its own floating pill (.ri-pill) to the end of
+     body, fixed at right:20px/bottom:20px (right:12px/bottom:12px under
+     560px — see its own CSS). This flag sits just above it at a matching
+     right offset; it is page-local markup, not a change to that shared
+     script, so it says nothing about the other eight pages that load it. -->
+<p class="mock-flag feedback">Mock only — Send feedback isn't connected yet.</p>
+
 <script src="assets/report-issue.js" defer></script>
