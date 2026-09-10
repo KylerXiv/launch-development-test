@@ -45,6 +45,7 @@ window.LAUNCH_DATA =
     "GMP": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites."
   },
   "changelog": [
+    { "date": "2026-09-10", "product": "All", "change": "Terminology: the two product `flag` sentences now say \"access barrier\" rather than \"bottleneck\", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed.", "plain": "We now call a blocked step an \"access barrier\" instead of a \"bottleneck\". Only the wording changed \u2014 no figures or dates were altered." },
     { "date": "2026-09-08", "product": "ASPY", "change": "First confirmed national guideline adoption recorded: Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (alongside AS-AQ and AL), per a peer-reviewed therapeutic-efficacy study (Ghana 2023 fieldwork, published 2026). National policy adoption stage remains 'late' — Ghana is the only confirmed country so far against WHO's 2022 strong recommendation. Procurement stage dates for ASPY (since 2018) and DHA–PPQ (since 2008) added — both years were already cited in the Global Fund PQR figures elsewhere in this file but had not been carried into the stage `date` field.", "plain": "We found a real example of a country acting on the World Health Organization's advice: Ghana added this medicine as a backup first-choice treatment in 2022. It's still the only country confirmed to have done so. We also recorded the years Global Fund purchasing began for both underused medicines (2018 and 2008)." },
     { "date": "2026-09-05", "product": "All", "change": "Illustrated journey dashboard: the country access map gained a WHO drug-resistance overlay. Treatment-failure results from the WHO Malaria Threat Maps (therapeutic efficacy studies, extract 5 Sep 2026) are drawn as dots over the access shading, with their own provenance line and their own tooltip. All five Plasmodium species and studies of every size are included, selectable by drug and species; pairings WHO has no data for are disabled rather than shown empty. Each dot is the most recent study year for that country, averaged across that year's sites and weighted by patient numbers — click a dot for every underlying study. The access layer remains illustrative, so the two readings are presented separately and not combined." },
     { "date": "2026-08-25", "product": "All", "change": "Version 2 merged: the collected-data updates reviewed in the /v2/ preview (Global Fund PQR volumes, WHO PQ listings, EMA dates, trial-registry records, Nigeria + Tanzania register verification, sourced fact corrections) are now the live draft dataset. The preview edition is retired.", "plain": "Everything we checked during the August review is now part of the main dataset. The separate preview version has been retired." },
@@ -166,7 +167,7 @@ window.LAUNCH_DATA =
       "classLabel": "Recommended · underutilized",
       "phase": "access",
       "currentStage": 5,
-      "flag": "Adoption is the bottleneck — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
+      "flag": "Adoption is the access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
       "stages": [
         { "status": "done", "note": "Development complete (Shin Poong / MMV co-development)", "date": "", "next": "", "nextDate": "", "source": "MMV", "asOf": "2026-08-14" },
         { "status": "done", "note": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); label updated 2025 to include treatment of pregnant women (EMA outcome 5 Jun 2025; announced 31 Jul 2025)", "date": "2012 (label update 2025)", "next": "", "nextDate": "", "source": "EMA EU-M4all opinions table; MMV, 31 Jul 2025", "asOf": "2026-08-22" },
@@ -248,7 +249,7 @@ window.LAUNCH_DATA =
       "classLabel": "Recommended · underutilized",
       "phase": "access",
       "currentStage": 6,
-      "flag": "Procurement is the bottleneck — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
+      "flag": "Procurement is the access barrier — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
       "stages": [
         { "status": "done", "note": "Development complete", "date": "", "next": "", "nextDate": "", "source": "MMV", "asOf": "2026-08-14" },
         { "status": "done", "note": "EMA approval (Eurartesim)", "date": "2011", "next": "", "nextDate": "", "source": "EMA register", "asOf": "2026-08-14" },
