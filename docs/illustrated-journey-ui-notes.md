@@ -26,7 +26,7 @@ existed. Do not treat it as precedent.
 | Shipped in | PR #4 (merged 8 Sep 2026 11:26Z), PR #5 (merged 8 Sep 2026 18:29Z) |
 | Commits | `5aa7c19` (PR #4), `ce765c8` (PR #5) |
 | Push state | fully merged into `main`; nothing outstanding |
-| Validator | `0 errors, 3 warnings` — all three are DEV-13's resistance provenance debt, unchanged by this work |
+| Validator | `0 errors, 5 warnings` — the documented 3 + 2 split (resistance, molecular markers), unchanged by this work |
 | CI | **never green.** Every run on `main` since Initial commit is `startup_failure` — see §4 |
 | Scope | this page only. Four other editions were deliberately left alone — see §3.6 |
 
@@ -62,6 +62,8 @@ how much they change what a reader sees:
 6. "Powered by" + the Unitaid mark, top right.
 7. Sources footer became a list of named links to each official register.
 8. "Subscribe for more information" button — front end only.
+9. The summary strip became an explicit **portfolio** summary and dropped
+   "bottleneck" for "access barrier" (client feedback, 10 Sep 2026 — §3.12).
 
 ---
 
@@ -236,6 +238,13 @@ used for. URLs were taken from the repo's own fetcher scripts and
 WHO guidelines, WHO PQ (+ the separate vector-control list), EMA, NAFDAC Green
 Book, TMDA, Global Fund PQR, ClinicalTrials.gov — all 200.
 
+**WHO Malaria Threat Maps** was added on 10 Sep 2026 — it backs both resistance
+layers on the map yet was missing from the list, so two of the page's own
+datasets were unattributed in the one place a reader goes to check them. URL
+taken from `SOURCE_URL` in both normalizers (they agree) rather than retyped;
+verified 200. Placed with the other two WHO entries so the three read as one
+source family.
+
 `unitaid.org` and `endmalaria.org` return 403 to curl and headless Chrome. That
 is Cloudflare bot protection, not a dead site; they could not be
 machine-confirmed and are worth a manual click.
@@ -278,7 +287,120 @@ rather than three things.
 
 ---
 
+### 3.12 "Access barrier", and why "barriers overcome" is absent rather than zero
+
+Client feedback, 10 Sep 2026: use *access barriers* not *bottlenecks* "as the
+overall endeavour is about accelerating access"; add a positive counterpart
+("X access barriers overcome" / "Y current access barriers"); drop
+"2 expected to market ≤ 3 yrs"; and treat the strip as a portfolio summary.
+
+**The strip now reads:** `4 medicines tracked · 10 of 32 access gates cleared ·
+2 current access barriers`.
+
+**Two mislabels were found while implementing, and both are fixed.** Neither
+was a rendering bug — the labels described something the code did not compute:
+
+| Label | Actually computed | Now |
+| --- | --- | --- |
+| "active bottlenecks" | `products` with ≥1 `late` stage | `late` **stages** — the barriers themselves |
+| "expected to market ≤ 3 yrs" | `products` with `class === "pipeline"` | removed |
+
+The barrier count reads 2 either way today, but only because each affected
+product happens to be blocked at exactly one gate (ASPY — National policy
+adoption; DHA–PPQ — Procurement). It would have diverged the first time one
+product was blocked at two. The second was the client's own objection —
+`class === "pipeline"` is a portfolio *class*, not a market-entry forecast, so
+the number never meant what the label claimed. Its calculation is gone;
+`p.class` is still read for the row chip and the map empty state.
+
+**"Access barriers overcome" is deliberately not shown.** It is a stronger
+claim than "gates cleared": a gate that *was* `late` and has since been
+cleared. The data cannot support it, and this was checked rather than assumed:
+
+- A stage object carries only `status, note, date, next, nextDate, source,
+  asOf` — its current state, with no memory of having been a barrier.
+- Diffing all three `history/` snapshots (15, 23, 25 Aug 2026) against the live
+  file finds **zero** `late` → cleared transitions.
+
+So the honest value today is **0**, which would read as "nothing has been
+achieved" — an artefact of the record, not of the programme, and the opposite
+of the positive framing asked for. A TODO in the page states the two ways to
+make it real: persist a per-stage marker (`wasDelayed` / `barrierClearedOn`)
+when an analyst moves a stage off `late`, or have `scripts/make-brief.js` —
+which already diffs stage status against `history/` — write those transitions
+back into `data/products.js`.
+
+**What is shown instead** is gates cleared (`done` stages) over every gate the
+portfolio must clear: 10 of 32 (4 products × 8 gates). Real, positive,
+aggregate, and it does not borrow the word "barrier" for something the legend
+defines as `late`. The denominator is in the label so the figure cannot read as
+a bare score. **This is a substitution, not the requested metric — worth
+confirming with the client.**
+
+**Timeline left alone, deliberately.** Forward-looking data exists
+(`stage.next`, `stage.nextDate`) and is already surfaced in three places: the
+hover peek, the gate panel's "Next step"/"Expected" rows, and the CSV export.
+It is *not* plotted on the timeline axis and was not added, because the values
+are `TBC`, `~2027` and `Q4 2026` — plotting `~2027` as a point asserts a
+precision the data explicitly disclaims, and `stageYear()` only parses `done`
+stages by design (§3.5: a target must never be drawn as elapsed time). With the
+portfolio KPI gone, this information is no longer duplicated anywhere.
+
+**The two `flag` sentences in `data/products.js` were reworded too**
+("Adoption/Procurement is the **access barrier** — …"), with a changelog entry,
+because they render on this dashboard as `.flagnote` and `.gp-why` and leaving
+them would have left "bottleneck" visible on the page the client was reading.
+Wording only — no status, date or figure touched. **Ripple worth knowing:**
+that prose renders on 15 other pages, whose own chrome still says "bottleneck"
+(see §4).
+
+---
+
 ## 4. Newly discovered, deferred, or left alone
+
+### Are access barriers scalable at portfolio level? (client question, 10 Sep 2026)
+
+*"I do wonder if it would be best to provide this per product though, as it
+gets a bit tricky to then figure out how this high level info links to specific
+areas. This will be particularly difficult once there are more drugs."*
+
+**Barriers are already per-product — in the data and in the UI.** This is not a
+gap that needs building:
+
+| Where | What it shows |
+| --- | --- |
+| `p.stages[i].status === "late"` | the barrier, on a named gate, for a named product |
+| `p.flag` | one sentence explaining *why*, per product — the validator **requires** it whenever a product has a late stage (`validate-data.js`: "has a delayed stage but no top-level `flag` sentence") |
+| product row | that gate's marker turns red with a `!` badge |
+| `.flagnote` on the row | the `flag` sentence in full |
+| gate panel (`.gp-why`) | the same sentence, against the gate |
+| pathway strip | per-gate count ("1 delayed"), and its drill-down lists every affected medicine with a jump link |
+
+**So the diagnosis is navigational, not structural.** The client can already
+answer "which product, which gate, and why" — what they cannot do is get there
+*from the summary number*. The strip's "2 current access barriers" is inert
+text; the route to the two affected products is the pathway strip below it,
+which is not visibly connected to it.
+
+**Does it scale?** The arithmetic does — the figures are sums over
+`tracked`, so they stay correct as products are added. The *reading* degrades:
+at 4 products "2 current access barriers" is nearly self-explanatory, at 30 it
+is a number with no way in. The pathway strip degrades more gracefully, because
+it already partitions barriers by gate and its drill-down is per-product.
+
+**Smallest change that would close it** (deliberately not built here — the
+brief asked for investigation, not a product-level redesign):
+
+1. Make the barrier figure a control, not text — clicking it opens the
+   `gatewrap` drill-down filtered to gates with a `late` stage. The panel,
+   its per-product rows and the "Open in row" jump links all already exist;
+   this is a click handler and a filter, roughly the size of the existing
+   `.pathnode` handler.
+2. If a per-product barrier column is ever genuinely wanted, the honest home is
+   the product row — which already has the red marker and the flag sentence —
+   not a second portfolio KPI.
+
+Nothing in the data model needs to change for either.
 
 - **CI has never passed on `main`.** Every run since Initial commit is
   `startup_failure` with 0 jobs and no logs — a workflow-config or
@@ -286,6 +408,17 @@ rather than three things.
   `active`. **Predates this work and is unrelated to it**, but it means no push
   to `main` has ever been checked by CI. Needs the Actions web UI to diagnose.
   Own ticket.
+- **"bottleneck" still appears in 15 other pages' own chrome.** This task was
+  scoped to `illustrated-journey-dashboard.html`, but the same summary strip
+  (`stat-bottlenecks`, `stat-pipeline`, "active bottlenecks", "expected to
+  market ≤ 3 yrs") is duplicated verbatim in `index.html`, `option-b.html` and
+  the `unitaid/` and `synthetic/` editions, and the reworded `flag` prose now
+  renders there too — so those pages currently pair "access barrier" data with
+  "bottleneck" chrome. If the client wants the terminology change everywhere,
+  it is the same three-line edit per page plus the KPI removal. Not done here
+  under "do not change unrelated components".
+- **`scripts/validate-data.js` error text** still says "explaining the
+  bottleneck". Developer-facing only, never rendered. Left for the same reason.
 - **The 20 `plain` changelog strings need a data-team read** — §3.7.
 - **Two cosmetic issues on `main`'s timeline**, seen while reviewing and not
   touched because they are DEV-13's: the legend swatch reading *"Gate's real
@@ -333,6 +466,8 @@ rather than three things.
 | the sources footer or any source URL | §3.9 |
 | wiring a subscribe backend | §3.10 — replace the seam, note the provider |
 | the draft/dataStatus banner | §3.11 |
+| the summary strip's KPIs, or "access barrier" wording | §3.12 |
+| making barriers navigable or product-specific | §4's first subsection |
 | anything found and not fixed | §4 |
 
 If a task changes nothing a reader here would care about, say so in the commit
