@@ -120,9 +120,25 @@ the radii were dropped; the variable survives as the run, and its declaration
 now says so. Do not reintroduce `border-radius` from it — the geometry breaks
 if the run goes to 0.
 
-Verified by computed style rather than by eye: all four elbows report
-`border-radius: 0px` with `width: 9px` and `height: 28.5px` unchanged, and
-`.pathgroup` reports `0px`.
+Squaring them exposed a defect the radius had been hiding: **the corners did
+not actually meet.** A border paints *inside* its box edge, so a `3px`
+`border-top` puts its whole stroke below the box's top line, while `.bar` is
+centred on the marker's centreline — leaving the two 1.5px apart, a half-stroke
+step at every corner. The arc had blurred it; a right angle showed it.
+
+Fixed by making the elbow box half a stroke taller,
+`height: calc(var(--sg-arm) + var(--sg-w) / 2)`. Each elbow is anchored at its
+spine end (`bottom` for `.sg-top`, `top` for `.sg-bottom`), so the extra height
+moves only the free edge outward and the stroke ends up straddling the
+centreline. The stroke weight is now `--sg-w` instead of `3px` repeated eight
+times, because the fix depends on it: **`--sg-w` must equal `.stage .bar`'s
+height** or the step comes back.
+
+Verified by measurement, not by eye — cropped screenshots proved unreliable
+here. Against the marker rect as ground truth, both branches report
+`markerMid == barMid == elbowStrokeMid` (delta `0.00px`), and horizontally the
+elbow's run ends exactly where `.bar.pre` begins. All four elbows report
+`border-radius: 0px`; `.pathgroup` reports `0px`.
 
 ## Verification
 

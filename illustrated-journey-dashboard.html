@@ -330,26 +330,36 @@
     --sg-note: 15px;
     --sg-arm: calc(var(--sg-mark) / 2 + var(--sg-note) / 2);
     --sg-r: 9px;      /* horizontal run of each elbow, NOT a corner radius */
+    --sg-w: 3px;      /* stroke weight — must equal .stage .bar's height */
   }
+  /* Height is the arm PLUS half a stroke, and that half matters: a border is
+     painted inside its box edge, so a 3px border-top puts its stroke entirely
+     BELOW the box's top line, while .bar is centred on the marker's centreline.
+     Left as-is the two are 1.5px apart and every corner shows a half-stroke
+     step. Growing the box by half a stroke moves its free edge (the top for
+     .sg-top, the bottom for .sg-bottom — each is anchored at the spine end)
+     out by exactly that much, so the stroke straddles the centreline and meets
+     the bar flush. */
   .stagegroup .stage::before, .stagegroup .stage::after {
-    content: ""; position: absolute; width: var(--sg-r); height: var(--sg-arm);
+    content: ""; position: absolute;
+    width: var(--sg-r); height: calc(var(--sg-arm) + var(--sg-w) / 2);
     border: 0 solid var(--line);
   }
   /* top branch: marker sits at the branch's bottom edge (column-reverse), so
      the elbows hang below it and turn up into the arm */
   .stagegroup .sg-top::before, .stagegroup .sg-top::after {
     bottom: calc(-1 * var(--sg-note) / 2);
-    border-top-width: 3px;
+    border-top-width: var(--sg-w);
   }
-  .stagegroup .sg-top::before { left: 0; border-left-width: 3px; }
-  .stagegroup .sg-top::after { right: 0; border-right-width: 3px; }
+  .stagegroup .sg-top::before { left: 0; border-left-width: var(--sg-w); }
+  .stagegroup .sg-top::after { right: 0; border-right-width: var(--sg-w); }
   /* bottom branch: marker sits at the branch's top edge */
   .stagegroup .sg-bottom::before, .stagegroup .sg-bottom::after {
     top: calc(-1 * var(--sg-note) / 2);
-    border-bottom-width: 3px;
+    border-bottom-width: var(--sg-w);
   }
-  .stagegroup .sg-bottom::before { left: 0; border-left-width: 3px; }
-  .stagegroup .sg-bottom::after { right: 0; border-right-width: 3px; }
+  .stagegroup .sg-bottom::before { left: 0; border-left-width: var(--sg-w); }
+  .stagegroup .sg-bottom::after { right: 0; border-right-width: var(--sg-w); }
 
   /* the arms start where the elbow's turn ends, so the stroke never doubles */
   .stagegroup .stage .bar.pre { margin-left: var(--sg-r); }
