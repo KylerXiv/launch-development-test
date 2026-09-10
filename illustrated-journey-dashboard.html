@@ -485,10 +485,6 @@
   .pathnode .pill { transition: border-color .12s ease, box-shadow .12s ease, transform .12s ease; }
   .pathnode[aria-expanded="true"] .pill { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
   .pathnode[aria-expanded="true"] .plabel { color: var(--accent); font-weight: 700; }
-  .pathnode .cnt {
-    display: block; margin-top: 3px; font-size: 10.5px; font-weight: 700;
-    color: var(--crit); font-variant-numeric: tabular-nums;
-  }
 
   .gatewrap {
     margin: -12px 0 22px; padding: 16px 18px;
@@ -1613,10 +1609,13 @@
   function pathNodeHtml(i, stacked) {
     const s = STAGES[i];
     const n = lateAt(i);
+    // The per-gate delayed count used to print as a red "N delayed" line under
+    // the label (.cnt, removed 10 Sep 2026). Still carried in the aria-label
+    // for screen readers, and still shown per-medicine in the gate panel this
+    // button opens — just not as a second always-visible line in the strip.
     return `<button class="pathnode${stacked ? " pathnode-sm" : ""}" type="button" aria-expanded="false" aria-controls="gatewrap"
       data-gate="${i}" aria-label="${esc(s)} — show every medicine at this gate${n ? ", " + n + " delayed" : ""}">` +
-      `<span class="pill">${stageIconImg(i, "")}</span><span class="plabel">${esc(s)}</span>` +
-      (n ? `<span class="cnt">${n} delayed</span>` : "") + `</button>`;
+      `<span class="pill">${stageIconImg(i, "")}</span><span class="plabel">${esc(s)}</span></button>`;
   }
 
   pathway.innerHTML = STAGE_COLUMNS.map(col => {
