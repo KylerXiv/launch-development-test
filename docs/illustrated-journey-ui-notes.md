@@ -238,6 +238,13 @@ used for. URLs were taken from the repo's own fetcher scripts and
 WHO guidelines, WHO PQ (+ the separate vector-control list), EMA, NAFDAC Green
 Book, TMDA, Global Fund PQR, ClinicalTrials.gov — all 200.
 
+**WHO Malaria Threat Maps** was added on 10 Sep 2026 — it backs both resistance
+layers on the map yet was missing from the list, so two of the page's own
+datasets were unattributed in the one place a reader goes to check them. URL
+taken from `SOURCE_URL` in both normalizers (they agree) rather than retyped;
+verified 200. Placed with the other two WHO entries so the three read as one
+source family.
+
 `unitaid.org` and `endmalaria.org` return 403 to curl and headless Chrome. That
 is Cloudflare bot protection, not a dead site; they could not be
 machine-confirmed and are worth a manual click.
