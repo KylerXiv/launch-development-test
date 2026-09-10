@@ -107,6 +107,23 @@ its source.
   effect. `pipeline.html` itself was not touched by this task (it renders by
   `phase`, not `stages`, so the parallel-gates change doesn't apply to it).
 
+## Follow-up: the fork's corners are square, not rounded
+
+10 Sep 2026, on client request — the fork read as a rounded *container* drawn
+around the pair rather than as a bar that splits and rejoins. Removed the four
+`border-*-radius` declarations on the `.stagegroup` elbows and the `14px`
+`border-radius` on `.pathgroup`, so the strip and the row match.
+
+`--sg-r` (9px) was doing double duty: the corner radius *and* the elbow's
+horizontal run, which is also what `.bar.pre`/`.bar.post` margins key off. Only
+the radii were dropped; the variable survives as the run, and its declaration
+now says so. Do not reintroduce `border-radius` from it — the geometry breaks
+if the run goes to 0.
+
+Verified by computed style rather than by eye: all four elbows report
+`border-radius: 0px` with `width: 9px` and `height: 28.5px` unchanged, and
+`.pathgroup` reports `0px`.
+
 ## Verification
 
 - `node scripts/validate-data.js` → 0 errors, 5 warnings (unchanged: 3

@@ -198,7 +198,9 @@
     flex: 1; min-width: 84px; display: flex; flex-direction: column; align-items: center;
     gap: 2px; padding: 4px 6px 6px; align-self: stretch;
     border-left: 3px solid var(--line); border-right: 3px solid var(--line);
-    border-radius: 14px;
+    /* square, matching the product-row fork's elbows (10 Sep 2026). The strip
+       and the row are two views of the same parallel pair, so a radius on one
+       and not the other reads as an oversight. */
   }
   .pathgroup .pathnode { flex: none; min-width: 0; width: 100%; }
   .pathgroup-note {
@@ -306,12 +308,18 @@
     color: var(--ink-3);
   }
 
-  /* ---- the fork itself: four rounded elbows ----
+  /* ---- the fork itself: four square elbows ----
      Each branch draws its own two corners as ::before / ::after — a box with
-     two borders and one rounded corner, so the vertical run and the turn into
-     the marker's arm are one continuous stroke instead of two crossing lines.
-     The four elbows meet in pairs at x=0 and x=100%, on the spine, which is
-     exactly where the neighbouring columns' bars arrive.
+     two borders meeting at a right angle, so the vertical run and the turn
+     into the marker's arm are one continuous stroke instead of two crossing
+     lines. The four elbows meet in pairs at x=0 and x=100%, on the spine,
+     which is exactly where the neighbouring columns' bars arrive.
+
+     Corners are square by request (10 Sep 2026): the fork reads as circuitry
+     — a bar that splits and rejoins — and a radius made it read as a rounded
+     container drawn around the pair instead. --sg-r survives as the elbow's
+     horizontal RUN (its width, and the matching bar margins below); it is no
+     longer a radius, so do not reintroduce border-radius from it.
 
      --sg-arm (half a marker + half the caption band) is the distance from a
      marker's centre to the spine. It is derived, not guessed, but it does
@@ -321,7 +329,7 @@
     --sg-mark: 42px;
     --sg-note: 15px;
     --sg-arm: calc(var(--sg-mark) / 2 + var(--sg-note) / 2);
-    --sg-r: 9px;
+    --sg-r: 9px;      /* horizontal run of each elbow, NOT a corner radius */
   }
   .stagegroup .stage::before, .stagegroup .stage::after {
     content: ""; position: absolute; width: var(--sg-r); height: var(--sg-arm);
@@ -333,15 +341,15 @@
     bottom: calc(-1 * var(--sg-note) / 2);
     border-top-width: 3px;
   }
-  .stagegroup .sg-top::before { left: 0; border-left-width: 3px; border-top-left-radius: var(--sg-r); }
-  .stagegroup .sg-top::after { right: 0; border-right-width: 3px; border-top-right-radius: var(--sg-r); }
+  .stagegroup .sg-top::before { left: 0; border-left-width: 3px; }
+  .stagegroup .sg-top::after { right: 0; border-right-width: 3px; }
   /* bottom branch: marker sits at the branch's top edge */
   .stagegroup .sg-bottom::before, .stagegroup .sg-bottom::after {
     top: calc(-1 * var(--sg-note) / 2);
     border-bottom-width: 3px;
   }
-  .stagegroup .sg-bottom::before { left: 0; border-left-width: 3px; border-bottom-left-radius: var(--sg-r); }
-  .stagegroup .sg-bottom::after { right: 0; border-right-width: 3px; border-bottom-right-radius: var(--sg-r); }
+  .stagegroup .sg-bottom::before { left: 0; border-left-width: 3px; }
+  .stagegroup .sg-bottom::after { right: 0; border-right-width: 3px; }
 
   /* the arms start where the elbow's turn ends, so the stroke never doubles */
   .stagegroup .stage .bar.pre { margin-left: var(--sg-r); }
