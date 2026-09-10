@@ -189,6 +189,22 @@
   }
   .pathnode[aria-expanded="true"] .pill::after { transform: rotate(180deg); }
   .patharrow { flex: none; color: var(--ink-3); font-size: 15px; margin-top: 15px; user-select: none; }
+  /* A column holding more than one stage (stageColumns groups them) — drawn
+     stacked and bracketed, not side by side, so nothing implies which one
+     comes first. Markers stay the same size as every ungrouped gate; the
+     bracket is the strip's echo of the fork the product rows draw, since the
+     strip has arrows between columns rather than connecting bars. */
+  .pathgroup {
+    flex: 1; min-width: 84px; display: flex; flex-direction: column; align-items: center;
+    gap: 2px; padding: 4px 6px 6px; align-self: stretch;
+    border-left: 3px solid var(--line); border-right: 3px solid var(--line);
+    border-radius: 14px;
+  }
+  .pathgroup .pathnode { flex: none; min-width: 0; width: 100%; }
+  .pathgroup-note {
+    display: block; font-size: 9.5px; font-style: italic; letter-spacing: .01em;
+    color: var(--ink-3); line-height: 1.15; margin: 1px 0 2px; padding: 0 2px;
+  }
 
   /* ---------- product rows ---------- */
   .board { display: flex; flex-direction: column; gap: 14px; }
@@ -237,18 +253,105 @@
      flat instead of curving. padding-top gives it (and the hover lift, and
      the focus/aria-expanded rings) room to draw before the clip. */
   .trackbox { overflow-x: auto; padding-top: 8px; }
-  .track { display: flex; align-items: flex-start; min-width: 700px; }
+  .track { display: flex; align-items: flex-start; min-width: 700px; padding-top: var(--sg-lift, 0px); }
   .stage { flex: 1; min-width: 80px; position: relative; text-align: center; }
   .stage .row { display: flex; align-items: center; }
   .stage .bar { flex: 1; height: 3px; background: var(--line); }
   .stage .bar.done-bar { background: var(--good); }
-  .stage:first-child .bar.pre, .stage:last-child .bar.post { visibility: hidden; }
+  /* Hide the two dangling bar-ends at the far left and far right of the ROW.
+     Must stay scoped to direct children of .track: a stage nested inside a
+     .stagegroup is first/last of its *group*, not of the row, and hiding its
+     bars there breaks the fork's arms. */
+  .track > .stage:first-child .bar.pre, .track > .stage:last-child .bar.post { visibility: hidden; }
   .stage .lbl { font-size: 11px; line-height: 1.25; color: var(--ink-3); margin-top: 7px; padding: 0 3px; }
   .stage.cur .lbl { color: var(--ink); font-weight: 650; }
   /* year a gate was reached, under its label — also the value plotted on the
      real-year timeline underneath (.tlbox), so this and that stay honest twins */
   .stage .syear { font-size: 11px; font-weight: 650; color: var(--ink-2); margin-top: 3px; font-variant-numeric: tabular-nums; }
   .stage.s-idle .syear { color: var(--ink-3); }
+  /* ---------- parallel gate pair, drawn as a fork ----------
+     A column holding more than one stage (stageColumns groups them) is drawn
+     as a branch: the incoming bar meets a vertical, which carries it up and
+     down to two same-size markers, and a matching vertical rejoins them on
+     the way out. Neither branch is above the other in any sense the layout
+     can imply — that is the whole point of drawing it this way.
+
+     Markers stay full size, identical to every ungrouped gate. The two
+     branches mirror about the spine: the top one runs year / label / marker
+     (column-reverse), the bottom one marker / label / year, so both labels
+     sit on the OUTSIDE and the two markers end up adjacent, separated only
+     by the caption band. That keeps the vertical distance between marker
+     centres fixed and known, which is what lets the fork verticals be drawn
+     in CSS instead of measured per row.
+
+     --sg-lift is measured once at runtime (alignStageForks) and pulls the
+     group up so its spine lands exactly on the neighbouring markers'
+     centreline; .track absorbs the same amount as padding so nothing clips.
+     With no JS it stays 0 and the fork simply hangs below the line. */
+  .stagegroup {
+    flex: 1; min-width: 80px; display: flex; flex-direction: column;
+    align-items: stretch; margin-top: calc(-1 * var(--sg-lift, 0px));
+  }
+  .stagegroup .stage { flex: none; min-width: 0; }
+  /* top branch mirrors the bottom one: year, label, marker (top to bottom) */
+  .stagegroup .sg-top { display: flex; flex-direction: column-reverse; }
+  /* margins mirror too, so the label/year spacing matches the bottom branch */
+  .stagegroup .sg-top .lbl { margin-top: 0; margin-bottom: 7px; }
+  .stagegroup .sg-top .syear { margin-top: 0; margin-bottom: 3px; }
+
+  /* the caption band sits on the spine, in the gap between the two markers */
+  .stagegroup-note {
+    height: var(--sg-note); line-height: var(--sg-note);
+    text-align: center; font-size: 9px; font-style: italic; letter-spacing: .01em;
+    color: var(--ink-3);
+  }
+
+  /* ---- the fork itself: four rounded elbows ----
+     Each branch draws its own two corners as ::before / ::after — a box with
+     two borders and one rounded corner, so the vertical run and the turn into
+     the marker's arm are one continuous stroke instead of two crossing lines.
+     The four elbows meet in pairs at x=0 and x=100%, on the spine, which is
+     exactly where the neighbouring columns' bars arrive.
+
+     --sg-arm (half a marker + half the caption band) is the distance from a
+     marker's centre to the spine. It is derived, not guessed, but it does
+     couple to the two sizes below: keep --sg-mark equal to .stage .smark's
+     height and --sg-note equal to the caption band's. */
+  .stagegroup {
+    --sg-mark: 42px;
+    --sg-note: 15px;
+    --sg-arm: calc(var(--sg-mark) / 2 + var(--sg-note) / 2);
+    --sg-r: 9px;
+  }
+  .stagegroup .stage::before, .stagegroup .stage::after {
+    content: ""; position: absolute; width: var(--sg-r); height: var(--sg-arm);
+    border: 0 solid var(--line);
+  }
+  /* top branch: marker sits at the branch's bottom edge (column-reverse), so
+     the elbows hang below it and turn up into the arm */
+  .stagegroup .sg-top::before, .stagegroup .sg-top::after {
+    bottom: calc(-1 * var(--sg-note) / 2);
+    border-top-width: 3px;
+  }
+  .stagegroup .sg-top::before { left: 0; border-left-width: 3px; border-top-left-radius: var(--sg-r); }
+  .stagegroup .sg-top::after { right: 0; border-right-width: 3px; border-top-right-radius: var(--sg-r); }
+  /* bottom branch: marker sits at the branch's top edge */
+  .stagegroup .sg-bottom::before, .stagegroup .sg-bottom::after {
+    top: calc(-1 * var(--sg-note) / 2);
+    border-bottom-width: 3px;
+  }
+  .stagegroup .sg-bottom::before { left: 0; border-left-width: 3px; border-bottom-left-radius: var(--sg-r); }
+  .stagegroup .sg-bottom::after { right: 0; border-right-width: 3px; border-bottom-right-radius: var(--sg-r); }
+
+  /* the arms start where the elbow's turn ends, so the stroke never doubles */
+  .stagegroup .stage .bar.pre { margin-left: var(--sg-r); }
+  .stagegroup .stage .bar.post { margin-right: var(--sg-r); }
+
+  /* elbows take the same green as a cleared bar: the incoming pair when the
+     column before the fork is cleared, the outgoing pair when BOTH gates in
+     it are — leaving the fork needs both, which is the honest rule */
+  .stagegroup.sg-pre-done .stage::before { border-color: var(--good); }
+  .stagegroup.sg-post-done .stage::after { border-color: var(--good); }
 
   /* trackwrap holds both the stepper (trackbox) and, underneath it, its own
      standalone real-year timeline (.tlbox) — min-width:0 keeps the nested
@@ -1046,7 +1149,7 @@
   </section>
 
   <details class="updates changes" id="updates" hidden>
-    <summary>What&#39;s changed recently</summary>
+    <summary>Recent dashboard updates</summary>
     <p class="updates-intro">The eight most recent changes we have made to the information on this page, in plain English.</p>
     <ul id="updates-list"></ul>
   </details>
@@ -1138,6 +1241,25 @@
   const DATA = window.LAUNCH_DATA;
   const STAGES = DATA.stages;
   const PRODUCTS = DATA.products;
+
+  // stageColumns groups stage indices into display columns; a column with
+  // more than one index (currently [2, 3] — WHO recommendation and WHO PQ
+  // listing) is a parallel pair with no defined order between its members,
+  // drawn stacked/fanned rather than strictly left-to-right. Absent
+  // stageColumns, every stage gets its own column and everything below
+  // reduces to the old one-stage-per-column behaviour.
+  const STAGE_COLUMNS = DATA.stageColumns || STAGES.map((_, i) => ({ stages: [i] }));
+  const colIndexOf = i => STAGE_COLUMNS.findIndex(c => c.stages.includes(i));
+  const sameColumn = (i, j) => colIndexOf(i) === colIndexOf(j) && colIndexOf(i) !== -1;
+  // Is the column *before* stage i's column fully cleared? For an ungrouped
+  // stage this is exactly "is stage i-1 done". For a stage that shares a
+  // column with another, it looks past its groupmate to the column before
+  // the *group* — the two parallel stages never gate each other's bar.
+  const preBoundaryDone = (p, i) => {
+    const ci = colIndexOf(i);
+    if (ci <= 0) return false;
+    return STAGE_COLUMNS[ci - 1].stages.every(j => p.stages[j].status === "done");
+  };
   const ICON = { done: "✓", prog: "›", late: "!", idle: "" };
   const LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
   // Illustrated stage glyphs (assets/journey-icons/icons.js), one per stage in
@@ -1156,10 +1278,10 @@
   // stroke="currentColor", which is exactly what an official emblem may not do.
   // Kept local to this page — assets/journey-icons/icons.js is shared by four
   // other editions and none of them asked for this.
-  // Only the guidelines gate carries the emblem. Prequalification has its own
+  // Only the recommendation gate carries the emblem. The PQ listing has its own
   // glyph in the solid set — the board gives it a check, and two identical
   // emblems side by side read as a duplicate rather than as two gates.
-  const WHO_STAGES = { 2: true };            // WHO guidelines
+  const WHO_STAGES = { 2: true };            // WHO recommendation
   const stageIconImg = (i, cls) => WHO_STAGES[i]
     ? `<img class="${cls} whoemb" src="assets/who-emblem.svg" alt="" width="205" height="181">`
     : (JI ? JI.use(i, cls) : "");
@@ -1344,8 +1466,8 @@
   // Independent of the stepper above it — no lines tie the two together. Every
   // gate with a real year gets its own point, name written out in full, on an
   // axis zoomed to this product's own span. Points still join in pathway order,
-  // so a gate reached out of that order (WHO prequalification can land years
-  // before the WHO guideline recommendation that precedes it) shows as the
+  // so a gate reached out of that order (the WHO PQ listing can land years
+  // before the WHO recommendation that precedes it) shows as the
   // join dipping backward rather than a chip explaining it — a fact about
   // sequence, drawn in neutral grey rather than the red a real delay earns.
   // The active gate (currentStage) always gets an open-ended "today" marker
@@ -1450,28 +1572,38 @@
 
     const xByIdx = {};
     items.forEach(it => xByIdx[it.idx] = it.x);
-    for (let i = 1; i < STAGES.length; i++) {
-      const ax = xByIdx[i - 1], bx = xByIdx[i];
-      if (ax == null || bx == null) continue;
+    // Connect column to column, not index to index — a column holding more
+    // than one stage (the WHO pair) fans out to / in from every member
+    // instead of drawing one implied line between the members themselves.
+    // That line is the one that used to dip backward and read as an error:
+    // there is no "before" or "after" between two stages with no defined
+    // order, so nothing is drawn between them at all, in either direction.
+    for (let ci = 1; ci < STAGE_COLUMNS.length; ci++) {
+      const fromIdxs = STAGE_COLUMNS[ci - 1].stages;
+      const toIdxs = STAGE_COLUMNS[ci].stages;
+      fromIdxs.forEach(a => toIdxs.forEach(b => {
+      const ax = xByIdx[a], bx = xByIdx[b];
+      if (ax == null || bx == null) return;
       const midX = (ax + bx) / 2;
       if (bx < ax) {
-        const yrs = (years[i] != null && years[i - 1] != null) ? Math.abs(years[i] - years[i - 1]) : null;
+        const yrs = (years[b] != null && years[a] != null) ? Math.abs(years[b] - years[a]) : null;
         const ttl = yrs != null
-          ? `${esc(STAGES[i])} was reached ${yrs} yr${yrs === 1 ? "" : "s"} before ${esc(STAGES[i - 1])} — these gates were not cleared in pathway order.`
+          ? `${esc(STAGES[b])} was reached ${yrs} yr${yrs === 1 ? "" : "s"} before ${esc(STAGES[a])} — these gates were not cleared in pathway order.`
           : "";
         parts.push(`<path d="M ${ax},${dotY} Q ${midX},${dipY} ${bx},${dotY}" fill="none" stroke="var(--ink-3)" stroke-width="1.75" stroke-dasharray="4 3">${ttl ? `<title>${ttl}</title>` : ""}</path>`);
       } else {
-        const dashed = i === p.currentStage;
-        const yrs = (years[i] != null && years[i - 1] != null) ? years[i] - years[i - 1]
-          : (dashed && years[i - 1] != null) ? CUR_YEAR - years[i - 1] : null;
+        const dashed = b === p.currentStage;
+        const yrs = (years[b] != null && years[a] != null) ? years[b] - years[a]
+          : (dashed && years[a] != null) ? CUR_YEAR - years[a] : null;
         const ttl = (yrs != null && !dashed)
-          ? `${yrs} yr${yrs === 1 ? "" : "s"} from ${esc(STAGES[i - 1])} in ${years[i - 1]} to ${esc(STAGES[i])} in ${years[i]}.`
+          ? `${yrs} yr${yrs === 1 ? "" : "s"} from ${esc(STAGES[a])} in ${years[a]} to ${esc(STAGES[b])} in ${years[b]}.`
           : "";
         parts.push(`<line x1="${ax}" y1="${dotY}" x2="${bx}" y2="${dotY}" stroke="var(--ink-3)" stroke-width="1.75"${dashed ? ' stroke-dasharray="5 4"' : ""}>${ttl ? `<title>${ttl}</title>` : ""}</line>`);
         if (yrs != null && yrs > 0) {
           parts.push(`<text x="${midX}" y="${dotY + 20}" text-anchor="middle" font-size="10" font-weight="700" font-variant-numeric="tabular-nums" fill="var(--ink-2)">${yrs} yr${yrs === 1 ? "" : "s"}</text>`);
         }
       }
+      }));
     }
 
     items.forEach(it => {
@@ -1512,21 +1644,33 @@
   }
 
   const lateAt = i => tracked.filter(p => p.stages[i].status === "late").length;
-  pathway.innerHTML = STAGES.map((s, i) => {
+
+  function pathNodeHtml(i, stacked) {
+    const s = STAGES[i];
     const n = lateAt(i);
-    return `<button class="pathnode" type="button" aria-expanded="false" aria-controls="gatewrap"
+    return `<button class="pathnode${stacked ? " pathnode-sm" : ""}" type="button" aria-expanded="false" aria-controls="gatewrap"
       data-gate="${i}" aria-label="${esc(s)} — show every medicine at this gate${n ? ", " + n + " delayed" : ""}">` +
       `<span class="pill">${stageIconImg(i, "")}</span><span class="plabel">${esc(s)}</span>` +
       (n ? `<span class="cnt">${n} delayed</span>` : "") + `</button>`;
+  }
+
+  pathway.innerHTML = STAGE_COLUMNS.map(col => {
+    if (col.stages.length === 1) return pathNodeHtml(col.stages[0], false);
+    const names = col.stages.map(i => STAGES[i]).join(" and ");
+    return `<span class="pathgroup" role="group" aria-label="${esc(names)} — independent approvals with no defined order between them">` +
+      col.stages.map(i => pathNodeHtml(i, true)).join(`<span class="pathgroup-note" aria-hidden="true">no fixed order</span>`) +
+      `</span>`;
   }).join(`<span class="patharrow" aria-hidden="true">→</span>`);
 
   tracked.forEach(p => {
     const years = p.stages.map(stageYear);
-    const stagesHtml = p.stages.map((st, i) => {
-      const preDone = i > 0 && (p.stages[i - 1].status === "done");
+
+    const stageUnitHtml = (i, extraClass) => {
+      const st = p.stages[i];
+      const preDone = preBoundaryDone(p, i);
       const postDone = st.status === "done";
       return `
-        <div class="stage ${i === p.currentStage ? "cur" : ""} s-${st.status}">
+        <div class="stage ${extraClass || ""} ${i === p.currentStage ? "cur" : ""} s-${st.status}">
           <div class="row">
             <div class="bar pre ${preDone ? "done-bar" : ""}"></div>
             <button class="smark" type="button"
@@ -1540,6 +1684,23 @@
           <div class="lbl">${esc(STAGES[i])}</div>
           ${years[i] ? `<div class="syear">${years[i]}</div>` : ""}
         </div>`;
+    };
+
+    const stagesHtml = STAGE_COLUMNS.map(col => {
+      if (col.stages.length === 1) return stageUnitHtml(col.stages[0]);
+      // A parallel pair is drawn as a fork: the first branch mirrors upward
+      // (sg-top), the caption band carries the two fork verticals, the rest
+      // hang below. The verticals turn green on the same rule the bars use —
+      // in when the previous column is cleared, out when BOTH gates are.
+      const preDone = preBoundaryDone(p, col.stages[0]);
+      const allDone = col.stages.every(i => p.stages[i].status === "done");
+      const cls = ["stagegroup", preDone ? "sg-pre-done" : "", allDone ? "sg-post-done" : ""]
+        .filter(Boolean).join(" ");
+      const names = col.stages.map(i => STAGES[i]).join(" and ");
+      return `<div class="${cls}" role="group" aria-label="${esc(names)} — independent approvals, no defined order between them">` +
+        col.stages.map((i, n) => stageUnitHtml(i, n === 0 ? "sg-top" : "sg-bottom"))
+          .join(`<div class="stagegroup-note" aria-hidden="true">no fixed order</div>`) +
+        `</div>`;
     }).join("");
 
     const d = p.detail;
@@ -1676,12 +1837,46 @@
       tlbox.outerHTML = stageTimeline(p, years, w);
     });
   }
+  // ---- fork alignment ------------------------------------------------------
+  // A parallel pair (.stagegroup) is symmetric about its caption band, so its
+  // spine sits far lower in its own box than an ungrouped marker's centre does
+  // in its box. Measure that difference once and publish it as --sg-lift: the
+  // group pulls itself up by it, .track absorbs the same amount as padding, and
+  // every marker plus the fork's spine ends up on one line. Measured rather
+  // than hard-coded because the branch labels wrap differently by width, font
+  // and zoom. With no JS (or nothing to measure) it stays 0 and the fork just
+  // hangs below the line — degraded, not broken.
+  function alignStageForks() {
+    // Per track, not once globally: a branch only renders its year line when
+    // that gate has a real year, so an all-idle pair (GanLum) is shorter than
+    // a cleared one (ASPY) and needs a different lift. --sg-lift is set on the
+    // .track itself and inherits to both the padding and the group's margin.
+    document.querySelectorAll(".track").forEach(track => {
+      const group = track.querySelector(".stagegroup");
+      if (!group) return;
+      track.style.setProperty("--sg-lift", "0px");
+      const note = group.querySelector(".stagegroup-note");
+      const mark = group.querySelector(".smark");
+      if (!note || !mark) return;
+      const nr = note.getBoundingClientRect();
+      // spine: centre of the caption band, measured from the group's own top
+      const spine = (nr.top + nr.bottom) / 2 - group.getBoundingClientRect().top;
+      // not rounded: a half-pixel of rounding here shows up as the spine
+      // sitting 1px off the neighbouring markers' centreline
+      const lift = Math.max(0, spine - mark.offsetHeight / 2);
+      track.style.setProperty("--sg-lift", lift.toFixed(2) + "px");
+    });
+  }
+
   fitTimelines();
+  alignStageForks();
   let fitTimelinesRAF = null;
   window.addEventListener("resize", () => {
     cancelAnimationFrame(fitTimelinesRAF);
-    fitTimelinesRAF = requestAnimationFrame(fitTimelines);
+    fitTimelinesRAF = requestAnimationFrame(() => { fitTimelines(); alignStageForks(); });
   });
+  // labels wrap differently once webfonts land, which moves the spine
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignStageForks);
 
   // placeholder rows (e.g. prevention tools not yet approved for tracking)
   PRODUCTS.filter(p => p.placeholder).forEach(p => {
@@ -3360,7 +3555,7 @@
     failed:       "Sorry — your feedback could not be sent just now. Please try again in a moment.",
     doneTitle:    "Thank you — we have your feedback.",
     doneMessage:  "The LAUNCH team reads every message. If you have pointed us to a public source that " +
-                  "checks out, we correct the data at the next update and note it under <em>What's changed recently</em>.",
+                  "checks out, we correct the data at the next update and note it under <em>Recent dashboard updates</em>.",
     again:        "Send more feedback"
   };
 </script>

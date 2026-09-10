@@ -1,0 +1,28 @@
+{
+  "parkedOn": "2026-09-09",
+  "reason": "Removed from the public site on reviewer feedback (Sep 2026): a prevention product does not belong in the treatment-stage board. Re-add behind its own tab, with prevention-specific stage names (WHO PQ Vector Control, a different guideline group), when it is activated for tracking.",
+  "reAdd": "Paste `product` back into data/products.js products[] and `changelog` back into changelog[] (newest-first by date). scripts/build-ontology.js already carries the PRODUCT_ORGS entry for id \"emanators\"; nothing else was removed.",
+  "product": {
+    "id": "emanators",
+    "placeholder": true,
+    "name": "Spatial emanators",
+    "inn": "Vector-control prevention tool",
+    "manufacturer": "SC Johnson",
+    "classLabel": "Prevention · WHO-recommended · rollout funded",
+    "note": "Planned addition to LAUNCH tracking. WHO PQ (vector control) lists two SC Johnson spatial emanators — Guardian and Mosquito Shield — prequalified 13 Aug 2025 (WHO PQ vector-control list, extract 22 Aug 2026), alongside WHO's policy recommendation for spatial repellents of the same date; a Global Fund–US partnership announced 13 May 2026 targets rollout to 60 million people by 2028. The pipeline view will apply with WHO PQ/Vector Control and guideline stages adapted for prevention products."
+  },
+  "changelog": [
+    {
+      "date": "2026-08-23",
+      "product": "Spatial emanators",
+      "change": "Status refreshed: WHO policy recommendation for spatial repellents (13 Aug 2025) and the Global Fund–US rollout partnership (13 May 2026) recorded — no longer pending funder approval.",
+      "plain": "These mosquito-repellent devices now have a World Health Organization recommendation (August 2025) and funding agreed for rollout (May 2026). They are no longer waiting on a funder."
+    },
+    {
+      "date": "2026-08-23",
+      "product": "Spatial emanators",
+      "change": "WHO PQ (vector control) listing of two SC Johnson spatial emanators — Guardian and Mosquito Shield — on 13 Aug 2025 noted on the placeholder row.",
+      "plain": "Two of these devices passed World Health Organization quality checks in August 2025."
+    }
+  ]
+}

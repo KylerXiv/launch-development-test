@@ -346,6 +346,20 @@ precision the data explicitly disclaims, and `stageYear()` only parses `done`
 stages by design (§3.5: a target must never be drawn as elapsed time). With the
 portfolio KPI gone, this information is no longer duplicated anywhere.
 
+**Merged with `fix/sep9-feedback-parallel` (10 Sep 2026).** That branch answers
+a *different* review — it renames stage 2 to "WHO recommendation" and stage 3
+to "WHO PQ listing", groups the two WHO gates as parallel ("no fixed order"),
+and parks the `emanators` placeholder to `docs/parked/emanators.json`. The two
+efforts overlapped in exactly two lines: both sides reworded the same `flag`
+sentences, theirs adding the qualifier *current*, mine replacing *bottleneck*
+with *access barrier*. Resolved by taking both — "Adoption / Procurement is the
+**current access barrier** — …" — which also matches the strip's "current
+access barriers". `illustrated-journey-dashboard.html` auto-merged with no
+conflict; `feed.xml` and the ontology exports were regenerated rather than
+hand-merged, since they derive from `data/products.js`. Changelog arithmetic
+after the merge: their 20 (main's 22 less the two parked emanators entries)
+plus this branch's 1 = 21.
+
 **The two `flag` sentences in `data/products.js` were reworded too**
 ("Adoption/Procurement is the **access barrier** — …"), with a changelog entry,
 because they render on this dashboard as `.flagnote` and `.gp-why` and leaving

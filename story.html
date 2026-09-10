@@ -128,6 +128,14 @@
   .trk .dot.done { background: var(--good); } .trk .dot.prog { background: var(--warn); }
   .trk .dot.late { background: var(--crit); } .trk .dot.idle { background: var(--idle-soft); border: 1.5px dashed var(--idle); color: var(--idle); }
   .trk .lbl { font-size: 10.5px; line-height: 1.25; color: var(--ink-3); margin-top: 6px; padding: 0 2px; }
+  /* A column holding more than one stage (stageColumns groups them) — the
+     two rows stack instead of sitting left-to-right, so nothing implies
+     which one this product cleared first. */
+  .trk .stgroup { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .trk .stgroup .st { flex: none; }
+  .trk .stgroup .dot { width: 15px; height: 15px; font-size: 9px; }
+  .trk .stgroup .lbl { font-size: 9px; margin-top: 3px; }
+  .trk .stgroup-note { font-size: 8px; font-style: italic; color: var(--ink-3); }
   .halves { display: flex; margin-top: 10px; font-size: 12px; font-weight: 650; }
   .halves div { flex: 1; text-align: center; padding: 5px; border-radius: 6px; }
   .halves .h1 { background: var(--good-soft); color: var(--good); margin-right: 4px; }
@@ -240,6 +248,17 @@
   }
   const DATA = window.LAUNCH_DATA;
   const tracked = DATA.products.filter(p => !p.placeholder);
+  // stageColumns groups stage indices into display columns; a column with
+  // more than one index (currently [2, 3] — WHO recommendation and WHO PQ
+  // listing) is a parallel pair with no defined order, drawn stacked rather
+  // than left-to-right. Absent stageColumns, every stage keeps its own column.
+  const STAGE_COLUMNS = DATA.stageColumns || DATA.stages.map((_, i) => ({ stages: [i] }));
+  const colIndexOf = i => STAGE_COLUMNS.findIndex(c => c.stages.includes(i));
+  const preBoundaryDone = (stages, i) => {
+    const ci = colIndexOf(i);
+    if (ci <= 0) return false;
+    return STAGE_COLUMNS[ci - 1].stages.every(j => stages[j].status === "done");
+  };
   const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
   const nowYear = parseInt(DATA.meta.lastUpdated.slice(0, 4), 10);
 
@@ -336,13 +355,20 @@
     <div class="panel">${timelineHtml("dim-early")}</div></div>`);
 
   // stage track
-  const trk = hero.stages.map((s, i) => {
-    const preDone = i > 0 && hero.stages[i - 1].status === "done";
+  const stUnitHtml = i => {
+    const s = hero.stages[i];
+    const preDone = preBoundaryDone(hero.stages, i);
     const icon = { done: "✓", prog: "›", late: "!", idle: "" }[s.status];
     return `<div class="st"><div class="row"><div class="bar pre ${preDone ? "g" : ""}"></div>` +
       `<span class="dot ${s.status}">${icon}</span>` +
       `<div class="bar post ${s.status === "done" ? "g" : ""}"></div></div>` +
       `<div class="lbl">${esc(DATA.stages[i])}</div></div>`;
+  };
+  const trk = STAGE_COLUMNS.map(col => {
+    if (col.stages.length === 1) return stUnitHtml(col.stages[0]);
+    return `<div class="stgroup">` +
+      col.stages.map(stUnitHtml).join(`<div class="stgroup-note" aria-hidden="true">no fixed order</div>`) +
+      `</div>`;
   }).join("");
   L.push(`<div class="layer" data-viz="track"><div class="panel">
     <div class="trk">${trk}</div>

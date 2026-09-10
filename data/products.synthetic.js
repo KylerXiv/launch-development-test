@@ -26,12 +26,21 @@ window.LAUNCH_DATA =
   "stages": [
     "R&D & clinical",
     "Regulatory approval (SRA)",
-    "WHO guidelines",
-    "WHO prequalification",
+    "WHO recommendation",
+    "WHO PQ listing",
     "Country registration",
     "National policy adoption",
     "Procurement",
     "In-country delivery"
+  ],
+  "stageColumns": [
+    { "stages": [0] },
+    { "stages": [1] },
+    { "stages": [2, 3] },
+    { "stages": [4] },
+    { "stages": [5] },
+    { "stages": [6] },
+    { "stages": [7] }
   ],
   "glossary": {
     "ACT": "Artemisinin-based combination therapy — the standard class of malaria treatments pairing an artemisinin derivative with a longer-acting partner drug.",
@@ -39,7 +48,7 @@ window.LAUNCH_DATA =
     "WLA": "WHO-Listed Authority — a regulator assessed by WHO as operating at an advanced level.",
     "Article 58": "EMA procedure giving a scientific opinion on high-priority medicines intended for markets outside the EU.",
     "GDG": "Guidelines Development Group — the WHO expert group that reviews evidence and formulates treatment recommendations.",
-    "PQ": "WHO prequalification — quality, safety and efficacy assessment that makes a product eligible for procurement by UN agencies and major donors.",
+    "PQ": "WHO prequalification — the quality, safety and efficacy assessment whose outcome, a listing on the WHO prequalified-products list, makes a product eligible for procurement by UN agencies and major donors.",
     "MFT": "Multiple first-line therapies — deploying several first-line treatments in parallel to reduce drug pressure and slow resistance.",
     "EOI": "Expression of Interest — the WHO prequalification invitation list; a product must be on it before a PQ dossier can be assessed.",
     "AMA": "African Medicines Agency — continental body coordinating regulatory review across African Union member states.",
@@ -223,7 +232,7 @@ window.LAUNCH_DATA =
           { "milestone": "Phase III enrolment", "status": "done", "label": "Complete", "date": "Aug 2026", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
           { "milestone": "Phase III results", "status": "prog", "label": "Follow-up ongoing", "date": "—", "next": "Last patient out", "anticipated": "Q1 2027", "source": "Synthetic dataset" },
           { "milestone": "SRA submission", "status": "idle", "label": "Not started", "date": "—", "next": "Dossier preparation", "anticipated": "~2028", "source": "" },
-          { "milestone": "WHO prequalification", "status": "idle", "label": "EOI listed", "date": "—", "next": "Dossier after SRA filing", "anticipated": "~2028", "source": "Synthetic dataset" }
+          { "milestone": "WHO PQ listing", "status": "idle", "label": "EOI listed", "date": "—", "next": "Dossier after SRA filing", "anticipated": "~2028", "source": "Synthetic dataset" }
         ]
       }
     },
@@ -268,7 +277,7 @@ window.LAUNCH_DATA =
           { "milestone": "SRA dossier submission", "status": "done", "label": "Complete", "date": "15 May 2026", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
           { "milestone": "SRA accelerated review", "status": "prog", "label": "Day-120 responses", "date": "Ongoing", "next": "Regulatory decision", "anticipated": "H2 2027", "source": "Synthetic dataset" },
           { "milestone": "WHO GDG engagement", "status": "prog", "label": "Dialogue open", "date": "Jun 2026", "next": "Evidence package", "anticipated": "2027", "source": "Synthetic dataset" },
-          { "milestone": "WHO prequalification", "status": "idle", "label": "EOI listed", "date": "—", "next": "Dossier submission", "anticipated": "2027", "source": "" }
+          { "milestone": "WHO PQ listing", "status": "idle", "label": "EOI listed", "date": "—", "next": "Dossier submission", "anticipated": "2027", "source": "" }
         ]
       }
     },
@@ -281,7 +290,7 @@ window.LAUNCH_DATA =
       "classLabel": "Recommended · underutilized",
       "phase": "access",
       "currentStage": 5,
-      "flag": "Adoption is the bottleneck — WHO-recommended since 2021 and registered in 22 countries, but only 6 national guidelines include it and MFT uptake is minimal",
+      "flag": "Adoption is the current bottleneck — WHO-recommended since 2021 and registered in 22 countries, but only 6 national guidelines include it and MFT uptake is minimal",
       "stages": [
         { "status": "done", "note": "Development complete (Kestrel / Access Medicines Alliance co-development)", "date": "", "next": "", "nextDate": "", "source": "Synthetic dataset", "asOf": "2026-08-22" },
         { "status": "done", "note": "SRA approval via accelerated assessment", "date": "2014", "next": "", "nextDate": "", "source": "Synthetic dataset", "asOf": "2026-08-22" },
@@ -336,7 +345,7 @@ window.LAUNCH_DATA =
         },
         "journey": [
           { "label": "SRA approval", "year": 2014 },
-          { "label": "WHO prequalification (tablets)", "year": 2015 },
+          { "label": "WHO PQ listing (tablets)", "year": 2015 },
           { "label": "Paediatric dispersible prequalified", "year": 2018 },
           { "label": "WHO strong recommendation", "year": 2021 },
           { "label": "Broad national guideline inclusion", "year": "TBC" }
@@ -354,7 +363,7 @@ window.LAUNCH_DATA =
         "volumeNote": "",
         "milestones": [
           { "milestone": "SRA approval", "status": "done", "label": "Complete", "date": "2014", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
-          { "milestone": "WHO prequalification", "status": "done", "label": "Complete", "date": "2015–2018", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
+          { "milestone": "WHO PQ listing", "status": "done", "label": "Complete", "date": "2015–2018", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
           { "milestone": "WHO strong recommendation", "status": "done", "label": "Complete", "date": "2021", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
           { "milestone": "Country registrations", "status": "prog", "label": "22 countries", "date": "Rolling", "next": "Regional joint review", "anticipated": "Q4 2026", "source": "Synthetic dataset" },
           { "milestone": "National guideline inclusion", "status": "late", "label": "6 of 22 registered", "date": "—", "next": "Committee reviews in 5 countries", "anticipated": "Q4 2026", "source": "Synthetic dataset" },
@@ -371,7 +380,7 @@ window.LAUNCH_DATA =
       "classLabel": "Recommended · underutilized",
       "phase": "access",
       "currentStage": 6,
-      "flag": "Procurement is the bottleneck — recommended for a decade with three PQ'd suppliers, yet volumes have been flat for three consecutive quarters at under 4% of ACT procurement",
+      "flag": "Procurement is the current bottleneck — recommended for a decade with three PQ'd suppliers, yet volumes have been flat for three consecutive quarters at under 4% of ACT procurement",
       "stages": [
         { "status": "done", "note": "Development complete", "date": "", "next": "", "nextDate": "", "source": "Synthetic dataset", "asOf": "2026-08-22" },
         { "status": "done", "note": "SRA approval", "date": "2012", "next": "", "nextDate": "", "source": "Synthetic dataset", "asOf": "2026-08-22" },
@@ -424,8 +433,8 @@ window.LAUNCH_DATA =
         },
         "journey": [
           { "label": "SRA approval", "year": 2012 },
-          { "label": "WHO guideline recommendation", "year": 2015 },
-          { "label": "WHO prequalification", "year": 2015 },
+          { "label": "WHO recommendation", "year": 2015 },
+          { "label": "WHO PQ listing", "year": 2015 },
           { "label": "Second supplier prequalified", "year": 2019 },
           { "label": "Broad procurement uptake", "year": "TBC" }
         ],
@@ -443,8 +452,8 @@ window.LAUNCH_DATA =
         "volumeNote": "",
         "milestones": [
           { "milestone": "SRA approval", "status": "done", "label": "Complete", "date": "2012", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
-          { "milestone": "WHO guideline recommendation", "status": "done", "label": "Complete", "date": "2015", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
-          { "milestone": "WHO prequalification (3 suppliers)", "status": "done", "label": "Complete", "date": "2015–2022", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
+          { "milestone": "WHO recommendation", "status": "done", "label": "Complete", "date": "2015", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
+          { "milestone": "WHO PQ listing (3 suppliers)", "status": "done", "label": "Complete", "date": "2015–2022", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
           { "milestone": "National guideline inclusion", "status": "prog", "label": "11 countries", "date": "Rolling", "next": "MFT decisions", "anticipated": "2027", "source": "Synthetic dataset" },
           { "milestone": "Procurement scale-up", "status": "late", "label": "Flat 3 quarters", "date": "—", "next": "Quantification review", "anticipated": "Q1 2027", "source": "Synthetic dataset" }
         ]
@@ -530,7 +539,7 @@ window.LAUNCH_DATA =
         },
         "journey": [
           { "label": "SRA approval", "year": 2016 },
-          { "label": "WHO prequalification", "year": 2017 },
+          { "label": "WHO PQ listing", "year": 2017 },
           { "label": "WHO strong recommendation", "year": 2019 },
           { "label": "First national first-line adoption", "year": 2020 },
           { "label": "Broad routine delivery (14 countries)", "year": 2025 }
@@ -549,7 +558,7 @@ window.LAUNCH_DATA =
         "volumeNote": "",
         "milestones": [
           { "milestone": "SRA approval", "status": "done", "label": "Complete", "date": "2016", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
-          { "milestone": "WHO prequalification", "status": "done", "label": "Complete", "date": "2017", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
+          { "milestone": "WHO PQ listing", "status": "done", "label": "Complete", "date": "2017", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
           { "milestone": "WHO strong recommendation", "status": "done", "label": "Complete", "date": "2019", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
           { "milestone": "First first-line adoption", "status": "done", "label": "Complete", "date": "2020", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
           { "milestone": "Technology transfer (Africa)", "status": "done", "label": "Complete", "date": "2024", "next": "—", "anticipated": "—", "source": "Synthetic dataset" },
