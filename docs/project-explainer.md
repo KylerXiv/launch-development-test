@@ -92,7 +92,7 @@ flowchart LR
     S0["0 · R&D & clinical"]
   end
   subgraph approvals [Four separate approvals — four different bodies]
-    S1["1 · Regulatory approval (SRA)"] --> S2["2 · WHO guidelines"] --> S3["3 · WHO prequalification"] --> S4["4 · Country registration"]
+    S1["1 · Regulatory approval (SRA)"] --> S2["2 · WHO recommendation"] --> S3["3 · WHO PQ listing"] --> S4["4 · Country registration"]
   end
   subgraph delivery [Delivery chain]
     S5["5 · National policy adoption"] --> S6["6 · Procurement"] --> S7["7 · In-country delivery"]
@@ -112,8 +112,8 @@ product can pass all of them and still reach no one if a ministry never adopts i
 | --- | --- | --- | --- |
 | 0 | R&D & clinical | Laboratory development and human trials (Phase I safety → II dosing → III large multi-country efficacy trials, typically 3–6 years). | Manufacturer + product development partnerships |
 | 1 | Regulatory approval (SRA) | Review by a stringent regulator such as the EMA or US FDA. Malaria products usually use the EMA's **EU-M4all** procedure (formerly "Article 58") — a full EMA scientific review for medicines used outside the EU. This opinion anchors everything downstream. | EMA / FDA |
-| 2 | WHO guidelines | WHO's expert group (the Guidelines Development Group) weighs the evidence and decides whether WHO *recommends* the medicine. Countries largely copy these. | WHO Global Malaria Programme |
-| 3 | WHO prequalification | WHO's *quality* check — dossier review plus factory inspections — that makes a product eligible for purchase by UN agencies and major donors. The ticket that lets the Global Fund buy it. | WHO Prequalification Team |
+| 2 | WHO recommendation | WHO's expert group (the Guidelines Development Group) weighs the evidence and decides whether WHO *recommends* the medicine. Countries largely copy these. | WHO Global Malaria Programme |
+| 3 | WHO PQ listing | WHO's *quality* check — dossier review plus factory inspections — that makes a product eligible for purchase by UN agencies and major donors. The ticket that lets the Global Fund buy it. | WHO Prequalification Team |
 | 4 | Country registration | Each country's own regulator licenses the product nationally — often sequentially, country by country. The African Medicines Agency and WHO's collaborative registration procedure exist to speed this up. | National regulatory authorities |
 | 5 | National policy adoption | The ministry of health writes the medicine into *national treatment guidelines* — the document that determines what health workers actually prescribe. A WHO recommendation does **not** flow into these automatically. | Ministries of health / NMCPs |
 | 6 | Procurement | Someone actually pays: Global Fund grants (the majority of treatment volume), US PMI, UNICEF, domestic budgets. Tenders, reference pricing, forecasting. | Global Fund, PMI, governments |

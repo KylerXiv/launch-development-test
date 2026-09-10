@@ -139,6 +139,19 @@ const graph = [];
 // ---- generated concepts: pathway stages + glossary ---------------------------
 if (data.stages.length !== STAGE_OPERATORS.length && warnGaps)
   console.warn(`WARN: ${data.stages.length} stages but ${STAGE_OPERATORS.length} STAGE_OPERATORS entries — realign the map`);
+
+// stageColumns groups stage indices into display columns; a column listing
+// more than one index (e.g. [2, 3] — WHO recommendation / WHO PQ listing) is
+// a parallel pair with no defined order between its members. Absent
+// stageColumns (e.g. an older synthetic file), every stage gets its own
+// column and nothing is concurrent — the ontology just carries less.
+const stageColumns = data.stageColumns || data.stages.map((_, i) => ({ stages: [i] }));
+const concurrentOf = {};
+stageColumns.forEach((col) => {
+  if (col.stages.length > 1)
+    col.stages.forEach((i) => { concurrentOf[i] = col.stages.filter((j) => j !== i); });
+});
+
 data.stages.forEach((label, i) => {
   const node = {
     "@id": `launch:stage-${i}`,
@@ -153,6 +166,10 @@ data.stages.forEach((label, i) => {
     const refs = op.orgs.filter((k) => ORGS[k]).map((k) => id(`org-${k}`));
     if (refs.length) node.operatedBy = refs.length === 1 ? refs[0] : refs;
     set(node, "operatorNote", op.note);
+  }
+  if (concurrentOf[i]) {
+    const refs = concurrentOf[i].map((j) => `launch:stage-${j}`);
+    node.concurrentWith = refs.length === 1 ? refs[0] : refs;
   }
   graph.push(node);
 });

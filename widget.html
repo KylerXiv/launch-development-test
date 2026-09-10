@@ -33,6 +33,13 @@
   .dot.late { background: var(--crit); color: #fff; }
   .dot.idle { background: var(--idle-soft); border: 1.5px dashed var(--idle); color: var(--idle); }
   .lbl { font-size: 8.5px; line-height: 1.2; color: var(--ink-3); margin-top: 4px; padding: 0 1px; }
+  /* A column holding more than one stage (stageColumns groups them) — the
+     rows stack instead of sitting left-to-right. */
+  .stagegroup { flex: 1; min-width: 44px; display: flex; flex-direction: column; gap: 2px; }
+  .stagegroup .stage { flex: none; min-width: 0; }
+  .stagegroup .dot { width: 12px; height: 12px; font-size: 7px; }
+  .stagegroup .lbl { font-size: 7.5px; margin-top: 2px; }
+  .stagegroup-note { font-size: 6.5px; font-style: italic; color: var(--ink-3); }
   .flag { margin-top: 8px; font-size: 11.5px; color: var(--crit); }
   .flag::before { content: "▲ "; font-size: 8px; }
   .foot { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 11px; color: var(--ink-3); }
@@ -55,6 +62,17 @@
   if (!window.LAUNCH_DATA) { root.innerHTML = '<div class="err">LAUNCH widget: data failed to load.</div>'; return; }
 
   const DATA = window.LAUNCH_DATA;
+  // stageColumns groups stage indices into display columns; a column with
+  // more than one index (currently [2, 3] — WHO recommendation and WHO PQ
+  // listing) is a parallel pair with no defined order, drawn stacked rather
+  // than left-to-right. Absent stageColumns, every stage keeps its own column.
+  const STAGE_COLUMNS = DATA.stageColumns || DATA.stages.map((_, i) => ({ stages: [i] }));
+  const colIndexOf = i => STAGE_COLUMNS.findIndex(c => c.stages.includes(i));
+  const preBoundaryDone = (stages, i) => {
+    const ci = colIndexOf(i);
+    if (ci <= 0) return false;
+    return STAGE_COLUMNS[ci - 1].stages.every(j => stages[j].status === "done");
+  };
   const id = (new URLSearchParams(location.search).get("product") || "").toLowerCase();
   const tracked = DATA.products.filter(p => !p.placeholder);
   // match by stable id or by display name, so ?product=aspy works even though
@@ -68,13 +86,20 @@
   const ICON = { done: "✓", prog: "›", late: "!", idle: "" };
   const LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
 
-  const stages = p.stages.map((st, i) => {
-    const preDone = i > 0 && p.stages[i - 1].status === "done";
+  const stageUnitHtml = i => {
+    const st = p.stages[i];
+    const preDone = preBoundaryDone(p.stages, i);
     return `<div class="stage">
       <div class="row"><div class="bar pre ${preDone ? "done-bar" : ""}"></div>
       <span class="dot ${st.status}" title="${esc(DATA.stages[i])}: ${LABEL[st.status]}">${ICON[st.status]}</span>
       <div class="bar post ${st.status === "done" ? "done-bar" : ""}"></div></div>
       <div class="lbl">${esc(DATA.stages[i])}</div></div>`;
+  };
+  const stages = STAGE_COLUMNS.map(col => {
+    if (col.stages.length === 1) return stageUnitHtml(col.stages[0]);
+    return `<div class="stagegroup">` +
+      col.stages.map(stageUnitHtml).join(`<div class="stagegroup-note" aria-hidden="true">no fixed order</div>`) +
+      `</div>`;
   }).join("");
 
   root.innerHTML = `

@@ -136,6 +136,14 @@
   .mcell.late-cell { background: var(--crit-soft); }
   .mrow-label.has-late { color: var(--crit); }
   .mrow:last-child .mrow-label, .mrow:last-child .mcell { border-bottom: 0; }
+  /* A merged row for a parallel pair (stageColumns groups them): the label
+     stacks its two names instead of showing one, and each product's cell
+     stacks the two dots instead of showing one — nothing here suggests
+     either happens before the other. */
+  .mrow-label-group { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
+  .mrow-sublabel { display: block; }
+  .mrow-parallel-note { display: block; font-size: 9.5px; font-style: italic; font-weight: 400; color: var(--ink-3); }
+  .mcell-group { flex-direction: column; gap: 6px; }
 
   /* ---------- bottleneck summary ---------- */
   .stuck { margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--crit); border-radius: 12px; padding: 16px 20px; box-shadow: var(--shadow); }
@@ -390,6 +398,12 @@
   }
   const DATA = window.LAUNCH_DATA;
   const STAGES = DATA.stages;
+  // stageColumns groups stage indices into display rows; a group of more
+  // than one index (currently [2, 3] — WHO recommendation and WHO PQ
+  // listing) is a parallel pair with no defined order — shown as one merged
+  // row with two dots per product, not two separate rows. Absent
+  // stageColumns, every stage keeps its own row.
+  const STAGE_COLUMNS = DATA.stageColumns || STAGES.map((_, i) => ({ stages: [i] }));
   const ICON = { done: "✓", prog: "›", late: "!", idle: "" };
   const LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
   const tracked = DATA.products.filter(p => !p.placeholder);
@@ -435,19 +449,31 @@
       </div>`;
   });
 
-  STAGES.forEach((stageName, si) => {
-    const anyLate = tracked.some(p => p.stages[si].status === "late");
+  STAGE_COLUMNS.forEach(col => {
+    const idxs = col.stages;
+    const grouped = idxs.length > 1;
+    const anyLate = idxs.some(si => tracked.some(p => p.stages[si].status === "late"));
+    const isFirstRow = idxs.includes(0);
+    const isLastRow = idxs.includes(STAGES.length - 1);
+    const labelHtml = grouped
+      ? idxs.map(si => `<span class="mrow-sublabel">${esc(STAGES[si])}</span>`).join(`<span class="mrow-parallel-note" aria-hidden="true">no fixed order</span>`)
+      : esc(STAGES[idxs[0]]);
     html += `<div style="display:contents" class="mrow">`;
-    html += `<div class="mrow-label ${anyLate ? "has-late" : ""}">${esc(stageName)}</div>`;
+    html += `<div class="mrow-label ${grouped ? "mrow-label-group" : ""} ${anyLate ? "has-late" : ""}">${labelHtml}</div>`;
     tracked.forEach(p => {
-      const st = p.stages[si];
-      html += `
-        <div class="mcell ${si === 0 ? "first" : ""} ${si === STAGES.length - 1 ? "last" : ""} ${si === p.currentStage ? "cur" : ""} ${st.status === "late" ? "late-cell" : ""}">
-          <span class="dot ${st.status}" tabindex="0" role="img"
-            aria-label="${esc(p.name)} — ${esc(stageName)}: ${LABEL[st.status]}. ${esc(st.note)}"
-            data-title="${esc(p.name)} · ${esc(stageName)} — ${LABEL[st.status]}"
+      const curHere = idxs.includes(p.currentStage);
+      const lateHere = idxs.some(si => p.stages[si].status === "late");
+      const dotsHtml = idxs.map(si => {
+        const st = p.stages[si];
+        return `<span class="dot ${st.status}" tabindex="0" role="img"
+            aria-label="${esc(p.name)} — ${esc(STAGES[si])}: ${LABEL[st.status]}. ${esc(st.note)}"
+            data-title="${esc(p.name)} · ${esc(STAGES[si])} — ${LABEL[st.status]}"
             data-note="${esc(st.note)}" data-date="${esc(st.date)}"
-            data-next="${esc(st.next)}" data-nextdate="${esc(st.nextDate)}" data-asof="${esc(st.asOf)}">${ICON[st.status]}</span>
+            data-next="${esc(st.next)}" data-nextdate="${esc(st.nextDate)}" data-asof="${esc(st.asOf)}">${ICON[st.status]}</span>`;
+      }).join("");
+      html += `
+        <div class="mcell ${grouped ? "mcell-group" : ""} ${isFirstRow ? "first" : ""} ${isLastRow ? "last" : ""} ${curHere ? "cur" : ""} ${lateHere ? "late-cell" : ""}">
+          ${dotsHtml}
         </div>`;
     });
     html += `</div>`;

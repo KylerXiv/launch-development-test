@@ -12,6 +12,17 @@
 //   draft = compiled from public sources, pending LAUNCH team verification
 //           and manufacturer written confirmation. Unknown values are "TBC" —
 //           never estimated.
+  //
+  // stageColumns: how the stages above are grouped into display columns.
+  // Most columns hold one stage index; a column that lists more than one
+  // (currently [2, 3] — WHO recommendation and WHO PQ listing) is a
+  // *parallel* pair: two independent WHO approvals shown side by side in one
+  // column, with no arrow or implied order between them. WHO runs these as
+  // separate tracks and (per LAUNCH's 2026 review) wants them read that way;
+  // drawing them strictly in sequence had been quietly endorsing the opposite.
+  // Flattened in order, stageColumns must equal every index in "stages"
+  // exactly once, ascending — scripts/validate-data.js enforces this.
+  //
 window.LAUNCH_DATA =
 {
   "meta": {
@@ -22,12 +33,21 @@ window.LAUNCH_DATA =
   "stages": [
     "R&D & clinical",
     "Regulatory approval (SRA)",
-    "WHO guidelines",
-    "WHO prequalification",
+    "WHO recommendation",
+    "WHO PQ listing",
     "Country registration",
     "National policy adoption",
     "Procurement",
     "In-country delivery"
+  ],
+  "stageColumns": [
+    { "stages": [0] },
+    { "stages": [1] },
+    { "stages": [2, 3] },
+    { "stages": [4] },
+    { "stages": [5] },
+    { "stages": [6] },
+    { "stages": [7] }
   ],
   "glossary": {
     "ACT": "Artemisinin-based combination therapy — the standard class of malaria treatments pairing an artemisinin derivative with a longer-acting partner drug.",
@@ -35,7 +55,7 @@ window.LAUNCH_DATA =
     "WLA": "WHO-Listed Authority — a regulator assessed by WHO as operating at an advanced level.",
     "Article 58": "EMA procedure giving a scientific opinion on high-priority medicines intended for markets outside the EU.",
     "GDG": "Guidelines Development Group — the WHO expert group that reviews evidence and formulates treatment recommendations.",
-    "PQ": "WHO prequalification — quality, safety and efficacy assessment that makes a product eligible for procurement by UN agencies and major donors.",
+    "PQ": "WHO prequalification — the quality, safety and efficacy assessment whose outcome, a listing on the WHO prequalified-products list, makes a product eligible for procurement by UN agencies and major donors.",
     "MFT": "Multiple first-line therapies — deploying several first-line treatments in parallel to reduce drug pressure and slow resistance.",
     "EOI": "Expression of Interest — the WHO prequalification invitation list; a product must be on it before a PQ dossier can be assessed.",
     "AMA": "African Medicines Agency — continental body coordinating regulatory review across African Union member states.",
@@ -53,13 +73,11 @@ window.LAUNCH_DATA =
     { "date": "2026-08-23", "product": "ASPY", "change": "Nigeria and Tanzania registrations verified against the national registers: TZA 2 (TMDA, 2022), NGA 1 (Greenbook granules, approved Feb 2024). The NGA/TZA registered-level map entries are now register-verified.", "plain": "We checked the official medicine registers: Tanzania approved this medicine in 2022, and Nigeria approved a version for children in February 2024. Both are now confirmed on the map." },
     { "date": "2026-08-23", "product": "DHA–PPQ", "change": "WHO guideline recommendation year corrected to 2010 (second-edition treatment guidelines; reaffirmed 2015) — previously shown as 2015.", "plain": "We corrected the year the World Health Organization first recommended this medicine. It was 2010, not 2015." },
     { "date": "2026-08-23", "product": "ALAQ", "change": "Co-formulated pivotal Phase III renamed to FD-TACT (successor to the DeTACT programme); unverified 'taste-masked' wording replaced with the sourced 'child-friendly dispersible'.", "plain": "We updated the name of the main trial and reworded how we describe the medicine, so both match what the published sources actually say." },
-    { "date": "2026-08-23", "product": "Spatial emanators", "change": "Status refreshed: WHO policy recommendation for spatial repellents (13 Aug 2025) and the Global Fund–US rollout partnership (13 May 2026) recorded — no longer pending funder approval.", "plain": "These mosquito-repellent devices now have a World Health Organization recommendation (August 2025) and funding agreed for rollout (May 2026). They are no longer waiting on a funder." },
     { "date": "2026-08-23", "product": "GanLum", "change": "Use-case wording aligned with the sourced Novartis claim (first major innovation in malaria treatment since ACTs were introduced 25+ years ago).", "plain": "We reworded how we describe this medicine to match the manufacturer's own words: the first major change in malaria treatment in more than 25 years." },
     { "date": "2026-08-23", "product": "All", "change": "Version 2 preview: first collected-data updates from the public-source staging layer (Global Fund PQR extract 23 Aug 2026, WHO PQ lists, EMA EU-M4all table, ClinicalTrials.gov).", "plain": "First batch of updates drawn from public databases — Global Fund purchasing records, World Health Organization approval lists, European medicines records and clinical trial registries." },
     { "date": "2026-08-23", "product": "DHA–PPQ", "change": "Global Fund volumes filled from PQR: 11.5m packs / US$41.5m since 2008; 0.9–4.5% of Global Fund antimalarial spend 2022–24 with a sharp 2025 uptick (US$15.3m). Nine PQ'd presentations across Alfasigma, Guilin and Beijing Holley (2015–2023) recorded.", "plain": "Purchasing figures added: the Global Fund has bought 11.5 million packs (US$41.5m) since 2008, with a sharp rise in 2025. Nine versions of the medicine have passed World Health Organization quality checks." },
     { "date": "2026-08-23", "product": "ASPY", "change": "Global Fund volumes filled from PQR: 940k packs / US$14.5m since 2018, with US$11.6m of it in 2025 (Uganda, Burkina Faso). EMA opinion outcome date 5 Jun 2025 recorded from the EU-M4all table.", "plain": "Purchasing figures added: the Global Fund has bought 940,000 packs (US$14.5m) since 2018, most of it in 2025 for Uganda and Burkina Faso. The European medicines decision date is now recorded." },
     { "date": "2026-08-23", "product": "GanLum", "change": "KALUMA registry record (NCT05842954) added: trial completed 25 Nov 2025, 1,720 participants (registry actual).", "plain": "The main trial finished on 25 November 2025 with 1,720 participants — now confirmed from the public trial registry." },
-    { "date": "2026-08-23", "product": "Spatial emanators", "change": "WHO PQ (vector control) listing of two SC Johnson spatial emanators — Guardian and Mosquito Shield — on 13 Aug 2025 noted on the placeholder row.", "plain": "Two of these devices passed World Health Organization quality checks in August 2025." },
     { "date": "2026-08-15", "product": "All", "change": "Added MMV-style pipeline poster view (pipeline.html) placing each product in its development phase.", "plain": "Added a poster view showing where each medicine sits in development." },
     { "date": "2026-08-15", "product": "All", "change": "Added country access map (illustrative until verified), cross-product pathway timing chart, embeddable product widget, RSS update feed and automatic data-history snapshots.", "plain": "Added a country map, a chart of how long each step takes, a shareable widget, an updates feed and automatic snapshots of the data." },
     { "date": "2026-08-14", "product": "ASPY", "change": "Renamed from Pyramax to ASPY (pyronaridine–artesunate); trade name retained in the subtitle.", "plain": "Renamed from Pyramax to ASPY. The brand name still appears underneath." },
@@ -110,7 +128,7 @@ window.LAUNCH_DATA =
           { "milestone": "Phase III (KALUMA)", "status": "done", "label": "Complete", "date": "12 Nov 2025 (trial completed 25 Nov 2025)", "next": "—", "anticipated": "—", "source": "Novartis / MMV press releases; ClinicalTrials.gov NCT05842954" },
           { "milestone": "SRA dossier submission", "status": "prog", "label": "In preparation", "date": "—", "next": "Submission", "anticipated": "TBC", "source": "Novartis announcement, Nov 2025" },
           { "milestone": "WHO GDG engagement", "status": "idle", "label": "Not started", "date": "—", "next": "Pre-submission dialogue", "anticipated": "TBC", "source": "" },
-          { "milestone": "WHO prequalification", "status": "idle", "label": "Not started", "date": "—", "next": "EOI listing (not on 24th malaria EOI, Feb 2026)", "anticipated": "TBC", "source": "WHO PQ EOI list (24th edition)" }
+          { "milestone": "WHO PQ listing", "status": "idle", "label": "Not started", "date": "—", "next": "EOI listing (not on 24th malaria EOI, Feb 2026)", "anticipated": "TBC", "source": "WHO PQ EOI list (24th edition)" }
         ]
       }
     },
@@ -154,7 +172,7 @@ window.LAUNCH_DATA =
           { "milestone": "Dose-optimization of co-formulation", "status": "done", "label": "Complete", "date": "Published 2025", "next": "—", "anticipated": "—", "source": "Clin Pharmacol Ther (2025)" },
           { "milestone": "Pivotal Phase III (FD-TACT)", "status": "prog", "label": "In progress", "date": "First patient Sep 2025", "next": "Results", "anticipated": "2026", "source": "MORU / FD-TACT" },
           { "milestone": "SRA/WLA submission", "status": "idle", "label": "Not started", "date": "—", "next": "Dossier preparation", "anticipated": "~2027", "source": "" },
-          { "milestone": "WHO prequalification", "status": "idle", "label": "Not started", "date": "—", "next": "EOI listing, then dossier", "anticipated": "~2027", "source": "WHO PADO malaria, Jun 2025" }
+          { "milestone": "WHO PQ listing", "status": "idle", "label": "Not started", "date": "—", "next": "EOI listing, then dossier", "anticipated": "~2027", "source": "WHO PADO malaria, Jun 2025" }
         ]
       }
     },
@@ -167,7 +185,7 @@ window.LAUNCH_DATA =
       "classLabel": "Recommended · underutilized",
       "phase": "access",
       "currentStage": 5,
-      "flag": "Adoption is the access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
+      "flag": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
       "stages": [
         { "status": "done", "note": "Development complete (Shin Poong / MMV co-development)", "date": "", "next": "", "nextDate": "", "source": "MMV", "asOf": "2026-08-14" },
         { "status": "done", "note": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); label updated 2025 to include treatment of pregnant women (EMA outcome 5 Jun 2025; announced 31 Jul 2025)", "date": "2012 (label update 2025)", "next": "", "nextDate": "", "source": "EMA EU-M4all opinions table; MMV, 31 Jul 2025", "asOf": "2026-08-22" },
@@ -216,7 +234,7 @@ window.LAUNCH_DATA =
         },
         "journey": [
           { "label": "EMA Article 58 positive opinion", "year": 2012 },
-          { "label": "WHO prequalification (tablets)", "year": 2012 },
+          { "label": "WHO PQ listing (tablets)", "year": 2012 },
           { "label": "Paediatric granules prequalified", "year": 2016 },
           { "label": "WHO strong recommendation", "year": 2022 },
           { "label": "Broad national guideline inclusion", "year": "TBC" }
@@ -231,8 +249,8 @@ window.LAUNCH_DATA =
         },
         "milestones": [
           { "milestone": "SRA approval (EMA Art. 58)", "status": "done", "label": "Complete", "date": "16 Feb 2012", "next": "—", "anticipated": "—", "source": "EMA EU-M4all opinions table" },
-          { "milestone": "WHO prequalification", "status": "done", "label": "Complete", "date": "2012–2016", "next": "—", "anticipated": "—", "source": "WHO PQ list" },
-          { "milestone": "WHO guideline strong recommendation", "status": "done", "label": "Complete", "date": "2022", "next": "—", "anticipated": "—", "source": "WHO Guidelines for malaria" },
+          { "milestone": "WHO PQ listing", "status": "done", "label": "Complete", "date": "2012–2016", "next": "—", "anticipated": "—", "source": "WHO PQ list" },
+          { "milestone": "WHO recommendation (strong)", "status": "done", "label": "Complete", "date": "2022", "next": "—", "anticipated": "—", "source": "WHO Guidelines for malaria" },
           { "milestone": "Label update — pregnancy", "status": "done", "label": "Complete", "date": "EMA outcome 5 Jun 2025", "next": "—", "anticipated": "—", "source": "EMA EU-M4all opinions table; MMV, 31 Jul 2025" },
           { "milestone": "Country registrations", "status": "prog", "label": "25+ countries", "date": "Rolling (TZA 2022, NGA 2024 register-verified)", "next": "Asia submissions", "anticipated": "TBC", "source": "MMV; NAFDAC + TMDA registers (23 Aug 2026)" },
           { "milestone": "National guideline inclusion", "status": "late", "label": "Ghana only — 1 country confirmed", "date": "Ghana, 2022", "next": "Committee reviews in other endemic countries", "anticipated": "TBC", "source": "Peer-reviewed therapeutic-efficacy study, Ghana 2023 (published 2026)" },
@@ -249,7 +267,7 @@ window.LAUNCH_DATA =
       "classLabel": "Recommended · underutilized",
       "phase": "access",
       "currentStage": 6,
-      "flag": "Procurement is the access barrier — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
+      "flag": "Procurement is the current access barrier — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
       "stages": [
         { "status": "done", "note": "Development complete", "date": "", "next": "", "nextDate": "", "source": "MMV", "asOf": "2026-08-14" },
         { "status": "done", "note": "EMA approval (Eurartesim)", "date": "2011", "next": "", "nextDate": "", "source": "EMA register", "asOf": "2026-08-14" },
@@ -297,9 +315,9 @@ window.LAUNCH_DATA =
           ]
         },
         "journey": [
-          { "label": "WHO guideline recommendation", "year": 2010 },
+          { "label": "WHO recommendation", "year": 2010 },
           { "label": "EMA approval (Eurartesim)", "year": 2011 },
-          { "label": "WHO prequalification", "year": 2015 },
+          { "label": "WHO PQ listing", "year": 2015 },
           { "label": "Broad procurement uptake", "year": "TBC" }
         ],
         "volume": {
@@ -311,9 +329,9 @@ window.LAUNCH_DATA =
           "source": "Global Fund PQR Transaction Summary, extract 23 Aug 2026 — sourcing/staging/procurement_transactions.csv. Covers Global Fund-financed procurement only; US PMI data unavailable post-2025 (GHSC-PSM dataset offline). Recent quarters incomplete due to PQR reporting lag."
         },
         "milestones": [
-          { "milestone": "WHO guideline recommendation", "status": "done", "label": "Complete", "date": "2010 (2nd ed.; reaffirmed 2015)", "next": "—", "anticipated": "—", "source": "WHO Guidelines for the treatment of malaria, 2nd ed. (2010)" },
+          { "milestone": "WHO recommendation", "status": "done", "label": "Complete", "date": "2010 (2nd ed.; reaffirmed 2015)", "next": "—", "anticipated": "—", "source": "WHO Guidelines for the treatment of malaria, 2nd ed. (2010)" },
           { "milestone": "SRA approval (EMA, Eurartesim)", "status": "done", "label": "Complete", "date": "2011", "next": "—", "anticipated": "—", "source": "EMA register" },
-          { "milestone": "WHO prequalification (Eurartesim)", "status": "done", "label": "Complete", "date": "9 Oct 2015", "next": "—", "anticipated": "—", "source": "WHO PQ list" },
+          { "milestone": "WHO PQ listing (Eurartesim)", "status": "done", "label": "Complete", "date": "9 Oct 2015", "next": "—", "anticipated": "—", "source": "WHO PQ list" },
           { "milestone": "WHO PQ requalification", "status": "done", "label": "Complete", "date": "20 Jan 2025", "next": "—", "anticipated": "—", "source": "WHO PQ list" },
           { "milestone": "Additional PQ'd suppliers", "status": "done", "label": "9 presentations · 3 makers", "date": "2015–2023", "next": "—", "anticipated": "—", "source": "WHO PQ list (extract 22 Aug 2026)" },
           { "milestone": "Register verification (NGA, TZA)", "status": "done", "label": "TZA 10 compliant · NGA 26/47 active", "date": "Extracts 23 Aug 2026", "next": "Further countries", "anticipated": "TBC", "source": "NAFDAC Greenbook; TMDA IMIS2" },
@@ -321,15 +339,6 @@ window.LAUNCH_DATA =
           { "milestone": "Procurement scale-up", "status": "late", "label": "US$41.5m since 2008", "date": "US$15.3m in 2025", "next": "Verify surge in next PQR extract", "anticipated": "Q4 2026", "source": "Global Fund PQR (extract 23 Aug 2026)" }
         ]
       }
-    },
-    {
-      "id": "emanators",
-      "placeholder": true,
-      "name": "Spatial emanators",
-      "inn": "Vector-control prevention tool",
-      "manufacturer": "SC Johnson",
-      "classLabel": "Prevention · WHO-recommended · rollout funded",
-      "note": "Planned addition to LAUNCH tracking. WHO PQ (vector control) lists two SC Johnson spatial emanators — Guardian and Mosquito Shield — prequalified 13 Aug 2025 (WHO PQ vector-control list, extract 22 Aug 2026), alongside WHO's policy recommendation for spatial repellents of the same date; a Global Fund–US partnership announced 13 May 2026 targets rollout to 60 million people by 2028. The pipeline view will apply with WHO PQ/Vector Control and guideline stages adapted for prevention products."
     }
   ]
 }
