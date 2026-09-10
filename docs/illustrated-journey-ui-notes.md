@@ -22,13 +22,13 @@ existed. Do not treat it as precedent.
 
 | | |
 | --- | --- |
-| Branch | `redesigning-illustrative-journey` — merged, now on `main` |
-| Shipped in | PR #4 (merged 8 Sep 2026 11:26Z), PR #5 (merged 8 Sep 2026 18:29Z) |
-| Commits | `5aa7c19` (PR #4), `ce765c8` (PR #5) |
-| Push state | fully merged into `main`; nothing outstanding |
-| Validator | `0 errors, 5 warnings` — the documented 3 + 2 split (resistance, molecular markers), unchanged by this work |
+| Branch | `redesigning-illustrative-journey` — everything through `b6c1b72` is merged; the fork rework (§3.13) is one further commit on the branch, this one |
+| Shipped in | PR #4 (merged 8 Sep 2026 11:26Z), PR #5 (merged 8 Sep 2026 18:29Z). The fork rework is **not** shipped |
+| Commits | `5aa7c19` (PR #4), `ce765c8` (PR #5), then `09c609f`, `dc50fc4`, `47a905b`, `b6c1b72` on the branch, plus this one |
+| Push state | `origin/main` and `origin/redesigning-illustrative-journey` both contain `b6c1b72`; local `main` is 4 behind and stale. The fork rework is local only, unpushed |
+| Validator | `0 errors, 5 warnings` — the documented 3 + 2 split (resistance, molecular markers), unchanged by this work. Both normalizers byte-identical; `products.synthetic.js` 0/0; `make-preview.js` clean |
 | CI | **never green.** Every run on `main` since Initial commit is `startup_failure` — see §4 |
-| Scope | this page only. Four other editions were deliberately left alone — see §3.6 |
+| Scope | this page only. For §3.13 that is not a choice: the elbow CSS existed nowhere else — `index.html`, `widget.html` and `preview.html` stack the pair with no fork at all. Four other editions were deliberately left alone — see §3.6 |
 
 ### Files this work owns
 
@@ -368,9 +368,152 @@ Wording only — no status, date or figure touched. **Ripple worth knowing:**
 that prose renders on 15 other pages, whose own chrome still says "bottleneck"
 (see §4).
 
+### 3.13 The parallel-gate fork is one SVG path per side, not four border corners
+
+The report was *"I do not like that the fork look not connected"*, on a
+screenshot of the WHO column. It was not a matter of taste. Two things were
+measurably wrong, both readable straight off the CSS that drew it:
+
+- **Every corner stepped 1.5px.** `.stage .bar` is `height: 3px` centred on the
+  marker centreline, so it occupied centre −1.5 → +1.5. Each elbow was a
+  9 × 28.5px box whose *top edge* sat on that same centreline with
+  `border-top-width: 3px` — a stroke running centre → centre +1.5. Four elbows,
+  four 1.5px steps; and because the lower branch used `border-bottom` the two
+  branches stepped opposite ways, so the bracket was 1.5px fat on its inside
+  edge and 1.5px thin on its outside.
+- **Nothing overlapped where the line split.** The previous column's
+  `.bar.post` ended at the group's left edge, x = 0. The spine was a
+  `border-left` occupying x = 0 → 3. They shared exactly one edge, never
+  overlapped, and nothing was drawn at the point itself. A butt joint at a T is
+  what was being looked at.
+
+Now each side is a single path emitted into a `.forkline` overlay by
+`drawStageForks()` — arm, rounded corner (r = 10 on the stroke centreline),
+spine, corner, arm — plus a 4.5px node where the neighbouring bar lands. A
+whole path cannot be misaligned with itself, and the spine's centreline sits
+*on* x = 0 rather than beside it, so the arriving bar overlaps it by half a
+stroke. `overflow: visible` on the SVG is load-bearing for exactly that: half
+of each stroke and most of each node is outside the viewBox by design.
+
+**Chosen from four options, drawn first.** A comparison artifact (10 Sep 2026)
+rendered the whole eight-gate stepper four ways at production scale, each with
+its junction at 3×, before any code changed:
+
+| | Option | What it reads as | Outcome |
+| --- | --- | --- | --- |
+| **A** | **node split** — the same bracket, one path per side, node on the junction | the shape already signed off, with the joins fixed | **chosen** |
+| B | **switch** — two eased curves diverging from one point on the trunk | the only option where the split is *drawn* rather than implied | not chosen. Kept as the answer if the silhouette comes back — see below |
+| C | **through-line** — unbroken trunk, both gates on one attachment point | strongest connection read available; states "no order" structurally, since both gates attach at the same point | rejected on cost: needs 40px between markers instead of 15 (**+24px on every product row**) and the caption cannot stay on the spine — below the column it drifts toward the lower gate, the exact asymmetry the pair exists to avoid |
+| D | **parallel lane** — a tinted lane holding both gates, carrying the caption | most explicit that the pair is one *place* on the pathway | rejected: another filled surface inside a card inside a row, and the lane edge competes with the marker rings 8px from it |
+
+**What A deliberately does not fix.** The silhouette. The bracket is still a
+57 × ~106px rounded box open only at its two mid-edges, and the third finding
+in the diagnosis — that the eye resolves that as an enclosure the line arrives
+at, rather than a path dividing — is untouched. If "not connected" comes back
+after this, that is what is left, and B is the answer to it.
+
+**Rejected: a 16px caption band.** `--sg-note` stayed at 15. The idea was that
+an even band puts both marker centrelines on a half pixel, so a 3px stroke
+lands on whole-pixel boundaries. It does not work here: the group's own origin
+is a fractional page position (flex columns divide `min-width: 700px` by seven)
+and `--sg-lift` is applied as a two-decimal padding, so no arithmetic inside
+the band can put a stroke on the device grid. **Snapping the measured
+coordinates was rejected for a worse reason** — it would move the spine's
+midpoint up to half a pixel off the centreline `--sg-lift` puts the
+neighbouring bars on, reintroducing a jog at the one junction the change exists
+to close. Both `alignStageForks()` and `drawStageForks()` therefore round
+nothing.
+
+**Two consequences worth knowing.** The bars inside the group are now invisible
+layout spacers (`.stagegroup .stage .bar { visibility: hidden }`) — `flex: 1`
+either side is still what centres the marker in its row, but painting them
+would put a second stroke back where the overlay's arm already is, which is the
+defect. And `--sg-mark`, `--sg-arm` and `--sg-r` are gone: the old comment
+required `--sg-mark` to be kept equal to `.stage .smark`'s height or the elbows
+would drift, and measuring off the markers removes that coupling entirely.
+
+#### The legend strip's pair sat off every other icon's line, same session
+
+First reported as *"the timeline is not in the middle and only pointing to WHO
+Recommendation"* — the strip (`.pathway`) has arrows between columns rather
+than connecting bars, and `.patharrow` carries one fixed `margin-top: 15px`,
+tuned to a single gate's icon centre. Beside the stacked pair that offset
+lands on the **top** icon, so both arrows pointed at WHO recommendation alone.
+
+The first fix moved just the two arrows onto the pair's midpoint. The
+follow-up — *"make the whole thing aligned"* — asked for the actual cause
+instead: `.pathgroup` has `align-self: stretch` so its bracket spans the row's
+full height (matching the fork below it), but stretch only sizes the box, it
+does not centre the two-icon-plus-caption block inside that box. The block
+sits low in it, so the pair itself was off the row's shared centreline — the
+arrows had only been symptomatic.
+
+`alignPathGroup()` now measures that gap directly: the pair's own two-icon
+midpoint against one ordinary `.pathnode`'s pill centre, both read from the
+strip's untransformed position (reset first, same trick `alignStageForks()`
+uses for `--sg-lift`). The difference is published as `--pg-lift`, and
+`.pathgroup` is shifted onto that line with `transform: translateY()` — a
+transform and not a margin, because `.pathgroup` is stretch-sized: a negative
+margin-top on a stretched flex item grows its used height by the margin's own
+magnitude (the stretch formula solves for height from the line's cross size
+*minus* the item's margins), which would have made the bracket taller than the
+row instead of just moving it. A transform runs after layout and touches
+neither the stretch calculation nor any sibling's size. `.pathway`'s
+padding-top carries the same `--pg-lift` so the strip has room above the
+shifted bracket — the same role `.track`'s padding-top plays for `--sg-lift`,
+for the same reason (`overflow-x: auto` forces `overflow-y` to a used value of
+`auto` too, so anything shifted above the padding box would be clipped rather
+than simply invisible).
+
+With the pair itself back on the shared line, the arrows needed no change —
+their original fixed 15px was always tuned to that same line, and once the
+pair sits on it too they land there automatically. The `pa-pair` marker and
+`alignPathArrows()` from the first pass were removed rather than layered on.
+
+Verified against the strip's real box model: single-icon centre at 36px from
+the strip's own top, the pair's unlifted midpoint at 70.96px, `--pg-lift`
+computed at 34.96px, and the pair's midpoint after the transform landing at
+36.00px — exact. `alignStageForks()`, `drawStageForks()` and
+`alignPathGroup()` are wrapped in `layoutJourney()` (renamed from
+`layoutStageForks()`, since it now also lays out the legend strip) and always
+run as one pass, on load, on resize and on `fonts.ready`.
+
+The strip's bracket itself was left as CSS borders. It has the same silhouette
+question as the stepper's, and none of the join defects — there is no arriving
+bar to butt against, only an arrow that stops short of it.
+
 ---
 
 ## 4. Newly discovered, deferred, or left alone
+
+### Deferred with the fork rework (10 Sep 2026)
+
+- **The row-band grid, and deleting `--sg-lift`.** The fork's *alignment* is
+  still a runtime measurement even though its strokes are now drawn properly:
+  `alignStageForks()` measures the caption band, publishes `--sg-lift`, the
+  group pulls itself up by it and `.track` absorbs the same amount as padding.
+  Restructuring `.track` as one grid with three rows — labels above, a fixed
+  100px marker band, labels below — with every column placing its parts in the
+  same rows would make the spine land on the neighbouring markers' centreline
+  as a property of the layout, and `alignStageForks()`, `--sg-lift`, the resize
+  listener and the `fonts.ready` hook would all go. Not done deliberately:
+  option A was chosen partly *because* it is not a layout change, and this is
+  one. It is the natural next step if the stepper is touched again.
+- **A column of three or more gates would leave the middle one unattached.**
+  `drawStageForks()` attaches the **first and last** `.smark` in the group and
+  nothing between. `scripts/validate-data.js` permits a column of any size; no
+  dataset has one. Flagged in the code at the function itself, not just here.
+- **The strip's bracket and the stepper's fork still differ in kind.** One is
+  `border-left`/`border-right` on `.pathgroup`, the other an SVG path. They
+  agree on silhouette and now on where a connector meets the pair, but nothing
+  keeps them in sync. Consolidating was not attempted; the strip has no
+  connecting bars to reconcile.
+- **Not verified in a browser.** `verify-map-clusters.js` needs puppeteer,
+  which is not installed here (§5). All three fixes were instead checked by
+  running the shipped functions against the real box models and rendering what
+  they emit — see §3.13's figures. The fork's path data and `--pg-lift`'s
+  arithmetic are correct by construction; what has *not* been seen is the
+  stepper and the legend strip composited on the live page at 1×.
 
 ### Are access barriers scalable at portfolio level? (client question, 10 Sep 2026)
 
@@ -481,6 +624,7 @@ Nothing in the data model needs to change for either.
 | wiring a subscribe backend | §3.10 — replace the seam, note the provider |
 | the draft/dataStatus banner | §3.11 |
 | the summary strip's KPIs, or "access barrier" wording | §3.12 |
+| the parallel-gate fork, or the legend strip's pair alignment | §3.13, plus §4 if the row-band grid or the strip's bracket moves |
 | making barriers navigable or product-specific | §4's first subsection |
 | anything found and not fixed | §4 |
 

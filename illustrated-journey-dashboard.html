@@ -158,7 +158,12 @@
   /* ---------- pathway legend strip (illustrated journey) ---------- */
   .pathway {
     display: flex; align-items: flex-start; gap: 2px;
-    padding: 14px 18px 12px; margin-bottom: 22px; overflow-x: auto;
+    /* padding-top carries --pg-lift (see alignPathGroup): .pathgroup is
+       translated up by that amount so its two-icon midpoint lines up with
+       every single icon's centre, and the strip needs the matching extra
+       room at the top or the lifted bracket would clip against the
+       overflow-x:auto box — the same trick .track/--sg-lift already uses. */
+    padding: calc(14px + var(--pg-lift, 0px)) 18px 12px; margin-bottom: 22px; overflow-x: auto;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
@@ -193,12 +198,22 @@
      stacked and bracketed, not side by side, so nothing implies which one
      comes first. Markers stay the same size as every ungrouped gate; the
      bracket is the strip's echo of the fork the product rows draw, since the
-     strip has arrows between columns rather than connecting bars. */
+     strip has arrows between columns rather than connecting bars.
+
+     Two stacked icons plus the caption between them sit lower, as a block,
+     than one icon does — align-self:stretch only matches its outer height to
+     the row, it does not centre its content within that height. Left alone,
+     the whole pair (and the arrows either side of it, which point at a single
+     icon's fixed centre) reads off-axis from every other gate. alignPathGroup()
+     measures the gap and publishes it as --pg-lift; transform (not margin)
+     shifts the group so nothing else in the row's flex sizing has to change,
+     the same reason --sg-lift stays off percentages further down this file. */
   .pathgroup {
     flex: 1; min-width: 84px; display: flex; flex-direction: column; align-items: center;
     gap: 2px; padding: 4px 6px 6px; align-self: stretch;
     border-left: 3px solid var(--line); border-right: 3px solid var(--line);
     border-radius: 14px;
+    transform: translateY(calc(-1 * var(--pg-lift, 0px)));
   }
   .pathgroup .pathnode { flex: none; min-width: 0; width: 100%; }
   .pathgroup-note {
@@ -280,14 +295,13 @@
      branches mirror about the spine: the top one runs year / label / marker
      (column-reverse), the bottom one marker / label / year, so both labels
      sit on the OUTSIDE and the two markers end up adjacent, separated only
-     by the caption band. That keeps the vertical distance between marker
-     centres fixed and known, which is what lets the fork verticals be drawn
-     in CSS instead of measured per row.
+     by the caption band.
 
      --sg-lift is measured once at runtime (alignStageForks) and pulls the
      group up so its spine lands exactly on the neighbouring markers'
      centreline; .track absorbs the same amount as padding so nothing clips.
-     With no JS it stays 0 and the fork simply hangs below the line. */
+     The strokes themselves are then measured off the two markers by
+     drawStageForks() — see the block below. */
   .stagegroup {
     flex: 1; min-width: 80px; display: flex; flex-direction: column;
     align-items: stretch; margin-top: calc(-1 * var(--sg-lift, 0px));
@@ -306,52 +320,57 @@
     color: var(--ink-3);
   }
 
-  /* ---- the fork itself: four rounded elbows ----
-     Each branch draws its own two corners as ::before / ::after — a box with
-     two borders and one rounded corner, so the vertical run and the turn into
-     the marker's arm are one continuous stroke instead of two crossing lines.
-     The four elbows meet in pairs at x=0 and x=100%, on the spine, which is
-     exactly where the neighbouring columns' bars arrive.
+  /* ---- the fork itself: one path per side, drawn into .forkline ----
+     Each side is a single stroke — arm, rounded corner, spine, corner, arm —
+     emitted by drawStageForks() from the two markers' measured positions,
+     plus a node where the neighbouring column's bar lands on the spine.
 
-     --sg-arm (half a marker + half the caption band) is the distance from a
-     marker's centre to the spine. It is derived, not guessed, but it does
-     couple to the two sizes below: keep --sg-mark equal to .stage .smark's
-     height and --sg-note equal to the caption band's. */
-  .stagegroup {
-    --sg-mark: 42px;
-    --sg-note: 15px;
-    --sg-arm: calc(var(--sg-mark) / 2 + var(--sg-note) / 2);
-    --sg-r: 9px;
-  }
-  .stagegroup .stage::before, .stagegroup .stage::after {
-    content: ""; position: absolute; width: var(--sg-r); height: var(--sg-arm);
-    border: 0 solid var(--line);
-  }
-  /* top branch: marker sits at the branch's bottom edge (column-reverse), so
-     the elbows hang below it and turn up into the arm */
-  .stagegroup .sg-top::before, .stagegroup .sg-top::after {
-    bottom: calc(-1 * var(--sg-note) / 2);
-    border-top-width: 3px;
-  }
-  .stagegroup .sg-top::before { left: 0; border-left-width: 3px; border-top-left-radius: var(--sg-r); }
-  .stagegroup .sg-top::after { right: 0; border-right-width: 3px; border-top-right-radius: var(--sg-r); }
-  /* bottom branch: marker sits at the branch's top edge */
-  .stagegroup .sg-bottom::before, .stagegroup .sg-bottom::after {
-    top: calc(-1 * var(--sg-note) / 2);
-    border-bottom-width: 3px;
-  }
-  .stagegroup .sg-bottom::before { left: 0; border-left-width: 3px; border-bottom-left-radius: var(--sg-r); }
-  .stagegroup .sg-bottom::after { right: 0; border-right-width: 3px; border-bottom-right-radius: var(--sg-r); }
+     It used to be four ::before/::after boxes, each a border-corner. Two
+     things were wrong with that and neither was a matter of taste:
 
-  /* the arms start where the elbow's turn ends, so the stroke never doubles */
-  .stagegroup .stage .bar.pre { margin-left: var(--sg-r); }
-  .stagegroup .stage .bar.post { margin-right: var(--sg-r); }
+       - a border-top's 3px stroke hangs BELOW the box's top edge, while
+         .stage .bar's 3px is centred on the marker centreline the box's top
+         edge sits on — so every corner stepped 1.5px off the arm it was
+         supposed to continue, four times, and the two branches stepped
+         opposite ways;
+       - the incoming bar ended at x=0 and the spine's border-left occupied
+         x=0–3, so they shared one edge and never overlapped. A butt joint at
+         a T is what "the fork looks not connected" was.
 
-  /* elbows take the same green as a cleared bar: the incoming pair when the
-     column before the fork is cleared, the outgoing pair when BOTH gates in
-     it are — leaving the fork needs both, which is the honest rule */
-  .stagegroup.sg-pre-done .stage::before { border-color: var(--good); }
-  .stagegroup.sg-post-done .stage::after { border-color: var(--good); }
+     A whole path cannot be misaligned with itself, and the node puts ink on
+     the junction rather than leaving it to two edges touching.
+
+     The geometry is measured off the markers rather than derived from
+     constants, so --sg-mark, --sg-arm and --sg-r are gone with the elbows and
+     the caption band no longer has to be kept in sync with anything.
+     --sg-note stays: it still sets that band's height.
+
+     overflow: visible is load-bearing. The spine's centreline sits ON the
+     group's own edge (x=0 and x=100%) — where the neighbouring bars end — so
+     half of each stroke and most of each node falls outside the viewBox by
+     design. That overlap is the fix. */
+  .stagegroup { --sg-note: 15px; position: relative; }
+  .stagegroup .forkline {
+    position: absolute; inset: 0; overflow: visible; pointer-events: none;
+  }
+  /* markers and the caption paint over the strokes, never under them */
+  .stagegroup > .stage { z-index: 1; }
+  .stagegroup > .stagegroup-note { position: relative; z-index: 1; }
+  .stagegroup .fk-arm { fill: none; stroke: var(--line); stroke-width: 3; }
+  .stagegroup .fk-node { fill: var(--line); stroke: none; }
+  /* the strokes take the same green as a cleared bar: the incoming side when
+     the column before the fork is cleared, the outgoing side when BOTH gates
+     in it are — leaving the fork needs both, which is the honest rule */
+  .stagegroup.sg-pre-done .fk-arm.is-in { stroke: var(--good); }
+  .stagegroup.sg-pre-done .fk-node.is-in { fill: var(--good); }
+  .stagegroup.sg-post-done .fk-arm.is-out { stroke: var(--good); }
+  .stagegroup.sg-post-done .fk-node.is-out { fill: var(--good); }
+
+  /* Inside the fork every stroke comes from the overlay above. The bars stay
+     in the markup as layout spacers — .bar's flex:1 either side of the marker
+     is what centres it in its row — but must not paint, or the fork would
+     again be two strokes that have to meet. */
+  .stagegroup .stage .bar { visibility: hidden; }
 
   /* trackwrap holds both the stepper (trackbox) and, underneath it, its own
      standalone real-year timeline (.tlbox) — min-width:0 keeps the nested
@@ -1689,15 +1708,17 @@
     const stagesHtml = STAGE_COLUMNS.map(col => {
       if (col.stages.length === 1) return stageUnitHtml(col.stages[0]);
       // A parallel pair is drawn as a fork: the first branch mirrors upward
-      // (sg-top), the caption band carries the two fork verticals, the rest
-      // hang below. The verticals turn green on the same rule the bars use —
-      // in when the previous column is cleared, out when BOTH gates are.
+      // (sg-top), the caption band sits on the spine, the rest hang below.
+      // The .forkline overlay is filled in by drawStageForks() once the row
+      // has been laid out; the strokes turn green on the same rule the bars
+      // use — in when the previous column is cleared, out when BOTH gates are.
       const preDone = preBoundaryDone(p, col.stages[0]);
       const allDone = col.stages.every(i => p.stages[i].status === "done");
       const cls = ["stagegroup", preDone ? "sg-pre-done" : "", allDone ? "sg-post-done" : ""]
         .filter(Boolean).join(" ");
       const names = col.stages.map(i => STAGES[i]).join(" and ");
       return `<div class="${cls}" role="group" aria-label="${esc(names)} — independent approvals, no defined order between them">` +
+        `<svg class="forkline" preserveAspectRatio="none" aria-hidden="true" focusable="false"></svg>` +
         col.stages.map((i, n) => stageUnitHtml(i, n === 0 ? "sg-top" : "sg-bottom"))
           .join(`<div class="stagegroup-note" aria-hidden="true">no fixed order</div>`) +
         `</div>`;
@@ -1844,8 +1865,10 @@
   // group pulls itself up by it, .track absorbs the same amount as padding, and
   // every marker plus the fork's spine ends up on one line. Measured rather
   // than hard-coded because the branch labels wrap differently by width, font
-  // and zoom. With no JS (or nothing to measure) it stays 0 and the fork just
-  // hangs below the line — degraded, not broken.
+  // and zoom. With nothing measurable it stays 0 and the fork hangs below the
+  // line — degraded, not broken. ("With no JS" is not a case: #board is empty
+  // in the markup and every row here is built by this script, so a no-script
+  // reader gets the failure banner, never a half-drawn fork.)
   function alignStageForks() {
     // Per track, not once globally: a branch only renders its year line when
     // that gate has a real year, so an all-idle pair (GanLum) is shorter than
@@ -1868,15 +1891,95 @@
     });
   }
 
+  // ---- fork strokes --------------------------------------------------------
+  // One path per side into the .forkline overlay: arm, rounded corner, spine,
+  // corner, arm, drawn from where the two markers actually ended up. Two
+  // strokes never have to meet, which is the whole point — see the CSS block
+  // for the two ways the old border-corner version failed to.
+  //
+  // Pairs only: this attaches the FIRST and LAST marker in the group. A column
+  // of three would need an arm per marker and would currently leave the middle
+  // one unattached. validate-data.js permits such a column; no dataset has one.
+  const FORK_R = 10;          // corner radius, on the stroke's centreline
+  const FORK_NODE = 4.5;      // radius of the node sitting on the junction
+  function drawStageForks() {
+    document.querySelectorAll(".stagegroup").forEach(group => {
+      const svg = group.querySelector(".forkline");
+      const marks = group.querySelectorAll(".smark");
+      if (!svg || marks.length < 2) return;
+      const gr = group.getBoundingClientRect();
+      if (!gr.width || !gr.height) return;   // not laid out (or hidden) yet
+      const top = marks[0].getBoundingClientRect();
+      const bot = marks[marks.length - 1].getBoundingClientRect();
+      const w = gr.width, h = gr.height, R = FORK_R;
+      // Deliberately unrounded, for the same reason --sg-lift is: the spine's
+      // midpoint has to land exactly on the centreline that lift put the
+      // neighbouring columns' bars on. Snapping these to the pixel grid would
+      // reintroduce a half-pixel jog at the one junction this exists to close.
+      const yT = top.top - gr.top + top.height / 2;
+      const yB = bot.top - gr.top + bot.height / 2;
+      // the arms stop at the marker's own 4px gap, where .bar used to end
+      const xIn = top.left - gr.left - 4;
+      const xOut = top.right - gr.left + 4;
+      const spine = (yT + yB) / 2;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      svg.innerHTML =
+        `<path class="fk-arm is-in" d="M ${xIn} ${yT} H ${R}` +
+          ` A ${R} ${R} 0 0 0 0 ${yT + R} V ${yB - R}` +
+          ` A ${R} ${R} 0 0 0 ${R} ${yB} H ${xIn}"/>` +
+        `<path class="fk-arm is-out" d="M ${xOut} ${yT} H ${w - R}` +
+          ` A ${R} ${R} 0 0 1 ${w} ${yT + R} V ${yB - R}` +
+          ` A ${R} ${R} 0 0 1 ${w - R} ${yB} H ${xOut}"/>` +
+        `<circle class="fk-node is-in" cx="0" cy="${spine}" r="${FORK_NODE}"/>` +
+        `<circle class="fk-node is-out" cx="${w}" cy="${spine}" r="${FORK_NODE}"/>`;
+    });
+  }
+
+  // ---- legend strip: lift the pair onto every other icon's centreline ------
+  // .pathgroup stretches to the row's full height (so its bracket spans it,
+  // matching the fork below), but stretch only sizes the box — it does not
+  // centre the two-icon-plus-caption block inside it, so that block (and with
+  // it the arrows either side, which point at a single icon's fixed offset)
+  // sits lower than every other gate. Same shape of fix as --sg-lift: measure
+  // the gap between the pair's own midpoint and a single icon's centre, once,
+  // and publish it as --pg-lift for the CSS above to apply as a transform.
+  //
+  // Measured, not a constant: the offset depends on how the two labels wrap,
+  // and "WHO recommendation" takes two lines at narrow widths while "WHO PQ
+  // listing" takes one. Reset first so the read is against the strip's own
+  // untransformed position, the same trick alignStageForks() uses.
+  function alignPathGroup() {
+    pathway.style.setProperty("--pg-lift", "0px");
+    const group = pathway.querySelector(".pathgroup");
+    const single = pathway.querySelector(".pathnode:not(.pathnode-sm) .pill");
+    if (!group || !single) return;
+    const pills = group.querySelectorAll(".pill");
+    if (pills.length < 2) return;
+    const first = pills[0].getBoundingClientRect();
+    const last = pills[pills.length - 1].getBoundingClientRect();
+    const sr = single.getBoundingClientRect();
+    if (!first.height || !sr.height) return;        // not laid out yet
+    const mid = (first.top + first.height / 2 + last.top + last.height / 2) / 2;
+    const singleCentre = sr.top + sr.height / 2;
+    // not rounded, same reason as alignStageForks: a half-pixel here shows up
+    // as the pair sitting 1px off every other icon's line
+    const lift = Math.max(0, mid - singleCentre);
+    pathway.style.setProperty("--pg-lift", lift.toFixed(2) + "px");
+  }
+
+  // align first, then draw: the fork strokes are measured off the markers, so
+  // the three passes always run together
+  function layoutJourney() { alignStageForks(); drawStageForks(); alignPathGroup(); }
+
   fitTimelines();
-  alignStageForks();
+  layoutJourney();
   let fitTimelinesRAF = null;
   window.addEventListener("resize", () => {
     cancelAnimationFrame(fitTimelinesRAF);
-    fitTimelinesRAF = requestAnimationFrame(() => { fitTimelines(); alignStageForks(); });
+    fitTimelinesRAF = requestAnimationFrame(() => { fitTimelines(); layoutJourney(); });
   });
   // labels wrap differently once webfonts land, which moves the spine
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(alignStageForks);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutJourney);
 
   // placeholder rows (e.g. prevention tools not yet approved for tracking)
   PRODUCTS.filter(p => p.placeholder).forEach(p => {
