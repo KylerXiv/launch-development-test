@@ -1068,7 +1068,7 @@
             <label class="visually-hidden" for="sub-email">Your email address</label>
             <input id="sub-email" name="email" type="email" autocomplete="email"
                    placeholder="you@organisation.org" aria-describedby="sub-msg">
-            <button class="sub-go" type="submit">Notify me</button>
+            <button class="sub-go" type="submit" aria-disabled="true">Notify me</button>
           </form>
           <p class="sub-msg" id="sub-msg" role="status" hidden></p>
           <p class="sub-note">Mock only — Subscribe for updates isn't connected yet.</p>
@@ -3553,6 +3553,14 @@
   const subForm = document.getElementById("sub-form");
   const subMail = document.getElementById("sub-email");
   const subMsg  = document.getElementById("sub-msg");
+  const subGo   = subForm.querySelector(".sub-go");
+
+  // Disabled at Keith's request, 10 Sep 2026 — inert rather than styled
+  // disabled, so it keeps the accent look and the .sub-note beneath it stays
+  // the only word on why nothing happens. Blocking the click (not the submit
+  // handler below) also blocks Enter-to-submit from the email field, since
+  // the browser routes that through this button's own click first.
+  subGo.addEventListener("click", e => e.preventDefault());
 
   function openSub() {
     subWrap.hidden = false;
@@ -3687,3 +3695,17 @@
 <style>.ri-dialog .ri-note { color: var(--crit); font-weight: 700; }</style>
 
 <script src="assets/report-issue.js" defer></script>
+<script>
+  // Disabled at Keith's request, 10 Sep 2026 — page-local, same reasoning as
+  // the Subscribe button above: block the click (not the widget's own submit
+  // handler in assets/report-issue.js) so the button keeps its normal look
+  // and the red LAUNCH_FEEDBACK_COPY.note stays the only explanation. Other
+  // pages that load the shared widget are unaffected.
+  document.addEventListener("DOMContentLoaded", () => {
+    const api = window.LAUNCH_REPORT_ISSUE;
+    const sendBtn = api && api.dialog && api.dialog.querySelector("#ri-send");
+    if (!sendBtn) return;
+    sendBtn.setAttribute("aria-disabled", "true");
+    sendBtn.addEventListener("click", e => e.preventDefault());
+  });
+</script>
