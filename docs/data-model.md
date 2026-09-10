@@ -107,7 +107,7 @@ Two flavors of `PRODUCT` share the array:
   when the display name does — ASPY's id is still `pyramax`. Renaming an id is
   a breaking change to external links and history diffs; don't.
 - **Stage relationships are positional, not named.** `products[].stages[3]`
-  *is* the product's status for `stages[3]` ("WHO prequalification"). The
+  *is* the product's status for `stages[3]` ("WHO PQ listing"). The
   validator enforces the count (8); nothing can enforce that you didn't swap
   two entries — take care to keep the order intact when editing.
 - **`changelog[].product` is a soft reference by display name** (or `"All"`),

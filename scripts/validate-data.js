@@ -79,6 +79,41 @@ else if (data.stages.some((s) => typeof s !== "string" || !s.trim()))
   err("stages: every entry must be a non-empty string");
 const nStages = Array.isArray(data.stages) ? data.stages.length : 0;
 
+// ---- stageColumns ------------------------------------------------------------
+// How stages[] is grouped into display columns. A column listing more than
+// one index is a parallel pair (no arrow, no implied order, shown side by
+// side) — currently [2, 3], WHO recommendation and WHO PQ listing. Optional:
+// its absence just means every stage gets its own column, as before.
+if (data.stageColumns !== undefined) {
+  if (!Array.isArray(data.stageColumns) || data.stageColumns.length === 0) {
+    err("stageColumns: must be a non-empty array of { stages: [...] } columns");
+  } else {
+    const seen = [];
+    data.stageColumns.forEach((col, ci) => {
+      const ctag = `stageColumns[${ci}]`;
+      if (!col || !Array.isArray(col.stages) || col.stages.length === 0) {
+        err(`${ctag}: "stages" must be a non-empty array of stage indices`);
+        return;
+      }
+      if (col.stages.length > 3)
+        warn(`${ctag}: ${col.stages.length} stages sharing one column — check this renders legibly`);
+      col.stages.forEach((idx) => {
+        if (!Number.isInteger(idx) || idx < 0 || idx >= nStages)
+          err(`${ctag}: stage index ${JSON.stringify(idx)} is out of range for ${nStages} stages`);
+        seen.push(idx);
+      });
+    });
+    // flattened in column order, stageColumns must be exactly 0..nStages-1
+    // ascending — grouping may merge adjacent indices but never reorder or
+    // drop them, so every other consumer (currentStage, milestones,
+    // stageIndex-keyed maps) keeps meaning what it already means.
+    const expected = Array.from({ length: nStages }, (_, i) => i);
+    if (JSON.stringify(seen) !== JSON.stringify(expected)) {
+      err(`stageColumns: flattened in order must be exactly [${expected.join(", ")}], got [${seen.join(", ")}]`);
+    }
+  }
+}
+
 // ---- products ----------------------------------------------------------------
 if (!Array.isArray(data.products) || data.products.length === 0) {
   err("products: must be a non-empty array");

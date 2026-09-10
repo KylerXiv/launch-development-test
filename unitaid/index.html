@@ -208,6 +208,19 @@
   }
   .stage.s-idle .smark .dot { display: none; }
   .stage.cur .smark { box-shadow: 0 0 0 3px var(--accent-soft); }
+  /* A column holding more than one stage (stageColumns groups them) — the
+     rows stack instead of sitting left-to-right, so nothing implies which
+     one this product cleared first. */
+  .stagegroup { flex: 1; min-width: 80px; display: flex; flex-direction: column; gap: 3px; }
+  .stagegroup .stage { flex: none; min-width: 0; }
+  .stagegroup .stage .smark { width: 26px; height: 26px; margin: 0 2px; }
+  .stagegroup .stage .sicon { width: 16px; height: 16px; }
+  .stagegroup .stage .smark .dot { width: 11px; height: 11px; font-size: 7.5px; right: -2px; bottom: -2px; }
+  .stagegroup .stage .lbl { font-size: 9.5px; margin-top: 4px; }
+  .stagegroup-note {
+    text-align: center; font-size: 8.5px; font-style: italic; letter-spacing: .01em;
+    color: var(--ink-3); line-height: 1;
+  }
   .flagnote {
     margin: 10px 20px 0 290px; font-size: 12.5px; color: var(--crit);
     display: flex; gap: 7px; align-items: baseline;
@@ -545,6 +558,19 @@
   const DATA = window.LAUNCH_DATA;
   const STAGES = DATA.stages;
   const PRODUCTS = DATA.products;
+
+  // stageColumns groups stage indices into display columns; a column with
+  // more than one index (currently [2, 3] — WHO recommendation and WHO PQ
+  // listing) is a parallel pair with no defined order between its members,
+  // drawn stacked rather than left-to-right. Absent stageColumns, every
+  // stage keeps its own column.
+  const STAGE_COLUMNS = DATA.stageColumns || STAGES.map((_, i) => ({ stages: [i] }));
+  const colIndexOf = i => STAGE_COLUMNS.findIndex(c => c.stages.includes(i));
+  const preBoundaryDone = (p, i) => {
+    const ci = colIndexOf(i);
+    if (ci <= 0) return false;
+    return STAGE_COLUMNS[ci - 1].stages.every(j => p.stages[j].status === "done");
+  };
   const ICON = { done: "✓", prog: "›", late: "!", idle: "" };
   const LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
 
@@ -627,8 +653,9 @@
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
 
   tracked.forEach(p => {
-    const stagesHtml = p.stages.map((st, i) => {
-      const preDone = i > 0 && (p.stages[i - 1].status === "done");
+    const stageUnitHtml = i => {
+      const st = p.stages[i];
+      const preDone = preBoundaryDone(p, i);
       const postDone = st.status === "done";
       return `
         <div class="stage ${i === p.currentStage ? "cur" : ""} s-${st.status}">
@@ -644,6 +671,13 @@
           </div>
           <div class="lbl">${esc(STAGES[i])}</div>
         </div>`;
+    };
+
+    const stagesHtml = STAGE_COLUMNS.map(col => {
+      if (col.stages.length === 1) return stageUnitHtml(col.stages[0]);
+      return `<div class="stagegroup">` +
+        col.stages.map(stageUnitHtml).join(`<div class="stagegroup-note" aria-hidden="true">no fixed order</div>`) +
+        `</div>`;
     }).join("");
 
     const d = p.detail;

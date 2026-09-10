@@ -9,12 +9,12 @@
 // reusing icons.js's — R&D is a test tube (not the flask/trial there),
 // regulatory approval is the authority building (not the dossier), country
 // registration is a stamp and pad (not the map pin), procurement stays a
-// cart. WHO prequalification's medal-and-ribbon and in-country delivery's
+// cart. The WHO PQ listing's medal-and-ribbon and in-country delivery's
 // lorry matched the icons.js glyphs closely enough to reuse outright.
 //
 // National policy adoption is the one exception: kept pixel-identical to
 // the original filled glyph by request, so it carries its own `attr`
-// override back to a solid fill. Stage 3 (WHO guidelines) still carries no
+// override back to a solid fill. Stage 3 (WHO recommendation) still carries no
 // body — the WHO emblem substitutes for it, see the page's stageIconImg.
 (function () {
   const ICONS = [
@@ -38,10 +38,10 @@
         <path d="M5 11.3v6.4M9.3 11.3v6.4M14.7 11.3v6.4M19 11.3v6.4"/>
         <path d="M3 19.6h18"/>`
     },
-    { id: "03-who-guidelines",      title: "WHO guidelines",      body: "" },   // WHO emblem
+    { id: "03-who-guidelines",      title: "WHO recommendation",  body: "" },   // WHO emblem
     {
       id: "04-who-prequalification",
-      title: "WHO prequalification",
+      title: "WHO PQ listing",
       // A quality seal on a ribbon — the mark awarded, which is what
       // prequalification is.
       body: `

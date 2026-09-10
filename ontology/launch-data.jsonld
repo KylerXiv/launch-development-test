@@ -4,14 +4,13 @@
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#dataset",
       "@type": "Dataset",
-      "lastUpdated": "2026-08-25",
+      "lastUpdated": "2026-09-08",
       "dataStatus": "launch:datastatus-draft",
       "tracksProduct": [
         "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
         "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-alaq",
         "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax",
-        "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq",
-        "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-emanators"
+        "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq"
       ],
       "host": "RBM Partnership to End Malaria"
     },
@@ -42,20 +41,22 @@
       "@type": "Concept",
       "inScheme": "launch:PathwayStageScheme",
       "notation": "2",
-      "prefLabel": "WHO guidelines",
+      "prefLabel": "WHO recommendation",
       "stageIndex": 2,
       "operatedBy": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#org-who-gmp",
-      "operatorNote": "WHO Global Malaria Programme — its Guidelines Development Group weighs the evidence and decides whether WHO recommends."
+      "operatorNote": "WHO Global Malaria Programme — its Guidelines Development Group weighs the evidence and decides whether WHO recommends.",
+      "concurrentWith": "launch:stage-3"
     },
     {
       "@id": "launch:stage-3",
       "@type": "Concept",
       "inScheme": "launch:PathwayStageScheme",
       "notation": "3",
-      "prefLabel": "WHO prequalification",
+      "prefLabel": "WHO PQ listing",
       "stageIndex": 3,
       "operatedBy": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#org-who-pq",
-      "operatorNote": "WHO Prequalification — quality and manufacturing assessment, separate from the guideline decision."
+      "operatorNote": "WHO Prequalification — quality and manufacturing assessment, separate from the guideline decision.",
+      "concurrentWith": "launch:stage-2"
     },
     {
       "@id": "launch:stage-4",
@@ -139,7 +140,7 @@
       "@type": "Concept",
       "inScheme": "launch:GlossaryScheme",
       "prefLabel": "PQ",
-      "definition": "WHO prequalification — quality, safety and efficacy assessment that makes a product eligible for procurement by UN agencies and major donors."
+      "definition": "WHO prequalification — the quality, safety and efficacy assessment whose outcome, a listing on the WHO prequalified-products list, makes a product eligible for procurement by UN agencies and major donors."
     },
     {
       "@id": "launch:term-MFT",
@@ -388,12 +389,6 @@
       "sameAs": "http://www.wikidata.org/entity/Q25101993"
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#org-sc-johnson",
-      "@type": "Organization",
-      "name": "S. C. Johnson & Son",
-      "sameAs": "http://www.wikidata.org/entity/Q683170"
-    },
-    {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#org-shin-poong",
       "@type": "Organization",
       "name": "Shin Poong Pharmaceutical",
@@ -572,7 +567,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum-milestone-3",
           "@type": "Milestone",
-          "milestoneName": "WHO prequalification",
+          "milestoneName": "WHO PQ listing",
           "hasStatus": "launch:status-idle",
           "statusLabel": "Not started",
           "dateLabel": "—",
@@ -732,7 +727,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-alaq-milestone-3",
           "@type": "Milestone",
-          "milestoneName": "WHO prequalification",
+          "milestoneName": "WHO PQ listing",
           "hasStatus": "launch:status-idle",
           "statusLabel": "Not started",
           "dateLabel": "—",
@@ -753,7 +748,7 @@
       "productClass": "launch:class-market",
       "currentStage": "launch:stage-5",
       "developmentPhase": "launch:phase-access",
-      "bottleneckFlag": "Adoption is the bottleneck — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
+      "bottleneckFlag": "Adoption is the current bottleneck — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
       "atcCode": {
         "@type": "schema:MedicalCode",
         "codeValue": "P01BF06",
@@ -820,11 +815,12 @@
           "@type": "StageEntry",
           "atStage": "launch:stage-5",
           "hasStatus": "launch:status-late",
-          "note": "National guideline inclusion lags WHO's 2022 strong recommendation — the core adoption gap LAUNCH is tracking; verified country count pending",
+          "note": "National guideline inclusion lags WHO's 2022 strong recommendation — Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (its third, alongside AS-AQ and AL), but this remains the only confirmed national guideline adoption found; broader inclusion is the core adoption gap LAUNCH is tracking",
+          "dateLabel": "Ghana only (2022)",
           "nextStep": "Country guideline committee reviews",
           "nextDate": "TBC",
-          "source": "LAUNCH assessment (draft)",
-          "asOf": "2026-08-14"
+          "source": "Peer-reviewed therapeutic-efficacy study, Ghana 2023 (published 2026); LAUNCH assessment (draft)",
+          "asOf": "2026-09-08"
         },
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-stage-6",
@@ -832,6 +828,7 @@
           "atStage": "launch:stage-6",
           "hasStatus": "launch:status-prog",
           "note": "Global Fund procurement 2018–2025: 940,111 packs / US$14.5m — modest overall, but US$11.6m of it landed in 2025 (led by Uganda and Burkina Faso), a sharp uptick consistent with early MFT rollouts",
+          "dateLabel": "Since 2018",
           "nextStep": "Verify 2025 surge holds in next quarterly PQR extract",
           "nextDate": "Q4 2026",
           "source": "Global Fund PQR Transaction Summary (extract 23 Aug 2026)",
@@ -989,7 +986,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-gate-1",
           "@type": "JourneyGate",
-          "gateLabel": "WHO prequalification (tablets)",
+          "gateLabel": "WHO PQ listing (tablets)",
           "gateYear": 2012
         },
         {
@@ -1041,7 +1038,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-milestone-1",
           "@type": "Milestone",
-          "milestoneName": "WHO prequalification",
+          "milestoneName": "WHO PQ listing",
           "hasStatus": "launch:status-done",
           "statusLabel": "Complete",
           "dateLabel": "2012–2016",
@@ -1052,7 +1049,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-milestone-2",
           "@type": "Milestone",
-          "milestoneName": "WHO guideline strong recommendation",
+          "milestoneName": "WHO recommendation (strong)",
           "hasStatus": "launch:status-done",
           "statusLabel": "Complete",
           "dateLabel": "2022",
@@ -1087,11 +1084,11 @@
           "@type": "Milestone",
           "milestoneName": "National guideline inclusion",
           "hasStatus": "launch:status-late",
-          "statusLabel": "Limited — TBC",
-          "dateLabel": "—",
-          "nextStep": "Committee reviews",
+          "statusLabel": "Ghana only — 1 country confirmed",
+          "dateLabel": "Ghana, 2022",
+          "nextStep": "Committee reviews in other endemic countries",
           "anticipated": "TBC",
-          "source": "LAUNCH assessment (draft)"
+          "source": "Peer-reviewed therapeutic-efficacy study, Ghana 2023 (published 2026)"
         },
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-milestone-6",
@@ -1117,7 +1114,7 @@
       "productClass": "launch:class-market",
       "currentStage": "launch:stage-6",
       "developmentPhase": "launch:phase-access",
-      "bottleneckFlag": "Procurement is the bottleneck — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
+      "bottleneckFlag": "Procurement is the current bottleneck — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
       "atcCode": {
         "@type": "schema:MedicalCode",
         "codeValue": "P01BF05",
@@ -1196,6 +1193,7 @@
           "atStage": "launch:stage-6",
           "hasStatus": "launch:status-late",
           "note": "Global Fund procurement held at 0.9–4.5% of antimalarial spend 2022–24 (US$41.5m / 11.5m packs cumulative since 2008) — chronic underuse; 2025 shows a sharp uptick (US$15.3m, led by Uganda, Madagascar, Mozambique) that needs confirming as reporting completes",
+          "dateLabel": "Since 2008",
           "nextStep": "Verify 2025 surge holds in next quarterly PQR extract",
           "nextDate": "Q4 2026",
           "source": "Global Fund PQR Transaction Summary (extract 23 Aug 2026)",
@@ -1349,7 +1347,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-gate-0",
           "@type": "JourneyGate",
-          "gateLabel": "WHO guideline recommendation",
+          "gateLabel": "WHO recommendation",
           "gateYear": 2010
         },
         {
@@ -1361,7 +1359,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-gate-2",
           "@type": "JourneyGate",
-          "gateLabel": "WHO prequalification",
+          "gateLabel": "WHO PQ listing",
           "gateYear": 2015
         },
         {
@@ -1390,7 +1388,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-milestone-0",
           "@type": "Milestone",
-          "milestoneName": "WHO guideline recommendation",
+          "milestoneName": "WHO recommendation",
           "hasStatus": "launch:status-done",
           "statusLabel": "Complete",
           "dateLabel": "2010 (2nd ed.; reaffirmed 2015)",
@@ -1412,7 +1410,7 @@
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-milestone-2",
           "@type": "Milestone",
-          "milestoneName": "WHO prequalification (Eurartesim)",
+          "milestoneName": "WHO PQ listing (Eurartesim)",
           "hasStatus": "launch:status-done",
           "statusLabel": "Complete",
           "dateLabel": "9 Oct 2015",
@@ -1478,99 +1476,88 @@
       ]
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-emanators",
-      "@type": "PlaceholderProduct",
-      "name": "Spatial emanators",
-      "productId": "emanators",
-      "inn": "Vector-control prevention tool",
-      "manufacturerLabel": "SC Johnson",
-      "classLabel": "Prevention · WHO-recommended · rollout funded",
-      "placeholderNote": "Planned addition to LAUNCH tracking. WHO PQ (vector control) lists two SC Johnson spatial emanators — Guardian and Mosquito Shield — prequalified 13 Aug 2025 (WHO PQ vector-control list, extract 22 Aug 2026), alongside WHO's policy recommendation for spatial repellents of the same date; a Global Fund–US partnership announced 13 May 2026 targets rollout to 60 million people by 2028. The pipeline view will apply with WHO PQ/Vector Control and guideline stages adapted for prevention products.",
-      "manufacturedBy": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#org-sc-johnson"
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-0",
+      "@type": "ChangelogEntry",
+      "changeDate": "2026-09-08",
+      "productDisplayName": "ASPY",
+      "changeText": "First confirmed national guideline adoption recorded: Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (alongside AS-AQ and AL), per a peer-reviewed therapeutic-efficacy study (Ghana 2023 fieldwork, published 2026). National policy adoption stage remains 'late' — Ghana is the only confirmed country so far against WHO's 2022 strong recommendation. Procurement stage dates for ASPY (since 2018) and DHA–PPQ (since 2008) added — both years were already cited in the Global Fund PQR figures elsewhere in this file but had not been carried into the stage `date` field."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-0",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-1",
+      "@type": "ChangelogEntry",
+      "changeDate": "2026-09-05",
+      "productDisplayName": "All",
+      "changeText": "Illustrated journey dashboard: the country access map gained a WHO drug-resistance overlay. Treatment-failure results from the WHO Malaria Threat Maps (therapeutic efficacy studies, extract 5 Sep 2026) are drawn as dots over the access shading, with their own provenance line and their own tooltip. All five Plasmodium species and studies of every size are included, selectable by drug and species; pairings WHO has no data for are disabled rather than shown empty. Each dot is the most recent study year for that country, averaged across that year's sites and weighted by patient numbers — click a dot for every underlying study. The access layer remains illustrative, so the two readings are presented separately and not combined."
+    },
+    {
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-2",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-25",
       "productDisplayName": "All",
       "changeText": "Version 2 merged: the collected-data updates reviewed in the /v2/ preview (Global Fund PQR volumes, WHO PQ listings, EMA dates, trial-registry records, Nigeria + Tanzania register verification, sourced fact corrections) are now the live draft dataset. The preview edition is retired."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-1",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-3",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "Nigeria and Tanzania registrations verified against the national registers: TZA 10 presentations across four manufacturers (all compliant); NGA 47 presentations but only 26 Active — 22 lapsed, a registration-maintenance signal."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-2",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-4",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ASPY",
       "changeText": "Nigeria and Tanzania registrations verified against the national registers: TZA 2 (TMDA, 2022), NGA 1 (Greenbook granules, approved Feb 2024). The NGA/TZA registered-level map entries are now register-verified."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-3",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-5",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "WHO guideline recommendation year corrected to 2010 (second-edition treatment guidelines; reaffirmed 2015) — previously shown as 2015."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-4",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-6",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ALAQ",
       "changeText": "Co-formulated pivotal Phase III renamed to FD-TACT (successor to the DeTACT programme); unverified 'taste-masked' wording replaced with the sourced 'child-friendly dispersible'."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-5",
-      "@type": "ChangelogEntry",
-      "changeDate": "2026-08-23",
-      "productDisplayName": "Spatial emanators",
-      "changeText": "Status refreshed: WHO policy recommendation for spatial repellents (13 Aug 2025) and the Global Fund–US rollout partnership (13 May 2026) recorded — no longer pending funder approval."
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-6",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-7",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "GanLum",
       "changeText": "Use-case wording aligned with the sourced Novartis claim (first major innovation in malaria treatment since ACTs were introduced 25+ years ago)."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-7",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-8",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "All",
       "changeText": "Version 2 preview: first collected-data updates from the public-source staging layer (Global Fund PQR extract 23 Aug 2026, WHO PQ lists, EMA EU-M4all table, ClinicalTrials.gov)."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-8",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-9",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "Global Fund volumes filled from PQR: 11.5m packs / US$41.5m since 2008; 0.9–4.5% of Global Fund antimalarial spend 2022–24 with a sharp 2025 uptick (US$15.3m). Nine PQ'd presentations across Alfasigma, Guilin and Beijing Holley (2015–2023) recorded."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-9",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-10",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ASPY",
       "changeText": "Global Fund volumes filled from PQR: 940k packs / US$14.5m since 2018, with US$11.6m of it in 2025 (Uganda, Burkina Faso). EMA opinion outcome date 5 Jun 2025 recorded from the EU-M4all table."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-10",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-11",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "GanLum",
       "changeText": "KALUMA registry record (NCT05842954) added: trial completed 25 Nov 2025, 1,720 participants (registry actual)."
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-11",
-      "@type": "ChangelogEntry",
-      "changeDate": "2026-08-23",
-      "productDisplayName": "Spatial emanators",
-      "changeText": "WHO PQ (vector control) listing of two SC Johnson spatial emanators — Guardian and Mosquito Shield — on 13 Aug 2025 noted on the placeholder row."
     },
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-12",

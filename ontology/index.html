@@ -183,7 +183,7 @@
     </tbody>
   </table></div>
 
-  <h2>Object properties <span class="count">· 24</span></h2>
+  <h2>Object properties <span class="count">· 25</span></h2>
   <div class="tablewrap"><table>
     <thead><tr><th>term</th><th>domain → range</th><th>meaning</th></tr></thead>
     <tbody>
@@ -331,6 +331,12 @@
         <td><code>launch:StatusPeriod</code> → <code>launch:Product</code></td>
         <td class="desc">The product a status period belongs to (by its canonical IRI in launch-data.jsonld).</td>
       </tr>
+      <tr id="concurrentWith">
+        <td class="term"><code>launch:concurrentWith</code><span class="lbl">concurrent with</span></td>
+        
+        <td><code>skos:Concept</code> → <code>skos:Concept</code></td>
+        <td class="desc">Marks two pathway-stage concepts as an independent pair with no defined order — stage 2 (WHO recommendation) and stage 3 (WHO PQ listing) are separate WHO approvals that may clear in either order, and the dashboard draws them in one shared column rather than in sequence for exactly that reason. Symmetric: if A concurrentWith B then B concurrentWith A. Generated from the data file's stageColumns array — a column listing more than one stage index.</td>
+      </tr>
     </tbody>
   </table></div>
 
@@ -416,7 +422,7 @@
         <td class="term"><code>launch:stageIndex</code><span class="lbl">stage index</span></td>
         
         <td><code>—</code> → <code>xsd:integer</code></td>
-        <td class="desc">0–7 position in the pathway. Order is meaning — stage relationships in the contract are positional, not named.</td>
+        <td class="desc">0–7 position in the pathway. Order is meaning — stage relationships in the contract are positional, not named — except between indices joined by launch:concurrentWith, where no order is implied at all.</td>
       </tr>
       <tr id="statusRank">
         <td class="term"><code>launch:statusRank</code><span class="lbl">status rank</span></td>
@@ -653,7 +659,7 @@
   
     <section class="scheme" id="PathwayStageScheme">
       <h3>Access pathway stages <code class="dim">launch:PathwayStageScheme</code></h3>
-      <p>The 8 ordered gates of a malaria product's journey from R&amp;D to in-country delivery — three different kinds of approval (SRA regulatory, WHO guideline recommendation, WHO prequalification) plus registration, policy adoption and the delivery chain. Recommendation ≠ prequalification ≠ registration: three independent approvals run by different institutions. Concepts are generated from the data file's stages[] array with their positional index.</p>
+      <p>The 8 gates of a malaria product's journey from R&amp;D to in-country delivery — three different kinds of approval (SRA regulatory, WHO recommendation, WHO PQ listing) plus registration, policy adoption and the delivery chain. Recommendation ≠ PQ listing ≠ registration: three independent approvals run by different institutions. Stage index is otherwise meaningful order, but the WHO recommendation and WHO PQ listing stages (2 and 3) are a concurrentWith pair — WHO runs them as separate tracks with no defined sequence, and the data file's stageColumns groups them into one display column rather than drawing an order that does not exist. Concepts are generated from the data file's stages[] array with their positional index.</p>
       <p class="gen">Concepts are generated into <a href="launch-data.jsonld">launch-data.jsonld</a> from the data file itself, so they can never drift from the contract.</p>
     </section>
     <section class="scheme" id="GlossaryScheme">

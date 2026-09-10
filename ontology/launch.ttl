@@ -290,7 +290,12 @@ launch:note a owl:DatatypeProperty ;
 launch:stageIndex a owl:DatatypeProperty ;
     rdfs:range xsd:integer ;
     rdfs:label "stage index" ;
-    rdfs:comment "0–7 position in the pathway. Order is meaning — stage relationships in the contract are positional, not named." .
+    rdfs:comment "0–7 position in the pathway. Order is meaning — stage relationships in the contract are positional, not named — except between indices joined by launch:concurrentWith, where no order is implied at all." .
+
+launch:concurrentWith a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain skos:Concept ; rdfs:range skos:Concept ;
+    rdfs:label "concurrent with" ;
+    rdfs:comment "Marks two pathway-stage concepts as an independent pair with no defined order — stage 2 (WHO recommendation) and stage 3 (WHO PQ listing) are separate WHO approvals that may clear in either order, and the dashboard draws them in one shared column rather than in sequence for exactly that reason. Symmetric: if A concurrentWith B then B concurrentWith A. Generated from the data file's stageColumns array — a column listing more than one stage index." .
 
 launch:statusRank a owl:DatatypeProperty ;
     rdfs:range xsd:integer ;
@@ -458,7 +463,7 @@ launch:placeholderNote a owl:DatatypeProperty ;
 
 launch:PathwayStageScheme a skos:ConceptScheme ;
     skos:prefLabel "Access pathway stages" ;
-    skos:definition "The 8 ordered gates of a malaria product's journey from R&D to in-country delivery — three different kinds of approval (SRA regulatory, WHO guideline recommendation, WHO prequalification) plus registration, policy adoption and the delivery chain. Recommendation ≠ prequalification ≠ registration: three independent approvals run by different institutions. Concepts are generated from the data file's stages[] array with their positional index." .
+    skos:definition "The 8 gates of a malaria product's journey from R&D to in-country delivery — three different kinds of approval (SRA regulatory, WHO recommendation, WHO PQ listing) plus registration, policy adoption and the delivery chain. Recommendation ≠ PQ listing ≠ registration: three independent approvals run by different institutions. Stage index is otherwise meaningful order, but the WHO recommendation and WHO PQ listing stages (2 and 3) are a concurrentWith pair — WHO runs them as separate tracks with no defined sequence, and the data file's stageColumns groups them into one display column rather than drawing an order that does not exist. Concepts are generated from the data file's stages[] array with their positional index." .
 
 launch:GlossaryScheme a skos:ConceptScheme ;
     skos:prefLabel "LAUNCH glossary" ;

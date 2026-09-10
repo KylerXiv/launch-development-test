@@ -31,7 +31,7 @@
     },
     {
       id: "03-who-guidelines",
-      title: "WHO guidelines",
+      title: "WHO recommendation",
       // Open guideline text.
       body: `
         <path d="M12 6.5C10.3 5.1 8 4.4 5 4.4A1.1 1.1 0 0 0 3.9 5.5v11.6c0 .6.5 1.1 1.1 1.1 3 0 5.3.7 7 2.1"/>
@@ -40,7 +40,7 @@
     },
     {
       id: "04-who-prequalification",
-      title: "WHO prequalification",
+      title: "WHO PQ listing",
       // Quality seal on a ribbon — a mark awarded, not a security shield.
       body: `
         <circle cx="12" cy="9.6" r="5.7"/>

@@ -5,7 +5,21 @@
     <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
     <description>Changes to tracked antimalarial product statuses on the LAUNCH dashboard (draft data).</description>
     <language>en</language>
-    <lastBuildDate>Tue, 25 Aug 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 08 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>ASPY: First confirmed national guideline adoption recorded: Ghana introduced artesu…</title>
+      <description>First confirmed national guideline adoption recorded: Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (alongside AS-AQ and AL), per a peer-reviewed therapeutic-efficacy study (Ghana 2023 fieldwork, published 2026). National policy adoption stage remains 'late' — Ghana is the only confirmed country so far against WHO's 2022 strong recommendation. Procurement stage dates for ASPY (since 2018) and DHA–PPQ (since 2008) added — both years were already cited in the Global Fund PQR figures elsewhere in this file but had not been carried into the stage `date` field.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-09-08:ASPY:First confirmed national guideline adopt</guid>
+      <pubDate>Tue, 08 Sep 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>All: Illustrated journey dashboard: the country access map gained a WHO drug-resis…</title>
+      <description>Illustrated journey dashboard: the country access map gained a WHO drug-resistance overlay. Treatment-failure results from the WHO Malaria Threat Maps (therapeutic efficacy studies, extract 5 Sep 2026) are drawn as dots over the access shading, with their own provenance line and their own tooltip. All five Plasmodium species and studies of every size are included, selectable by drug and species; pairings WHO has no data for are disabled rather than shown empty. Each dot is the most recent study year for that country, averaged across that year's sites and weighted by patient numbers — click a dot for every underlying study. The access layer remains illustrative, so the two readings are presented separately and not combined.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-09-05:All:Illustrated journey dashboard: the count</guid>
+      <pubDate>Sat, 05 Sep 2026 12:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>All: Version 2 merged: the collected-data updates reviewed in the /v2/ preview (Gl…</title>
       <description>Version 2 merged: the collected-data updates reviewed in the /v2/ preview (Global Fund PQR volumes, WHO PQ listings, EMA dates, trial-registry records, Nigeria + Tanzania register verification, sourced fact corrections) are now the live draft dataset. The preview edition is retired.</description>
@@ -42,13 +56,6 @@
       <pubDate>Sun, 23 Aug 2026 12:00:00 GMT</pubDate>
     </item>
     <item>
-      <title>Spatial emanators: Status refreshed: WHO policy recommendation for spatial repellents (13 Aug 20…</title>
-      <description>Status refreshed: WHO policy recommendation for spatial repellents (13 Aug 2025) and the Global Fund–US rollout partnership (13 May 2026) recorded — no longer pending funder approval.</description>
-      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
-      <guid isPermaLink="false">2026-08-23:Spatial emanators:Status refreshed: WHO policy recommendat</guid>
-      <pubDate>Sun, 23 Aug 2026 12:00:00 GMT</pubDate>
-    </item>
-    <item>
       <title>GanLum: Use-case wording aligned with the sourced Novartis claim (first major innovat…</title>
       <description>Use-case wording aligned with the sourced Novartis claim (first major innovation in malaria treatment since ACTs were introduced 25+ years ago).</description>
       <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
@@ -81,13 +88,6 @@
       <description>KALUMA registry record (NCT05842954) added: trial completed 25 Nov 2025, 1,720 participants (registry actual).</description>
       <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
       <guid isPermaLink="false">2026-08-23:GanLum:KALUMA registry record (NCT05842954) add</guid>
-      <pubDate>Sun, 23 Aug 2026 12:00:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>Spatial emanators: WHO PQ (vector control) listing of two SC Johnson spatial emanators — Guardia…</title>
-      <description>WHO PQ (vector control) listing of two SC Johnson spatial emanators — Guardian and Mosquito Shield — on 13 Aug 2025 noted on the placeholder row.</description>
-      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
-      <guid isPermaLink="false">2026-08-23:Spatial emanators:WHO PQ (vector control) listing of two S</guid>
       <pubDate>Sun, 23 Aug 2026 12:00:00 GMT</pubDate>
     </item>
     <item>

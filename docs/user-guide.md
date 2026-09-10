@@ -32,8 +32,8 @@ access pathway, left to right:
 | --- | --- |
 | **R&D & clinical** | Laboratory development and human trials (Phase I–III). |
 | **Regulatory approval (SRA)** | Review by an advanced regulator such as the EMA or US FDA. This anchors everything after it. |
-| **WHO guidelines** | WHO's expert group weighs the evidence and decides whether to recommend the medicine. |
-| **WHO prequalification** | WHO's quality check that makes the product eligible for purchase by UN agencies and major donors. |
+| **WHO recommendation** | WHO's expert group weighs the evidence and decides whether to recommend the medicine. The recommendation is published in the WHO Guidelines for malaria. |
+| **WHO PQ listing** | The outcome of WHO's quality check (prequalification): a listing that makes the product eligible for purchase by UN agencies and major donors. |
 | **Country registration** | Each country's own regulator licenses the product for use. |
 | **National policy adoption** | The ministry of health writes the medicine into national treatment guidelines. |
 | **Procurement** | Funders and governments actually buy it (Global Fund, PMI, domestic budgets). |
