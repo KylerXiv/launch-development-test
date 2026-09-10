@@ -285,6 +285,18 @@ verified`, replacing `· draft data`) and the map overlay
 (`DRAFT, NOT YET VERIFIED —`), so the page says one thing in three places
 rather than three things.
 
+**Addendum, 10 Sep 2026 — the explanatory sentence below the caveat was cut,
+by request.** The banner's `BANNERS.draft` string used to continue past the
+bold lead line with "Everything on this page was gathered from public
+sources... we never fill a gap with an estimate" — three sentences of *why*
+the data is unverified and what `TBC` means. Removed outright rather than
+trimmed; the bold line alone now is the whole banner. `.tbc` (the span class
+that bolded "TBC" inside that prose) is unused after this but left defined —
+nothing else references it, and it costs nothing to leave. The `.bl` line's
+`margin-bottom: 3px` is likewise now inert (nothing follows it inside the
+banner) rather than removed, since it does no harm and reverting this is a
+one-line change if the explanation comes back.
+
 ---
 
 ### 3.12 "Access barrier", and why "barriers overcome" is absent rather than zero
