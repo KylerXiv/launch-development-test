@@ -132,7 +132,7 @@
      `tracked`, which the rest of the page still needs) went with them. */
   .strip {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px;
-    padding: 12px 18px; margin-bottom: 22px;
+    padding: 12px 18px; margin-top: 22px; margin-bottom: 22px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-left: auto; font-size: 12.5px; color: var(--ink-2); }
@@ -1002,7 +1002,12 @@
     /* an open drill-down carries the analysis — keep it in the PDF */
     .gatepanel[hidden], .gatewrap[hidden] { display: none !important; }
     .gatepanel, .gatewrap { break-inside: avoid; box-shadow: none; }
-    .updates, .glossary-panel { display: block; }
+    /* .updates excluded while its screen panel is disabled (10 Sep 2026) —
+       this rule used to force it open for print/PDF regardless of on-screen
+       state; left in it would print "Recent dashboard updates" on a page
+       where it no longer shows at all. Restore alongside the .hidden=false
+       line above if the panel comes back. */
+    .glossary-panel { display: block; }
     .updates[open] summary, .glossary-panel[open] summary { list-style: none; }
   }
 
@@ -1059,6 +1064,10 @@
 
   <div class="demo-banner" id="banner" hidden></div>
 
+  <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway — choose a gate to see every medicine at it" hidden></div>
+
+  <!-- Moved below the pathway strip, 10 Sep 2026 (was above it) — reads as
+       the key to the stages just drawn, rather than as a summary ahead of them. -->
   <div class="strip" role="group" aria-label="Status legend">
     <div class="legend" aria-label="Status legend">
       <span class="key"><span class="dot done" aria-hidden="true">✓</span> Complete</span>
@@ -1068,7 +1077,6 @@
     </div>
   </div>
 
-  <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway — choose a gate to see every medicine at it" hidden></div>
   <div class="gatewrap" id="gatewrap" hidden></div>
 
   <div class="board" id="board"></div>
@@ -1314,7 +1322,11 @@
   // changelog
   const updates = DATA.changelog || [];
   if (updates.length) {
-    document.getElementById("updates").hidden = false;
+    // Panel un-hide disabled by request, 10 Sep 2026 — "Recent dashboard
+    // updates" should not show on the dashboard for now. Everything else
+    // here still runs (the list still gets built, DATA.changelog is
+    // untouched) so restoring it later is this one line, not a rebuild.
+    // document.getElementById("updates").hidden = false;
     // Prefer the plain-language retelling where the data carries one; the
     // technical `change` line stays the record of what actually happened and
     // is what the RSS feed and the other editions still publish.
@@ -3581,11 +3593,19 @@
 <script>
   /* This page runs the shared report-issue widget as "Send feedback" — same
      form and same seam, friendlier framing for a general visitor. Must be set
-     before the widget script runs. */
+     before the widget script runs.
+
+     note/doneTitle/doneMessage were rewritten 10 Sep 2026 to say plainly that
+     the form isn't wired to anywhere yet (see report-issue.js's own comment,
+     "no endpoint wired yet (DEV-04b)" — the front end confirms on its own,
+     which used to read as a real confirmation with no such caveat). The old
+     doneMessage also pointed to "Recent dashboard updates", which is hidden
+     for now (see the changelog code above) — replaced rather than left
+     pointing at a section a visitor can no longer see. */
   window.LAUNCH_FEEDBACK_COPY = {
     pill:         "Send feedback",
     title:        "Send feedback",
-    intro:        "Something look wrong, out of date, or hard to follow? Tell the LAUNCH team — we read every message.",
+    intro:        "Something look wrong, out of date, or hard to follow? Tell the LAUNCH team what you're seeing.",
     typeLabel:    "What is your feedback about?",
     types: {
       correction: "Something on the page looks wrong",
@@ -3596,14 +3616,17 @@
     messageLabel: "What would you like to tell us?",
     messagePlaceholder:
       "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026.",
-    note: "If you leave an email address we will only use it to come back to you about this message. " +
-          "We also note which page you were on and which version of the data you saw, so the team can find what you found.",
+    note: "This form is not connected to an inbox yet, so nothing you write here is sent or saved right now — " +
+          "the confirmation after Send feedback says the same. Once it is connected, an email address left here " +
+          "would only be used to come back to you about this message; we would also note which page and data " +
+          "version you saw, so the team can find what you found.",
     submit:       "Send feedback",
     sending:      "Sending…",
     failed:       "Sorry — your feedback could not be sent just now. Please try again in a moment.",
-    doneTitle:    "Thank you — we have your feedback.",
-    doneMessage:  "The LAUNCH team reads every message. If you have pointed us to a public source that " +
-                  "checks out, we correct the data at the next update and note it under <em>Recent dashboard updates</em>.",
+    doneTitle:    "Thanks — though this isn't sent anywhere yet.",
+    doneMessage:  "This form has no inbox behind it yet, so nothing was actually sent — your note stayed in " +
+                  "this browser tab. Once it is connected, the LAUNCH team will read every message, and where " +
+                  "you have pointed us to a public source that checks out, we correct the data at the next update.",
     again:        "Send more feedback"
   };
 </script>
