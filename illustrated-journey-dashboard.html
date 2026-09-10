@@ -365,6 +365,21 @@
   .stagegroup .stage .bar.pre { margin-left: var(--sg-r); }
   .stagegroup .stage .bar.post { margin-right: var(--sg-r); }
 
+  /* Bare rectangle (client request, 10 Sep 2026): nothing enters or leaves the
+     frame, so it reads as the rectangle it is rather than as a box with two
+     spurs. The lines that met its sides at mid-height were never part of the
+     group — they belong to the NEIGHBOURING columns, the stage before
+     contributing .bar.post and the one after .bar.pre — which is why they are
+     suppressed from out here rather than inside .stagegroup.
+
+     visibility, not display: those bars are flex:1 spacers. Taking them out of
+     layout would let their columns' markers slide, and the marker centres have
+     to keep matching the pathway strip above and the real-year timeline below.
+     The trade the client accepted is that the chain now reads as broken across
+     the pair — see the parallel-gates note. */
+  .track > .stage:has(+ .stagegroup) .bar.post,
+  .track > .stagegroup + .stage .bar.pre { visibility: hidden; }
+
   /* elbows take the same green as a cleared bar: the incoming pair when the
      column before the fork is cleared, the outgoing pair when BOTH gates in
      it are — leaving the fork needs both, which is the honest rule */

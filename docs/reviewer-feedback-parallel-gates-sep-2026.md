@@ -134,6 +134,40 @@ centreline. The stroke weight is now `--sg-w` instead of `3px` repeated eight
 times, because the fix depends on it: **`--sg-w` must equal `.stage .bar`'s
 height** or the step comes back.
 
+### And then: a bare rectangle, no side joins
+
+Asked for and confirmed by the client after seeing the alternatives (10 Sep
+2026). The frame now has nothing entering or leaving it — it reads as the
+rectangle it is rather than as a box with two spurs.
+
+The lines that met its sides at mid-height were never part of the group: they
+belong to the **neighbouring columns**, the stage before contributing its
+`.bar.post` and the one after its `.bar.pre`. So they are suppressed from
+outside `.stagegroup`:
+
+```css
+.track > .stage:has(+ .stagegroup) .bar.post,
+.track > .stagegroup + .stage .bar.pre { visibility: hidden; }
+```
+
+`visibility`, not `display`. Those bars are `flex: 1` spacers — removing them
+from layout lets their columns' markers slide, and the marker centres must keep
+matching the pathway strip above and the real-year timeline below. Verified: the
+eight marker centres stay at 417 / 556 / 696 / 696 / 835 / 974 / 1114 / 1253,
+evenly spaced 139px apart with the parallel pair stacked, unchanged from before.
+
+**The accepted trade-off:** the stepper chain now reads as broken across the
+pair — there is a visible gap between "Regulatory approval (SRA)" and the frame,
+and between the frame and "Country registration". Two alternatives were offered
+and declined: routing the joins to the top corners, and rebuilding the frame as
+a single bordered box while keeping the mid-height joins. If the disconnect ever
+reads as a bug rather than a choice, that second option is the way back.
+
+Not applied to the pathway strip's `.pathgroup`, which has no bars to suppress —
+its nodes are separated by arrows, so it never had spurs. It remains two vertical
+rules rather than a closed rectangle; making it match is a two-line change if
+wanted.
+
 Verified by measurement, not by eye — cropped screenshots proved unreliable
 here. Against the marker rect as ground truth, both branches report
 `markerMid == barMid == elbowStrokeMid` (delta `0.00px`), and horizontally the
