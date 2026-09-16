@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>LAUNCH data editor</title>
 <!--
-  LAUNCH data editor — read-only slice.
+  LAUNCH data editor.
 
   INTERNAL. This page is never copied into the public bundle: it is not in the
   allowlist in scripts/build-public-site.sh, and that omission is deliberate.
@@ -16,8 +16,14 @@
   repo, so the editor hands over to RBM inside the same file set as the
   dashboard it feeds.
 
-  Currently read-only: it loads data/products.js, renders it, and runs the
-  same governance rules the command line runs. No editing, no saving yet.
+  Edits accumulate in a draft. The draft is checked live by the same rules the
+  command line runs (scripts/data-rules.js). Saving requires zero errors and a
+  changelog entry, bumps meta.lastUpdated, and writes the file in house style
+  (scripts/serialize-products.js) so the diff shows only what changed.
+
+  Saving currently downloads the file. Committing it to a branch through the
+  GitHub API is the next piece of work; the gate and the serializer it runs
+  through do not change when that lands.
 
   Run it with a local server, not file://, or the browser will refuse to fetch
   the data file. Bind to localhost: without --bind, http.server listens on
@@ -43,115 +49,166 @@
   *{box-sizing:border-box;}
   body{margin:0;background:var(--band);color:var(--ink);font-family:var(--sans);
        font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:0 64px;}
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;}
 
-  /* ---------- top bar ---------- */
-  .top{background:var(--ink);color:#fff;padding-block:14px;margin-bottom:22px;}
-  .top .wrap{padding-block:0;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;}
-  .top h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-0.01em;}
+  /* ---------- sticky top bar ---------- */
+  .top{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20;
+       box-shadow:0 1px 0 rgba(0,0,0,.2);}
+  .top .wrap{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;
+             padding-block:11px;}
+  .top h1{margin:0;font-size:16px;font-weight:600;letter-spacing:-0.01em;}
   .top .file{font-family:var(--mono);font-size:12px;color:#A9C0CC;}
   .top .spacer{flex:1;}
   .pill{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
         padding:3px 8px;border-radius:3px;white-space:nowrap;}
-  .pill-ro{background:#2E4F60;color:#CFE2EA;}
   .pill-draft{background:var(--warn);color:#fff;}
   .pill-live{background:var(--good);color:#fff;}
   .pill-illustrative{background:#5C7480;color:#fff;}
+  .pill-unknown{background:#5C7480;color:#fff;}
+  .pill-dirty{background:#2E4F60;color:#CFE2EA;}
+  .pill-clean{background:#24404E;color:#8FA9B5;}
+  .mini{display:inline-flex;align-items:baseline;gap:5px;font-size:12.5px;
+        padding:3px 9px;border-radius:3px;font-variant-numeric:tabular-nums;}
+  .mini b{font-size:14px;font-weight:600;}
+  .mini-err{background:var(--crit);color:#fff;}
+  .mini-warn{background:var(--warn);color:#fff;}
+  .mini-ok{background:var(--good);color:#fff;}
+  button{font:inherit;cursor:pointer;border-radius:4px;border:1px solid transparent;
+         padding:6px 13px;font-size:13.5px;font-weight:600;}
+  button:focus-visible{outline:2px solid #7FD3EC;outline-offset:2px;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:disabled{background:#3C5E6B;color:#8FA9B5;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:#CFE2EA;border-color:#40606F;}
+  .btn-ghost:disabled{color:#6A8794;border-color:#2E4F60;cursor:not-allowed;}
+  .btn-small{background:var(--band);color:var(--ink);border-color:var(--line);
+             padding:4px 10px;font-size:12.5px;font-weight:500;}
+  .btn-small:hover{background:var(--accent-soft);border-color:var(--accent);}
+  .btn-del{background:transparent;color:var(--crit);border-color:var(--line);
+           padding:3px 9px;font-size:12px;font-weight:500;}
+  .btn-del:hover{background:var(--crit-soft);border-color:var(--crit);}
 
   /* ---------- panels ---------- */
   .panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;
-         margin-bottom:18px;}
+         margin-bottom:16px;}
   .panel-h{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;
-           padding:13px 16px;border-bottom:1px solid var(--line);}
-  .panel-h h2{margin:0;font-size:14px;font-weight:600;letter-spacing:0.01em;}
+           padding:12px 16px;border-bottom:1px solid var(--line);}
+  .panel-h h2{margin:0;font-size:14px;font-weight:600;}
   .panel-h .sub{font-size:12.5px;color:var(--soft);}
+  .panel-h .spacer{flex:1;}
   .panel-b{padding:14px 16px;}
 
-  /* ---------- validation ---------- */
-  .checks{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;}
-  .tally{display:flex;align-items:baseline;gap:9px;padding:10px 14px;border-radius:5px;
-         border:1px solid;min-width:150px;}
-  .tally b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;}
-  .tally span{font-size:12.5px;}
-  .t-err{border-color:var(--crit);background:var(--crit-soft);color:var(--crit);}
-  .t-warn{border-color:var(--warn);background:var(--warn-soft);color:var(--warn);}
-  .t-ok{border-color:var(--good);background:var(--good-soft);color:var(--good);}
-  .t-zero{border-color:var(--line);background:var(--band);color:var(--soft);}
-  .findings{margin:0;padding:0;list-style:none;border-top:1px solid var(--line);}
+  /* ---------- findings ---------- */
+  .findings{margin:0;padding:0;list-style:none;max-height:280px;overflow-y:auto;}
   .findings li{display:grid;grid-template-columns:62px 1fr;gap:12px;
-               padding:9px 16px;border-bottom:1px solid var(--line);font-size:13.5px;}
+               padding:8px 16px;border-bottom:1px solid var(--line);font-size:13.5px;}
   .findings li:last-child{border-bottom:none;}
   .findings .lvl{font-family:var(--mono);font-size:10.5px;font-weight:500;
                  letter-spacing:0.07em;text-transform:uppercase;padding-top:3px;}
   .lvl-error{color:var(--crit);}
   .lvl-warn{color:var(--warn);}
-  .findings code{font-family:var(--mono);font-size:12.5px;background:var(--band);
-                 padding:1px 4px;border-radius:2px;}
-  .none{padding:14px 16px;color:var(--soft);font-size:13.5px;border-top:1px solid var(--line);}
+  .none{padding:13px 16px;color:var(--soft);font-size:13.5px;}
 
-  /* ---------- products ---------- */
-  .prod{border-bottom:1px solid var(--line);padding:16px;}
-  .prod:last-child{border-bottom:none;}
-  .prod-h{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;margin-bottom:3px;}
-  .prod-h h3{margin:0;font-size:16px;font-weight:600;letter-spacing:-0.01em;}
-  .prod-h .inn{font-size:13px;color:var(--soft);font-style:italic;}
-  .prod-meta{font-size:12.5px;color:var(--soft);margin-bottom:11px;}
-  .tag{font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
-       padding:2px 6px;border-radius:3px;background:var(--accent-soft);color:var(--accent);}
-  .tag-ph{background:var(--idle-soft);color:var(--soft);}
-  .flag{display:flex;gap:9px;background:var(--crit-soft);border-left:3px solid var(--crit);
-        border-radius:0 4px 4px 0;padding:9px 12px;margin-bottom:12px;font-size:13.5px;}
-  .flag b{color:var(--crit);white-space:nowrap;font-size:11px;letter-spacing:0.06em;
-          text-transform:uppercase;padding-top:2px;}
+  /* ---------- product tabs ---------- */
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;
+        border-bottom:1px solid var(--line);}
+  .tab{background:var(--band);border:1px solid var(--line);border-radius:4px;
+       padding:6px 12px;font-size:13.5px;font-weight:500;color:var(--ink);}
+  .tab:hover{border-color:var(--accent);}
+  .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .tab .edited{color:var(--warn);font-weight:700;margin-left:5px;}
+  .tab[aria-selected="true"] .edited{color:#FFD98A;}
 
-  /* stage track — same colour language as the dashboard */
-  .track{display:grid;gap:7px;margin-bottom:12px;
-         grid-template-columns:repeat(4,1fr);}
-  @media (max-width:900px){ .track{grid-template-columns:repeat(2,1fr);} }
-  @media (max-width:520px){ .track{grid-template-columns:1fr;} }
+  /* ---------- form fields ---------- */
+  .sect{border-bottom:1px solid var(--line);padding:14px 16px;}
+  .sect:last-child{border-bottom:none;}
+  .sect > h3{margin:0 0 3px 0;font-size:11px;font-weight:600;letter-spacing:0.08em;
+             text-transform:uppercase;color:var(--soft);}
+  .sect > .hint{margin:0 0 11px 0;font-size:12.5px;color:var(--soft);}
+  .grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));}
+  .grid + .grid{margin-top:12px;}
+  .sect > .grid + .rows, .sect > .rows{margin-top:12px;}
+  .sect > .rows + .btn-small{margin-top:10px;}
+  .sect > .f.check{margin-top:12px;}
+  .grid.wide{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));}
+  .f{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .f > label{font-size:11px;font-weight:600;letter-spacing:0.05em;
+             text-transform:uppercase;color:var(--soft);}
+  .f input[type=text],.f input[type=number],.f select,.f textarea{
+      font:inherit;font-size:13.5px;color:var(--ink);background:var(--surface);
+      border:1px solid var(--rule);border-radius:4px;padding:6px 8px;width:100%;}
+  .f textarea{resize:vertical;min-height:58px;line-height:1.45;}
+  .f input:focus,.f select:focus,.f textarea:focus{outline:2px solid var(--accent);
+      outline-offset:-1px;border-color:var(--accent);}
+  .f .help{font-size:11.5px;color:var(--soft);}
+  .f.check{flex-direction:row;align-items:center;gap:8px;}
+  .f.check input{width:auto;}
+  .f.check label{text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;
+                 color:var(--ink);}
+  .f.mono input,.f.mono textarea{font-family:var(--mono);font-size:12.5px;}
+  .f.bad input,.f.bad textarea{border-color:var(--crit);background:var(--crit-soft);}
+
+  /* ---------- stage cards ---------- */
+  .track{display:grid;gap:9px;grid-template-columns:repeat(4,1fr);}
+  @media (max-width:1000px){ .track{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:620px){ .track{grid-template-columns:1fr;} }
   .stage{border:1px solid var(--line);border-top:3px solid var(--idle);
-         border-radius:4px;padding:8px 10px;background:var(--surface);}
+         border-radius:4px;padding:9px 10px;display:flex;flex-direction:column;gap:7px;}
   .stage.done{border-top-color:var(--good);}
   .stage.prog{border-top-color:var(--warn);}
   .stage.late{border-top-color:var(--crit);background:var(--crit-soft);}
   .stage.idle{border-top-color:var(--idle);}
   .stage.current{box-shadow:0 0 0 2px var(--accent);}
-  .stage .nm{font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;
-             color:var(--soft);margin-bottom:3px;}
-  .stage .st{font-size:13px;font-weight:600;margin-bottom:3px;}
-  .stage.done .st{color:var(--good);}
-  .stage.prog .st{color:var(--warn);}
-  .stage.late .st{color:var(--crit);}
-  .stage.idle .st{color:var(--idle);}
-  .stage .note{font-size:12px;color:var(--soft);line-height:1.4;}
-  .stage .asof{font-family:var(--mono);font-size:10.5px;color:var(--soft);margin-top:4px;}
-  .stage .asof.missing{color:var(--warn);}
+  .stage > .nm{font-size:11px;font-weight:600;letter-spacing:0.04em;
+               text-transform:uppercase;color:var(--soft);}
+  .stage .row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
 
-  .facts{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-         font-size:13px;}
-  .fact{background:var(--band);border-radius:4px;padding:8px 10px;}
-  .fact .k{font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
-           color:var(--soft);margin-bottom:2px;}
-  .fact .v{font-variant-numeric:tabular-nums;}
-  .fact .warnish{color:var(--warn);font-size:12px;}
-  .fact .okish{color:var(--good);font-size:12px;}
+  /* ---------- row tables (milestones, gates, countries) ---------- */
+  .rows{display:flex;flex-direction:column;gap:8px;}
+  .row-item{border:1px solid var(--line);border-radius:4px;padding:9px 10px;
+            display:flex;flex-direction:column;gap:8px;background:var(--surface);}
+  .row-item .row-top{display:flex;gap:10px;align-items:center;}
+  .row-item .row-top .n{font-family:var(--mono);font-size:11px;color:var(--soft);
+                        min-width:22px;}
+  .row-item .row-top .spacer{flex:1;}
+  .inline{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));}
+  .add-row{align-self:flex-start;}
 
-  /* ---------- changelog ---------- */
-  .cl{margin:0;padding:0;list-style:none;}
-  .cl li{display:grid;grid-template-columns:96px 120px 1fr;gap:12px;padding:9px 16px;
+  /* ---------- save bar ---------- */
+  .save .panel-b{display:flex;flex-direction:column;gap:12px;}
+  .gate{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none;}
+  .gate li{display:flex;gap:9px;align-items:baseline;font-size:13.5px;}
+  .gate .mark{font-weight:700;min-width:15px;}
+  .gate .pass .mark,.gate li.pass .mark{color:var(--good);}
+  .gate li.fail .mark{color:var(--crit);}
+  .gate li.fail{color:var(--crit);}
+  .changes{font-size:13px;color:var(--soft);background:var(--band);border-radius:4px;
+           padding:9px 11px;}
+  .changes b{color:var(--ink);}
+  .save-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center;}
+  .save-actions .note{font-size:12.5px;color:var(--soft);}
+  .btn-save{background:var(--good);color:#fff;padding:8px 18px;font-size:14px;}
+  .btn-save:disabled{background:var(--idle);cursor:not-allowed;}
+  .btn-reset{background:var(--surface);color:var(--crit);border-color:var(--rule);}
+
+  /* ---------- changelog list ---------- */
+  .cl{margin:0;padding:0;list-style:none;max-height:260px;overflow-y:auto;}
+  .cl li{display:grid;grid-template-columns:96px 118px 1fr;gap:12px;padding:8px 16px;
          border-bottom:1px solid var(--line);font-size:13.5px;}
   .cl li:last-child{border-bottom:none;}
   .cl .d{font-family:var(--mono);font-size:12px;color:var(--soft);}
   .cl .p{font-weight:600;font-size:13px;}
+  .cl li.new{background:var(--good-soft);}
 
   .boot{padding:26px 16px;font-size:14px;}
   .boot code{display:block;font-family:var(--mono);font-size:13px;background:var(--ink);
              color:#CFE2EA;padding:10px 13px;border-radius:4px;margin-top:10px;
              white-space:pre-wrap;}
   .boot .bad{color:var(--crit);font-weight:600;}
+  .foot{padding-block:10px 60px;font-size:12.5px;color:var(--soft);}
   @media (max-width:640px){
     .cl li{grid-template-columns:1fr;gap:3px;}
     .findings li{grid-template-columns:1fr;gap:2px;}
+    .stage .row{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -161,34 +218,78 @@
   <div class="wrap">
     <h1>LAUNCH data editor</h1>
     <span class="file">data/products.js</span>
+    <span id="statusPill" class="pill pill-unknown">…</span>
     <span class="spacer"></span>
-    <span class="pill pill-ro">Read-only</span>
-    <span id="statusPill"></span>
-    <span class="file" id="updated"></span>
+    <span id="dirtyPill" class="pill pill-clean">No changes</span>
+    <span id="miniChecks"></span>
   </div>
 </div>
 
 <div class="wrap">
   <div id="boot" class="panel"><div class="boot">Loading…</div></div>
+
   <div id="app" hidden>
     <div class="panel">
       <div class="panel-h">
         <h2>Governance checks</h2>
-        <span class="sub" id="checkSub"></span>
+        <span class="sub">Run against your draft by scripts/data-rules.js — the same rules the command line uses</span>
       </div>
-      <div class="checks" id="tallies"></div>
       <div id="findings"></div>
     </div>
 
     <div class="panel">
-      <div class="panel-h"><h2>Products</h2><span class="sub" id="prodSub"></span></div>
-      <div id="products"></div>
+      <div class="panel-h">
+        <h2>Products</h2>
+        <span class="sub" id="prodSub"></span>
+      </div>
+      <div class="tabs" id="tabs" role="tablist"></div>
+      <div id="editor"></div>
+    </div>
+
+    <div class="panel save">
+      <div class="panel-h">
+        <h2>Save</h2>
+        <span class="sub">A change needs a changelog entry — it becomes the public record of what moved and why</span>
+      </div>
+      <div class="panel-b">
+        <div class="grid wide">
+          <div class="f">
+            <label for="clProduct">Changelog: product</label>
+            <select id="clProduct"></select>
+            <span class="help">Use "All" for a change that spans products.</span>
+          </div>
+          <div class="f">
+            <label for="clChange">What changed</label>
+            <textarea id="clChange" placeholder="e.g. Pyramax: WHO PQ listing confirmed, 14 March 2026."></textarea>
+            <span class="help">At least 10 characters. Written for the public feed.</span>
+          </div>
+          <div class="f">
+            <label for="clPlain">Plain-English version <span style="text-transform:none;font-weight:400">(optional)</span></label>
+            <textarea id="clPlain" placeholder="Shown to non-specialist readers."></textarea>
+          </div>
+        </div>
+        <ul class="gate" id="gate"></ul>
+        <div class="changes" id="changes"></div>
+        <div class="save-actions">
+          <button type="button" class="btn-save" id="btnSave" disabled>Save products.js</button>
+          <button type="button" class="btn-reset" id="btnReset" disabled>Discard changes</button>
+          <span class="note" id="saveNote"></span>
+        </div>
+      </div>
     </div>
 
     <div class="panel">
-      <div class="panel-h"><h2>Changelog</h2><span class="sub">Newest first — the order the RSS feed depends on</span></div>
+      <div class="panel-h">
+        <h2>Changelog</h2>
+        <span class="sub">Newest first — the order the RSS feed depends on</span>
+      </div>
       <ul class="cl" id="changelog"></ul>
     </div>
+
+    <p class="foot">Read-only fields not covered by a form live in each product's
+      “Other fields” box as raw JSON. Nothing here touches
+      <code>data/resistance.js</code> or <code>data/molecular-markers.js</code> —
+      those are regenerated from their normalizers, never hand-edited.</p>
   </div>
 </div>
 
@@ -198,8 +299,20 @@
 (function () {
   "use strict";
 
+  var STATUSES = ["done", "prog", "late", "idle"];
   var STATUS_LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
+  var PHASES = ["preclinical", "phase1", "phase2", "phase3", "regulatory", "access"];
+  var CLASSES = ["pipeline", "market"];
+  var DATA_STATUSES = ["illustrative", "draft", "live"];
+  var COUNTRY_STATUSES = ["illustrative", "draft", "verified"];
+  var LEVELS = ["registered", "guidelines", "mft"];
+  var COUNT_KEYS = ["registered", "inGuidelines", "inMft", "forecastDemand"];
+  // Rendered by a dedicated form above; everything else falls to the raw box,
+  // so a schema addition degrades to "editable as JSON" rather than "invisible".
+  var FORMED_DETAIL = ["price", "country", "countries", "journey", "milestones"];
+
   var $ = function (id) { return document.getElementById(id); };
+  var state = { raw: "", original: null, draft: null, selected: 0, saved: false };
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -207,9 +320,614 @@
     if (text !== undefined && text !== null) n.textContent = String(text);
     return n;
   }
+  function clone(v) { return JSON.parse(JSON.stringify(v)); }
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") +
+           "-" + String(d.getDate()).padStart(2, "0");
+  }
 
-  // Everything from the data file goes through textContent, never innerHTML —
-  // the editor will later render strings an analyst typed.
+  // ---------------------------------------------------------------- fields
+  // Every builder binds straight to the draft object it is given, so typing
+  // never re-renders the form — only the checks panel refreshes. Re-rendering
+  // inputs on keystroke would steal focus mid-word.
+
+  function field(labelText, cls) {
+    var f = el("div", "f" + (cls ? " " + cls : ""));
+    var id = "f" + (field.n = (field.n || 0) + 1);
+    var l = el("label", null, labelText);
+    l.setAttribute("for", id);
+    f.appendChild(l);
+    f._id = id;
+    return f;
+  }
+  function help(f, text) { if (text) f.appendChild(el("span", "help", text)); return f; }
+
+  function textField(label, obj, key, opts) {
+    opts = opts || {};
+    var f = field(label, opts.mono ? "mono" : null);
+    var i = document.createElement(opts.area ? "textarea" : "input");
+    if (!opts.area) i.type = "text";
+    i.id = f._id;
+    i.value = obj[key] === undefined || obj[key] === null ? "" : String(obj[key]);
+    if (opts.placeholder) i.placeholder = opts.placeholder;
+    i.addEventListener("input", function () {
+      var v = i.value;
+      if (v === "" && opts.dropEmpty) delete obj[key];
+      else obj[key] = v;
+      touched();
+    });
+    f.insertBefore(i, f.firstChild.nextSibling);
+    return help(f, opts.help);
+  }
+
+  function selectField(label, obj, key, options, opts) {
+    opts = opts || {};
+    var f = field(label);
+    var s = document.createElement("select");
+    s.id = f._id;
+    options.forEach(function (o) {
+      var v = typeof o === "object" ? o.value : o;
+      var t = typeof o === "object" ? o.label : o;
+      var op = el("option", null, t);
+      op.value = v;
+      s.appendChild(op);
+    });
+    s.value = obj[key];
+    s.addEventListener("change", function () {
+      obj[key] = opts.number ? Number(s.value) : s.value;
+      if (opts.onChange) opts.onChange();
+      touched();
+    });
+    f.appendChild(s);
+    return help(f, opts.help);
+  }
+
+  function checkField(label, obj, key) {
+    var f = el("div", "f check");
+    var id = "f" + (field.n = (field.n || 0) + 1);
+    var i = document.createElement("input");
+    i.type = "checkbox";
+    i.id = id;
+    i.checked = obj[key] === true;
+    i.addEventListener("change", function () { obj[key] = i.checked; touched(); });
+    var l = el("label", null, label);
+    l.setAttribute("for", id);
+    f.appendChild(i);
+    f.appendChild(l);
+    return f;
+  }
+
+  // Counts are an integer or the literal "TBC" — an admitted gap is better
+  // than an invented number, so the field accepts both and nothing else.
+  function countField(label, obj, key) {
+    var f = field(label);
+    var i = document.createElement("input");
+    i.type = "text";
+    i.id = f._id;
+    i.value = obj[key] === undefined ? "" : String(obj[key]);
+    i.addEventListener("input", function () {
+      var v = i.value.trim();
+      if (v === "") { delete obj[key]; }
+      else if (/^\d+$/.test(v)) { obj[key] = parseInt(v, 10); }
+      else { obj[key] = v; }
+      f.classList.toggle("bad", v !== "" && v !== "TBC" && !/^\d+$/.test(v));
+      touched();
+    });
+    f.appendChild(i);
+    return help(f, 'A whole number, or "TBC"');
+  }
+
+  // Gate years are the same shape: a year, or "TBC" for one not yet reached.
+  function yearField(label, obj, key) {
+    var f = field(label);
+    var i = document.createElement("input");
+    i.type = "text";
+    i.id = f._id;
+    i.value = obj[key] === undefined ? "" : String(obj[key]);
+    i.addEventListener("input", function () {
+      var v = i.value.trim();
+      if (v === "") delete obj[key];
+      else if (/^\d{4}$/.test(v)) obj[key] = parseInt(v, 10);
+      else obj[key] = v;
+      f.classList.toggle("bad", v !== "" && v !== "TBC" && !/^\d{4}$/.test(v));
+      touched();
+    });
+    f.appendChild(i);
+    return help(f, 'A year, or "TBC"');
+  }
+
+  function jsonField(label, holder, key, hint) {
+    var f = field(label, "mono");
+    var t = document.createElement("textarea");
+    t.id = f._id;
+    t.rows = 6;
+    t.value = JSON.stringify(holder[key], null, 2);
+    var msg = el("span", "help", hint || "");
+    t.addEventListener("input", function () {
+      try {
+        holder[key] = JSON.parse(t.value);
+        f.classList.remove("bad");
+        msg.textContent = hint || "";
+        touched();
+      } catch (e) {
+        f.classList.add("bad");
+        msg.textContent = "Not valid JSON — " + e.message + " (not applied)";
+      }
+    });
+    f.appendChild(t);
+    f.appendChild(msg);
+    return f;
+  }
+
+  // ---------------------------------------------------------------- sections
+  function section(title, hint) {
+    var s = el("div", "sect");
+    s.appendChild(el("h3", null, title));
+    if (hint) s.appendChild(el("p", "hint", hint));
+    return s;
+  }
+  function grid(wide) { return el("div", "grid" + (wide ? " wide" : "")); }
+
+  function identitySection(p, data) {
+    var s = section("Identity");
+    var g = grid();
+    g.appendChild(textField("Name", p, "name"));
+    g.appendChild(textField("INN", p, "inn"));
+    g.appendChild(textField("Manufacturer", p, "manufacturer"));
+    g.appendChild(textField("Class label", p, "classLabel"));
+    g.appendChild(selectField("Class", p, "class", CLASSES));
+    g.appendChild(selectField("Poster phase", p, "phase", PHASES,
+      { help: "Where it sits on the pipeline poster" }));
+    g.appendChild(selectField("Current stage", p, "currentStage",
+      data.stages.map(function (n, i) { return { value: i, label: n }; }),
+      { number: true, onChange: function () { renderProduct(); } }));
+    s.appendChild(g);
+
+    var fg = grid(true);
+    fg.appendChild(textField("Access barrier", p, "flag", {
+      area: true, dropEmpty: true,
+      help: "Required when any stage is Delayed; leave empty otherwise",
+      placeholder: "One sentence naming what is blocking progress."
+    }));
+    s.appendChild(fg);
+    return s;
+  }
+
+  function stagesSection(p, data) {
+    var s = section("Stages",
+      "A stage set to Delayed needs a substantive note — the validator refuses to save without one.");
+    var track = el("div", "track");
+    p.stages.forEach(function (st, i) {
+      var c = el("div", "stage " + (st.status || "idle") + (i === p.currentStage ? " current" : ""));
+      c.appendChild(el("div", "nm", data.stages[i] || ("stage " + i)));
+      c.appendChild(selectField("Status", st, "status",
+        STATUSES.map(function (k) { return { value: k, label: STATUS_LABEL[k] }; }),
+        { onChange: function () { renderProduct(); } }));
+      c.appendChild(textField("Note", st, "note", { area: true, dropEmpty: true }));
+      var r1 = el("div", "row");
+      r1.appendChild(textField("Date", st, "date", { dropEmpty: true }));
+      r1.appendChild(textField("Verified (asOf)", st, "asOf",
+        { dropEmpty: true, placeholder: "YYYY-MM-DD" }));
+      c.appendChild(r1);
+      c.appendChild(textField("Next step", st, "next", { area: true, dropEmpty: true }));
+      var r2 = el("div", "row");
+      r2.appendChild(textField("Anticipated", st, "nextDate", { dropEmpty: true }));
+      r2.appendChild(textField("Source", st, "source", { dropEmpty: true }));
+      c.appendChild(r2);
+      track.appendChild(c);
+    });
+    s.appendChild(track);
+    return s;
+  }
+
+  function priceSection(p) {
+    var d = p.detail;
+    if (!d.price || typeof d.price !== "object") return null;
+    var s = section("Price",
+      "A displayed price needs either written confirmation or a public source. This is a governance rule, not a warning.");
+    var g = grid();
+    g.appendChild(textField("Value", d.price, "value", { help: 'Use "TBC" if unverified' }));
+    g.appendChild(textField("As of", d.price, "asOf", { dropEmpty: true, placeholder: "YYYY-MM-DD" }));
+    g.appendChild(textField("Source", d.price, "source", { dropEmpty: true }));
+    s.appendChild(g);
+    var g2 = grid(true);
+    g2.appendChild(textField("Note", d.price, "note", { area: true, dropEmpty: true }));
+    s.appendChild(g2);
+    s.appendChild(checkField("Manufacturer confirmed this figure in writing",
+      d.price, "confirmedInWriting"));
+    return s;
+  }
+
+  function countsSection(p) {
+    var d = p.detail;
+    if (!d.country || typeof d.country !== "object") return null;
+    var s = section("Country counts");
+    var g = grid();
+    COUNT_KEYS.forEach(function (k) {
+      if (k in d.country || k !== "forecastDemand") g.appendChild(countField(k, d.country, k));
+    });
+    s.appendChild(g);
+    return s;
+  }
+
+  function countriesSection(p) {
+    var d = p.detail;
+    if (!d.countries) return null;
+    var s = section("Country map",
+      "Anything not Verified shows the warning note on the map, so the note has to say what is provisional about it.");
+    var g = grid();
+    g.appendChild(selectField("Status", d.countries, "status", COUNTRY_STATUSES));
+    s.appendChild(g);
+    var g2 = grid(true);
+    g2.appendChild(textField("Map warning note", d.countries, "note", { area: true }));
+    s.appendChild(g2);
+
+    var list = d.countries.list || (d.countries.list = []);
+    var rows = el("div", "rows");
+    list.forEach(function (e, i) {
+      var r = el("div", "row-item");
+      var top = el("div", "row-top");
+      top.appendChild(el("span", "n", i + 1));
+      top.appendChild(el("span", "spacer"));
+      top.appendChild(removeBtn(list, i));
+      r.appendChild(top);
+      var inl = el("div", "inline");
+      inl.appendChild(textField("ISO3", e, "iso3", { mono: true, help: "3 uppercase letters" }));
+      inl.appendChild(selectField("Level", e, "level", LEVELS));
+      r.appendChild(inl);
+      rows.appendChild(r);
+    });
+    s.appendChild(rows);
+    s.appendChild(addBtn("Add country", list, { iso3: "", level: "registered" }));
+    return s;
+  }
+
+  function journeySection(p) {
+    var d = p.detail;
+    if (!d.journey) return null;
+    var s = section("Journey gates",
+      "Order matters — gates are read in sequence to derive the timing chart.");
+    var rows = el("div", "rows");
+    d.journey.forEach(function (g, i) {
+      var r = el("div", "row-item");
+      var top = el("div", "row-top");
+      top.appendChild(el("span", "n", i + 1));
+      top.appendChild(el("span", "spacer"));
+      top.appendChild(removeBtn(d.journey, i));
+      r.appendChild(top);
+      var inl = el("div", "inline");
+      inl.appendChild(textField("Label", g, "label"));
+      inl.appendChild(yearField("Year", g, "year"));
+      r.appendChild(inl);
+      rows.appendChild(r);
+    });
+    s.appendChild(rows);
+    s.appendChild(addBtn("Add gate", d.journey, { label: "", year: "TBC" }));
+    return s;
+  }
+
+  function milestonesSection(p) {
+    var d = p.detail;
+    if (!Array.isArray(d.milestones)) return null;
+    var s = section("Milestones",
+      "A completed milestone without a source citation raises a warning — it will not block saving, but it is provenance debt.");
+    var rows = el("div", "rows");
+    d.milestones.forEach(function (m, i) {
+      var r = el("div", "row-item");
+      var top = el("div", "row-top");
+      top.appendChild(el("span", "n", i + 1));
+      top.appendChild(el("span", "spacer"));
+      top.appendChild(removeBtn(d.milestones, i));
+      r.appendChild(top);
+      var inl = el("div", "inline");
+      inl.appendChild(textField("Milestone", m, "milestone"));
+      inl.appendChild(selectField("Status", m, "status",
+        STATUSES.map(function (k) { return { value: k, label: STATUS_LABEL[k] }; })));
+      inl.appendChild(textField("Label", m, "label"));
+      inl.appendChild(textField("Date", m, "date"));
+      inl.appendChild(textField("Next", m, "next"));
+      inl.appendChild(textField("Anticipated", m, "anticipated"));
+      inl.appendChild(textField("Source", m, "source", { dropEmpty: true }));
+      r.appendChild(inl);
+      rows.appendChild(r);
+    });
+    s.appendChild(rows);
+    s.appendChild(addBtn("Add milestone", d.milestones,
+      { milestone: "", status: "idle", label: "", date: "", next: "", anticipated: "" }));
+    return s;
+  }
+
+  function otherSection(p) {
+    var d = p.detail;
+    var keys = Object.keys(d).filter(function (k) { return FORMED_DETAIL.indexOf(k) === -1; });
+    if (!keys.length) return null;
+    var s = section("Other fields",
+      "Edited as JSON. Anything without a dedicated form appears here, so a new field is never invisible.");
+    var g = grid(true);
+    keys.forEach(function (k) { g.appendChild(jsonField(k, d, k)); });
+    s.appendChild(g);
+    return s;
+  }
+
+  function removeBtn(arr, i) {
+    var b = el("button", "btn-del", "Remove");
+    b.type = "button";
+    b.addEventListener("click", function () {
+      arr.splice(i, 1);
+      renderProduct();
+      touched();
+    });
+    return b;
+  }
+  function addBtn(label, arr, template) {
+    var b = el("button", "btn-small add-row", label);
+    b.type = "button";
+    b.addEventListener("click", function () {
+      arr.push(clone(template));
+      renderProduct();
+      touched();
+    });
+    return b;
+  }
+
+  // ---------------------------------------------------------------- render
+  function renderTabs() {
+    var tabs = $("tabs");
+    tabs.innerHTML = "";
+    state.draft.products.forEach(function (p, i) {
+      var b = el("button", "tab");
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", i === state.selected ? "true" : "false");
+      b.appendChild(document.createTextNode(p.name || p.id || "(unnamed)"));
+      if (JSON.stringify(p) !== JSON.stringify(state.original.products[i])) {
+        b.appendChild(el("span", "edited", "●"));
+      }
+      b.addEventListener("click", function () {
+        state.selected = i;
+        renderTabs();
+        renderProduct();
+      });
+      tabs.appendChild(b);
+    });
+    var tracked = state.draft.products.filter(function (p) { return !p.placeholder; }).length;
+    $("prodSub").textContent = tracked + " tracked, " +
+      (state.draft.products.length - tracked) + " placeholder";
+  }
+
+  function renderProduct() {
+    var host = $("editor");
+    host.innerHTML = "";
+    var p = state.draft.products[state.selected];
+    if (!p) return;
+
+    if (p.placeholder) {
+      var ph = section("Placeholder product",
+        "Placeholders carry identity and a note only — no stages, no detail.");
+      var g = grid();
+      g.appendChild(textField("Name", p, "name"));
+      g.appendChild(textField("INN", p, "inn"));
+      g.appendChild(textField("Manufacturer", p, "manufacturer"));
+      g.appendChild(textField("Class label", p, "classLabel"));
+      ph.appendChild(g);
+      var g2 = grid(true);
+      g2.appendChild(textField("Note", p, "note", { area: true }));
+      ph.appendChild(g2);
+      host.appendChild(ph);
+      return;
+    }
+
+    [identitySection(p, state.draft),
+     stagesSection(p, state.draft),
+     priceSection(p),
+     countsSection(p),
+     countriesSection(p),
+     journeySection(p),
+     milestonesSection(p),
+     otherSection(p)
+    ].forEach(function (s) { if (s) host.appendChild(s); });
+  }
+
+  function renderFindings(found) {
+    var box = $("findings");
+    box.innerHTML = "";
+    if (!found.errors.length && !found.warnings.length) {
+      box.appendChild(el("div", "none",
+        "Nothing to report. The WHO map-overlay warnings you see on the command line come from files the editor does not touch."));
+      return;
+    }
+    var ul = el("ul", "findings");
+    found.errors.forEach(function (m) { ul.appendChild(finding("error", m)); });
+    found.warnings.forEach(function (m) { ul.appendChild(finding("warn", m)); });
+    box.appendChild(ul);
+  }
+  function finding(level, message) {
+    var li = el("li");
+    li.appendChild(el("span", "lvl lvl-" + level, level));
+    li.appendChild(el("span", null, message));
+    return li;
+  }
+
+  function renderChangelog(pending) {
+    var ul = $("changelog");
+    ul.innerHTML = "";
+    var entries = (state.draft.changelog || []).slice(0, 12);
+    if (pending) entries = [pending].concat(entries).slice(0, 12);
+    entries.forEach(function (c, i) {
+      var li = el("li", pending && i === 0 ? "new" : null);
+      li.appendChild(el("span", "d", c.date || "—"));
+      li.appendChild(el("span", "p", c.product || "—"));
+      li.appendChild(el("span", null,
+        (pending && i === 0 ? "(will be added) " : "") + (c.change || "")));
+      ul.appendChild(li);
+    });
+  }
+
+  // ---------------------------------------------------------------- state
+  var timer = null;
+  function touched() {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(refresh, 120);
+  }
+
+  function changedProducts() {
+    var out = [];
+    state.draft.products.forEach(function (p, i) {
+      if (JSON.stringify(p) !== JSON.stringify(state.original.products[i])) {
+        out.push(p.name || p.id);
+      }
+    });
+    return out;
+  }
+
+  function refresh() {
+    var found = window.LAUNCH_RULES.checkData(state.draft);
+    renderFindings(found);
+
+    var mini = $("miniChecks");
+    mini.innerHTML = "";
+    mini.appendChild(pillCount(found.errors.length,
+      found.errors.length === 1 ? "error" : "errors",
+      found.errors.length ? "mini-err" : "mini-ok"));
+    mini.appendChild(document.createTextNode(" "));
+    mini.appendChild(pillCount(found.warnings.length,
+      found.warnings.length === 1 ? "warning" : "warnings",
+      found.warnings.length ? "mini-warn" : "mini-ok"));
+
+    var changed = changedProducts();
+    var metaChanged = JSON.stringify(state.draft.meta) !== JSON.stringify(state.original.meta);
+    var dirty = changed.length > 0 || metaChanged;
+    var dp = $("dirtyPill");
+    dp.textContent = dirty
+      ? (changed.length ? changed.length + " product" + (changed.length === 1 ? "" : "s") + " edited"
+                        : "Edited")
+      : "No changes";
+    dp.className = "pill " + (dirty ? "pill-dirty" : "pill-clean");
+
+    var ch = $("changes");
+    ch.innerHTML = "";
+    if (!dirty) {
+      ch.appendChild(document.createTextNode("Nothing has changed yet."));
+    } else {
+      ch.appendChild(document.createTextNode("Changed: "));
+      var b = el("b", null, changed.length ? changed.join(", ") : "document metadata");
+      ch.appendChild(b);
+      ch.appendChild(document.createTextNode(
+        ". Saving will add a changelog entry and set meta.lastUpdated to " + today() + "."));
+    }
+
+    var change = $("clChange").value.trim();
+    var product = $("clProduct").value;
+    var gate = [
+      { ok: dirty, text: "Something has changed" },
+      { ok: found.errors.length === 0,
+        text: found.errors.length === 0 ? "No errors" : found.errors.length + " error(s) must be fixed first" },
+      { ok: !!product, text: "Changelog product chosen" },
+      { ok: change.length >= 10, text: "Changelog description of at least 10 characters" }
+    ];
+    var gl = $("gate");
+    gl.innerHTML = "";
+    gate.forEach(function (g) {
+      var li = el("li", g.ok ? "pass" : "fail");
+      li.appendChild(el("span", "mark", g.ok ? "✓" : "✕"));
+      li.appendChild(el("span", null, g.text));
+      gl.appendChild(li);
+    });
+
+    var canSave = gate.every(function (g) { return g.ok; });
+    $("btnSave").disabled = !canSave;
+    $("btnReset").disabled = !dirty;
+
+    renderChangelog(canSave ? {
+      date: today(), product: product, change: change
+    } : null);
+
+    renderTabs();
+    updateStatusPill();
+  }
+
+  function pillCount(n, label, cls) {
+    var s = el("span", "mini " + cls);
+    s.appendChild(el("b", null, n));
+    s.appendChild(el("span", null, label));
+    return s;
+  }
+
+  function updateStatusPill() {
+    var st = (state.draft.meta && state.draft.meta.dataStatus) || "unknown";
+    var pill = $("statusPill");
+    pill.textContent = st;
+    pill.className = "pill pill-" + st;
+  }
+
+  // ---------------------------------------------------------------- save
+  // Everything the analyst guide's update loop requires, in one place: the
+  // changelog entry goes on newest-first (the RSS feed reads from the top),
+  // lastUpdated moves to today, and the result is re-checked before it is
+  // allowed out. Serialization goes through the same house-style writer the
+  // round-trip test covers, so the diff shows only the real change.
+  function save() {
+    var out = clone(state.draft);
+    var entry = {
+      date: today(),
+      product: $("clProduct").value,
+      change: $("clChange").value.trim()
+    };
+    var plain = $("clPlain").value.trim();
+    if (plain) entry.plain = plain;
+
+    out.changelog = [entry].concat(out.changelog || []);
+    out.meta.lastUpdated = today();
+
+    var recheck = window.LAUNCH_RULES.checkData(out);
+    if (recheck.errors.length) {
+      note("Refused: the finished file has " + recheck.errors.length +
+           " error(s). Nothing was written.", true);
+      renderFindings(recheck);
+      return;
+    }
+
+    var text = window.LAUNCH_SERIALIZE.serializeProducts(out, state.raw);
+
+    var blob = new Blob([text], { type: "text/javascript;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "products.js";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+
+    // The draft becomes the new baseline, so the dirty markers reset and a
+    // second save does not re-add the same changelog entry.
+    state.draft = out;
+    state.original = clone(out);
+    $("clChange").value = "";
+    $("clPlain").value = "";
+    renderProduct();
+    refresh();
+    note("Saved products.js to your downloads. Move it into data/, run " +
+         "node scripts/validate-data.js, then commit.", false);
+  }
+
+  function note(text, bad) {
+    var n = $("saveNote");
+    n.textContent = text;
+    n.style.color = bad ? "var(--crit)" : "var(--good)";
+  }
+
+  function reset() {
+    state.draft = clone(state.original);
+    $("clChange").value = "";
+    $("clPlain").value = "";
+    note("", false);
+    renderProduct();
+    refresh();
+  }
+
+  // ---------------------------------------------------------------- boot
   function boot(msg, detail, cmd) {
     var b = el("div", "boot");
     b.appendChild(el("p", "bad", msg));
@@ -224,7 +942,7 @@
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.text();
     })
-    .then(render)
+    .then(start)
     .catch(function (e) {
       boot(
         "Could not read data/products.js — " + e.message,
@@ -233,7 +951,7 @@
       );
     });
 
-  function render(raw) {
+  function start(raw) {
     var extracted = window.LAUNCH_RULES.extractData(raw);
     if (!extracted.ok) {
       boot(
@@ -244,174 +962,69 @@
       );
       return;
     }
-    var data = extracted.data;
 
-    // Proves the serializer agrees with the file it just read. If this ever
-    // says no, saving would rewrite the whole file, so it is worth surfacing
-    // rather than discovering in a diff.
-    var faithful = window.LAUNCH_SERIALIZE.serializeProducts(data, raw) === raw;
+    // If the serializer disagrees with the file as loaded, every save would
+    // rewrite the whole thing. Better to refuse than to hand someone an
+    // unreviewable diff.
+    var faithful = window.LAUNCH_SERIALIZE.serializeProducts(extracted.data, raw) === raw;
+    if (!faithful) {
+      boot(
+        "The serializer does not reproduce data/products.js byte for byte.",
+        "Saving would reformat the whole file and bury your change in the diff. Run node scripts/test-serializer.js to see where it differs, and fix that before editing here."
+      );
+      return;
+    }
+
+    state.raw = raw;
+    state.original = clone(extracted.data);
+    state.draft = clone(extracted.data);
 
     $("boot").hidden = true;
     $("app").hidden = false;
 
-    var st = (data.meta && data.meta.dataStatus) || "unknown";
-    var pill = el("span", "pill pill-" + st, st);
-    $("statusPill").replaceWith(pill);
-    pill.id = "statusPill";
-    $("updated").textContent = "last updated " + ((data.meta && data.meta.lastUpdated) || "—");
+    // dataStatus controls the banner on the public page, so it belongs with
+    // the governance checks rather than buried in a product form.
+    var bar = el("div", "sect");
+    var g = grid();
+    g.appendChild(selectField("Data status", state.draft.meta, "dataStatus", DATA_STATUSES,
+      { help: "Controls the banner shown on the public dashboard" }));
+    var lu = field("Last updated");
+    var luInput = document.createElement("input");
+    luInput.type = "text";
+    luInput.id = lu._id;
+    luInput.value = state.draft.meta.lastUpdated || "";
+    luInput.readOnly = true;
+    luInput.style.background = "var(--band)";
+    luInput.style.color = "var(--soft)";
+    lu.appendChild(luInput);
+    help(lu, "Set to today automatically when you save");
+    g.appendChild(lu);
+    bar.appendChild(g);
+    $("findings").parentNode.insertBefore(bar, $("findings"));
 
-    renderChecks(data, faithful);
-    renderProducts(data);
-    renderChangelog(data);
-  }
-
-  function renderChecks(data, faithful) {
-    var found = window.LAUNCH_RULES.checkData(data);
-    var nE = found.errors.length, nW = found.warnings.length;
-
-    var tallies = $("tallies");
-    tallies.innerHTML = "";
-    tallies.appendChild(tally(nE, nE === 1 ? "error" : "errors", nE ? "t-err" : "t-zero"));
-    tallies.appendChild(tally(nW, nW === 1 ? "warning" : "warnings", nW ? "t-warn" : "t-zero"));
-    tallies.appendChild(tally(
-      faithful ? "✓" : "✕",
-      faithful ? "round-trips byte-identical" : "serializer disagrees with the file",
-      faithful ? "t-ok" : "t-err"
-    ));
-
-    $("checkSub").textContent =
-      "The product-data rules from scripts/data-rules.js — the same ones the command line runs";
-
-    var box = $("findings");
-    box.innerHTML = "";
-    if (!nE && !nW) {
-      box.appendChild(el("div", "none",
-        "Nothing to report. The WHO map-overlay warnings you see on the command line come from files the editor does not touch."));
-      return;
-    }
-    var ul = el("ul", "findings");
-    found.errors.forEach(function (m) { ul.appendChild(finding("error", m)); });
-    found.warnings.forEach(function (m) { ul.appendChild(finding("warn", m)); });
-    box.appendChild(ul);
-  }
-
-  function tally(n, label, cls) {
-    var d = el("div", "tally " + cls);
-    d.appendChild(el("b", null, n));
-    d.appendChild(el("span", null, label));
-    return d;
-  }
-
-  function finding(level, message) {
-    var li = el("li");
-    li.appendChild(el("span", "lvl lvl-" + level, level));
-    li.appendChild(el("span", null, message));
-    return li;
-  }
-
-  function renderProducts(data) {
-    var box = $("products");
-    box.innerHTML = "";
-    var tracked = data.products.filter(function (p) { return !p.placeholder; });
-    $("prodSub").textContent =
-      tracked.length + " tracked" +
-      (data.products.length > tracked.length
-        ? ", " + (data.products.length - tracked.length) + " placeholder" : "");
-
-    data.products.forEach(function (p) { box.appendChild(product(p, data)); });
-  }
-
-  function product(p, data) {
-    var d = el("div", "prod");
-
-    var h = el("div", "prod-h");
-    h.appendChild(el("h3", null, p.name || "(unnamed)"));
-    if (p.inn) h.appendChild(el("span", "inn", p.inn));
-    if (p.placeholder) h.appendChild(el("span", "tag tag-ph", "placeholder"));
-    else if (p.class) h.appendChild(el("span", "tag", p.class));
-    if (p.phase) h.appendChild(el("span", "tag", p.phase));
-    d.appendChild(h);
-
-    var meta = [p.manufacturer, p.classLabel].filter(Boolean).join(" · ");
-    if (meta) d.appendChild(el("div", "prod-meta", meta));
-
-    if (p.placeholder) {
-      if (p.note) d.appendChild(el("div", "prod-meta", p.note));
-      return d;
-    }
-
-    if (p.flag) {
-      var f = el("div", "flag");
-      f.appendChild(el("b", null, "Access barrier"));
-      f.appendChild(el("span", null, p.flag));
-      d.appendChild(f);
-    }
-
-    if (Array.isArray(p.stages)) {
-      var track = el("div", "track");
-      p.stages.forEach(function (s, i) {
-        var cls = "stage " + (s.status || "idle") + (i === p.currentStage ? " current" : "");
-        var c = el("div", cls);
-        c.appendChild(el("div", "nm", (data.stages && data.stages[i]) || ("stage " + i)));
-        var label = STATUS_LABEL[s.status] || s.status || "—";
-        c.appendChild(el("div", "st", label));
-        if (s.note && s.note.trim() !== label) c.appendChild(el("div", "note", s.note));
-        if (s.status !== "idle") {
-          c.appendChild(el("div", "asof" + (s.asOf ? "" : " missing"),
-            s.asOf ? "verified " + s.asOf : "no asOf date"));
-        }
-        track.appendChild(c);
-      });
-      d.appendChild(track);
-    }
-
-    var detail = p.detail || {};
-    var facts = el("div", "facts");
-
-    if (detail.price) {
-      var pf = fact("Price", detail.price.value || "—");
-      pf.appendChild(el("div", detail.price.confirmedInWriting ? "okish" : "warnish",
-        detail.price.confirmedInWriting
-          ? "confirmed in writing"
-          : (detail.price.source ? "public source cited" : "not confirmed")));
-      facts.appendChild(pf);
-    }
-    if (detail.country) {
-      facts.appendChild(fact("Registered", detail.country.registered));
-      facts.appendChild(fact("In guidelines", detail.country.inGuidelines));
-      facts.appendChild(fact("In MFT", detail.country.inMft));
-    }
-    if (detail.countries) {
-      var cf = fact("Country map", (detail.countries.list || []).length + " countries");
-      cf.appendChild(el("div", detail.countries.status === "verified" ? "okish" : "warnish",
-        detail.countries.status));
-      facts.appendChild(cf);
-    }
-    if (Array.isArray(detail.milestones)) {
-      facts.appendChild(fact("Milestones", detail.milestones.length));
-    }
-    if (facts.children.length) d.appendChild(facts);
-
-    return d;
-  }
-
-  function fact(k, v) {
-    var f = el("div", "fact");
-    f.appendChild(el("div", "k", k));
-    f.appendChild(el("div", "v", v === undefined || v === null || v === "" ? "—" : v));
-    return f;
-  }
-
-  function renderChangelog(data) {
-    var ul = $("changelog");
-    ul.innerHTML = "";
-    (data.changelog || []).slice(0, 12).forEach(function (c) {
-      var li = el("li");
-      li.appendChild(el("span", "d", c.date || "—"));
-      li.appendChild(el("span", "p", c.product || "—"));
-      li.appendChild(el("span", null, c.change || ""));
-      ul.appendChild(li);
+    var sel = $("clProduct");
+    sel.appendChild(new Option("All", "All"));
+    state.draft.products.forEach(function (p) {
+      sel.appendChild(new Option(p.name || p.id, p.name || p.id));
     });
+
+    $("clChange").addEventListener("input", touched);
+    $("clPlain").addEventListener("input", touched);
+    sel.addEventListener("change", touched);
+    $("btnSave").addEventListener("click", save);
+    $("btnReset").addEventListener("click", reset);
+
+    window.addEventListener("beforeunload", function (e) {
+      if (changedProducts().length ||
+          JSON.stringify(state.draft.meta) !== JSON.stringify(state.original.meta)) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+
+    renderTabs();
+    renderProduct();
+    refresh();
   }
 })();
 </script>

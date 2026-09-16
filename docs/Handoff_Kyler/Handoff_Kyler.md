@@ -159,6 +159,44 @@ it. Left alone as out of scope.
       fixed 4-column grid (8 stages = 2 full rows; `auto-fit` stranded the
       eighth alone), and a note that merely repeats its status label is
       suppressed.
+- [x] **Item 3, slice B — the forms.** `editor.html` is now editable, 1028
+      lines. Product tabs, then per-product sections: identity, the eight
+      stages, price, country counts, country map, journey gates, milestones,
+      and a raw-JSON box for every `detail` key without a dedicated form —
+      so a schema addition degrades to "editable as JSON", never to invisible.
+
+      Inputs bind straight to the draft object; only the checks panel
+      re-renders on a keystroke. Re-rendering the form would steal focus
+      mid-word.
+
+      **The save gate** is four conditions, all shown live: something has
+      changed, zero errors, a changelog product, and a description of at least
+      ten characters (the validator's own threshold). Saving prepends the
+      changelog entry, sets `meta.lastUpdated` to today, **re-checks the
+      finished object**, and only then serializes. A failed re-check writes
+      nothing and says so.
+
+      **Verified the save path produces a minimal diff.** Simulated a real
+      edit — a stage to In progress, a note, an `asOf` — and diffed the
+      output:
+
+      ```
+      29c29   "lastUpdated": "2026-09-08"  ->  "2026-09-16"
+      67a68   + the new changelog entry
+      104c105 the one stage row
+      ```
+
+      Five changed lines, nothing else moved. That is the whole reason the
+      house-style serializer exists.
+
+      Saving currently **downloads** `products.js`. The GitHub commit path is
+      item 5; the gate and the serializer it runs through do not change when
+      that lands.
+
+      One refusal worth knowing about: if the serializer does not reproduce
+      the file byte-for-byte on load, the editor refuses to open at all.
+      Better than handing someone a save that reformats 345 lines and buries
+      their change.
 
 ### Verify block — all passing
 
@@ -184,28 +222,32 @@ NUL bytes: 0 in every touched file, counted in Python. Line endings: LF.
 | `data/products.js` | one escaped em-dash normalised (see §1) |
 | `docs/editor-build-spec.pdf` | **new** — build spec |
 | `docs/editor-setup-requirements.pdf` | **new** — accounts, plan, setup phases |
-| `editor.html` | **new** — the editor, read-only slice |
+| `editor.html` | **new** — the editor: read-only slice, then the forms and save gate |
 | `scripts/build-public-site.sh` | comment only: says why `editor.html` is absent |
 
 ---
 
 ## 4. Still to do
 
-### Next up — item 3, slice B: the forms
+### Next up — item 4, the preview
 
-Slice A is in. Slice B makes the fields editable. The functional spec already
-exists: `streamlit-app/edit_tab.py` (402 lines) has worked out every field,
-grid and save gate. Rebuild the packaging, not the thinking.
+The analyst can now edit and save, but cannot see the result on the real page
+before committing to it. That is the gap.
 
-Scope, following the analyst guide's update loop: stage statuses/notes/dates/
-sources/`asOf`, the bottleneck flag, current stage, poster phase, price,
-country counts, milestones, journey gates, the country-map list, add/delete/
-placeholder products, `meta.dataStatus`, and a raw-JSON escape hatch for
-everything else.
+Load `illustrated-journey-dashboard.html` into an iframe from a blob URL with
+the draft data substituted for the `data/products.js` script tag. The page
+reads `window.LAUNCH_DATA` plus `LAUNCH_MAP`, `LAUNCH_MAP_GEO`,
+`LAUNCH_RESISTANCE` and `LAUNCH_MOLECULAR_MARKERS`; only the first is being
+edited, so the rest load unchanged.
 
-The save gate is the part to get right: a changelog description is required,
-added newest-first, with `meta.lastUpdated` bumped to today. `checkData` must
-pass before save is offered at all.
+Deliberately **not** a deploy-per-branch preview: that couples us to a
+specific host, and the hosting decision is RBM's.
+
+### Not built yet, from slice B's scope
+
+Add / delete / placeholder products. Everything else in the item 3 scope is
+in. Deferred because the four products are stable and the delete path wants
+a confirmation flow that is worth designing once rather than twice.
 
 **Run it:**
 
