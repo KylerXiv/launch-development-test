@@ -197,6 +197,31 @@ it. Left alone as out of scope.
       the file byte-for-byte on load, the editor refuses to open at all.
       Better than handing someone a save that reformats 345 lines and buries
       their change.
+- [x] **Item 4 — in-page preview.** A Preview panel between editing and
+      saving renders the real `illustrated-journey-dashboard.html` from the
+      draft, in an iframe, with no deploy involved.
+
+      How: the journey page is fetched once and kept as a template. Each build
+      swaps its `<script src="data/products.js">` tag for the draft inline and
+      injects a `<base>` so the remaining relative paths — the map, the WHO
+      overlays, the icons — still resolve from a `blob:` URL.
+
+      **Save and preview now share one `finished()` function** that produces
+      what publishing would actually write: draft, plus the pending changelog
+      entry, plus `lastUpdated` set to today. Same principle as the shared
+      rules module — if the preview and the save each built their own object,
+      they could show different things, and the preview would be worthless.
+
+      Verified by serving the transform from a **subdirectory**, so every
+      relative path could only resolve via the injected `<base>`. A draft-only
+      edit (renamed product, a stage set to Delayed, an access-barrier
+      sentence) rendered correctly: the red delayed badge appeared on the
+      right gate, the barrier sentence showed under the card, and the header
+      read the bumped date — none of it present in `data/products.js`.
+
+      Rebuild is manual, not per-keystroke: the journey page pulls 1.5 MB of
+      map geometry and initialises MapLibre. The panel says when the draft has
+      moved on from what is rendered.
 
 ### Verify block — all passing
 
@@ -229,19 +254,20 @@ NUL bytes: 0 in every touched file, counted in Python. Line endings: LF.
 
 ## 4. Still to do
 
-### Next up — item 4, the preview
+### Next up — item 5, GitHub read and write
 
-The analyst can now edit and save, but cannot see the result on the real page
-before committing to it. That is the gap.
+The loop is complete except for where the file goes. Saving downloads
+`products.js`; the analyst then moves it into `data/`, validates and commits
+by hand. Item 5 replaces that with: read the current file from GitHub, create
+a branch, commit the serialized file to it, open a pull request.
 
-Load `illustrated-journey-dashboard.html` into an iframe from a blob URL with
-the draft data substituted for the `data/products.js` script tag. The page
-reads `window.LAUNCH_DATA` plus `LAUNCH_MAP`, `LAUNCH_MAP_GEO`,
-`LAUNCH_RESISTANCE` and `LAUNCH_MOLECULAR_MARKERS`; only the first is being
-edited, so the rest load unchanged.
+Four operations, all against the signed-in user's own token, so GitHub's
+permissions are the authorisation model and the page holds no credential of
+its own.
 
-Deliberately **not** a deploy-per-branch preview: that couples us to a
-specific host, and the hosting decision is RBM's.
+**Stop at opening the draft.** The publish button is not wired until branch
+protection exists — see the Pro note below. Point the editor at a scratch
+branch while building, so a mistake cannot reach `main`.
 
 ### Not built yet, from slice B's scope
 

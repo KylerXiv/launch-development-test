@@ -190,6 +190,16 @@
   .btn-save:disabled{background:var(--idle);cursor:not-allowed;}
   .btn-reset{background:var(--surface);color:var(--crit);border-color:var(--rule);}
 
+  /* ---------- preview ---------- */
+  .prev-bar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:12px 16px;
+            border-bottom:1px solid var(--line);}
+  .prev-bar .spacer{flex:1;}
+  .prev-state{font-size:12.5px;color:var(--soft);}
+  .prev-state.stale{color:var(--warn);font-weight:600;}
+  .prev-frame{width:100%;height:72vh;min-height:420px;border:0;display:block;
+              background:var(--surface);}
+  .prev-empty{padding:26px 16px;color:var(--soft);font-size:13.5px;}
+
   /* ---------- changelog list ---------- */
   .cl{margin:0;padding:0;list-style:none;max-height:260px;overflow-y:auto;}
   .cl li{display:grid;grid-template-columns:96px 118px 1fr;gap:12px;padding:8px 16px;
@@ -244,6 +254,21 @@
       </div>
       <div class="tabs" id="tabs" role="tablist"></div>
       <div id="editor"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">
+        <h2>Preview</h2>
+        <span class="sub">The real illustrated-journey page, rendered from your draft — exactly what publishing would produce</span>
+      </div>
+      <div class="prev-bar">
+        <button type="button" class="btn-small" id="btnPreview">Show preview</button>
+        <button type="button" class="btn-small" id="btnPreviewRefresh" hidden>Refresh</button>
+        <span class="prev-state" id="prevState"></span>
+        <span class="spacer"></span>
+        <button type="button" class="btn-small" id="btnPreviewTab" hidden>Open in new tab</button>
+      </div>
+      <div id="prevHost"></div>
     </div>
 
     <div class="panel save">
@@ -845,6 +870,7 @@
 
     renderTabs();
     updateStatusPill();
+    updatePreviewState();
   }
 
   function pillCount(n, label, cls) {
@@ -861,6 +887,117 @@
     pill.className = "pill pill-" + st;
   }
 
+  // ------------------------------------------------------------- finished
+  // What publishing would actually produce. Save serializes this; the preview
+  // renders it. Sharing one function is what stops the preview from showing
+  // something the save would not write — the same reason the rules live in
+  // one module rather than two.
+  function isDirty() {
+    return changedProducts().length > 0 ||
+           JSON.stringify(state.draft.meta) !== JSON.stringify(state.original.meta);
+  }
+
+  function finished() {
+    var out = clone(state.draft);
+    if (!isDirty()) return out;
+    var change = $("clChange").value.trim();
+    var product = $("clProduct").value;
+    if (change.length >= 10 && product) {
+      var entry = { date: today(), product: product, change: change };
+      var plain = $("clPlain").value.trim();
+      if (plain) entry.plain = plain;
+      out.changelog = [entry].concat(out.changelog || []);
+    }
+    out.meta.lastUpdated = today();
+    return out;
+  }
+
+  // ---------------------------------------------------------------- preview
+  // The journey page is fetched once and kept as a template. Each build swaps
+  // its data/products.js script tag for the draft inline, and injects a <base>
+  // so the remaining relative paths (the map, the WHO overlays, the icons)
+  // still resolve from a blob: URL.
+  var preview = { template: null, shownFingerprint: null, url: null, open: false };
+
+  function previewFingerprint() { return JSON.stringify(finished()); }
+
+  function buildPreview() {
+    var host = $("prevHost");
+    var data = finished();
+
+    var html = preview.template
+      .replace('<script src="data/products.js"><\/script>',
+               '<script>window.LAUNCH_DATA = ' + JSON.stringify(data) + ';<\/script>')
+      .replace('<meta charset="utf-8">',
+               '<meta charset="utf-8">\n<base href="' +
+                 new URL(".", location.href).href + '">');
+
+    if (preview.url) URL.revokeObjectURL(preview.url);
+    preview.url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+
+    host.innerHTML = "";
+    var f = document.createElement("iframe");
+    f.className = "prev-frame";
+    f.title = "Illustrated journey, rendered from the current draft";
+    f.src = preview.url;
+    host.appendChild(f);
+
+    preview.shownFingerprint = previewFingerprint();
+    updatePreviewState();
+  }
+
+  function updatePreviewState() {
+    var st = $("prevState");
+    if (!preview.open) { st.textContent = ""; st.className = "prev-state"; return; }
+    if (preview.shownFingerprint === previewFingerprint()) {
+      st.textContent = "Showing the current draft.";
+      st.className = "prev-state";
+    } else {
+      st.textContent = "The draft has changed since this was rendered — refresh to see it.";
+      st.className = "prev-state stale";
+    }
+  }
+
+  function togglePreview() {
+    if (preview.open) {
+      preview.open = false;
+      $("prevHost").innerHTML = "";
+      $("btnPreview").textContent = "Show preview";
+      $("btnPreviewRefresh").hidden = true;
+      $("btnPreviewTab").hidden = true;
+      updatePreviewState();
+      return;
+    }
+    var start = function () {
+      preview.open = true;
+      $("btnPreview").textContent = "Hide preview";
+      $("btnPreviewRefresh").hidden = false;
+      $("btnPreviewTab").hidden = false;
+      buildPreview();
+    };
+    if (preview.template) return start();
+
+    $("prevHost").innerHTML = "";
+    $("prevHost").appendChild(el("div", "prev-empty", "Loading the journey page…"));
+    fetch("illustrated-journey-dashboard.html", { cache: "no-store" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.text();
+      })
+      .then(function (t) {
+        if (t.indexOf('<script src="data/products.js"><\/script>') === -1) {
+          throw new Error("could not find the data/products.js script tag to substitute");
+        }
+        preview.template = t;
+        start();
+      })
+      .catch(function (e) {
+        $("prevHost").innerHTML = "";
+        $("prevHost").appendChild(el("div", "prev-empty",
+          "Could not load illustrated-journey-dashboard.html — " + e.message));
+      });
+  }
+
   // ---------------------------------------------------------------- save
   // Everything the analyst guide's update loop requires, in one place: the
   // changelog entry goes on newest-first (the RSS feed reads from the top),
@@ -868,17 +1005,7 @@
   // allowed out. Serialization goes through the same house-style writer the
   // round-trip test covers, so the diff shows only the real change.
   function save() {
-    var out = clone(state.draft);
-    var entry = {
-      date: today(),
-      product: $("clProduct").value,
-      change: $("clChange").value.trim()
-    };
-    var plain = $("clPlain").value.trim();
-    if (plain) entry.plain = plain;
-
-    out.changelog = [entry].concat(out.changelog || []);
-    out.meta.lastUpdated = today();
+    var out = finished();
 
     var recheck = window.LAUNCH_RULES.checkData(out);
     if (recheck.errors.length) {
@@ -1013,6 +1140,11 @@
     sel.addEventListener("change", touched);
     $("btnSave").addEventListener("click", save);
     $("btnReset").addEventListener("click", reset);
+    $("btnPreview").addEventListener("click", togglePreview);
+    $("btnPreviewRefresh").addEventListener("click", buildPreview);
+    $("btnPreviewTab").addEventListener("click", function () {
+      if (preview.url) window.open(preview.url, "_blank", "noopener");
+    });
 
     window.addEventListener("beforeunload", function (e) {
       if (changedProducts().length ||
