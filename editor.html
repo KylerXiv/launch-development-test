@@ -20,9 +20,11 @@
   same governance rules the command line runs. No editing, no saving yet.
 
   Run it with a local server, not file://, or the browser will refuse to fetch
-  the data file:
-      python3 -m http.server 8000
-      open http://localhost:8000/editor.html
+  the data file. Bind to localhost: without --bind, http.server listens on
+  every network interface and serves this whole private repo to anyone who can
+  reach the machine.
+      python3 -m http.server 8001 --bind 127.0.0.1
+      open http://localhost:8001/editor.html
 -->
 <style>
   :root{
@@ -226,8 +228,8 @@
     .catch(function (e) {
       boot(
         "Could not read data/products.js — " + e.message,
-        "Browsers refuse to fetch local files from a file:// page. Serve the repo over HTTP instead, from the repo root:",
-        "python3 -m http.server 8000\nopen http://localhost:8000/editor.html"
+        "Browsers refuse to fetch local files from a file:// page. Serve the repo over HTTP instead, from the repo root — --bind keeps it off the network:",
+        "python3 -m http.server 8001 --bind 127.0.0.1\nopen http://localhost:8001/editor.html"
       );
     });
 

@@ -102,6 +102,25 @@ one-line change (`_SCALARS` check → allow `list` of scalars) should be made
 with its own round-trip test. **Worth doing before anyone edits data through
 Streamlit again.**
 
+**A stale `http.server` was serving this repo to the whole network.** Found
+while trying to start a local server for the editor: port 8000 was taken by a
+`python -m http.server 8000` started on **9 Sep at 01:35**, still running seven
+days later, with its working directory set to this repo.
+
+It was bound to `*:8000` — every network interface, not just localhost, which
+is `http.server`'s default and its worst footgun. For a week, anyone on the
+same network could have browsed `sourcing/`, `briefs/`, `docs/` and the rest of
+the private repo.
+
+Two unrelated `uvicorn` processes from the Ontology project also hold port 8000
+on `127.0.0.1`; they are a different project and were left alone.
+
+Consequence for this branch: **every run instruction now says
+`--bind 127.0.0.1`**, in `editor.html` (header comment and the on-screen
+message), this document, and `editor-setup-requirements.pdf`. The earlier
+wording reproduced exactly this problem. Use a port that is actually free —
+8001 rather than 8000 — since the Ontology services still hold 8000.
+
 **`.DS_Store` files are untracked and not ignored** — `.DS_Store` and
 `data/.DS_Store` show in `git status`. One line in `.gitignore` would settle
 it. Left alone as out of scope.
@@ -188,9 +207,15 @@ The save gate is the part to get right: a changelog description is required,
 added newest-first, with `meta.lastUpdated` bumped to today. `checkData` must
 pass before save is offered at all.
 
-**Run it:** `python3 -m http.server 8000`, then
-`http://localhost:8000/editor.html`. A `file://` page cannot fetch the data
-file; the editor says so, with the command, if you try.
+**Run it:**
+
+```
+python3 -m http.server 8001 --bind 127.0.0.1
+open http://localhost:8001/editor.html
+```
+
+A `file://` page cannot fetch the data file; the editor says so, with the
+command, if you try. `--bind 127.0.0.1` is not optional — see §2.
 
 ### Then
 
@@ -234,6 +259,24 @@ None block items 3–5.
 | Will their site embed our page, or copy the files? | Whether publishing stays automatic after handover |
 | Who owns the repo and hosting afterwards? | Where the GitHub App and hosting get created — cheaper to get right first time |
 | Is endmalaria.org in-house or contractor-run? | Who we are actually handing over to |
+
+### Order of work from here
+
+1. **Slice B — the forms.** The large piece. Everything else waits on it.
+2. **Item 4 — preview.** Small once the draft state from slice B exists: the
+   journey page in an iframe, fed the draft.
+3. **Item 5 — GitHub read/write.** Stops at *opening* a draft. The publish
+   button stays unwired.
+4. **Item 6 — sign-in.** Pasted fine-grained token. Independent of the above,
+   can be slotted in whenever.
+5. **Item 7 — branch protection.** Blocked on GitHub Pro. The moment this
+   lands, item 5's publish button can be wired and not before.
+6. **Item 8 — analyst guide.** Last, once the loop it describes exists.
+
+Not on the critical path, but worth clearing while the above happens: send RBM
+the four questions, and decide what to do about the Streamlit serializer bug
+(fix it, or stop editing through Streamlit until this editor lands — its first
+save would rewrite the whole file).
 
 ### One thing to verify at Phase 2
 
