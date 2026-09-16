@@ -4,7 +4,10 @@
 #
 # Deliberately excluded, and never copied here: briefs/, sourcing/, ontology/,
 # docs/, history/, powerbi/, streamlit-app/, scripts/ itself, and repo files
-# like README.md/CLAUDE.md. Vercel reads the whole private repo to run this
+# like README.md/CLAUDE.md.
+#
+# editor.html is excluded too, and that omission is the ONLY thing keeping the
+# data editor off the public site. It is not an oversight — do not add it. Vercel reads the whole private repo to run this
 # script, but only files copied into $OUT end up on the public URL.
 set -euo pipefail
 

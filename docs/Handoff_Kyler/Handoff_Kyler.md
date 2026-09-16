@@ -1,12 +1,12 @@
 # Handoff — data editor (branch `data-editor`)
 
 Working notes for the browser-based data editor. This is the branch's own
-document, per [CLAUDE.md](../CLAUDE.md); `redesigning-illustrative-journey`
-keeps [illustrated-journey-ui-notes.md](illustrated-journey-ui-notes.md).
+document, per [CLAUDE.md](../../CLAUDE.md); `redesigning-illustrative-journey`
+keeps [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md).
 
 Two reference documents sit alongside this one:
-[editor-build-spec.pdf](editor-build-spec.pdf) (the technical spec) and
-[editor-setup-requirements.pdf](editor-setup-requirements.pdf) (accounts,
+[editor-build-spec.pdf](../editor-build-spec.pdf) (the technical spec) and
+[editor-setup-requirements.pdf](../editor-setup-requirements.pdf) (accounts,
 plan, and the phased setup).
 
 ---
@@ -122,6 +122,24 @@ it. Left alone as out of scope.
 - [x] **Item 2 — house-style serializer.** `scripts/serialize-products.js`,
       ported from `streamlit-app/launch_data.py`, plus
       `scripts/test-serializer.js` which round-trips both datasets.
+- [x] **Item 3, slice A — read-only editor.** `editor.html`: loads the data
+      file, renders all four products with their stage tracks, runs
+      `checkData` live and lists every finding. No editing, no saving.
+
+      Verified against deliberately broken data (bad date format, wrong type
+      on `confirmedInWriting`, invalid status enum). The page reported all
+      three with **messages identical to the CLI**, plus the knock-on
+      flag-without-a-late-stage warning — which is the point of sharing the
+      rules rather than copying them.
+
+      Counts differ by design: the page showed 3 errors / 1 warning where the
+      CLI showed 3 / 6. The gap is exactly the 5 WHO overlay warnings, which
+      read files the browser has no access to.
+
+      Two layout fixes after looking at it rendered: the stage track is a
+      fixed 4-column grid (8 stages = 2 full rows; `auto-fit` stranded the
+      eighth alone), and a note that merely repeats its status label is
+      suppressed.
 
 ### Verify block — all passing
 
@@ -147,21 +165,32 @@ NUL bytes: 0 in every touched file, counted in Python. Line endings: LF.
 | `data/products.js` | one escaped em-dash normalised (see §1) |
 | `docs/editor-build-spec.pdf` | **new** — build spec |
 | `docs/editor-setup-requirements.pdf` | **new** — accounts, plan, setup phases |
+| `editor.html` | **new** — the editor, read-only slice |
+| `scripts/build-public-site.sh` | comment only: says why `editor.html` is absent |
 
 ---
 
 ## 4. Still to do
 
-### Next up — item 3, the editor page
+### Next up — item 3, slice B: the forms
 
-`editor.html`, as a plain page with no build step. The functional spec already
+Slice A is in. Slice B makes the fields editable. The functional spec already
 exists: `streamlit-app/edit_tab.py` (402 lines) has worked out every field,
 grid and save gate. Rebuild the packaging, not the thinking.
 
-Suggested first slice, to get something reviewable early: load the data, render
-it read-only, run `checkData` live, show findings. No saving. The form layout
-is where taste decisions start, so it is worth looking at before building it
-all.
+Scope, following the analyst guide's update loop: stage statuses/notes/dates/
+sources/`asOf`, the bottleneck flag, current stage, poster phase, price,
+country counts, milestones, journey gates, the country-map list, add/delete/
+placeholder products, `meta.dataStatus`, and a raw-JSON escape hatch for
+everything else.
+
+The save gate is the part to get right: a changelog description is required,
+added newest-first, with `meta.lastUpdated` bumped to today. `checkData` must
+pass before save is offered at all.
+
+**Run it:** `python3 -m http.server 8000`, then
+`http://localhost:8000/editor.html`. A `file://` page cannot fetch the data
+file; the editor says so, with the command, if you try.
 
 ### Then
 

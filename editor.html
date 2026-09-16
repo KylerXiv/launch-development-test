@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>LAUNCH data editor</title>
+<!--
+  LAUNCH data editor — read-only slice.
+
+  INTERNAL. This page is never copied into the public bundle: it is not in the
+  allowlist in scripts/build-public-site.sh, and that omission is deliberate.
+  Do not add it.
+
+  Plain HTML, no build step, no dependencies — same as every other page in this
+  repo, so the editor hands over to RBM inside the same file set as the
+  dashboard it feeds.
+
+  Currently read-only: it loads data/products.js, renders it, and runs the
+  same governance rules the command line runs. No editing, no saving yet.
+
+  Run it with a local server, not file://, or the browser will refuse to fetch
+  the data file:
+      python3 -m http.server 8000
+      open http://localhost:8000/editor.html
+-->
+<style>
+  :root{
+    /* Taken from illustrated-journey-dashboard.html so the editor reads as
+       part of the same product, and a status here means what it means there. */
+    --ink:#16303F; --soft:#5C7480; --line:#DCE3E7; --rule:#C4D0D7;
+    --ground:#FFFFFF; --surface:#FFFFFF; --band:#F3F7F8;
+    --accent:#0F5A72; --accent-soft:#E6F1F4;
+    --good:#1E8A5A; --good-soft:#E2F2EA;
+    --warn:#B87500; --warn-soft:#FBF0DA;
+    --crit:#C0392B; --crit-soft:#FAE7E4;
+    --idle:#9AA8B1; --idle-soft:#EEF1F3;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--band);color:var(--ink);font-family:var(--sans);
+       font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:0 64px;}
+
+  /* ---------- top bar ---------- */
+  .top{background:var(--ink);color:#fff;padding-block:14px;margin-bottom:22px;}
+  .top .wrap{padding-block:0;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;}
+  .top h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-0.01em;}
+  .top .file{font-family:var(--mono);font-size:12px;color:#A9C0CC;}
+  .top .spacer{flex:1;}
+  .pill{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+        padding:3px 8px;border-radius:3px;white-space:nowrap;}
+  .pill-ro{background:#2E4F60;color:#CFE2EA;}
+  .pill-draft{background:var(--warn);color:#fff;}
+  .pill-live{background:var(--good);color:#fff;}
+  .pill-illustrative{background:#5C7480;color:#fff;}
+
+  /* ---------- panels ---------- */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;
+         margin-bottom:18px;}
+  .panel-h{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;
+           padding:13px 16px;border-bottom:1px solid var(--line);}
+  .panel-h h2{margin:0;font-size:14px;font-weight:600;letter-spacing:0.01em;}
+  .panel-h .sub{font-size:12.5px;color:var(--soft);}
+  .panel-b{padding:14px 16px;}
+
+  /* ---------- validation ---------- */
+  .checks{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;}
+  .tally{display:flex;align-items:baseline;gap:9px;padding:10px 14px;border-radius:5px;
+         border:1px solid;min-width:150px;}
+  .tally b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;}
+  .tally span{font-size:12.5px;}
+  .t-err{border-color:var(--crit);background:var(--crit-soft);color:var(--crit);}
+  .t-warn{border-color:var(--warn);background:var(--warn-soft);color:var(--warn);}
+  .t-ok{border-color:var(--good);background:var(--good-soft);color:var(--good);}
+  .t-zero{border-color:var(--line);background:var(--band);color:var(--soft);}
+  .findings{margin:0;padding:0;list-style:none;border-top:1px solid var(--line);}
+  .findings li{display:grid;grid-template-columns:62px 1fr;gap:12px;
+               padding:9px 16px;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .findings li:last-child{border-bottom:none;}
+  .findings .lvl{font-family:var(--mono);font-size:10.5px;font-weight:500;
+                 letter-spacing:0.07em;text-transform:uppercase;padding-top:3px;}
+  .lvl-error{color:var(--crit);}
+  .lvl-warn{color:var(--warn);}
+  .findings code{font-family:var(--mono);font-size:12.5px;background:var(--band);
+                 padding:1px 4px;border-radius:2px;}
+  .none{padding:14px 16px;color:var(--soft);font-size:13.5px;border-top:1px solid var(--line);}
+
+  /* ---------- products ---------- */
+  .prod{border-bottom:1px solid var(--line);padding:16px;}
+  .prod:last-child{border-bottom:none;}
+  .prod-h{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;margin-bottom:3px;}
+  .prod-h h3{margin:0;font-size:16px;font-weight:600;letter-spacing:-0.01em;}
+  .prod-h .inn{font-size:13px;color:var(--soft);font-style:italic;}
+  .prod-meta{font-size:12.5px;color:var(--soft);margin-bottom:11px;}
+  .tag{font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+       padding:2px 6px;border-radius:3px;background:var(--accent-soft);color:var(--accent);}
+  .tag-ph{background:var(--idle-soft);color:var(--soft);}
+  .flag{display:flex;gap:9px;background:var(--crit-soft);border-left:3px solid var(--crit);
+        border-radius:0 4px 4px 0;padding:9px 12px;margin-bottom:12px;font-size:13.5px;}
+  .flag b{color:var(--crit);white-space:nowrap;font-size:11px;letter-spacing:0.06em;
+          text-transform:uppercase;padding-top:2px;}
+
+  /* stage track — same colour language as the dashboard */
+  .track{display:grid;gap:7px;margin-bottom:12px;
+         grid-template-columns:repeat(4,1fr);}
+  @media (max-width:900px){ .track{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .track{grid-template-columns:1fr;} }
+  .stage{border:1px solid var(--line);border-top:3px solid var(--idle);
+         border-radius:4px;padding:8px 10px;background:var(--surface);}
+  .stage.done{border-top-color:var(--good);}
+  .stage.prog{border-top-color:var(--warn);}
+  .stage.late{border-top-color:var(--crit);background:var(--crit-soft);}
+  .stage.idle{border-top-color:var(--idle);}
+  .stage.current{box-shadow:0 0 0 2px var(--accent);}
+  .stage .nm{font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;
+             color:var(--soft);margin-bottom:3px;}
+  .stage .st{font-size:13px;font-weight:600;margin-bottom:3px;}
+  .stage.done .st{color:var(--good);}
+  .stage.prog .st{color:var(--warn);}
+  .stage.late .st{color:var(--crit);}
+  .stage.idle .st{color:var(--idle);}
+  .stage .note{font-size:12px;color:var(--soft);line-height:1.4;}
+  .stage .asof{font-family:var(--mono);font-size:10.5px;color:var(--soft);margin-top:4px;}
+  .stage .asof.missing{color:var(--warn);}
+
+  .facts{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+         font-size:13px;}
+  .fact{background:var(--band);border-radius:4px;padding:8px 10px;}
+  .fact .k{font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+           color:var(--soft);margin-bottom:2px;}
+  .fact .v{font-variant-numeric:tabular-nums;}
+  .fact .warnish{color:var(--warn);font-size:12px;}
+  .fact .okish{color:var(--good);font-size:12px;}
+
+  /* ---------- changelog ---------- */
+  .cl{margin:0;padding:0;list-style:none;}
+  .cl li{display:grid;grid-template-columns:96px 120px 1fr;gap:12px;padding:9px 16px;
+         border-bottom:1px solid var(--line);font-size:13.5px;}
+  .cl li:last-child{border-bottom:none;}
+  .cl .d{font-family:var(--mono);font-size:12px;color:var(--soft);}
+  .cl .p{font-weight:600;font-size:13px;}
+
+  .boot{padding:26px 16px;font-size:14px;}
+  .boot code{display:block;font-family:var(--mono);font-size:13px;background:var(--ink);
+             color:#CFE2EA;padding:10px 13px;border-radius:4px;margin-top:10px;
+             white-space:pre-wrap;}
+  .boot .bad{color:var(--crit);font-weight:600;}
+  @media (max-width:640px){
+    .cl li{grid-template-columns:1fr;gap:3px;}
+    .findings li{grid-template-columns:1fr;gap:2px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <h1>LAUNCH data editor</h1>
+    <span class="file">data/products.js</span>
+    <span class="spacer"></span>
+    <span class="pill pill-ro">Read-only</span>
+    <span id="statusPill"></span>
+    <span class="file" id="updated"></span>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="boot" class="panel"><div class="boot">Loading…</div></div>
+  <div id="app" hidden>
+    <div class="panel">
+      <div class="panel-h">
+        <h2>Governance checks</h2>
+        <span class="sub" id="checkSub"></span>
+      </div>
+      <div class="checks" id="tallies"></div>
+      <div id="findings"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><h2>Products</h2><span class="sub" id="prodSub"></span></div>
+      <div id="products"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><h2>Changelog</h2><span class="sub">Newest first — the order the RSS feed depends on</span></div>
+      <ul class="cl" id="changelog"></ul>
+    </div>
+  </div>
+</div>
+
+<script src="scripts/data-rules.js"></script>
+<script src="scripts/serialize-products.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var STATUS_LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
+  var $ = function (id) { return document.getElementById(id); };
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined && text !== null) n.textContent = String(text);
+    return n;
+  }
+
+  // Everything from the data file goes through textContent, never innerHTML —
+  // the editor will later render strings an analyst typed.
+  function boot(msg, detail, cmd) {
+    var b = el("div", "boot");
+    b.appendChild(el("p", "bad", msg));
+    if (detail) b.appendChild(el("p", null, detail));
+    if (cmd) b.appendChild(el("code", null, cmd));
+    $("boot").innerHTML = "";
+    $("boot").appendChild(b);
+  }
+
+  fetch("data/products.js", { cache: "no-store" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.text();
+    })
+    .then(render)
+    .catch(function (e) {
+      boot(
+        "Could not read data/products.js — " + e.message,
+        "Browsers refuse to fetch local files from a file:// page. Serve the repo over HTTP instead, from the repo root:",
+        "python3 -m http.server 8000\nopen http://localhost:8000/editor.html"
+      );
+    });
+
+  function render(raw) {
+    var extracted = window.LAUNCH_RULES.extractData(raw);
+    if (!extracted.ok) {
+      boot(
+        extracted.reason === "no-marker"
+          ? "data/products.js has no `window.LAUNCH_DATA =` line to read."
+          : "data/products.js is not strict JSON — " + extracted.message,
+        "Fix the file before the editor can load it. Single quotes, trailing commas and comments inside the object are the usual causes."
+      );
+      return;
+    }
+    var data = extracted.data;
+
+    // Proves the serializer agrees with the file it just read. If this ever
+    // says no, saving would rewrite the whole file, so it is worth surfacing
+    // rather than discovering in a diff.
+    var faithful = window.LAUNCH_SERIALIZE.serializeProducts(data, raw) === raw;
+
+    $("boot").hidden = true;
+    $("app").hidden = false;
+
+    var st = (data.meta && data.meta.dataStatus) || "unknown";
+    var pill = el("span", "pill pill-" + st, st);
+    $("statusPill").replaceWith(pill);
+    pill.id = "statusPill";
+    $("updated").textContent = "last updated " + ((data.meta && data.meta.lastUpdated) || "—");
+
+    renderChecks(data, faithful);
+    renderProducts(data);
+    renderChangelog(data);
+  }
+
+  function renderChecks(data, faithful) {
+    var found = window.LAUNCH_RULES.checkData(data);
+    var nE = found.errors.length, nW = found.warnings.length;
+
+    var tallies = $("tallies");
+    tallies.innerHTML = "";
+    tallies.appendChild(tally(nE, nE === 1 ? "error" : "errors", nE ? "t-err" : "t-zero"));
+    tallies.appendChild(tally(nW, nW === 1 ? "warning" : "warnings", nW ? "t-warn" : "t-zero"));
+    tallies.appendChild(tally(
+      faithful ? "✓" : "✕",
+      faithful ? "round-trips byte-identical" : "serializer disagrees with the file",
+      faithful ? "t-ok" : "t-err"
+    ));
+
+    $("checkSub").textContent =
+      "The product-data rules from scripts/data-rules.js — the same ones the command line runs";
+
+    var box = $("findings");
+    box.innerHTML = "";
+    if (!nE && !nW) {
+      box.appendChild(el("div", "none",
+        "Nothing to report. The WHO map-overlay warnings you see on the command line come from files the editor does not touch."));
+      return;
+    }
+    var ul = el("ul", "findings");
+    found.errors.forEach(function (m) { ul.appendChild(finding("error", m)); });
+    found.warnings.forEach(function (m) { ul.appendChild(finding("warn", m)); });
+    box.appendChild(ul);
+  }
+
+  function tally(n, label, cls) {
+    var d = el("div", "tally " + cls);
+    d.appendChild(el("b", null, n));
+    d.appendChild(el("span", null, label));
+    return d;
+  }
+
+  function finding(level, message) {
+    var li = el("li");
+    li.appendChild(el("span", "lvl lvl-" + level, level));
+    li.appendChild(el("span", null, message));
+    return li;
+  }
+
+  function renderProducts(data) {
+    var box = $("products");
+    box.innerHTML = "";
+    var tracked = data.products.filter(function (p) { return !p.placeholder; });
+    $("prodSub").textContent =
+      tracked.length + " tracked" +
+      (data.products.length > tracked.length
+        ? ", " + (data.products.length - tracked.length) + " placeholder" : "");
+
+    data.products.forEach(function (p) { box.appendChild(product(p, data)); });
+  }
+
+  function product(p, data) {
+    var d = el("div", "prod");
+
+    var h = el("div", "prod-h");
+    h.appendChild(el("h3", null, p.name || "(unnamed)"));
+    if (p.inn) h.appendChild(el("span", "inn", p.inn));
+    if (p.placeholder) h.appendChild(el("span", "tag tag-ph", "placeholder"));
+    else if (p.class) h.appendChild(el("span", "tag", p.class));
+    if (p.phase) h.appendChild(el("span", "tag", p.phase));
+    d.appendChild(h);
+
+    var meta = [p.manufacturer, p.classLabel].filter(Boolean).join(" · ");
+    if (meta) d.appendChild(el("div", "prod-meta", meta));
+
+    if (p.placeholder) {
+      if (p.note) d.appendChild(el("div", "prod-meta", p.note));
+      return d;
+    }
+
+    if (p.flag) {
+      var f = el("div", "flag");
+      f.appendChild(el("b", null, "Access barrier"));
+      f.appendChild(el("span", null, p.flag));
+      d.appendChild(f);
+    }
+
+    if (Array.isArray(p.stages)) {
+      var track = el("div", "track");
+      p.stages.forEach(function (s, i) {
+        var cls = "stage " + (s.status || "idle") + (i === p.currentStage ? " current" : "");
+        var c = el("div", cls);
+        c.appendChild(el("div", "nm", (data.stages && data.stages[i]) || ("stage " + i)));
+        var label = STATUS_LABEL[s.status] || s.status || "—";
+        c.appendChild(el("div", "st", label));
+        if (s.note && s.note.trim() !== label) c.appendChild(el("div", "note", s.note));
+        if (s.status !== "idle") {
+          c.appendChild(el("div", "asof" + (s.asOf ? "" : " missing"),
+            s.asOf ? "verified " + s.asOf : "no asOf date"));
+        }
+        track.appendChild(c);
+      });
+      d.appendChild(track);
+    }
+
+    var detail = p.detail || {};
+    var facts = el("div", "facts");
+
+    if (detail.price) {
+      var pf = fact("Price", detail.price.value || "—");
+      pf.appendChild(el("div", detail.price.confirmedInWriting ? "okish" : "warnish",
+        detail.price.confirmedInWriting
+          ? "confirmed in writing"
+          : (detail.price.source ? "public source cited" : "not confirmed")));
+      facts.appendChild(pf);
+    }
+    if (detail.country) {
+      facts.appendChild(fact("Registered", detail.country.registered));
+      facts.appendChild(fact("In guidelines", detail.country.inGuidelines));
+      facts.appendChild(fact("In MFT", detail.country.inMft));
+    }
+    if (detail.countries) {
+      var cf = fact("Country map", (detail.countries.list || []).length + " countries");
+      cf.appendChild(el("div", detail.countries.status === "verified" ? "okish" : "warnish",
+        detail.countries.status));
+      facts.appendChild(cf);
+    }
+    if (Array.isArray(detail.milestones)) {
+      facts.appendChild(fact("Milestones", detail.milestones.length));
+    }
+    if (facts.children.length) d.appendChild(facts);
+
+    return d;
+  }
+
+  function fact(k, v) {
+    var f = el("div", "fact");
+    f.appendChild(el("div", "k", k));
+    f.appendChild(el("div", "v", v === undefined || v === null || v === "" ? "—" : v));
+    return f;
+  }
+
+  function renderChangelog(data) {
+    var ul = $("changelog");
+    ul.innerHTML = "";
+    (data.changelog || []).slice(0, 12).forEach(function (c) {
+      var li = el("li");
+      li.appendChild(el("span", "d", c.date || "—"));
+      li.appendChild(el("span", "p", c.product || "—"));
+      li.appendChild(el("span", null, c.change || ""));
+      ul.appendChild(li);
+    });
+  }
+})();
+</script>
+</body>
+</html>
