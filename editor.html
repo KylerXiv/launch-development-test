@@ -812,7 +812,12 @@
         adoption: [],
         research: {},
         country: { registered: "TBC", inGuidelines: "TBC", inMft: "TBC" },
-        milestones: []
+        milestones: [],
+        // Present but empty on purpose. The validator warns when there is
+        // neither volume data nor a note explaining its absence, and the
+        // "Other fields" box only renders keys that exist — so without this
+        // the warning would name a field the interface gave no way to fill.
+        volumeNote: ""
       }
     };
   }
