@@ -136,12 +136,13 @@
 
   /* ---------- findings ---------- */
   .findings{margin:0;padding:0;list-style:none;max-height:300px;overflow-y:auto;}
-  .findings li{display:grid;grid-template-columns:64px 1fr;gap:12px;
+  .findings li{display:grid;grid-template-columns:78px 1fr;gap:13px;
                padding:9px 18px;border-bottom:1px solid var(--line-soft);font-size:13.5px;
                color:var(--ink-2);}
   .findings li:last-child{border-bottom:none;}
-  .findings .lvl{font-family:var(--mono);font-size:10px;font-weight:600;
-                 letter-spacing:0.1em;text-transform:uppercase;padding-top:3px;}
+  .findings .lvl{font-family:var(--sans);font-size:11px;font-weight:700;
+                 letter-spacing:0.04em;padding-top:2px;white-space:nowrap;}
+  .findings .where{color:var(--ink);font-weight:600;}
   .lvl-error{color:var(--magenta);}
   .lvl-warn{color:var(--amber);}
   .none{padding:15px 18px;color:var(--soft);font-size:13.5px;}
@@ -307,15 +308,15 @@
   <div id="app" hidden>
     <div class="panel">
       <div class="panel-h">
-        <h2>Governance checks</h2>
-        <span class="sub">Run against your draft by scripts/data-rules.js — the same rules the command line uses</span>
+        <h2>Checks</h2>
+        <span class="sub">Your changes are checked as you type, using the same rules the whole team uses</span>
       </div>
       <div id="findings"></div>
     </div>
 
     <div class="panel">
       <div class="panel-h">
-        <h2>Products</h2>
+        <h2>Medicines</h2>
         <span class="sub" id="prodSub"></span>
       </div>
       <div class="tabs" id="tabs" role="tablist"></div>
@@ -325,7 +326,7 @@
     <div class="panel">
       <div class="panel-h">
         <h2>Preview</h2>
-        <span class="sub">The real illustrated-journey page, rendered from your draft — exactly what publishing would produce</span>
+        <span class="sub">See your changes on the real dashboard page, before anyone else does</span>
       </div>
       <div class="prev-bar">
         <button type="button" class="btn-small" id="btnPreview">Show preview</button>
@@ -340,29 +341,29 @@
     <div class="panel save">
       <div class="panel-h">
         <h2>Save</h2>
-        <span class="sub">A change needs a changelog entry — it becomes the public record of what moved and why</span>
+        <span class="sub">Every change needs a short note saying what changed. It becomes the public record.</span>
       </div>
       <div class="panel-b">
         <div class="grid wide">
           <div class="f">
-            <label for="clProduct">Changelog: product</label>
+            <label for="clProduct">Which medicine?</label>
             <select id="clProduct"></select>
-            <span class="help">Use "All" for a change that spans products.</span>
+            <span class="help">Choose All if it affects more than one.</span>
           </div>
           <div class="f">
-            <label for="clChange">What changed</label>
+            <label for="clChange">What changed?</label>
             <textarea id="clChange" placeholder="e.g. Pyramax: WHO PQ listing confirmed, 14 March 2026."></textarea>
-            <span class="help">At least 10 characters. Written for the public feed.</span>
+            <span class="help">At least 10 characters. This gets published.</span>
           </div>
           <div class="f">
-            <label for="clPlain">Plain-English version <span style="text-transform:none;font-weight:400">(optional)</span></label>
-            <textarea id="clPlain" placeholder="Shown to non-specialist readers."></textarea>
+            <label for="clPlain">Simpler wording <span style="text-transform:none;font-weight:400">(optional)</span></label>
+            <textarea id="clPlain" placeholder="For readers who are not specialists."></textarea>
           </div>
         </div>
         <ul class="gate" id="gate"></ul>
         <div class="changes" id="changes"></div>
         <div class="save-actions">
-          <button type="button" class="btn-save" id="btnSave" disabled>Save products.js</button>
+          <button type="button" class="btn-save" id="btnSave" disabled>Save changes</button>
           <button type="button" class="btn-reset" id="btnReset" disabled>Discard changes</button>
           <span class="note" id="saveNote"></span>
         </div>
@@ -371,16 +372,15 @@
 
     <div class="panel">
       <div class="panel-h">
-        <h2>Changelog</h2>
-        <span class="sub">Newest first — the order the RSS feed depends on</span>
+        <h2>Recent changes</h2>
+        <span class="sub">Newest first</span>
       </div>
       <ul class="cl" id="changelog"></ul>
     </div>
 
-    <p class="foot">Read-only fields not covered by a form live in each product's
-      “Other fields” box as raw JSON. Nothing here touches
-      <code>data/resistance.js</code> or <code>data/molecular-markers.js</code> —
-      those are regenerated from their normalizers, never hand-edited.</p>
+    <p class="foot">Anything without its own box appears under “Other fields” for each
+      medicine, in its raw format. The drug-resistance and marker maps are not edited
+      here — those are rebuilt automatically from WHO data.</p>
   </div>
 </div>
 
@@ -392,11 +392,35 @@
 
   var STATUSES = ["done", "prog", "late", "idle"];
   var STATUS_LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
-  var PHASES = ["preclinical", "phase1", "phase2", "phase3", "regulatory", "access"];
-  var CLASSES = ["pipeline", "market"];
-  var DATA_STATUSES = ["illustrative", "draft", "live"];
-  var COUNTRY_STATUSES = ["illustrative", "draft", "verified"];
-  var LEVELS = ["registered", "guidelines", "mft"];
+  // Stored values stay exactly as the data contract defines them; only the
+  // words on screen change, so nothing downstream has to know about this.
+  var PHASES = [
+    { value: "preclinical", label: "Preclinical" },
+    { value: "phase1", label: "Phase I trials" },
+    { value: "phase2", label: "Phase II trials" },
+    { value: "phase3", label: "Phase III trials" },
+    { value: "regulatory", label: "With regulators" },
+    { value: "access", label: "Reaching patients" }
+  ];
+  var CLASSES = [
+    { value: "pipeline", label: "Still in development" },
+    { value: "market", label: "Already on the market" }
+  ];
+  var DATA_STATUSES = [
+    { value: "illustrative", label: "Illustrative \u2014 example figures only" },
+    { value: "draft", label: "Draft \u2014 not yet verified" },
+    { value: "live", label: "Live \u2014 verified and quotable" }
+  ];
+  var COUNTRY_STATUSES = [
+    { value: "illustrative", label: "Illustrative \u2014 example only" },
+    { value: "draft", label: "Draft \u2014 not yet checked" },
+    { value: "verified", label: "Verified" }
+  ];
+  var LEVELS = [
+    { value: "registered", label: "Approved for sale" },
+    { value: "guidelines", label: "In national guidelines" },
+    { value: "mft", label: "Used alongside other treatments" }
+  ];
   var COUNT_KEYS = ["registered", "inGuidelines", "inMft", "forecastDemand"];
   // Rendered by a dedicated form above; everything else falls to the raw box,
   // so a schema addition degrades to "editable as JSON" rather than "invisible".
@@ -516,7 +540,7 @@
       touched();
     });
     f.appendChild(i);
-    return help(f, 'A whole number, or "TBC"');
+    return help(f, "A number, or write TBC if not known yet");
   }
 
   // Gate years are the same shape: a year, or "TBC" for one not yet reached.
@@ -535,7 +559,7 @@
       touched();
     });
     f.appendChild(i);
-    return help(f, 'A year, or "TBC"');
+    return help(f, "A year, or write TBC if not reached yet");
   }
 
   // The product id is the key everything else joins on — the changelog, the
@@ -543,22 +567,22 @@
   // own shape rule (lowercase letters, digits, hyphens) and must be unique, so
   // it gets its own field rather than a plain text box.
   function idField(p) {
-    var f = field("ID", "mono");
+    var f = field("Short name (for links)", "mono");
     var i = document.createElement("input");
     i.type = "text";
     i.id = f._id;
     i.value = p.id || "";
-    var msg = el("span", "help", "Lowercase letters, digits and hyphens. Used in links and exports.");
+    var msg = el("span", "help", "Lowercase letters, numbers and hyphens. Appears in web links.");
     i.addEventListener("input", function () {
       var v = i.value.trim();
       p.id = v;
       var taken = state.draft.products.filter(function (o) { return o !== p && o.id === v; }).length > 0;
       var badShape = v !== "" && !/^[a-z0-9-]+$/.test(v);
       f.classList.toggle("bad", badShape || taken || v === "");
-      msg.textContent = v === "" ? "An id is required."
-        : badShape ? "Only lowercase letters, digits and hyphens."
-        : taken ? "Another product already uses this id."
-        : "Lowercase letters, digits and hyphens. Used in links and exports.";
+      msg.textContent = v === "" ? "This is required."
+        : badShape ? "Only lowercase letters, numbers and hyphens."
+        : taken ? "Another medicine is already using this."
+        : "Lowercase letters, numbers and hyphens. Appears in web links.";
       touched();
     });
     f.appendChild(i);
@@ -600,17 +624,17 @@
   function grid(wide) { return el("div", "grid" + (wide ? " wide" : "")); }
 
   function identitySection(p, data) {
-    var s = section("Identity");
+    var s = section("About this medicine");
     var g = grid();
     g.appendChild(idField(p));
     g.appendChild(textField("Name", p, "name"));
-    g.appendChild(textField("INN", p, "inn"));
+    g.appendChild(textField("Generic name (INN)", p, "inn"));
     g.appendChild(textField("Manufacturer", p, "manufacturer"));
-    g.appendChild(textField("Class label", p, "classLabel"));
-    g.appendChild(selectField("Class", p, "class", CLASSES));
-    g.appendChild(selectField("Poster phase", p, "phase", PHASES,
-      { help: "Where it sits on the pipeline poster" }));
-    g.appendChild(selectField("Current stage", p, "currentStage",
+    g.appendChild(textField("Short description", p, "classLabel"));
+    g.appendChild(selectField("In development or on market", p, "class", CLASSES));
+    g.appendChild(selectField("Development phase", p, "phase", PHASES,
+      { help: "Where it appears on the pipeline chart" }));
+    g.appendChild(selectField("Step reached so far", p, "currentStage",
       data.stages.map(function (n, i) { return { value: i, label: n }; }),
       { number: true, onChange: function () { renderProduct(); } }));
     s.appendChild(g);
@@ -618,7 +642,7 @@
     var fg = grid(true);
     fg.appendChild(textField("Access barrier", p, "flag", {
       area: true, dropEmpty: true,
-      help: "Required when any stage is Delayed; leave empty otherwise",
+      help: "Needed if any step below is marked Delayed. Leave empty otherwise.",
       placeholder: "One sentence naming what is blocking progress."
     }));
     s.appendChild(fg);
@@ -626,8 +650,8 @@
   }
 
   function stagesSection(p, data) {
-    var s = section("Stages",
-      "A stage set to Delayed needs a substantive note — the validator refuses to save without one.");
+    var s = section("Steps to reaching patients",
+      "If you mark a step Delayed, you have to explain why in its note. You cannot save without that.");
     var track = el("div", "track");
     p.stages.forEach(function (st, i) {
       var c = el("div", "stage " + (st.status || "idle") + (i === p.currentStage ? " current" : ""));
@@ -638,12 +662,12 @@
       c.appendChild(textField("Note", st, "note", { area: true, dropEmpty: true }));
       var r1 = el("div", "row");
       r1.appendChild(textField("Date", st, "date", { dropEmpty: true }));
-      r1.appendChild(textField("Verified (asOf)", st, "asOf",
-        { dropEmpty: true, placeholder: "YYYY-MM-DD" }));
+      r1.appendChild(textField("Last checked", st, "asOf",
+        { dropEmpty: true, placeholder: "2026-09-17" }));
       c.appendChild(r1);
       c.appendChild(textField("Next step", st, "next", { area: true, dropEmpty: true }));
       var r2 = el("div", "row");
-      r2.appendChild(textField("Anticipated", st, "nextDate", { dropEmpty: true }));
+      r2.appendChild(textField("Expected date", st, "nextDate", { dropEmpty: true }));
       r2.appendChild(textField("Source", st, "source", { dropEmpty: true }));
       c.appendChild(r2);
       track.appendChild(c);
@@ -656,10 +680,10 @@
     var d = p.detail;
     if (!d.price || typeof d.price !== "object") return null;
     var s = section("Price",
-      "A displayed price needs either written confirmation or a public source. This is a governance rule, not a warning.");
+      "A price can only be shown if the manufacturer confirmed it in writing, or you add a public source. That is a rule, not a suggestion.");
     var g = grid();
-    g.appendChild(textField("Value", d.price, "value", { help: 'Use "TBC" if unverified' }));
-    g.appendChild(textField("As of", d.price, "asOf", { dropEmpty: true, placeholder: "YYYY-MM-DD" }));
+    g.appendChild(textField("Price", d.price, "value", { help: "Write TBC if you do not have a confirmed figure" }));
+    g.appendChild(textField("Last checked", d.price, "asOf", { dropEmpty: true, placeholder: "2026-09-17" }));
     g.appendChild(textField("Source", d.price, "source", { dropEmpty: true }));
     s.appendChild(g);
     var g2 = grid(true);
@@ -673,10 +697,18 @@
   function countsSection(p) {
     var d = p.detail;
     if (!d.country || typeof d.country !== "object") return null;
-    var s = section("Country counts");
+    var s = section("How many countries");
     var g = grid();
+    var COUNT_LABEL = {
+      registered: "Approved for sale in",
+      inGuidelines: "In national guidelines in",
+      inMft: "Used alongside other treatments in",
+      forecastDemand: "Forecast demand"
+    };
     COUNT_KEYS.forEach(function (k) {
-      if (k in d.country || k !== "forecastDemand") g.appendChild(countField(k, d.country, k));
+      if (k in d.country || k !== "forecastDemand") {
+        g.appendChild(countField(COUNT_LABEL[k] || k, d.country, k));
+      }
     });
     s.appendChild(g);
     return s;
@@ -686,9 +718,9 @@
     var d = p.detail;
     if (!d.countries) return null;
     var s = section("Country map",
-      "Anything not Verified shows the warning note on the map, so the note has to say what is provisional about it.");
+      "Anything not marked Verified shows a warning on the map, so the note has to say what is still provisional.");
     var g = grid();
-    g.appendChild(selectField("Status", d.countries, "status", COUNTRY_STATUSES));
+    g.appendChild(selectField("How reliable is this map?", d.countries, "status", COUNTRY_STATUSES));
     s.appendChild(g);
     var g2 = grid(true);
     g2.appendChild(textField("Map warning note", d.countries, "note", { area: true }));
@@ -704,8 +736,8 @@
       top.appendChild(removeBtn(list, i));
       r.appendChild(top);
       var inl = el("div", "inline");
-      inl.appendChild(textField("ISO3", e, "iso3", { mono: true, help: "3 uppercase letters" }));
-      inl.appendChild(selectField("Level", e, "level", LEVELS));
+      inl.appendChild(textField("Country code", e, "iso3", { mono: true, help: "Three capital letters, e.g. NGA" }));
+      inl.appendChild(selectField("Status in that country", e, "level", LEVELS));
       r.appendChild(inl);
       rows.appendChild(r);
     });
@@ -717,8 +749,8 @@
   function journeySection(p) {
     var d = p.detail;
     if (!d.journey) return null;
-    var s = section("Journey gates",
-      "Order matters — gates are read in sequence to derive the timing chart.");
+    var s = section("Timeline",
+      "The order matters. These are read top to bottom to build the timeline chart.");
     var rows = el("div", "rows");
     d.journey.forEach(function (g, i) {
       var r = el("div", "row-item");
@@ -742,7 +774,7 @@
     var d = p.detail;
     if (!Array.isArray(d.milestones)) return null;
     var s = section("Milestones",
-      "A completed milestone without a source citation raises a warning — it will not block saving, but it is provenance debt.");
+      "A completed milestone with no source link raises a warning. It will not stop you saving, but it is a gap someone will eventually ask about.");
     var rows = el("div", "rows");
     d.milestones.forEach(function (m, i) {
       var r = el("div", "row-item");
@@ -758,7 +790,7 @@
       inl.appendChild(textField("Label", m, "label"));
       inl.appendChild(textField("Date", m, "date"));
       inl.appendChild(textField("Next", m, "next"));
-      inl.appendChild(textField("Anticipated", m, "anticipated"));
+      inl.appendChild(textField("Expected", m, "anticipated"));
       inl.appendChild(textField("Source", m, "source", { dropEmpty: true }));
       r.appendChild(inl);
       rows.appendChild(r);
@@ -774,7 +806,7 @@
     var keys = Object.keys(d).filter(function (k) { return FORMED_DETAIL.indexOf(k) === -1; });
     if (!keys.length) return null;
     var s = section("Other fields",
-      "Edited as JSON. Anything without a dedicated form appears here, so a new field is never invisible.");
+      "Anything without its own box appears here in its raw format. Take care with the punctuation — the layout matters.");
     var g = grid(true);
     keys.forEach(function (k) { g.appendChild(jsonField(k, d, k)); });
     s.appendChild(g);
@@ -846,13 +878,13 @@
   // asks twice rather than relying on an easily-missed browser dialog.
   function dangerZone(p) {
     var d = el("div", "danger");
-    d.appendChild(el("h3", null, "Delete this product"));
+    d.appendChild(el("h3", null, "Delete this medicine"));
     d.appendChild(el("p", null,
-      "Removes " + (p.name || p.id || "this product") + " from the dashboard entirely. " +
-      "Past versions stay in the repository's history, but the product stops appearing " +
-      "on the public board as soon as this is published."));
+      "Removes " + (p.name || p.id || "this medicine") + " from the dashboard. Older " +
+      "versions are kept, so it can be brought back \u2014 but it stops appearing publicly " +
+      "as soon as this is published."));
     var wrap = el("div");
-    var first = el("button", "btn-del", "Delete product");
+    var first = el("button", "btn-del", "Delete medicine");
     first.type = "button";
     first.addEventListener("click", function () {
       wrap.innerHTML = "";
@@ -931,7 +963,7 @@
     tabs.appendChild(addMed);
     var addPh = el("button", "btn-small", "+ Placeholder");
     addPh.type = "button";
-    addPh.title = "A product tracked by name only, with no stages or detail yet";
+    addPh.title = "A medicine tracked by name only, with no steps or detail yet";
     addPh.addEventListener("click", function () { addProduct(newPlaceholder); });
     tabs.appendChild(addPh);
 
@@ -947,14 +979,14 @@
     if (!p) return;
 
     if (p.placeholder) {
-      var ph = section("Placeholder product",
-        "Placeholders carry identity and a note only — no stages, no detail.");
+      var ph = section("Placeholder medicine",
+        "A placeholder is tracked by name only — no steps, no detail yet.");
       var g = grid();
       g.appendChild(idField(p));
       g.appendChild(textField("Name", p, "name"));
-      g.appendChild(textField("INN", p, "inn"));
+      g.appendChild(textField("Generic name (INN)", p, "inn"));
       g.appendChild(textField("Manufacturer", p, "manufacturer"));
-      g.appendChild(textField("Class label", p, "classLabel"));
+      g.appendChild(textField("Short description", p, "classLabel"));
       ph.appendChild(g);
       var g2 = grid(true);
       g2.appendChild(textField("Note", p, "note", { area: true }));
@@ -983,7 +1015,7 @@
     box.innerHTML = "";
     if (!found.errors.length && !found.warnings.length) {
       box.appendChild(el("div", "none",
-        "Nothing to report. The WHO map-overlay warnings you see on the command line come from files the editor does not touch."));
+        "Nothing to fix. (A few warnings about the drug-resistance maps only show up in the technical checks \u2014 those files are not edited here.)"));
       return;
     }
     var ul = el("ul", "findings");
@@ -991,10 +1023,95 @@
     found.warnings.forEach(function (m) { ul.appendChild(finding("warn", m)); });
     box.appendChild(ul);
   }
+  // [pattern, plain wording]. $1/$2 carry captured text through. Anything that
+  // matches nothing is shown as written — a rule we add later is then merely
+  // worded technically, never hidden.
+  var PLAIN = [
+    [/^"(\w+)" is required$/, "Needs a $1"],
+    [/^id required \(lowercase letters\/digits\/hyphens\)$/, "Needs a short name for web links — lowercase letters, numbers and hyphens only"],
+    [/^duplicate id "(.+)"$/, "Another medicine is already using the short name \u201c$1\u201d"],
+    [/^class must be "pipeline" or "market".*$/, "Say whether this is still in development or already on the market"],
+    [/^phase must be one of .*$/, "Pick a development phase"],
+    [/^no "phase" .*$/, "No development phase set, so it will not appear on the pipeline chart"],
+    [/^stages must have exactly (\d+) entries.*$/, "Should have all $1 steps listed"],
+    [/^status must be one of .*$/, "Pick a status for this step"],
+    [/^a delayed stage must carry a substantive reason in "note"$/, "Marked Delayed, so it needs a note explaining why"],
+    [/^no "asOf" verification date$/, "No date saying when this was last checked"],
+    [/^asOf must be YYYY-MM-DD, got "(.*)"$/, "The last-checked date should look like 2026-09-17, not \u201c$1\u201d"],
+    [/^has a delayed stage but no top-level "flag" sentence explaining the bottleneck$/, "A step is Delayed, so the Access barrier box needs a sentence explaining what is blocking it"],
+    [/^has a "flag" but no stage is marked late .*$/, "There is an Access barrier sentence but no step is marked Delayed"],
+    [/^currentStage must be an integer 0.*$/, "Pick which step it has currently reached"],
+    [/^"detail" is required$/, "Missing all of its detail"],
+    [/^detail\.(\w+) is required \(and must not be null\)$/, "Missing its $1 information"],
+    [/^detail\.price\.confirmedInWriting must be true or false$/, "Tick or untick the written-confirmation box for the price"],
+    [/^a displayed price needs confirmedInWriting=true or a public "source".*$/, "A price can only be shown if the manufacturer confirmed it in writing, or you add a public source"],
+    [/^detail\.price has no "asOf" date$/, "The price has no date saying when it was last checked"],
+    [/^detail\.country\.(\w+) must be a non-negative integer or "TBC"$/, "The $1 count should be a number, or TBC"],
+    [/^detail\.countries\.status must be .*$/, "Pick whether the country map is illustrative, draft or verified"],
+    [/^unverified detail\.countries needs a substantive "note".*$/, "The country map is not verified yet, so it needs a note saying what is still provisional"],
+    [/^detail\.countries\.list must be a non-empty array$/, "The country map has no countries in it"],
+    [/^countries\.list\[(\d+)\]\.iso3 must be a 3-letter uppercase ISO code$/, "Country $1 needs a three-letter country code, in capitals"],
+    [/^countries\.list has duplicate iso3 "(.+)"$/, "The country $1 is listed twice on the map"],
+    [/^countries\.list\[(\d+)\]\.level must be .*$/, "Country $1 needs a level choosing"],
+    [/^detail\.journey must be an array of at least 2 gates$/, "The timeline needs at least two points"],
+    [/^journey\[(\d+)\] needs a "label"$/, "Timeline point $1 needs a name"],
+    [/^journey\[(\d+)\]\.year must be a year .*$/, "Timeline point $1 needs a year, or TBC"],
+    [/^journey\[(\d+)\] year (\d+) is earlier than the previous.*$/, "Timeline point $1 is dated $2, earlier than the point before it \u2014 check the order"],
+    [/^no volume data and no "volumeNote" explaining why$/, "Does not say how many doses have been bought, or why that is not known"],
+    [/^detail\.volume needs total, period and split\[\]$/, "The purchase figures are incomplete"],
+    [/^detail\.volume\.split percentages sum to (\S+), expected 100$/, "The purchase split adds up to $1%, not 100%"],
+    [/^bad status "(.*)"$/, "\u201c$1\u201d is not a status we recognise"],
+    [/^completed milestone "(.+)" has no source citation$/, "The completed milestone \u201c$1\u201d has no source link"],
+    [/^placeholder products need a "note"$/, "Needs a note saying what it is"],
+    [/^glossary\["(.+)"\]: definition must be a real sentence$/, "The glossary entry for \u201c$1\u201d needs a proper sentence"],
+    [/^meta\.lastUpdated: .*$/, "The last-updated date is not in the right format"],
+    [/^meta\.dataStatus: .*$/, "Pick a data status at the top of the page"],
+    [/^changelog\[(\d+)\]: date must be YYYY-MM-DD$/, "Change $1 in the list below has a bad date"],
+    [/^changelog\[(\d+)\]: "product" is required.*$/, "Change $1 in the list below does not say which medicine it is about"],
+    [/^changelog\[(\d+)\]: "change" must describe what changed$/, "Change $1 in the list below needs a description"],
+    [/^changelog\[(\d+)\]: dates not newest-first.*$/, "The list of changes is out of order \u2014 newest must come first"]
+  ];
+
+  // "products[2] (pyramax) stage \"National policy adoption\": ..." becomes
+  // a readable place and a readable problem.
+  function splitFinding(message) {
+    var where = "", rest = message;
+    var m = rest.match(/^products\[(\d+)\] \(([^)]*)\)(.*)$/);
+    if (m) {
+      var prod = state.draft.products[Number(m[1])];
+      where = (prod && (prod.name || prod.id)) || m[2] || "A medicine";
+      rest = m[3];
+      var st = rest.match(/^ stage "([^"]+)":\s*(.*)$/);
+      if (st) { where += " \u2192 " + st[1]; rest = st[2]; }
+      var ms = rest.match(/^ milestone\[(\d+)\]:\s*(.*)$/);
+      if (ms) { where += " \u2192 milestone " + (Number(ms[1]) + 1); rest = ms[2]; }
+      rest = rest.replace(/^:\s*/, "");
+    } else if (/^(meta|changelog|glossary|stages|stageColumns)\b/.test(rest)) {
+      where = "This document";
+    }
+    return { where: where, rest: rest };
+  }
+
+  function plainly(message) {
+    var parts = splitFinding(message);
+    var text = parts.rest;
+    for (var i = 0; i < PLAIN.length; i++) {
+      if (PLAIN[i][0].test(text)) { text = text.replace(PLAIN[i][0], PLAIN[i][1]); break; }
+    }
+    return { where: parts.where, text: text };
+  }
+
   function finding(level, message) {
+    var p = plainly(message);
     var li = el("li");
-    li.appendChild(el("span", "lvl lvl-" + level, level));
-    li.appendChild(el("span", null, message));
+    li.appendChild(el("span", "lvl lvl-" + level,
+      level === "error" ? "Must fix" : "Check"));
+    var body = el("span");
+    if (p.where) body.appendChild(el("b", "where", p.where + " \u2014 "));
+    body.appendChild(document.createTextNode(p.text));
+    li.appendChild(body);
+    // the exact wording the command line uses, for anyone who needs it
+    li.title = message;
     return li;
   }
 
@@ -1008,7 +1125,7 @@
       li.appendChild(el("span", "d", c.date || "—"));
       li.appendChild(el("span", "p", c.product || "—"));
       li.appendChild(el("span", null,
-        (pending && i === 0 ? "(will be added) " : "") + (c.change || "")));
+        (pending && i === 0 ? "(about to be added) " : "") + (c.change || "")));
       ul.appendChild(li);
     });
   }
@@ -1049,7 +1166,7 @@
     var dirty = changed.length > 0 || metaChanged;
     var dp = $("dirtyPill");
     dp.textContent = dirty
-      ? (changed.length ? changed.length + " product" + (changed.length === 1 ? "" : "s") + " edited"
+      ? (changed.length ? changed.length + " medicine" + (changed.length === 1 ? "" : "s") + " edited"
                         : "Edited")
       : "No changes";
     dp.className = "pill " + (dirty ? "pill-dirty" : "pill-clean");
@@ -1057,23 +1174,24 @@
     var ch = $("changes");
     ch.innerHTML = "";
     if (!dirty) {
-      ch.appendChild(document.createTextNode("Nothing has changed yet."));
+      ch.appendChild(document.createTextNode("You have not changed anything yet."));
     } else {
       ch.appendChild(document.createTextNode("Changed: "));
       var b = el("b", null, changed.length ? changed.join(", ") : "document metadata");
       ch.appendChild(b);
       ch.appendChild(document.createTextNode(
-        ". Saving will add a changelog entry and set meta.lastUpdated to " + today() + "."));
+        ". Saving will add your note to the record and date it " + today() + "."));
     }
 
     var change = $("clChange").value.trim();
     var product = $("clProduct").value;
     var gate = [
-      { ok: dirty, text: "Something has changed" },
+      { ok: dirty, text: "You have changed something" },
       { ok: found.errors.length === 0,
-        text: found.errors.length === 0 ? "No errors" : found.errors.length + " error(s) must be fixed first" },
-      { ok: !!product, text: "Changelog product chosen" },
-      { ok: change.length >= 10, text: "Changelog description of at least 10 characters" }
+        text: found.errors.length === 0 ? "Nothing left to fix"
+          : found.errors.length + " thing(s) above still need fixing" },
+      { ok: !!product, text: "You have said which medicine it is about" },
+      { ok: change.length >= 10, text: "You have described what changed" }
     ];
     var gl = $("gate");
     gl.innerHTML = "";
@@ -1249,8 +1367,8 @@
 
     var recheck = window.LAUNCH_RULES.checkData(out);
     if (recheck.errors.length) {
-      note("Refused: the finished file has " + recheck.errors.length +
-           " error(s). Nothing was written.", true);
+      note("Not saved \u2014 " + recheck.errors.length +
+           " problem(s) remain. Nothing was written.", true);
       renderFindings(recheck);
       return;
     }
@@ -1275,8 +1393,8 @@
     $("clPlain").value = "";
     renderProduct();
     refresh();
-    note("Saved products.js to your downloads. Move it into data/, run " +
-         "node scripts/validate-data.js, then commit.", false);
+    note("Saved. The file is in your Downloads folder \u2014 pass it to whoever " +
+         "updates the site.", false);
   }
 
   function note(text, bad) {
@@ -1340,7 +1458,7 @@
         extracted.reason === "no-marker"
           ? "data/products.js has no `window.LAUNCH_DATA =` line to read."
           : "data/products.js is not strict JSON — " + extracted.message,
-        "Fix the file before the editor can load it. Single quotes, trailing commas and comments inside the object are the usual causes."
+        "The data file has to be repaired before the editor can open it. Ask a developer \u2014 this is not something to fix here."
       );
       return;
     }
@@ -1352,7 +1470,7 @@
     if (!faithful) {
       boot(
         "The serializer does not reproduce data/products.js byte for byte.",
-        "Saving would reformat the whole file and bury your change in the diff. Run node scripts/test-serializer.js to see where it differs, and fix that before editing here."
+        "Saving would rewrite the whole file and hide your change among hundreds of others. A developer needs to look at this before anyone edits here."
       );
       return;
     }

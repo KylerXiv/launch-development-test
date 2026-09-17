@@ -300,6 +300,30 @@ Deleting asks twice inline rather than through a browser dialog, and says what
 it means: the product stops appearing on the public board, though past
 versions stay in the repository's history.
 
+### Plain English throughout
+
+Every label, hint and message in the editor is now written for someone who has
+never seen the repository. "Governance checks" is "Checks"; "Products" is
+"Medicines"; "Poster phase" is "Development phase"; dropdowns show *Still in
+development* rather than `pipeline`.
+
+The bigger piece is the **check messages**. Those come from
+`scripts/data-rules.js`, which CI also runs, so they stay exactly as they are —
+the editor translates them on the way to the screen instead, and keeps the
+original in the row's `title` for anyone who needs it:
+
+```
+products[1] (alaq) stage "WHO PQ listing": a delayed stage must carry a
+substantive reason in "note"
+    ->  ALAQ -> WHO PQ listing
+        Marked Delayed, so it needs a note explaining why
+```
+
+The location prefix becomes the medicine's display name, and severity is
+labelled by what to do about it — **Must fix** (blocks saving) and **Check**
+(does not). A message matching no pattern is shown exactly as written, so a
+rule added later is merely worded technically, never hidden.
+
 ### Visual redesign
 
 The editor now has its own dark identity rather than borrowing the dashboard's
