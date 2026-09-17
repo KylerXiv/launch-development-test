@@ -70,12 +70,18 @@
   ::selection{background:var(--accent);color:#fff;}
 
   /* ---------- sticky top bar ---------- */
+  /* One background declaration, layered: dots over gradient over a solid
+     base. A `background:` shorthand followed by a `background-image:` longhand
+     silently discards the gradient and leaves the bar see-through — which is
+     exactly what happened here. */
   .top{position:sticky;top:0;z-index:30;
-       background:linear-gradient(180deg,#0A0E28 0%,#090C22 100%);
        border-bottom:1px solid var(--line);
-       /* the dot field from the reference, very quiet */
-       background-image:radial-gradient(circle at 1px 1px,rgba(122,140,255,.16) 1px,transparent 0);
-       background-size:22px 22px;}
+       background-color:#090C22;
+       background-image:
+         radial-gradient(circle at 1px 1px,rgba(122,140,255,.16) 1px,transparent 0),
+         linear-gradient(180deg,#0A0E28 0%,#090C22 100%);
+       background-size:22px 22px,100% 100%;
+       background-repeat:repeat,no-repeat;}
   .top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
               background:linear-gradient(90deg,transparent,var(--cyan),var(--accent),var(--magenta),transparent);
               opacity:.55;}
