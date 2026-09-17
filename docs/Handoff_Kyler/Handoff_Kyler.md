@@ -300,6 +300,44 @@ Deleting asks twice inline rather than through a browser dialog, and says what
 it means: the product stops appearing on the public board, though past
 versions stay in the repository's history.
 
+### Import — bringing outside data in
+
+`scripts/import-lib.js` reads CSV, TSV, semicolon- and pipe-separated files,
+JSON (arrays, `{products:[...]}`, any inner array, NDJSON), and our own
+`window.LAUNCH_DATA` format. Several files at once. Excel `.xlsx` is detected
+by its zip signature and refused with instructions rather than pulling a
+megabyte of library into an otherwise dependency-free tool.
+
+**Import never writes.** It produces a *plan* — new medicines, updates to
+existing ones, and skipped rows — shown with every proposed change spelled
+out, `was -> now`. The analyst ticks what to accept, it lands in the draft, and
+the draft still has to pass the save gate. Matching is by id, then name, then
+INN, so a re-import updates rather than duplicating.
+
+The library is pure and has no DOM, so **121 tests** run from the command line
+(`node scripts/test-import.js`). Fixtures live in `test-data/import/` with a
+README; `node scripts/report-import-fixtures.js` prints the expected-behaviour
+table for all 19.
+
+Design decisions worth keeping:
+
+- **Guessing is worse than refusing.** `14-nothing-useful.csv` is a page of
+  meeting minutes and must produce nothing. An early version mapped its
+  "Minutes reference" column to the product id because "reference" was in the
+  alias list; that alias is gone.
+- **Ambiguous dates are reported, never chosen.** `03/04/2026` is the 3rd of
+  April or the 4th of March and the value cannot say which. One reading is
+  used and the alternative is shown.
+- **Column mapping is correctable.** Every column gets a dropdown, so a wrong
+  guess costs one click rather than a re-export.
+- Stage columns are matched **before** generic field aliases — a stage name
+  comes from this dataset and is far more specific than an alias list.
+- Mapping assigns **strongest pair first** rather than field-by-field in order.
+  In list order, `id` claimed a column called "Name" because its alias "short
+  name" contains "name".
+
+Scale: 5,000 rows parse in ~13 ms and plan in ~15 ms.
+
 ### Named "RBM staging dashboard"
 
 `editor.html` presents itself as **RBM staging dashboard**, tagged *for
