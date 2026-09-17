@@ -121,6 +121,19 @@ message), this document, and `editor-setup-requirements.pdf`. The earlier
 wording reproduced exactly this problem. Use a port that is actually free —
 8001 rather than 8000 — since the Ontology services still hold 8000.
 
+**The editor could fail silently on startup.** Found while redesigning: a
+runtime error inside `start()` was caught by the `.catch()` attached to the
+data fetch, which wrote "Could not read data/products.js" into a panel
+`start()` had already hidden. The result was a page that loaded, showed its
+chrome, and rendered nothing at all — with no console error and a misleading
+message nobody could see.
+
+Fixed: rendering failures are caught separately from fetch failures and say so
+("the editor failed to start — this is a fault in the editor, not your data"),
+and `boot()` now un-hides its own panel. Worth knowing because it cost real
+time: the visible symptom was an empty page, and the cause was a one-word
+reference error.
+
 **`.DS_Store` files are untracked and not ignored** — `.DS_Store` and
 `data/.DS_Store` show in `git status`. One line in `.gitignore` would settle
 it. Left alone as out of scope.
@@ -269,11 +282,39 @@ its own.
 protection exists — see the Pro note below. Point the editor at a scratch
 branch while building, so a mistake cannot reach `main`.
 
-### Not built yet, from slice B's scope
+### Slice B's remaining scope — now in
 
-Add / delete / placeholder products. Everything else in the item 3 scope is
-in. Deferred because the four products are stable and the delete path wants
-a confirmation flow that is worth designing once rather than twice.
+**Add / delete / placeholder products**, plus the product `id`, which was not
+exposed by any form before and is the key the changelog, the ontology export
+and the widget's `?product=` parameter all join on.
+
+A new medicine starts **structurally complete and factually empty**: every
+shape the validator needs is present, every field requiring human judgement is
+blank. Adding one raises exactly four errors — `name`, `inn`, `manufacturer`,
+`classLabel` — and one warning about missing volume data. Nothing structural,
+nothing spurious. The editor never invents a plausible-looking placeholder,
+because a left-behind "New product" in the manufacturer column is worse than
+an empty field the checks are shouting about.
+
+Deleting asks twice inline rather than through a browser dialog, and says what
+it means: the product stops appearing on the public board, though past
+versions stay in the repository's history.
+
+### Visual redesign
+
+The editor now has its own dark identity rather than borrowing the dashboard's
+light skin, at the client's request and against a supplied reference image:
+deep navy ground, indigo for interaction, and the reference's cyan and magenta.
+
+**Status colours still mean what they mean on the public dashboard** — Complete
+reads cyan, In progress amber, Delayed magenta — so someone moving between the
+two pages is not relearning a colour language. Interaction (focus, selected
+tab, primary action) is indigo and never overlaps with status, so nothing
+about a control's state can be mistaken for a data state.
+
+Textareas now size to their content. Stage notes are routinely three sentences
+of provenance, and the previous fixed height made analysts read their own text
+through a two-line slot.
 
 **Run it:**
 
