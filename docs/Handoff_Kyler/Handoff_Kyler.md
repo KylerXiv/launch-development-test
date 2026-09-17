@@ -336,6 +336,19 @@ two pages is not relearning a colour language. Interaction (focus, selected
 tab, primary action) is indigo and never overlaps with status, so nothing
 about a control's state can be mistaken for a data state.
 
+Three additions carry information rather than decorate:
+
+- **A progress ring per medicine** — one arc per step, coloured by that step's
+  status, not a percentage. A percentage would hide the thing worth seeing:
+  not how far along it is, but *where it is stuck*. ASPY reads 4/8 with four
+  cyan arcs, two amber, one magenta and one grey, and the eye goes to the
+  magenta.
+- **A step track** above the detail cards, mirroring the public page's journey
+  shape. Clicking a step scrolls to the card that edits it and flashes it, so
+  a long form stops being a long scroll.
+- **Status dots on the tabs**, so a medicine with a problem is visible without
+  opening each one in turn.
+
 Textareas now size to their content. Stage notes are routinely three sentences
 of provenance, and the previous fixed height made analysts read their own text
 through a two-line slot.

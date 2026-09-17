@@ -197,6 +197,70 @@
   .f.bad input,.f.bad textarea{border-color:var(--magenta);
       box-shadow:0 0 0 3px rgba(244,44,116,.15);}
 
+  /* ---------- medicine summary ---------- */
+  .mhead{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding:18px;
+         border-bottom:1px solid var(--line-soft);
+         background:radial-gradient(120% 140% at 0% 0%,rgba(84,104,255,.10),transparent 60%);}
+  .ring{flex:0 0 auto;position:relative;width:104px;height:104px;}
+  .ring svg{width:104px;height:104px;display:block;}
+  .ring .rc{position:absolute;inset:0;display:flex;flex-direction:column;
+            align-items:center;justify-content:center;pointer-events:none;}
+  .ring .rn{font-size:25px;font-weight:700;line-height:1;letter-spacing:-0.02em;}
+  .ring .rl{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;
+            color:var(--faint);margin-top:3px;}
+  .mfacts{flex:1;min-width:230px;display:flex;flex-direction:column;gap:9px;}
+  .mfacts .mt{font-size:20px;font-weight:650;letter-spacing:-0.02em;line-height:1.15;}
+  .mfacts .ms{font-size:12.5px;color:var(--soft);}
+  .counts{display:flex;flex-wrap:wrap;gap:7px;}
+  .cnt{display:inline-flex;align-items:baseline;gap:6px;font-size:12px;
+       padding:4px 10px;border-radius:999px;border:1px solid;
+       font-variant-numeric:tabular-nums;}
+  .cnt b{font-size:13px;font-weight:700;}
+  .cnt-done{color:var(--cyan);border-color:rgba(47,224,206,.34);background:var(--cyan-dim);}
+  .cnt-prog{color:var(--amber);border-color:rgba(255,178,61,.34);background:var(--amber-dim);}
+  .cnt-late{color:var(--magenta);border-color:rgba(244,44,116,.38);background:var(--magenta-dim);
+            box-shadow:0 0 16px rgba(244,44,116,.18);}
+  .cnt-idle{color:var(--soft);border-color:var(--line);background:transparent;}
+  .mbar{font-size:12.5px;color:var(--magenta);display:flex;gap:8px;align-items:flex-start;
+        max-width:62ch;}
+  .mbar svg{flex:0 0 auto;margin-top:3px;}
+
+  /* ---------- step track ---------- */
+  .steps{display:flex;align-items:flex-start;gap:0;padding:16px 18px 6px;
+         overflow-x:auto;}
+  .stepn{flex:1 1 0;min-width:72px;background:none;border:0;padding:0;
+         display:flex;flex-direction:column;align-items:center;gap:7px;
+         cursor:pointer;position:relative;color:inherit;font-weight:500;}
+  .stepn::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;
+                 background:var(--line);z-index:0;}
+  .stepn:first-child::before{display:none;}
+  .stepn.after-done::before{background:var(--cyan);opacity:.5;}
+  .stepn .dot{width:22px;height:22px;border-radius:50%;z-index:1;position:relative;
+              border:2px solid var(--line);background:var(--surface);
+              display:flex;align-items:center;justify-content:center;
+              transition:transform .18s,box-shadow .18s;}
+  .stepn .dot::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--idle);}
+  .stepn.done .dot{border-color:var(--cyan);}
+  .stepn.done .dot::after{background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+  .stepn.prog .dot{border-color:var(--amber);}
+  .stepn.prog .dot::after{background:var(--amber);box-shadow:0 0 10px var(--amber);}
+  .stepn.late .dot{border-color:var(--magenta);}
+  .stepn.late .dot::after{background:var(--magenta);box-shadow:0 0 12px var(--magenta);}
+  .stepn.current .dot{transform:scale(1.28);box-shadow:0 0 0 4px rgba(84,104,255,.22);}
+  .stepn:hover .dot{transform:scale(1.18);}
+  .stepn .sl{font-size:10px;line-height:1.3;text-align:center;color:var(--soft);
+             max-width:94px;}
+  .stepn.current .sl{color:var(--ink);font-weight:600;}
+  .stepn:focus-visible{outline:none;}
+  .stepn:focus-visible .dot{box-shadow:0 0 0 3px var(--accent-2);}
+
+  /* ---------- tab status dot ---------- */
+  .tab .tdot{display:inline-block;width:7px;height:7px;border-radius:50%;
+             margin-right:7px;vertical-align:1px;background:var(--idle);}
+  .tab .tdot.ok{background:var(--cyan);box-shadow:0 0 7px var(--cyan);}
+  .tab .tdot.warn{background:var(--amber);box-shadow:0 0 7px var(--amber);}
+  .tab .tdot.err{background:var(--magenta);box-shadow:0 0 8px var(--magenta);}
+
   /* ---------- stage cards ---------- */
   .track{display:grid;gap:11px;grid-template-columns:repeat(4,1fr);}
   @media (max-width:1060px){ .track{grid-template-columns:repeat(2,1fr);} }
@@ -614,6 +678,116 @@
     return f;
   }
 
+  var STATUS_COLOUR = { done: "var(--cyan)", prog: "var(--amber)",
+                        late: "var(--magenta)", idle: "var(--idle)" };
+
+  function svgEl(tag, attrs) {
+    var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) if (attrs.hasOwnProperty(k)) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  // One arc per step, coloured by its status. A plain percentage would hide
+  // the thing worth seeing — not "how far along" but "where it is stuck".
+  function progressRing(p) {
+    var n = p.stages.length, R = 42, C = 2 * Math.PI * R, seg = C / n, gap = 5;
+    var wrap = el("div", "ring");
+    var svg = svgEl("svg", { viewBox: "0 0 104 104", role: "img" });
+    var done = 0;
+    p.stages.forEach(function (st) { if (st.status === "done") done++; });
+    svg.setAttribute("aria-label", done + " of " + n + " steps complete");
+
+    svg.appendChild(svgEl("circle", {
+      cx: 52, cy: 52, r: R, fill: "none", stroke: "var(--line-soft)", "stroke-width": 8
+    }));
+    p.stages.forEach(function (st, i) {
+      svg.appendChild(svgEl("circle", {
+        cx: 52, cy: 52, r: R, fill: "none",
+        stroke: STATUS_COLOUR[st.status] || STATUS_COLOUR.idle,
+        "stroke-width": st.status === "idle" ? 6 : 8,
+        "stroke-linecap": "round",
+        "stroke-dasharray": (seg - gap) + " " + (C - seg + gap),
+        "stroke-dashoffset": -i * seg,
+        transform: "rotate(-90 52 52)",
+        opacity: st.status === "idle" ? ".45" : "1"
+      }));
+    });
+    wrap.appendChild(svg);
+    var c = el("div", "rc");
+    var num = el("div", "rn", done + "/" + n);
+    num.style.color = done === n ? "var(--cyan)" : "var(--ink)";
+    c.appendChild(num);
+    c.appendChild(el("div", "rl", "steps done"));
+    wrap.appendChild(c);
+    return wrap;
+  }
+
+  function medicineHeader(p, data) {
+    var h = el("div", "mhead");
+    h.appendChild(progressRing(p));
+    var f = el("div", "mfacts");
+    f.appendChild(el("div", "mt", p.name || "(unnamed medicine)"));
+    var bits = [p.manufacturer, p.inn].filter(Boolean).join("  \u00b7  ");
+    if (bits) f.appendChild(el("div", "ms", bits));
+
+    var tally = { done: 0, prog: 0, late: 0, idle: 0 };
+    p.stages.forEach(function (st) { tally[st.status] = (tally[st.status] || 0) + 1; });
+    var counts = el("div", "counts");
+    [["done", "complete"], ["prog", "in progress"], ["late", "delayed"], ["idle", "not started"]]
+      .forEach(function (pair) {
+        if (!tally[pair[0]]) return;
+        var c = el("span", "cnt cnt-" + pair[0]);
+        c.appendChild(el("b", null, tally[pair[0]]));
+        c.appendChild(el("span", null, pair[1]));
+        counts.appendChild(c);
+      });
+    f.appendChild(counts);
+
+    if (p.flag) {
+      var bar = el("div", "mbar");
+      var ic = svgEl("svg", { width: 13, height: 13, viewBox: "0 0 16 16" });
+      ic.appendChild(svgEl("path", {
+        d: "M8 1.5 15 14H1z", fill: "none", stroke: "var(--magenta)", "stroke-width": 1.6,
+        "stroke-linejoin": "round"
+      }));
+      ic.appendChild(svgEl("path", {
+        d: "M8 6v3.6M8 11.4v.9", stroke: "var(--magenta)", "stroke-width": 1.6,
+        "stroke-linecap": "round"
+      }));
+      bar.appendChild(ic);
+      bar.appendChild(el("span", null, p.flag));
+      f.appendChild(bar);
+    }
+    h.appendChild(f);
+    return h;
+  }
+
+  // A navigator, not decoration: it shows the journey's shape the way the
+  // public page does, and clicking a step jumps to the card that edits it.
+  function stepTrack(p, data) {
+    var t = el("div", "steps");
+    p.stages.forEach(function (st, i) {
+      var prevDone = i > 0 && p.stages[i - 1].status === "done";
+      var b = el("button", "stepn " + (st.status || "idle") +
+        (i === p.currentStage ? " current" : "") + (prevDone ? " after-done" : ""));
+      b.type = "button";
+      b.title = (data.stages[i] || "") + " \u2014 " + (STATUS_LABEL[st.status] || st.status);
+      b.appendChild(el("span", "dot"));
+      b.appendChild(el("span", "sl", data.stages[i] || ("Step " + (i + 1))));
+      b.addEventListener("click", function () {
+        var card = document.querySelectorAll("#editor .stage")[i];
+        if (card && card.scrollIntoView) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (card) {
+          card.style.transition = "box-shadow .25s";
+          card.style.boxShadow = "0 0 0 2px var(--accent), 0 0 26px var(--glow)";
+          setTimeout(function () { card.style.boxShadow = ""; }, 1100);
+        }
+      });
+      t.appendChild(b);
+    });
+    return t;
+  }
+
   // ---------------------------------------------------------------- sections
   function section(title, hint) {
     var s = el("div", "sect");
@@ -650,7 +824,7 @@
   }
 
   function stagesSection(p, data) {
-    var s = section("Steps to reaching patients",
+    var s = section("Steps in detail",
       "If you mark a step Delayed, you have to explain why in its note. You cannot save without that.");
     var track = el("div", "track");
     p.stages.forEach(function (st, i) {
@@ -944,6 +1118,16 @@
       b.type = "button";
       b.setAttribute("role", "tab");
       b.setAttribute("aria-selected", i === state.selected ? "true" : "false");
+      var tag = "products[" + i + "]";
+      var f = state.found || { errors: [], warnings: [] };
+      var mine = function (list) {
+        return list.filter(function (m) { return m.indexOf(tag) === 0; }).length;
+      };
+      var nErr = mine(f.errors), nWarn = mine(f.warnings);
+      var dot = el("span", "tdot " + (nErr ? "err" : nWarn ? "warn" : "ok"));
+      dot.title = nErr ? nErr + " thing(s) to fix"
+        : nWarn ? nWarn + " thing(s) worth checking" : "Nothing to fix";
+      b.appendChild(dot);
       b.appendChild(document.createTextNode(p.name || p.id || "(unnamed)"));
       if (JSON.stringify(p) !== JSON.stringify(state.original.products[i])) {
         b.appendChild(el("span", "edited", "●"));
@@ -996,6 +1180,9 @@
       autosizeAll(host);
       return;
     }
+
+    host.appendChild(medicineHeader(p, state.draft));
+    host.appendChild(stepTrack(p, state.draft));
 
     [identitySection(p, state.draft),
      stagesSection(p, state.draft),
@@ -1149,6 +1336,7 @@
 
   function refresh() {
     var found = window.LAUNCH_RULES.checkData(state.draft);
+    state.found = found;
     renderFindings(found);
 
     var mini = $("miniChecks");
