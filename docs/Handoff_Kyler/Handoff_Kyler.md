@@ -336,6 +336,22 @@ Design decisions worth keeping:
   In list order, `id` claimed a column called "Name" because its alias "short
   name" contains "name".
 
+**Import is not for `sourcing/staging/`.** Those files are evidence — one row
+per disbursement, purchase order, registration, trial or study — and the
+analyst's job is to read them and write one cited sentence. Two guards exist
+because running the real staging files through the importer showed both were
+needed:
+
+- `procurement_transactions.csv` is 12,151 rows with 69 distinct medicine
+  names. It now raises a red *Check this file* notice naming the ratio, rather
+  than proposing 12,000 near-duplicate medicines.
+- `nafdac_registrations.csv` was parsed with the wrong delimiter: it has
+  semicolons inside quoted drug descriptions, which split every line into a
+  tidy two columns and beat commas on consistency. The sniffer now parses
+  quote-aware through the real parser and weights column count, because
+  consistency alone rewards the wrong answer — two columns every time is very
+  consistent and almost always wrong.
+
 Scale: 5,000 rows parse in ~13 ms and plan in ~15 ms.
 
 ### Named "RBM staging dashboard"

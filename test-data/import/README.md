@@ -31,6 +31,27 @@ Check the expected behaviour with `node scripts/report-import-fixtures.js`.
 | `18-large-5000.csv` | 5,000 rows | 5,000 new; parses in tens of milliseconds |
 | `19-mixed-mess.csv` | BOM, title line, semicolons, blanks, junk values, multi-line quotes, and one row matching an existing medicine | 3 new, 1 update, several issues, junk reported |
 
+## What import is NOT for
+
+`sourcing/staging/*.csv` is **evidence**, not dashboard data. Those files are
+one row per *event* — a disbursement, a purchase order, a registration, a
+trial, a study — fetched automatically and never hand-edited.
+`data/products.js` is one row per *medicine*, with a human sentence per step
+and a source against every figure.
+
+An analyst **reads** the staging files and **writes** one cited sentence. That
+judgement is the thing the dashboard exists to carry, and it cannot be
+imported.
+
+Import is for data already shaped one-row-per-medicine: a colleague's
+spreadsheet, a partner's product list, a country survey, an export from
+another system.
+
+Dropping `procurement_transactions.csv` in gets a red **Check this file**
+notice: 12,151 rows, 69 distinct names, about 176 rows per medicine. The
+importer recognises that shape and says so rather than creating 12,000
+near-duplicates.
+
 ## The point of the awkward ones
 
 `14-nothing-useful.csv` matters most. Import that guesses is worse than import

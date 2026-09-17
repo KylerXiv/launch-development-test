@@ -57,21 +57,32 @@
   // semicolon-separated, and a European export may use semicolons precisely
   // because its numbers contain commas.
   function sniffDelimiter(text) {
-    var lines = text.split(/\r?\n/).slice(0, 40).filter(function (l) { return l.trim(); });
-    var best = ",", bestScore = 0;
+    // Each candidate is tried through the real parser, not a naive split:
+    // quotes have to be respected or a delimiter that only ever appears
+    // INSIDE quoted text looks perfectly consistent. A registrations export
+    // with semicolons in its drug descriptions beat commas that way, because
+    // it split every line into a tidy two columns.
+    //
+    // Scored by how many columns it yields, weighted by how consistently.
+    // Consistency alone rewards the wrong answer: two columns every time is
+    // very consistent and almost always wrong.
+    var sample = text.split(/\r?\n/).slice(0, 60).join("\n");
+    var best = ",", bestScore = -1;
     [",", "\t", ";", "|"].forEach(function (d) {
-      // Lines that do not contain the delimiter at all are ignored rather
-      // than counted as one-column rows. A title line above the table has no
-      // tabs in it, and letting it vote drowns out the actual table.
-      var counts = lines.map(function (l) { return l.split(d).length; })
-                        .filter(function (c) { return c > 1; });
-      if (!counts.length) return;
+      var rows;
+      try { rows = parseDelimited(sample, d).rows; } catch (e) { return; }
+      rows = rows.filter(function (r) {
+        return r.some(function (c) { return !isBlank(c); });
+      });
+      if (!rows.length) return;
+      var counts = rows.map(function (r) { return r.length; });
       var mode = {}, top = 0, topN = 0;
       counts.forEach(function (c) {
         mode[c] = (mode[c] || 0) + 1;
         if (mode[c] > top || (mode[c] === top && c > topN)) { top = mode[c]; topN = c; }
       });
-      var score = top * 1000 + topN;
+      if (topN < 2) return;
+      var score = topN * (top / counts.length);
       if (score > bestScore) { bestScore = score; best = d; }
     });
     return best;
@@ -537,6 +548,43 @@
         out.creates.push({ row: rec.__row, label: label, changes: changes, issues: issues });
       }
     });
+
+    // A file with far more rows than distinct medicines is almost certainly
+    // one row per EVENT — a purchase order, a disbursement, a registration —
+    // rather than one row per medicine. Importing it would create hundreds of
+    // near-duplicates. The shape is detectable, so say so loudly rather than
+    // letting someone find out after applying.
+    out.notices = [];
+    var labels = {}, distinct = 0;
+    out.creates.forEach(function (c) {
+      var k = String(c.label).trim().toLowerCase();
+      if (!labels[k]) { labels[k] = 0; distinct++; }
+      labels[k]++;
+    });
+    var repeated = Object.keys(labels).filter(function (k) { return labels[k] > 1; });
+    if (out.creates.length >= 10 && distinct > 0 && out.creates.length / distinct >= 2) {
+      out.notices.push({
+        level: "stop",
+        text: out.creates.length + " rows would become new medicines, but there are only " +
+              distinct + " different names among them \u2014 about " +
+              Math.round(out.creates.length / distinct) + " rows each. This looks like one row " +
+              "per transaction or event, not one row per medicine. Importing it would create " +
+              "hundreds of near-duplicates."
+      });
+    } else if (repeated.length) {
+      out.notices.push({
+        level: "warn",
+        text: repeated.length + " name(s) appear on more than one row and would each be added " +
+              "twice \u2014 for example \u201c" + repeated[0] + "\u201d."
+      });
+    }
+    if (out.creates.length >= 50 && !out.notices.length) {
+      out.notices.push({
+        level: "warn",
+        text: "This would add " + out.creates.length + " medicines at once. Worth checking a " +
+              "few before applying."
+      });
+    }
     return out;
   }
 

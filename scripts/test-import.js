@@ -252,6 +252,43 @@ group("Planning — stages and the whole loop", () => {
      "errors: " + after.errors.length);
 });
 
+// ---------------------------------------------------------------- shape guard
+group("Shape — spotting transaction-level files", () => {
+  const d = draft();
+  // one row per purchase order: 60 rows, 3 medicines
+  const rows = [];
+  for (let i = 0; i < 60; i++) {
+    rows.push({ __row: i + 1, Name: ["Coartem", "Pyramax", "Artesun"][i % 3],
+                Manufacturer: "Maker " + i });
+  }
+  const map = imp.guessMapping(["Name", "Manufacturer"], d.stages);
+  const plan = imp.planImport(rows, map, d);
+  ok("a transaction-shaped file is flagged", plan.notices.some(n => n.level === "stop"),
+     JSON.stringify(plan.notices));
+  is("and says how many names it actually found",
+     /only 3 different names/.test(plan.notices[0].text), true);
+
+  // genuinely distinct medicines must NOT be flagged as transaction-shaped
+  const clean = [];
+  for (let i = 0; i < 60; i++) clean.push({ __row: i + 1, Name: "Medicine " + i, Manufacturer: "M" });
+  const plan2 = imp.planImport(clean, map, d);
+  is("distinct rows are not mistaken for transactions",
+     plan2.notices.filter(n => n.level === "stop").length, 0);
+  ok("but a large import is still worth a nudge", plan2.notices.length === 1);
+
+  // a couple of accidental duplicates get a softer warning
+  const dupes = [
+    { __row: 1, Name: "Alpha", Manufacturer: "A" },
+    { __row: 2, Name: "Beta", Manufacturer: "B" },
+    { __row: 3, Name: "Alpha", Manufacturer: "C" }
+  ];
+  const plan3 = imp.planImport(dupes, map, d);
+  ok("a repeated name is warned about", plan3.notices.some(n => /appear on more than one row/.test(n.text)));
+
+  is("a small tidy file is not nagged", imp.planImport(
+    [{ __row: 1, Name: "Solo", Manufacturer: "X" }], map, d).notices.length, 0);
+});
+
 // ---------------------------------------------------------------- scale
 group("Scale", () => {
   const rows = ["name,manufacturer,countries registered"];
