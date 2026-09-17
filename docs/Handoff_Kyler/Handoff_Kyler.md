@@ -1,65 +1,112 @@
-# Handoff — data editor (branch `data-editor`)
+# Handoff — RBM staging dashboard
 
-Working notes for the browser-based data editor. This is the branch's own
-document, per [CLAUDE.md](../../CLAUDE.md); `redesigning-illustrative-journey`
-keeps [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md).
+**Branch:** `data-editor` · **13 commits** · **not pushed** · CI not yet run
+**Last worked:** 17 September 2026
+**Working tree:** clean apart from two untracked `.DS_Store` files
 
-Two reference documents sit alongside this one:
+This is the branch's own working-notes document, per
+[CLAUDE.md](../../CLAUDE.md). `redesigning-illustrative-journey` keeps
+[illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md).
+
+Two reference documents sit alongside:
 [editor-build-spec.pdf](../editor-build-spec.pdf) (the technical spec) and
 [editor-setup-requirements.pdf](../editor-setup-requirements.pdf) (accounts,
-plan, and the phased setup).
+plan, setup phases).
 
 ---
 
-## 1. Decisions
+## Start here
+
+```bash
+git checkout data-editor
+python3 -m http.server 8001 --bind 127.0.0.1
+open http://localhost:8001/editor.html
+```
+
+`--bind 127.0.0.1` is not optional — see §3.
+
+Everything should pass:
+
+```bash
+node scripts/normalize-resistance.js          # byte-identical
+node scripts/normalize-molecular-markers.js   # byte-identical
+node scripts/validate-data.js                 # 0 errors, 5 warnings (3 + 2)
+node scripts/validate-data.js data/products.synthetic.js   # 0 errors, 0 warnings
+node scripts/test-serializer.js               # 0 failures
+node scripts/test-import.js                   # 127 passed
+node scripts/make-preview.js                  # smoke test
+node scripts/report-import-fixtures.js        # expected-behaviour table
+```
+
+**The next piece of work is item 5: GitHub read and write.** See §5.
+
+---
+
+## 1. What exists
+
+A browser page, `editor.html`, where an analyst updates the dashboard's data
+through forms. Plain HTML, no build step, no dependencies — the same as every
+other page here, so it hands over to RBM inside the same file set as the
+dashboard it feeds.
+
+| Piece | Where |
+|---|---|
+| The rules, as pure functions | `scripts/data-rules.js` |
+| House-style file writer | `scripts/serialize-products.js` |
+| Round-trip test | `scripts/test-serializer.js` |
+| Import parsing, mapping, planning | `scripts/import-lib.js` |
+| Import tests (127) | `scripts/test-import.js` |
+| Import fixtures + generator + report | `test-data/import/`, `scripts/make-import-fixtures.js`, `scripts/report-import-fixtures.js` |
+| The page itself | `editor.html` |
+
+The loop an analyst runs: **edit → checked live → preview on the real page →
+write a changelog line → save**. Saving currently downloads `products.js`;
+committing it to a branch is item 5.
+
+Also in: adding and deleting medicines, importing spreadsheets, a progress
+ring and step track per medicine, plain-English copy throughout, and a dark
+visual identity.
+
+---
+
+## 2. Decisions
 
 ### A static page in this repo, not a Next.js or Python app
 
 The dashboard hands over to RBM as a single artefact. A Next.js admin app or
-the existing `streamlit-app/` editor both need a server process, which means a
-second deployment, a second account, and a second thing for RBM to own — the
-split we are trying to avoid.
+the existing `streamlit-app/` editor both need a server process — a second
+deployment, a second account, a second thing for RBM to own.
 
 Checked RBM's own site while deciding. `dashboards.endmalaria.org` runs
-**Next.js on AWS Elastic Beanstalk** (eu-west-1), behind nginx, in en/fr/pt.
-So matching their framework buys nothing: it is their app, on their
-infrastructure, and we cannot deploy into it. Their site already embeds
-outside dashboards in iframes — the **WHO Malaria Threats Map** is on it today,
-the same WHO source `data/resistance.js` is drawn from. That is the route in,
-and it needs no framework match.
+**Next.js on AWS Elastic Beanstalk** (eu-west-1) behind nginx, in en/fr/pt. So
+matching their framework buys nothing: it is their app, on their
+infrastructure, and we cannot deploy into it. Their site already embeds outside
+dashboards in iframes — the **WHO Malaria Threats Map** is on it today, the
+same WHO source `data/resistance.js` is drawn from. That is the route in.
 
-Rejected, and why:
-
-| Option | Rejected because |
+| Rejected | Because |
 |---|---|
 | Next.js admin app | Needs a running server; breaks the single-artefact handover; cannot deploy into RBM's app anyway |
 | Keep the Streamlit editor | Works, but needs a Python host. Stays as the internal analyst workbench, not the handover artefact |
-| Edit on GitHub directly | Free, but the analyst edits code-shaped text. One stray comma breaks it |
-| Google Sheet + importer | Familiar, but accepts anything — no source, no date rules. The dashboard's value is that every figure is traceable |
+| Edit on GitHub directly | Free, but the analyst edits code-shaped text; one stray comma breaks it |
+| Google Sheet + importer | Familiar, but accepts anything — no source, no date rules |
 
 ### The rules split in two, not one function
 
-`checkData(data)` is pure and runs in the browser. `checkStudyLayers(sources)`
+`checkData(data)` is pure and runs in a browser. `checkStudyLayers(sources)`
 takes already-read file *contents* and is called only by the CLI.
 
-This is forced by what the rules actually do, not by preference. **All 5
-warnings come from the WHO layer checks**, which read three other files
-(`world-map.js`, `resistance.js`, `molecular-markers.js`) and evaluate them.
-The browser has none of those and never will — the editor must not touch those
-files at all. Splitting on that line keeps both halves pure and keeps the
-editor's half genuinely runnable in a page.
-
-Confirmed empirically: browser-side `checkData` on the real data returns
-**0 errors, 0 warnings**, while the CLI returns **0 errors, 5 warnings**. The
-difference is exactly the WHO layers, as expected.
+Forced by what the rules do, not preference. **All 5 warnings come from the WHO
+layer checks**, which read three other files the editor must never touch.
+Confirmed empirically: browser-side `checkData` returns 0/0 on the real data
+while the CLI returns 0 errors / 5 warnings. The difference is exactly those
+layers.
 
 ### The serializer inlines flat scalar arrays; the Python original does not
 
-The round-trip test failed first time on `stageColumns` rows: the file has
-`{ "stages": [2, 3] }` on one line, the port expanded it to four lines.
-
-Per CLAUDE.md, established which was wrong before changing either. Ran the
-Python serializer against the same file:
+The round-trip test failed first time on `stageColumns`. Per CLAUDE.md,
+established which side was wrong before changing either — ran the Python
+serializer against the same file:
 
 ```
 Python serializer round-trips byte-identical: False
@@ -68,426 +115,232 @@ Python serializer round-trips byte-identical: False
   line count: 345 -> 374
 ```
 
-So the port was faithful and **both disagreed with the file**. The file is the
-source of truth, so the JS rule was extended: an object also prints on one line
-when its values are scalars *or flat arrays of scalars*. Arrays outside an
-inlined object keep their existing multi-line form, so the top-level `stages`
-array is untouched.
+So the port was faithful and **both disagreed with the file**. The file wins:
+an object also prints on one line when its values are scalars *or flat arrays
+of scalars*.
 
-### Normalised one escaped em-dash in `data/products.js`
+### One `finished()` builder for save and preview
 
-After the fix, one difference remained: a single `—` in a changelog
-`plain` field, against **87 raw em-dashes** elsewhere in the same file. Both
-parse to the identical string, so no serializer can preserve the distinction —
-whichever form it emits, one of them changes.
+Produces what publishing would write: draft + pending changelog entry +
+`lastUpdated` set to today. Save serializes it; preview renders it. Two
+separate builders could diverge, and a preview that does not match the save is
+worse than no preview.
 
-Normalised the outlier to the raw character. Semantically a no-op for every
-consumer (validator, page, ontology exports all `JSON.parse` it). Checked
-first that `history/products-2026-09-08.js` does not exist, so `publish.yml`'s
-append-only guard cannot trip on it. Without this, the editor's first real save
-would have produced the same one-character diff anyway.
+### Import proposes, never writes
 
----
+Files become a **plan** — creates, updates, skips — with every change shown as
+`was → now`. The analyst ticks what to accept, it lands in the draft, and the
+draft still passes the save gate. Matching is by id, then name, then INN, so
+re-importing updates rather than duplicating.
 
-## 2. Found in passing, deliberately left alone
+Guessing is worse than refusing: `test-data/import/14-nothing-useful.csv` is a
+page of meeting minutes and must produce nothing. Ambiguous dates are reported,
+never chosen — `03/04/2026` is the 3rd of April or the 4th of March and the
+value cannot say which.
 
-**`streamlit-app/launch_data.py` reformats `stageColumns` on save.** Same root
-cause as above: its `_fmt()` does not treat a flat scalar array as inline-able,
-so the first save through the Streamlit editor rewrites `data/products.js` from
-345 to 374 lines — a whole-file diff for a one-field edit.
+### Import is not for `sourcing/staging/`
 
-Not fixed here. It is a live bug in a tool that is still in use, but fixing it
-belongs with the Streamlit app rather than inside the editor branch, and the
-one-line change (`_SCALARS` check → allow `list` of scalars) should be made
-with its own round-trip test. **Worth doing before anyone edits data through
-Streamlit again.**
+Those files are **evidence**: one row per disbursement, purchase order,
+registration, trial or study, fetched automatically. `data/products.js` is one
+row per **medicine**, with a cited sentence per step. The analyst reads the
+first and writes the second, and that judgement cannot be imported.
 
-**A stale `http.server` was serving this repo to the whole network.** Found
-while trying to start a local server for the editor: port 8000 was taken by a
-`python -m http.server 8000` started on **9 Sep at 01:35**, still running seven
-days later, with its working directory set to this repo.
+Running the real staging files through the importer proved two guards were
+needed — see §3.
 
-It was bound to `*:8000` — every network interface, not just localhost, which
-is `http.server`'s default and its worst footgun. For a week, anyone on the
-same network could have browsed `sourcing/`, `briefs/`, `docs/` and the rest of
-the private repo.
+### Plain English, with the technical wording kept underneath
 
-Two unrelated `uvicorn` processes from the Ontology project also hold port 8000
-on `127.0.0.1`; they are a different project and were left alone.
-
-Consequence for this branch: **every run instruction now says
-`--bind 127.0.0.1`**, in `editor.html` (header comment and the on-screen
-message), this document, and `editor-setup-requirements.pdf`. The earlier
-wording reproduced exactly this problem. Use a port that is actually free —
-8001 rather than 8000 — since the Ontology services still hold 8000.
-
-**The editor could fail silently on startup.** Found while redesigning: a
-runtime error inside `start()` was caught by the `.catch()` attached to the
-data fetch, which wrote "Could not read data/products.js" into a panel
-`start()` had already hidden. The result was a page that loaded, showed its
-chrome, and rendered nothing at all — with no console error and a misleading
-message nobody could see.
-
-Fixed: rendering failures are caught separately from fetch failures and say so
-("the editor failed to start — this is a fault in the editor, not your data"),
-and `boot()` now un-hides its own panel. Worth knowing because it cost real
-time: the visible symptom was an empty page, and the cause was a one-word
-reference error.
-
-**`.DS_Store` files are untracked and not ignored** — `.DS_Store` and
-`data/.DS_Store` show in `git status`. One line in `.gitignore` would settle
-it. Left alone as out of scope.
-
----
-
-## 3. Status
-
-**Branch:** `data-editor`, off `redesigning-illustrative-journey`.
-**Pushed:** no. **CI:** not yet run — verified locally.
-
-### Done
-
-- [x] **Item 1 — shared rules module.** `scripts/data-rules.js`:
-      `extractData`, `checkData`, `checkStudyLayers`, loadable from Node and
-      the browser. `scripts/validate-data.js` reduced to a CLI wrapper
-      (406 → 66 lines), behaviour unchanged.
-- [x] **Item 2 — house-style serializer.** `scripts/serialize-products.js`,
-      ported from `streamlit-app/launch_data.py`, plus
-      `scripts/test-serializer.js` which round-trips both datasets.
-- [x] **Item 3, slice A — read-only editor.** `editor.html`: loads the data
-      file, renders all four products with their stage tracks, runs
-      `checkData` live and lists every finding. No editing, no saving.
-
-      Verified against deliberately broken data (bad date format, wrong type
-      on `confirmedInWriting`, invalid status enum). The page reported all
-      three with **messages identical to the CLI**, plus the knock-on
-      flag-without-a-late-stage warning — which is the point of sharing the
-      rules rather than copying them.
-
-      Counts differ by design: the page showed 3 errors / 1 warning where the
-      CLI showed 3 / 6. The gap is exactly the 5 WHO overlay warnings, which
-      read files the browser has no access to.
-
-      Two layout fixes after looking at it rendered: the stage track is a
-      fixed 4-column grid (8 stages = 2 full rows; `auto-fit` stranded the
-      eighth alone), and a note that merely repeats its status label is
-      suppressed.
-- [x] **Item 3, slice B — the forms.** `editor.html` is now editable, 1028
-      lines. Product tabs, then per-product sections: identity, the eight
-      stages, price, country counts, country map, journey gates, milestones,
-      and a raw-JSON box for every `detail` key without a dedicated form —
-      so a schema addition degrades to "editable as JSON", never to invisible.
-
-      Inputs bind straight to the draft object; only the checks panel
-      re-renders on a keystroke. Re-rendering the form would steal focus
-      mid-word.
-
-      **The save gate** is four conditions, all shown live: something has
-      changed, zero errors, a changelog product, and a description of at least
-      ten characters (the validator's own threshold). Saving prepends the
-      changelog entry, sets `meta.lastUpdated` to today, **re-checks the
-      finished object**, and only then serializes. A failed re-check writes
-      nothing and says so.
-
-      **Verified the save path produces a minimal diff.** Simulated a real
-      edit — a stage to In progress, a note, an `asOf` — and diffed the
-      output:
-
-      ```
-      29c29   "lastUpdated": "2026-09-08"  ->  "2026-09-16"
-      67a68   + the new changelog entry
-      104c105 the one stage row
-      ```
-
-      Five changed lines, nothing else moved. That is the whole reason the
-      house-style serializer exists.
-
-      Saving currently **downloads** `products.js`. The GitHub commit path is
-      item 5; the gate and the serializer it runs through do not change when
-      that lands.
-
-      One refusal worth knowing about: if the serializer does not reproduce
-      the file byte-for-byte on load, the editor refuses to open at all.
-      Better than handing someone a save that reformats 345 lines and buries
-      their change.
-- [x] **Item 4 — in-page preview.** A Preview panel between editing and
-      saving renders the real `illustrated-journey-dashboard.html` from the
-      draft, in an iframe, with no deploy involved.
-
-      How: the journey page is fetched once and kept as a template. Each build
-      swaps its `<script src="data/products.js">` tag for the draft inline and
-      injects a `<base>` so the remaining relative paths — the map, the WHO
-      overlays, the icons — still resolve from a `blob:` URL.
-
-      **Save and preview now share one `finished()` function** that produces
-      what publishing would actually write: draft, plus the pending changelog
-      entry, plus `lastUpdated` set to today. Same principle as the shared
-      rules module — if the preview and the save each built their own object,
-      they could show different things, and the preview would be worthless.
-
-      Verified by serving the transform from a **subdirectory**, so every
-      relative path could only resolve via the injected `<base>`. A draft-only
-      edit (renamed product, a stage set to Delayed, an access-barrier
-      sentence) rendered correctly: the red delayed badge appeared on the
-      right gate, the barrier sentence showed under the card, and the header
-      read the bumped date — none of it present in `data/products.js`.
-
-      Rebuild is manual, not per-keystroke: the journey page pulls 1.5 MB of
-      map geometry and initialises MapLibre. The panel says when the draft has
-      moved on from what is rendered.
-
-### Verify block — all passing
-
-```
-node scripts/normalize-resistance.js          byte-identical
-node scripts/normalize-molecular-markers.js   byte-identical
-node scripts/validate-data.js                 0 errors, 5 warnings  (3 resistance + 2 molecular markers)
-node scripts/validate-data.js data/products.synthetic.js   0 errors, 0 warnings
-node scripts/make-preview.js                  Wrote preview.html (154 KB)
-node scripts/test-serializer.js               0 failures (both files byte-identical)
-```
-
-NUL bytes: 0 in every touched file, counted in Python. Line endings: LF.
-
-### Files touched
-
-| File | Change |
-|---|---|
-| `scripts/data-rules.js` | **new** — the rules, as pure functions |
-| `scripts/serialize-products.js` | **new** — house-style writer |
-| `scripts/test-serializer.js` | **new** — round-trip test |
-| `scripts/validate-data.js` | rewritten as a thin CLI wrapper |
-| `data/products.js` | one escaped em-dash normalised (see §1) |
-| `docs/editor-build-spec.pdf` | **new** — build spec |
-| `docs/editor-setup-requirements.pdf` | **new** — accounts, plan, setup phases |
-| `editor.html` | **new** — the editor: read-only slice, then the forms and save gate |
-| `scripts/build-public-site.sh` | comment only: says why `editor.html` is absent |
-
----
-
-## 4. Still to do
-
-### Next up — item 5, GitHub read and write
-
-The loop is complete except for where the file goes. Saving downloads
-`products.js`; the analyst then moves it into `data/`, validates and commits
-by hand. Item 5 replaces that with: read the current file from GitHub, create
-a branch, commit the serialized file to it, open a pull request.
-
-Four operations, all against the signed-in user's own token, so GitHub's
-permissions are the authorisation model and the page holds no credential of
-its own.
-
-**Stop at opening the draft.** The publish button is not wired until branch
-protection exists — see the Pro note below. Point the editor at a scratch
-branch while building, so a mistake cannot reach `main`.
-
-### Slice B's remaining scope — now in
-
-**Add / delete / placeholder products**, plus the product `id`, which was not
-exposed by any form before and is the key the changelog, the ontology export
-and the widget's `?product=` parameter all join on.
-
-A new medicine starts **structurally complete and factually empty**: every
-shape the validator needs is present, every field requiring human judgement is
-blank. Adding one raises exactly four errors — `name`, `inn`, `manufacturer`,
-`classLabel` — and one warning about missing volume data. Nothing structural,
-nothing spurious. The editor never invents a plausible-looking placeholder,
-because a left-behind "New product" in the manufacturer column is worse than
-an empty field the checks are shouting about.
-
-Deleting asks twice inline rather than through a browser dialog, and says what
-it means: the product stops appearing on the public board, though past
-versions stay in the repository's history.
-
-### Import — bringing outside data in
-
-`scripts/import-lib.js` reads CSV, TSV, semicolon- and pipe-separated files,
-JSON (arrays, `{products:[...]}`, any inner array, NDJSON), and our own
-`window.LAUNCH_DATA` format. Several files at once. Excel `.xlsx` is detected
-by its zip signature and refused with instructions rather than pulling a
-megabyte of library into an otherwise dependency-free tool.
-
-**Import never writes.** It produces a *plan* — new medicines, updates to
-existing ones, and skipped rows — shown with every proposed change spelled
-out, `was -> now`. The analyst ticks what to accept, it lands in the draft, and
-the draft still has to pass the save gate. Matching is by id, then name, then
-INN, so a re-import updates rather than duplicating.
-
-The library is pure and has no DOM, so **121 tests** run from the command line
-(`node scripts/test-import.js`). Fixtures live in `test-data/import/` with a
-README; `node scripts/report-import-fixtures.js` prints the expected-behaviour
-table for all 19.
-
-Design decisions worth keeping:
-
-- **Guessing is worse than refusing.** `14-nothing-useful.csv` is a page of
-  meeting minutes and must produce nothing. An early version mapped its
-  "Minutes reference" column to the product id because "reference" was in the
-  alias list; that alias is gone.
-- **Ambiguous dates are reported, never chosen.** `03/04/2026` is the 3rd of
-  April or the 4th of March and the value cannot say which. One reading is
-  used and the alternative is shown.
-- **Column mapping is correctable.** Every column gets a dropdown, so a wrong
-  guess costs one click rather than a re-export.
-- Stage columns are matched **before** generic field aliases — a stage name
-  comes from this dataset and is far more specific than an alias list.
-- Mapping assigns **strongest pair first** rather than field-by-field in order.
-  In list order, `id` claimed a column called "Name" because its alias "short
-  name" contains "name".
-
-**Import is not for `sourcing/staging/`.** Those files are evidence — one row
-per disbursement, purchase order, registration, trial or study — and the
-analyst's job is to read them and write one cited sentence. Two guards exist
-because running the real staging files through the importer showed both were
-needed:
-
-- `procurement_transactions.csv` is 12,151 rows with 69 distinct medicine
-  names. It now raises a red *Check this file* notice naming the ratio, rather
-  than proposing 12,000 near-duplicate medicines.
-- `nafdac_registrations.csv` was parsed with the wrong delimiter: it has
-  semicolons inside quoted drug descriptions, which split every line into a
-  tidy two columns and beat commas on consistency. The sniffer now parses
-  quote-aware through the real parser and weights column count, because
-  consistency alone rewards the wrong answer — two columns every time is very
-  consistent and almost always wrong.
-
-Scale: 5,000 rows parse in ~13 ms and plan in ~15 ms.
-
-### Named "RBM staging dashboard"
-
-`editor.html` presents itself as **RBM staging dashboard**, tagged *for
-analysts*. The filename is unchanged. Note the branding question is still open
-with RBM (whether they want their name and guidelines applied), so this may
-need revisiting at handover.
-
-### Plain English throughout
-
-Every label, hint and message in the editor is now written for someone who has
-never seen the repository. "Governance checks" is "Checks"; "Products" is
-"Medicines"; "Poster phase" is "Development phase"; dropdowns show *Still in
-development* rather than `pipeline`.
-
-The bigger piece is the **check messages**. Those come from
-`scripts/data-rules.js`, which CI also runs, so they stay exactly as they are —
-the editor translates them on the way to the screen instead, and keeps the
-original in the row's `title` for anyone who needs it:
+Check messages come from `scripts/data-rules.js`, which CI also runs, so they
+are unchanged. The editor translates them on the way to the screen and keeps
+the original in each row's `title`:
 
 ```
 products[1] (alaq) stage "WHO PQ listing": a delayed stage must carry a
 substantive reason in "note"
-    ->  ALAQ -> WHO PQ listing
+    ->  ALAQ → WHO PQ listing
         Marked Delayed, so it needs a note explaining why
 ```
 
-The location prefix becomes the medicine's display name, and severity is
-labelled by what to do about it — **Must fix** (blocks saving) and **Check**
-(does not). A message matching no pattern is shown exactly as written, so a
-rule added later is merely worded technically, never hidden.
+Anything matching no pattern is shown exactly as written, so a rule added later
+is worded technically rather than hidden.
 
-### Visual redesign
+### Its own dark identity, but the dashboard's colour meanings
 
-The editor now has its own dark identity rather than borrowing the dashboard's
-light skin, at the client's request and against a supplied reference image:
-deep navy ground, indigo for interaction, and the reference's cyan and magenta.
+Deep navy, indigo for interaction, cyan and magenta from a supplied reference.
+**Status colours still mean what they mean on the public board** — Complete
+cyan, In progress amber, Delayed magenta — so nobody relearns a colour language
+moving between the two pages, and interaction never borrows a status colour.
 
-**Status colours still mean what they mean on the public dashboard** — Complete
-reads cyan, In progress amber, Delayed magenta — so someone moving between the
-two pages is not relearning a colour language. Interaction (focus, selected
-tab, primary action) is indigo and never overlaps with status, so nothing
-about a control's state can be mistaken for a data state.
+### A progress ring per medicine, not a percentage
 
-Three additions carry information rather than decorate:
+One arc per step, coloured by that step's status. A percentage hides the thing
+worth seeing: not how far along a medicine is, but *where it is stuck*. ASPY
+reads 4/8 with four cyan arcs, two amber, one magenta, one grey.
 
-- **A progress ring per medicine** — one arc per step, coloured by that step's
-  status, not a percentage. A percentage would hide the thing worth seeing:
-  not how far along it is, but *where it is stuck*. ASPY reads 4/8 with four
-  cyan arcs, two amber, one magenta and one grey, and the eye goes to the
-  magenta.
-- **A step track** above the detail cards, mirroring the public page's journey
-  shape. Clicking a step scrolls to the card that edits it and flashes it, so
-  a long form stops being a long scroll.
-- **Status dots on the tabs**, so a medicine with a problem is visible without
-  opening each one in turn.
+---
 
-Textareas now size to their content. Stage notes are routinely three sentences
-of provenance, and the previous fixed height made analysts read their own text
-through a two-line slot.
+## 3. Found in passing
 
-**Run it:**
+### Left alone deliberately
 
-```
-python3 -m http.server 8001 --bind 127.0.0.1
-open http://localhost:8001/editor.html
-```
+**`streamlit-app/launch_data.py` reformats `stageColumns` on save.** Same root
+cause as the serializer decision above: its `_fmt()` does not treat a flat
+scalar array as inline-able, so the first save through the Streamlit editor
+rewrites `data/products.js` from 345 to 374 lines — a whole-file diff for a
+one-field edit. Fixing it belongs with the Streamlit app and wants its own
+round-trip test. **Worth doing before anyone edits data through Streamlit
+again.**
 
-A `file://` page cannot fetch the data file; the editor says so, with the
-command, if you try. `--bind 127.0.0.1` is not optional — see §2.
+**A stale `http.server` was serving this repo to the whole network.** Found
+while starting a local server: a `python -m http.server 8000` started on 9 Sep,
+still running seven days later, bound to `*:8000` — every interface, which is
+`http.server`'s default and its worst footgun. Every run instruction now says
+`--bind 127.0.0.1` and uses port 8001, since two unrelated `uvicorn` processes
+from another project hold 8000 on loopback.
+
+**`.DS_Store` files are untracked and not ignored.** One line in `.gitignore`
+would settle it.
+
+### Fixed along the way
+
+- **The editor could fail silently on startup.** A runtime error inside
+  `start()` was caught by the data fetch's `.catch()`, which wrote "could not
+  read data/products.js" into a panel `start()` had already hidden. The page
+  loaded, showed its chrome, rendered nothing, and reported nothing. Render
+  failures are now caught separately and `boot()` un-hides its own panel.
+- **File reads were being stranded.** The picker was cleared synchronously
+  while its reads were still in flight, releasing the handles so they never
+  settled — and an uncaught promise hid it. Same lesson twice.
+- **The sticky bar was see-through.** A `background:` shorthand set the
+  gradient, then a `background-image:` longhand two lines later replaced it
+  with the dot texture alone, leaving no opaque layer.
+- **Change labels reused the `.f` class**, which is the form-field rule
+  (`display:flex; flex-direction:column`), stacking every label above its
+  value.
+- **Delimiter sniffing was fooled by quoted text.**
+  `sourcing/staging/nafdac_registrations.csv` has semicolons inside quoted drug
+  descriptions, which split every line into a tidy two columns and beat commas
+  on consistency, so a data row was read as the header. The sniffer now parses
+  quote-aware and weights column count: consistency alone rewards the wrong
+  answer.
+- **Transaction-shaped files would have created hundreds of duplicates.**
+  `procurement_transactions.csv` is 12,151 rows with 69 distinct medicine
+  names. The importer now recognises that shape and refuses with a red notice
+  naming the ratio.
+
+### Tests that were themselves wrong
+
+Four times on this branch a test disagreed with the code and **the test was
+wrong** — the manufacturer value, the Excel epoch anchor, and two others.
+Each was checked against the data or a canonical reference before anything was
+changed. CLAUDE.md warns about this for a reason.
+
+---
+
+## 4. Status
+
+**Files added:** `editor.html`, `scripts/data-rules.js`,
+`scripts/serialize-products.js`, `scripts/test-serializer.js`,
+`scripts/import-lib.js`, `scripts/test-import.js`,
+`scripts/make-import-fixtures.js`, `scripts/report-import-fixtures.js`,
+`test-data/import/` (20 files), two PDFs in `docs/`.
+
+**Files changed:** `scripts/validate-data.js` (406 → 66 lines, now a thin CLI
+wrapper), `scripts/build-public-site.sh` (comment only — says why
+`editor.html` is deliberately absent from the copy allowlist, which is the only
+thing keeping the editor off the public site), `data/products.js` (one escaped
+em-dash normalised to raw, against 87 raw ones elsewhere; semantically
+identical).
+
+**Verify block:** all passing, as of 17 September 2026.
+
+---
+
+## 5. Still to do
+
+### Next — item 5, GitHub read and write
+
+The loop works except for where the file goes. Saving downloads `products.js`
+and the analyst moves it into `data/` by hand. Item 5 replaces that with four
+operations against GitHub: read the current file, create a branch, commit the
+serialized file, open a pull request. All using the signed-in user's own token,
+so GitHub's permissions are the authorisation model and the page holds no
+credential of its own.
+
+**Stop at opening the draft.** Do not wire the publish button until branch
+protection exists. Point the editor at a scratch branch while building.
 
 ### Then
 
 | # | Item | Notes |
 |---|---|---|
-| 4 | In-page preview | `illustrated-journey-dashboard.html` in an iframe from a blob URL, draft data substituted. Not a per-branch deploy — that would couple us to a host, and hosting is RBM's decision |
-| 5 | GitHub integration | Read, branch, commit, open a draft. **Target a scratch branch and do not wire publish** until branch protection exists |
-| 6 | Sign-in | Pasted fine-grained token for now. See the open question below |
-| 7 | Repo configuration | Needs GitHub Pro — see below |
-| 8 | Analyst guide | Extend `docs/data-analyst-guide.md`. Same commit as the code it describes |
+| 6 | Sign-in | Pasted fine-grained token, scoped to this repo, contents + pull requests only, 90-day expiry, `sessionStorage`. A GitHub App for one-click comes later and only changes the part that *obtains* the token |
+| 7 | Branch protection, editor/approver split | **Needs GitHub Pro** — see below |
+| 8 | Analyst guide | Extend `docs/data-analyst-guide.md`, same commit as the code it describes |
 
 ### Blocked on GitHub Pro — $4/month
 
-Branch protection is **not available on the current plan**. GitHub says so
+Branch protection is not available on the current plan. GitHub says so
 directly:
 
 ```
 Upgrade to GitHub Pro or make this repository public to enable this feature.
 ```
 
+Confirmed by API: `main` is `protected: false`, `enforcement_level: "off"`.
+
 This matters more than it looks. Token permissions are repository-wide — there
 is no way to scope a token to "can write files but not to `main`". Branch
 protection is therefore the *only* thing enforcing "the editor can only
 propose". Until it exists, that property is a convention our code follows, not
-something GitHub prevents.
+something GitHub prevents. Required status checks are also off, so a pull
+request showing errors can still be merged.
 
-So: **item 5 can be built, but the publish button must not be wired until Pro
-is on and `main` requires the `validate` check.**
+**Four accounts have push access** (`codebyjackson`, `Keith-paradox`,
+`KylerXiv`, `keith-paythonic`), so the "only one careful person" assumption
+stopped holding long before RBM enters the picture. Buy it now, not at
+handover.
 
-Also note the repo is owned by `Keith-paradox`, and the account in use here
-(`KylerXiv`) has push but **not admin**. Plan changes, branch rules and the
-eventual transfer all have to be done from the owner account.
+Two things to get right when switching it on:
 
-### Open questions for RBM
+1. Only `Keith-paradox` can — it is the sole admin. Not `KylerXiv`.
+2. Tick **"do not allow bypassing the above settings"**, or the owner account
+   walks through the rule. Then test it: push directly to `main` and confirm
+   GitHub refuses.
 
-None block items 3–5.
+Cost: **$4/month flat now** (personal Pro, does not scale with collaborators);
+**GitHub Team at ~$4/person** once RBM owns it in an organisation.
 
-| Question | What it affects |
-|---|---|
-| Can their staff have GitHub accounts? | If not: work-email sign-in with a shared machine account — weaker attribution, more to build |
-| Will their site embed our page, or copy the files? | Whether publishing stays automatic after handover |
-| Who owns the repo and hosting afterwards? | Where the GitHub App and hosting get created — cheaper to get right first time |
-| Is endmalaria.org in-house or contractor-run? | Who we are actually handing over to |
+### Not built, from item 3's scope
 
-### Order of work from here
+Nothing outstanding. Add / delete / placeholder medicines all landed.
 
-1. **Slice B — the forms.** The large piece. Everything else waits on it.
-2. **Item 4 — preview.** Small once the draft state from slice B exists: the
-   journey page in an iframe, fed the draft.
-3. **Item 5 — GitHub read/write.** Stops at *opening* a draft. The publish
-   button stays unwired.
-4. **Item 6 — sign-in.** Pasted fine-grained token. Independent of the above,
-   can be slotted in whenever.
-5. **Item 7 — branch protection.** Blocked on GitHub Pro. The moment this
-   lands, item 5's publish button can be wired and not before.
-6. **Item 8 — analyst guide.** Last, once the loop it describes exists.
+### Open questions — none block items 5 and 6
 
-Not on the critical path, but worth clearing while the above happens: send RBM
-the four questions, and decide what to do about the Streamlit serializer bug
-(fix it, or stop editing through Streamlit until this editor lands — its first
-save would rewrite the whole file).
+| Question | What it affects | Ask |
+|---|---|---|
+| Can RBM staff have GitHub accounts? | If not: work-email sign-in with a shared machine account — weaker attribution, more to build | RBM IT |
+| Will their site embed our page, or copy the files? | Whether publishing stays automatic after handover | RBM web team |
+| Who owns the repo and hosting afterwards? | Where the GitHub App and hosting get created | RBM |
+| Is endmalaria.org in-house or contractor-run? | Who we are handing over to | RBM |
+| Permission for the Unitaid mark and the WHO emblem | Currently carried on an unconfirmed assumption that explicitly does not transfer to another page or repo | Unitaid |
+| Who pays the ~$12/month after handover? | A small recurring cost that lapses when the person who set it up moves on | Unitaid / RBM |
+
+### Unresolved, and only your team can answer
+
+**`https://kochrisdev.github.io/launch-transparency-dashboard/` is live** —
+HTTP 200 today. `README.md`, `powerbi/queries.m` and
+`streamlit-app/README.md` all point at it. Is it an old copy serving stale
+data under a URL people may be citing, or the real public deployment with this
+repo as a working copy?
+
+This blocks nothing in the build, but it blocks handover planning: RBM cannot
+be handed a project whose documentation points at an account they do not
+control.
 
 ### One thing to verify at Phase 2
 
 `publish.yml` is path-filtered on `data/products.js` and its append-only guard
 fails the run if `meta.lastUpdated` was not bumped. The editor always bumps it,
 but confirm the whole loop end to end when the change arrives **by merge**
-rather than by direct push — that path has not been exercised.
+rather than by direct push — that path has never been exercised.
