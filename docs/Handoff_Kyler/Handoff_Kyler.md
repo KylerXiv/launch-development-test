@@ -300,6 +300,13 @@ Deleting asks twice inline rather than through a browser dialog, and says what
 it means: the product stops appearing on the public board, though past
 versions stay in the repository's history.
 
+### Named "RBM staging dashboard"
+
+`editor.html` presents itself as **RBM staging dashboard**, tagged *for
+analysts*. The filename is unchanged. Note the branding question is still open
+with RBM (whether they want their name and guidelines applied), so this may
+need revisiting at handover.
+
 ### Plain English throughout
 
 Every label, hint and message in the editor is now written for someone who has

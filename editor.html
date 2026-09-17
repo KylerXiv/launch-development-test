@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>LAUNCH data editor</title>
+<title>RBM staging dashboard</title>
 <!--
-  LAUNCH data editor.
+  RBM staging dashboard — where analysts edit the LAUNCH dashboard's data.
 
   INTERNAL. This page is never copied into the public bundle: it is not in the
   allowlist in scripts/build-public-site.sh, and that omission is deliberate.
@@ -58,7 +58,11 @@
     --r:10px;
   }
   *{box-sizing:border-box;}
-  html{background:var(--bg);}
+  /* The top bar is sticky, so anything scrolled to would otherwise arrive
+     underneath it. One offset, applied to every scroll target and to the
+     browser's own anchor scrolling. */
+  html{background:var(--bg);scroll-padding-top:76px;scroll-behavior:smooth;}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} }
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
        font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
        text-rendering:optimizeLegibility;}
@@ -79,6 +83,9 @@
              padding-block:13px;}
   .top h1{margin:0;font-size:15.5px;font-weight:650;letter-spacing:-0.01em;}
   .top .file{font-family:var(--mono);font-size:11.5px;color:var(--faint);}
+  .top .who{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+            color:var(--cyan);border:1px solid rgba(47,224,206,.3);background:var(--cyan-dim);
+            padding:3px 9px;border-radius:999px;white-space:nowrap;}
   .top .spacer{flex:1;}
 
   .pill{font-size:10.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
@@ -357,7 +364,8 @@
 
 <div class="top">
   <div class="wrap">
-    <h1>LAUNCH data editor</h1>
+    <h1>RBM staging dashboard</h1>
+    <span class="who">for analysts</span>
     <span class="file">data/products.js</span>
     <span id="statusPill" class="pill pill-unknown">…</span>
     <span class="spacer"></span>
@@ -1484,7 +1492,7 @@
     host.innerHTML = "";
     var f = document.createElement("iframe");
     f.className = "prev-frame";
-    f.title = "Illustrated journey, rendered from the current draft";
+    f.title = "The public dashboard, rendered from the current draft";
     f.src = preview.url;
     host.appendChild(f);
 
@@ -1626,8 +1634,8 @@
       try {
         start(raw);
       } catch (e) {
-        boot("The editor failed to start — " + e.message,
-             "This is a fault in the editor itself, not in your data.",
+        boot("The staging dashboard failed to start — " + e.message,
+             "This is a fault in the dashboard itself, not in your data.",
              (e.stack || "").split("\n").slice(0, 4).join("\n"));
       }
     })
@@ -1646,7 +1654,7 @@
         extracted.reason === "no-marker"
           ? "data/products.js has no `window.LAUNCH_DATA =` line to read."
           : "data/products.js is not strict JSON — " + extracted.message,
-        "The data file has to be repaired before the editor can open it. Ask a developer \u2014 this is not something to fix here."
+        "The data file has to be repaired before this can open. Ask a developer \u2014 it is not something to fix here."
       );
       return;
     }
