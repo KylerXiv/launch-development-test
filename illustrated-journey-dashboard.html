@@ -1193,48 +1193,15 @@
     Hover any stage for status detail; select a medicine to open its full profile.<br>
     <b>Sources.</b> Everything on this page is traceable to one of the public sources below.
     Each name opens that source's own official site in a new tab, so you can check any figure yourself.
-    <ul class="srclist">
-      <li>
-        <a href="https://www.who.int/teams/global-malaria-programme/guidelines-for-malaria" target="_blank" rel="noopener noreferrer">WHO malaria guidelines<span class="ext" aria-hidden="true">↗</span></a>
-        <span>Which medicines the World Health Organization recommends, and from when.</span>
-      </li>
-      <li>
-        <a href="https://extranet.who.int/prequal/medicines/prequalified/finished-pharmaceutical-products" target="_blank" rel="noopener noreferrer">WHO prequalification list<span class="ext" aria-hidden="true">↗</span></a>
-        <span>The medicines WHO has checked for quality, safety and effectiveness. <a href="https://extranet.who.int/prequal/vector-control-products/prequalified-product-list" target="_blank" rel="noopener noreferrer">Prevention tools are on a separate list<span class="ext" aria-hidden="true">↗</span></a>.</span>
-      </li>
-      <li>
-        <a href="https://apps.who.int/malaria/maps/threats/" target="_blank" rel="noopener noreferrer">WHO Malaria Threat Maps<span class="ext" aria-hidden="true">↗</span></a>
-        <span>Where malaria is becoming harder to treat — the study results behind the resistance layers on the map above.</span>
-      </li>
-      <li>
-        <a href="https://www.ema.europa.eu/en/medicines/download-medicine-data" target="_blank" rel="noopener noreferrer">European Medicines Agency<span class="ext" aria-hidden="true">↗</span></a>
-        <span>European approval decisions, including its opinions on medicines meant for use outside Europe.</span>
-      </li>
-      <li>
-        <a href="https://greenbook.nafdac.gov.ng/" target="_blank" rel="noopener noreferrer">Nigeria: NAFDAC Green Book<span class="ext" aria-hidden="true">↗</span></a>
-        <span>The national register of every medicine approved for sale in Nigeria.</span>
-      </li>
-      <li>
-        <a href="https://imis2.tmda.go.tz/portal/#/public/registered-medicines" target="_blank" rel="noopener noreferrer">Tanzania: TMDA register<span class="ext" aria-hidden="true">↗</span></a>
-        <span>The national register of every medicine approved for sale in Tanzania.</span>
-      </li>
-      <li>
-        <a href="https://insights.theglobalfund.org/t/Public/views/PriceQualityReportingTransactionSummary/TransactionSummary" target="_blank" rel="noopener noreferrer">Global Fund price and quality reporting<span class="ext" aria-hidden="true">↗</span></a>
-        <span>What was actually bought for countries — how many packs, at what price, in which year.</span>
-      </li>
-      <li>
-        <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer">ClinicalTrials.gov<span class="ext" aria-hidden="true">↗</span></a>
-        <span>Trial records: how many people took part, when a trial finished, and what it found.</span>
-      </li>
-      <li>
-        <span class="srcname">US President's Malaria Initiative</span>
-        <span>Its public data portal closed in 2025, so US-funded purchases from that point on are a gap we cannot yet fill.</span>
-      </li>
-      <li>
-        <span class="srcname">Manufacturer communications</span>
-        <span>Company announcements, and figures a manufacturer has confirmed to us in writing. There is no public register for these.</span>
-      </li>
-    </ul>
+    <!-- Both lists are rendered from data/sources.js (see renderSources below).
+         Do not hand-edit entries back into this markup: the registry is also
+         what the stage citations and the analyst's editor read, so a second
+         copy here would be the one that quietly goes stale. -->
+    <ul class="srclist" id="srclist"></ul>
+    <div id="srcdocs-wrap" hidden>
+      <b>Key documents.</b> Individual studies, assessments and announcements behind specific medicines.
+      <ul class="srclist" id="srcdocs"></ul>
+    </div>
     A LAUNCH initiative of
     <a href="https://unitaid.org/" target="_blank" rel="noopener noreferrer">Unitaid<span class="ext" aria-hidden="true">↗</span></a>
     partners, to be hosted by the
@@ -1249,6 +1216,7 @@
 <script src="data/world-map-geo.js"></script>
 <script src="data/resistance.js"></script>
 <script src="data/molecular-markers.js"></script>
+<script src="data/sources.js"></script>
 <script src="assets/journey-icons/icons.js"></script>
 <script src="assets/journey-icons/icons-solid.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.js"
@@ -3625,6 +3593,46 @@
     a.click();
     a.remove();
   });
+
+  // ---- Sources footer, from data/sources.js --------------------------------
+  // Two lists: first the registers and feeds a figure on this page comes from,
+  // then the one-off documents behind a single medicine. An entry with no url
+  // renders as plain text — that is how PMI and manufacturer communications
+  // have always appeared here, and the missing link is the point in both cases.
+  (function renderSources() {
+    const dataUl = document.getElementById("srclist");
+    const docsUl = document.getElementById("srcdocs");
+    const docsWrap = document.getElementById("srcdocs-wrap");
+    if (!dataUl) return;
+
+    const reg = window.LAUNCH_SOURCES;
+    if (!reg || !Array.isArray(reg.sources)) {
+      // Say so rather than leaving an empty list. A footer that quietly loses
+      // its sources still looks finished, and this page's entire claim is that
+      // every figure on it is traceable to one of them.
+      dataUl.outerHTML = '<p class="viznote">Source list unavailable — data/sources.js did not load.</p>';
+      if (docsWrap) docsWrap.remove();
+      return;
+    }
+
+    const EXT = '<span class="ext" aria-hidden="true">↗</span>';
+    const link = (url, text) =>
+      `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)}${EXT}</a>`;
+    const li = (s) => {
+      const name = s.url ? link(s.url, s.label || s.title)
+                         : `<span class="srcname">${esc(s.label || s.title)}</span>`;
+      const also = (s.alsoSee || []).map(a => " " + link(a.url, a.label) + ".").join("");
+      return `<li>${name}<span>${esc(s.plain)}${also}</span></li>`;
+    };
+
+    const shown = reg.sources.filter(s => s.public);
+    dataUl.innerHTML = shown.filter(s => s.group !== "document").map(li).join("");
+    const docs = shown.filter(s => s.group === "document");
+    if (docs.length && docsUl) {
+      docsUl.innerHTML = docs.map(li).join("");
+      docsWrap.hidden = false;
+    }
+  })();
 
   // print: open every panel so the printout is complete
   window.addEventListener("beforeprint", () => {

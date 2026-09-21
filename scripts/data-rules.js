@@ -42,12 +42,19 @@
       normalizer: "normalize-molecular-markers.js", value: "p", dim: "marker", unit: "surveys" }
   ];
 
+  const SOURCE_GROUPS = ["data", "document"];
+  const SOURCE_COLLECTION = ["automated", "manual", "static", "blocked", "none"];
+
   // ---- extraction ----------------------------------------------------------
   // The data file is a comment header, then `window.LAUNCH_DATA = ` at a line
   // start, then strict JSON. Anchored to a line start so the mention of the
   // marker inside the comment header cannot match.
-  function extractData(raw) {
-    const m = raw.match(/^window\.LAUNCH_DATA\s*=\s*/m);
+  //
+  // `global` names which window.* assignment to read, so the same extractor
+  // serves data/sources.js (LAUNCH_SOURCES). Defaulted, so every existing
+  // caller keeps working unchanged.
+  function extractData(raw, global) {
+    const m = raw.match(new RegExp("^window\\." + (global || "LAUNCH_DATA") + "\\s*=\\s*", "m"));
     if (!m) return { ok: false, reason: "no-marker" };
     const body = raw.slice(m.index + m[0].length).replace(/;?\s*$/, "");
     try {
@@ -421,8 +428,71 @@
     return { errors, warnings };
   }
 
+  // ---- the source registry contract ----------------------------------------
+  // data/sources.js is what the public Sources footer is drawn from, so a
+  // malformed entry is a footer that silently loses a source rather than a
+  // page that fails loudly. Errors only, deliberately: a warning here would
+  // be read as "the data is fine", and every rule below is a broken link or
+  // a missing credit.
+  //
+  // `productIds` is optional; pass it and every "products" entry is checked
+  // against the real portfolio, so renaming a product cannot orphan a
+  // citation.
+  function checkSources(data, productIds) {
+    const errors = [];
+    const err = (m) => errors.push(m);
+    const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (!data || typeof data !== "object") { err("sources: file body is not an object"); return { errors, warnings: [] }; }
+    if (!data.meta || !DATE.test(data.meta.lastUpdated || ""))
+      err(`sources meta.lastUpdated: must be YYYY-MM-DD, got "${data.meta && data.meta.lastUpdated}"`);
+    if (!Array.isArray(data.sources) || !data.sources.length) {
+      err("sources: must be a non-empty array");
+      return { errors, warnings: [] };
+    }
+
+    const seen = new Set();
+    data.sources.forEach((s, i) => {
+      const at = `sources[${i}]${s && s.id ? ` (${s.id})` : ""}`;
+      if (!s || typeof s !== "object") { err(`${at}: not an object`); return; }
+
+      if (!/^[a-z0-9][a-z0-9-]*$/.test(s.id || ""))
+        err(`${at}: "id" must be lower-case kebab-case, got "${s.id}"`);
+      else if (seen.has(s.id)) err(`${at}: duplicate id — ids are what citations point at`);
+      else seen.add(s.id);
+
+      for (const f of ["title", "org", "category", "plain"])
+        if (!s[f] || !String(s[f]).trim()) err(`${at}: "${f}" is required`);
+
+      if (!SOURCE_GROUPS.includes(s.group))
+        err(`${at}: "group" must be one of ${SOURCE_GROUPS.join("/")}, got "${s.group}"`);
+      if (!SOURCE_COLLECTION.includes(s.collection))
+        err(`${at}: "collection" must be one of ${SOURCE_COLLECTION.join("/")}, got "${s.collection}"`);
+      if (typeof s.public !== "boolean") err(`${at}: "public" must be true or false`);
+      if (!DATE.test(s.checked || "")) err(`${at}: "checked" must be YYYY-MM-DD, got "${s.checked}"`);
+
+      // null is a real answer here — PMI's portal closed and manufacturer
+      // communications have no public register. An empty string is not.
+      if (s.url !== null && !/^https?:\/\/\S+$/.test(s.url || ""))
+        err(`${at}: "url" must be an http(s) URL, or null where none exists`);
+
+      (s.alsoSee || []).forEach((a, j) => {
+        if (!a || !a.label || !/^https?:\/\/\S+$/.test(a.url || ""))
+          err(`${at}: alsoSee[${j}] needs a label and an http(s) url`);
+      });
+
+      if (!Array.isArray(s.products) || !s.products.length)
+        err(`${at}: "products" must list product ids, or ["all"]`);
+      else if (productIds)
+        s.products.filter((p) => p !== "all" && !productIds.includes(p))
+          .forEach((p) => err(`${at}: products lists "${p}", which is not a product in data/products.js`));
+    });
+
+    return { errors, warnings: [] };
+  }
+
   return {
-    STATUSES, DATA_STATUSES, PHASES, DATASETS,
-    extractData, checkData, checkStudyLayers
+    STATUSES, DATA_STATUSES, PHASES, DATASETS, SOURCE_GROUPS, SOURCE_COLLECTION,
+    extractData, checkData, checkStudyLayers, checkSources
   };
 });

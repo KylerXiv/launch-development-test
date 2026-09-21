@@ -53,6 +53,23 @@ if (!process.argv[2]) {
   });
   errors.push(...layers.errors);
   warnings.push(...layers.warnings);
+
+  // ---- the source registry -------------------------------------------------
+  // Same reasoning as the layers above: one global file, not one per product
+  // data file. Product ids are passed through so a source cannot cite a
+  // medicine that no longer exists.
+  const SRC = path.join(__dirname, "..", "data", "sources.js");
+  const rawSrc = rules.extractData(fs.readFileSync(SRC, "utf8"), "LAUNCH_SOURCES");
+  if (!rawSrc.ok) {
+    errors.push(rawSrc.reason === "no-marker"
+      ? "sources: could not find `window.LAUNCH_SOURCES = { ... }` at a line start in data/sources.js"
+      : "sources: data/sources.js is not strict JSON — " + rawSrc.message);
+  } else {
+    const ids = (extracted.data.products || []).map((p) => p.id);
+    const srcFound = rules.checkSources(rawSrc.data, ids);
+    errors.push(...srcFound.errors);
+    warnings.push(...srcFound.warnings);
+  }
 }
 
 // ---- report -----------------------------------------------------------------
