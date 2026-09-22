@@ -196,6 +196,76 @@ CI has not run and cannot — see §3.
 
 ---
 
+## 4a. Direction change — the editor becomes a review gate (22 Sep 2026)
+
+Decided with the team engineer, after the source registry landed. **The staging
+dashboard is no longer a manual data-entry tool.** It becomes the surface where
+proposed changes are approved or rejected. Nothing typed freehand; nothing
+published without a person agreeing to it.
+
+Flow diagrams (deliberately non-technical, for RBM and the wider team):
+<https://claude.ai/artifact/6TDdHARL6EdrKgLU5ANqD7>. The four-language
+architecture behind them: <https://claude.ai/artifact/5eyw5Tk4gSd59oFfp2MD1F>.
+
+### Where new data lands
+
+Today a fetcher ends at `sourcing/staging/*.csv` plus a watch report and a
+GitHub issue. That is **evidence**, not a proposal — one row per registration
+or disbursement, while `data/products.js` is one row per medicine with a cited
+sentence per step. The new flow needs a layer between them that does not exist
+yet:
+
+| Piece | What it holds | Status |
+| --- | --- | --- |
+| **Waiting room** | One proposal per change: product, field, current value, proposed value, evidence link, source, date seen | **Not built** |
+| **Review desk** | The rebuilt staging dashboard: current vs proposed side by side, approve / reject | Rebuild of `editor.html` |
+| **Decision record** | Who approved or rejected what, when, and why | **Not built** |
+
+Shape to follow: another `data/*.js` file setting a `window.LAUNCH_*` global,
+validated by `scripts/validate-data.js` like everything else. No server, no
+build step — the constraint that produced the static editor in the first place
+has not changed.
+
+**The pattern already exists and should be generalised, not reinvented.** The
+import feature on `data-editor` already turns a messy file into a *plan* of
+creates / updates / skips, shows every change as `was → now`, and lets the
+analyst tick what to accept. That is the review desk, restricted to one input.
+
+### The gap this creates — and it is the important one
+
+A rejection must be remembered, or the same proposal returns monthly until
+people stop reading the queue. That is straightforward.
+
+The hard one: **if analysts can only approve or reject, something must author
+the sentence.** Roughly a third of the dashboard is mechanical — registration
+status, trial dates, PQ listings, procurement volumes — and those proposals
+compose themselves from the evidence. The rest are judgements assembled from
+several sources, of exactly the kind CLAUDE.md's own example describes, and a
+register cannot propose one. A reviewer cannot approve a proposal nobody wrote.
+
+So the flow needs a named author for the judgement layer — a curator drafting
+proposals, or a drafting assistant whose output is always a proposal and never
+a publication. **Settle this before building the desk:** it decides whether the
+desk handles ten proposals a month or two.
+
+### Translation engine — recommendation, not yet decided
+
+Content is ~21,000 characters; three more languages is ~63,000. Cost is not a
+factor at that size, so choose on terminology control and determinism:
+
+**DeepL with a fixed glossary.** The glossary pins the official WHO wording
+once and carries the do-not-translate list (INNs, product names, registry
+numbers, source names); it is strongest on fr/pt/es; and it answers identically
+on a re-run, so a reviewed sentence stays reviewed. Its free tier covers this
+volume roughly eight times over. If the fourth language is Arabic, prefer
+Google Cloud Translation — wider coverage, and Arabic also brings an RTL layout
+job unrelated to the string plumbing.
+
+Before any engine runs, lift ~60 terms from **WHO's and RBM's own published
+French and Portuguese**. Both already publish in these languages; matching
+their vocabulary is something no engine gets right unprompted, and RBM is the
+future host.
+
 ## 5. Still to do
 
 ### Open questions that need an answer before the next step

@@ -44,6 +44,17 @@ node scripts/report-import-fixtures.js        # expected-behaviour table
 
 ## 1. What exists
 
+> **Superseded on this branch (22 September 2026).** The team has decided the
+> staging dashboard must *not* be a manual data-entry tool: it becomes the
+> surface where proposed changes are approved or rejected, and collection
+> produces proposals rather than edits. What this section describes is still
+> what the code does today, and the save gate, preview and import machinery all
+> carry over — but the editing forms do not. See
+> [source-registry-notes.md §4a](../source-registry-notes.md) for the new flow,
+> where new data lands, and the open question of who authors the judgement
+> sentences. This note exists only on `sources-registry`; `data-editor` is
+> unchanged.
+
 A browser page, `editor.html`, where an analyst updates the dashboard's data
 through forms. Plain HTML, no build step, no dependencies — the same as every
 other page here, so it hands over to RBM inside the same file set as the
