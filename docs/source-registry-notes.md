@@ -367,6 +367,469 @@ and the data layer serves both routes, so it does not block.
 Diagrams for all of the above, in deliberately plain language for RBM and the
 wider team: <https://claude.ai/artifact/6TDdHARL6EdrKgLU5ANqD7>
 
+## 4c. The whole route, drawn with the file names on it (22 Sep 2026)
+
+Companion to the plain-language diagrams in §4a — same flow, but every box
+carries the file it actually is, for whoever builds it:
+<https://claude.ai/artifact/7dchTLL1nEg79kpgMtnr5B>.
+
+### The desk cannot edit — approve or reject, nothing else
+
+**Decided with the team engineer, 22 September 2026, and it supersedes the
+three-button flow drawn in §4a.** The review desk offers exactly two outcomes.
+A reviewer cannot retype a value, fix a date or soften a sentence. Amend, which
+§4a's diagram carried, is gone.
+
+**Enforced as a file boundary, not a role check.** Two pages, not one:
+
+| Page | Holds | Writes to |
+| --- | --- | --- |
+| `propose.html` | today's `editor.html` forms, unchanged rules | `data/proposals.js` on the `proposals` branch |
+| `review.html` | current beside proposed, evidence one click away, two buttons | `data/decisions.js`, and a PR applying the proposal to `data/products.js` |
+
+`review.html` ships without any form code, so it *cannot* write a value no
+proposal contains — a bug in it cannot invent one either. An "edit mode behind a
+role flag" on one page was rejected for exactly that reason: the wall then
+exists only in JavaScript, and it ships to every reviewer.
+
+So there are **two ways a value changes** — a fetcher proposes, a person
+proposes — and one gate that can only say yes or no.
+
+| Rejected | Because |
+| --- | --- |
+| Reviewer amends, then approves (the §4a flow) | Puts a text field on the gate: a value nobody authored can reach the record, and the desk needs write access to every field. One page then holds both jobs and the separation lasts only as long as everyone remembers it |
+| One page, edit mode behind a role check | The form code still ships to every reviewer; the wall becomes a flag. Two files cost nothing and cannot be toggled by accident |
+| Edit `data/products.js` directly (GitHub web, or an editor) | Skips the gate entirely, captures no evidence, and puts code-shaped text in front of a non-developer |
+| A shared spreadsheet plus an importer | Accepts anything — no source, no date rules. `scripts/import-lib.js` stays as an *input* that generates proposals, not as the gate |
+| Keep the Streamlit editor as the write path | Needs a Python host; a second deployment for RBM to own. Stays the internal workbench |
+
+**What it costs, recorded honestly.** A proposal that is right except for a typo
+now takes a round trip. Worse, a fetcher-authored one has no author to send it
+back to — a person must write the corrected version through `propose.html`.
+Expect it on roughly one proposal in ten. This also makes §4a's open question
+*sharper, not softer*: with no rescue at the desk, the judgement-sentence author
+has to be named before anything else is built.
+
+**What it buys.** Every figure on the record was authored by someone with the
+evidence in front of them, rather than typed by someone clearing a queue at 5pm;
+and "who wrote this sentence" stays answerable, because only one role ever
+writes.
+
+`scripts/build-public-site.sh` copies a **named list**, so both new pages are
+excluded from the public site by default — verified, it names every file it
+copies. Never add them, same as `editor.html` today.
+
+### Option raised 22 Sep: build no page at all, and let GitHub be both surfaces
+
+Asked after the two-page split was drawn: *if we do not use HTML to edit, where
+can we manually edit?* Every job the two pages were going to do, GitHub already
+does — typed form (issue forms), queue (issue list), `was → now` (the diff),
+approve (the review), reject with a reason (close with a label), sign-in, and
+permissions on a private repo.
+
+**This is less of a departure than it looks.** `sourcing.yml` already opens an
+issue when a watch report changes "so an analyst reviews it", and its header
+comment already states that the fetchers never touch `data/products.js` and that
+the analyst plus the validator remain the only gate. The issue queue exists; it
+has no form on the front and no button on the back.
+
+| The job | A page we build | GitHub, with no page |
+| --- | --- | --- |
+| Writing a proposal | `propose.html` | an issue form, or a six-field `proposals/*.yml` edited in the web editor |
+| The queue | `data/proposals.js` | the issue or PR list, labelled |
+| Checking it | `data-rules.js` in the browser, as they type | the same file in a workflow; errors return as a comment |
+| Reviewing | `review.html` | the pull-request diff |
+| Seeing the real page first | `make-preview.js` | a Vercel branch build — `vercel.json` already runs `scripts/build-public-site.sh` |
+| Who may open it | a front door to build (local, or Cloudflare Access) | GitHub's permissions on a private repo |
+| Whose name is on it | a token in `sessionStorage` (item 6) | the account they signed in with |
+| What we maintain | two pages and a token flow | a form definition and two workflows |
+
+It deletes item 6 (sign-in), the front-door hosting question, and the finding
+that GitHub Pages cannot be access-controlled outside Enterprise Cloud.
+
+**Two prerequisites, both already open questions here.**
+
+1. **Everyone who proposes or reviews needs a GitHub account.** §4b already
+   lists this as a question for RBM IT; this choice makes it load-bearing. If
+   the answer is no, the only surviving surface is a hosted form with its own
+   login — which is what `streamlit-app/` already is, and the server the static
+   design was avoiding comes back.
+2. **Actions must work.** Removing the browser page moves every check
+   server-side; there is no rules engine running as someone types. With runs
+   `startup_failure` since 10 September, this design would today accept anything
+   and check nothing.
+
+**Checked, not assumed — self-approval.** GitHub blocks approving your own pull
+request *only if you opened it*. If a bot opens every PR from an issue, the
+person who filed the issue can approve their own proposal. Two fixes, both
+stronger than a rule in a page we wrote: the proposer opens the PR themselves
+(the web editor does this when they edit a proposal file), or a required status
+check compares the approving reviewer against the issue author and fails on a
+match.
+
+**Recommendation: GitHub-native, starting with the proposal file rather than the
+issue form.** The file route needs no parser and no bot — the web editor creates
+the branch and the PR in the proposer's name, CI validates, someone else
+approves. If six flat fields prove too code-shaped for analysts, the issue form
+is a friendlier front door onto the same pipeline and changes nothing
+downstream.
+
+Consequence for §4c's branch-protection note: **if the pull request is the
+review desk, required review becomes the right setting after all**, because the
+PR *is* the second pair of eyes rather than a third. The argument against it
+holds only for the two-page design, where a human has already approved at the
+desk before the PR exists.
+
+Other surfaces considered, and why they lose: a CSV in Excel converted by a
+workflow (`scripts/import-lib.js` already parses it, 127 tests — right for bulk,
+but Excel mangles dates and encodings, and `normalize-pqr.js` already carries
+those scars); `node scripts/propose.js` (zero hosting, full validation, but a
+terminal is not an analyst surface).
+
+### Decided: the issue form is the surface, and there is no page of ours
+
+Settled after the two-page split was drawn. The binding constraint is **no
+second site to build, host, secure and hand over** — not "analysts must never
+see GitHub", which was the earlier phrasing. Between a web app of ours and a
+form GitHub renders for free, the form wins.
+
+**The surface:** `.github/ISSUE_TEMPLATE/propose-change.yml` — dropdowns for
+medicine and field, required boxes for the new wording, the source and the date.
+No YAML, no diff, no code-shaped text. It is `propose.html` without building or
+hosting anything.
+
+**The gate:** a label on that issue — `approved`, or `rejected:‹reason›` from the
+fixed list. A label cannot carry a value, so the no-edit rule holds more
+strongly here than on a page of ours: there is nothing to type into.
+
+Everything downstream is unchanged — workflow applies it, opens the PR, checks
+run, auto-merge on green.
+
+**The hole this opens, and it must be closed in the same commit.** An issue body
+is editable by anyone with write access, so a reviewer could rewrite the
+proposal and then label it approved — the amend path through a side door. **The
+workflow snapshots the proposal into `data/proposals.js` the moment the issue is
+filed, and approval applies that snapshot, never the body as it currently
+reads.** Later edits to the issue are ignored, and a mismatch is worth flagging
+on the issue itself.
+
+What this deletes from the plan: `propose.html`, `review.html`, item 6's token
+flow, the front-door question, and the need to keep two more pages out of
+`build-public-site.sh`. `editor.html`'s exclusion from that named list still
+stands and still matters.
+
+**Two settings that decide whether the form is a gate or a suggestion.**
+
+1. **`blank_issues_enabled: false`** in `.github/ISSUE_TEMPLATE/config.yml`.
+   Without it the plain title-and-description screen stays available to
+   everyone, and "one way in" is gone — anyone can file free text and call it a
+   proposal. An issue form does not replace the blank issue, it sits beside it
+   until this is set.
+2. **The source dropdown is a second copy of `data/sources.js`.** Issue-form
+   options are static YAML and cannot be read from the registry at render time.
+   **That is precisely the trap §2 of this document was written to close** — one
+   registry, not a second list beside it. Generate the template's options from
+   `data/sources.js` in a workflow and fail CI when they drift; do not
+   hand-maintain 22 entries in two files. The same applies to the medicine and
+   stage dropdowns, though those change far less often (4 products, 8 stages).
+
+The page route stays recorded as the alternative — it is the one that wins if
+analysts turn out to need the rendered page beside the proposed wording to judge
+a judgement sentence, which is the one thing GitHub cannot show.
+
+### Built 22 Sep: the proposal form itself
+
+`.github/ISSUE_TEMPLATE/propose-change.yml` and
+`.github/ISSUE_TEMPLATE/config.yml` are in the tree. Once committed and pushed,
+`…/issues/new?template=propose-change.yml` renders the form instead of the blank
+issue box — no other change is needed to make the address work.
+
+Fields, chosen against the real record shape (`products[].stages[]` carries
+`status`, `note`, `date`, `next`, `nextDate`, `source`, `asOf`): medicine, stage,
+which field changes, the proposed wording, source, source date, an optional
+link, optional reviewer notes, and two required tick-boxes ("I read the source
+myself"; "this is one change"). The status wording in the form mirrors
+`STATUSES = ["done","prog","late","idle"]` from `scripts/data-rules.js`, and the
+field description repeats that rule's requirement that a delayed stage carry a
+substantive reason — so the analyst meets the validator's rules while filling
+the form, not after failing it.
+
+`config.yml` sets `blank_issues_enabled: false`. It affects the web chooser
+only; `sourcing.yml` opens its watch issues through `gh issue create`, which is
+unaffected. **Consequence to accept or fix:** there is now no template for a
+non-proposal issue (a dashboard bug, a question). Add a second template rather
+than turning blank issues back on.
+
+**Not machine-validated.** No YAML parser is installed here (no pyyaml on any
+interpreter, no node_modules), so the file was checked by hand: no tabs, every
+option string containing `&`, `:` or brackets quoted, every body item a valid
+type with `attributes`. GitHub validates issue forms on push and shows an error
+banner on the Issues tab if the syntax is wrong — that is the real check, and it
+has not run yet.
+
+Verify block after adding the two files: `validate-data.js` **0 errors, 5
+warnings**; synthetic **0 errors, 0 warnings**. Unchanged, as expected — no data
+file was touched.
+
+### One surface, and one enforced way in
+
+Clarified 22 Sep: **nobody edits the data on a second website, and there is one
+source.** The issue form and the web-editor file were candidates for the *same
+slot* as `propose.html`, not additional doors — they are closed. `propose.html`
+is the only surface a person types into.
+
+**But choosing a surface is not the same as having only one, because the other
+doors cannot be deleted.** GitHub's file editor exists whether we use it or not;
+a token that can write can write. So the rule gets enforced the way everything
+else here does — by making the other routes fail:
+
+> **A required check: every changed value in `data/products.js` must trace back
+> to an approved proposal.** The workflow diffs the file against the base,
+> resolves each changed path against `data/proposals.js` / `data/decisions.js`,
+> and fails on anything with no approval behind it.
+
+A hand-edit has no proposal behind it, so it never merges — whoever made it,
+whether person or workflow, whichever screen they used. **This retires the last
+thing in the design that was holding by convention**, and it is strictly
+stronger than the approver≠proposer check, which it subsumes for anything
+arriving outside the desk.
+
+**"Single source" covers two anxieties; both are answered.** One surface, above;
+and one file — nothing else in the design is a second copy of the data:
+
+| File | What it is | Second source? |
+| --- | --- | --- |
+| `data/products.js` | the record | **the only one** |
+| `data/proposals.js` | changes nobody has decided on | no — pending diffs with evidence; emptied as each is decided |
+| `data/decisions.js` | what was approved or rejected, and why | no — an append-only log, never read for a figure |
+| `data/i18n/products.fr.js` | translations | no — derived, keyed to the English and hash-checked against it, which is what stops it becoming a second version of the truth |
+| `history/`, the published dataset | snapshots, the public copy | no — generated output, one-way, never read back in |
+
+### One human gate — the approval *is* the merge
+
+Raised immediately after the option above, and it is the right catch: if a
+person approves at the desk and *then* a person approves the pull request, the
+second one is reading a JSON diff to answer a question about whether a medicine
+is registered in Rwanda. **A second human who cannot evaluate the claim adds
+delay and no safety** — the only thing they can check is that the file parses,
+which `validate-data.js` does better and in two seconds.
+
+**Decision: the merge is a consequence, not a decision.** The desk commits,
+opens the pull request on the approver's account, the checks run, and it
+auto-merges on green. The PR still exists — audit trail, one-click revert, and
+the reason a bad change meets CI before it meets `main` — but it lives about
+thirty seconds and nobody watches it.
+
+**The distinction that resolves the tension:** GitHub is the *road*, not the
+*office*. Every change travels through a commit, a PR, checks and a merge,
+because that is what makes the record trustworthy a year later. None of it
+requires an analyst to work there. Having an account is not the same as having
+to visit: one sign-in puts a real name on every approval made from our page.
+
+Two consequences:
+
+- **The two-person rule moves into a status check.** A workflow compares the
+  approving account against the proposal's `origin` and fails when they match.
+  Machine-enforced, and it fires without anyone opening a PR. This replaces the
+  convention recorded above.
+- **Required review is conditional, and the rule is symmetrical:** turn it on
+  exactly when the pull request *is* the review desk. With a desk of ours plus
+  auto-merge it would block every merge forever; with the GitHub-native route it
+  is the gate itself. Getting it backwards leaves the gate either blocking
+  everything or protecting nothing.
+
+**New state to build for: approved but not landed.** If the checks go red after
+an approval, the change never reaches the record and yesterday's version stays
+live. The desk has to show that — a silently failed approval is worse than a
+rejection, because everyone believes it went through.
+
+**Which surface wins, restated.** The page earns its place only for what GitHub
+cannot show: current wording beside proposed, the evidence open, and the
+rendered page. That matters for the judgement sentences and barely at all for
+the mechanical third. So the page is the answer *because the analysts are not
+going to work in GitHub* — not because GitHub is insufficient. The GitHub-native
+route above stays as the fallback that still works if the page never gets built.
+
+### Two buttons, five reasons — the reason list does the routing
+
+Two outcomes would be too few without it. Reject takes a reason from a fixed
+list, and the reason decides what happens next:
+
+- *wrong value*, *evidence missing or weak* → back to its author, who
+  re-proposes. The proposal is not closed.
+- *not a real change*, *already known*, *superseded* → closed, with a
+  fingerprint of (target path + proposed value) written to `data/decisions.js`.
+  The next fetch filters against it.
+
+That fingerprint is the "a rejection must be remembered" gap named in §4a.
+Without it the same rows return monthly until people stop reading the queue.
+
+### Branch protection — what it is actually load-bearing for
+
+It is the only thing that makes the rest of this design *enforced* rather than
+*chosen*. Three jobs, and nothing else can do any of them:
+
+1. **It forces the PR route.** The desk's token needs `contents: write`, and
+   token permissions are repository-wide — there is no way to scope one to
+   "write files but not `main`". Without protection the desk can push straight
+   past its own gate.
+2. **It makes the checks binding.** "Merges on green" means nothing unless red
+   blocks the merge.
+3. **It makes the approver ≠ proposer check real.** A required check blocks; an
+   unrequired one is a log entry.
+
+Settings: require a pull request before merging with **0 required approvals**
+(auto-merge depends on that — required *review* only in the GitHub-native
+variant, per the conditional rule above), required status checks =
+`validate-data.js` + the approver≠proposer workflow, block force pushes and
+deletion, no bypass for people including the owner. Still GitHub Pro, $4/month,
+and only `Keith-paradox` can enable it.
+
+**Found while answering this, and it will bite on day one.** Two workflows push
+directly to `main` today — `publish.yml` (`git push`, line 64: history
+snapshots, `feed.xml`, ontology rebuilds) and `sourcing.yml` (outputs under
+`sourcing/`). They share a concurrency group named `bot-push-main` precisely
+because both do. **"Require a pull request before merging" breaks both on their
+next run.** Handle it deliberately: a bypass entry for the Actions app only —
+bots, never people — or move those outputs off `main`. A bypass list is exactly
+where a design like this springs a quiet leak, so it is worth writing down which
+entry is in it and why.
+
+### The queue lives on its own branch
+
+`proposals` — unprotected, nothing deploys from it, bots and analysts both
+commit to it. A proposal publishes nothing, so making it pass a PR would be
+friction for no gain. Only an **approval** opens a PR, and only against `main`,
+which is the branch the record and the protection live on.
+
+### The proposal carries Phase 2's citation format
+
+`evidence` is `{ "src": "rwanda-fda", "asOf": "2026-09-21" }`, `src` resolving
+against `data/sources.js` — deliberately the shape §5's Phase 2 needs. Requiring
+it at authoring time retires the 50 freehand `source:` strings as a side effect
+of normal work rather than as a separate 1.5-day job.
+
+Approve-or-reject makes it load-bearing rather than merely tidy: **a reviewer
+who cannot edit needs the evidence in front of them, or they are not reviewing,
+they are guessing.**
+
+### Which files carry translatable text — measured, 22 Sep
+
+`data/products.js` is not the only one, and two of the others cannot hold a
+translation at all.
+
+| File | What needs translating | Size |
+| --- | --- | --- |
+| `data/products.js` | stage notes, next steps, access/adoption sentences, milestones, changelog, glossary definitions | **219 strings, ~15,500 chars** — four fifths of the job |
+| `data/sources.js` | the `plain` one-liner per source, which is what the footer renders. `title`/`org` are proper names; `findings`/`relevance` are stored but not rendered (§2), so nothing to do unless they get published | 23 strings, ~1,900 chars |
+| `data/resistance.js` | the metric labels and the aggregation rule printed beside the map | 7 strings, ~560 chars |
+| `data/molecular-markers.js` | the same, plus the `derivation` note | 6 strings, ~825 chars |
+| `data/world-map.js` | **nothing** — its 94 country names should come from `Intl.DisplayNames`. Same for the 220 and 143 place names in the two WHO files: countries from `Intl`, study sites left as proper nouns | — |
+| the pages themselves | headings, buttons, legend, banner, glossary UI, `aria-label`s — **in no data file**, it is markup | unmeasured until extracted |
+
+**This settles the overlay argument on structural grounds, not preference.**
+`resistance.js`, `molecular-markers.js` and `world-map.js` are generated, and
+the first two must regenerate **byte-identical** per the verify block in
+CLAUDE.md. A translated field inside them would be deleted by the next
+regeneration, or would fail the check. An overlay is the only structure the repo
+permits.
+
+Total ≈ **18,800 characters** of real prose across four files — close enough to
+the earlier ~21,000 estimate that the free-tier arithmetic is unchanged. The
+page furniture is extra and currently not extractable.
+
+### The fetchers must emit proposals, not prose
+
+Shown by watch issue #5 (trial watch, 14 Sep): the body reads
+`NCT07246525 (dhappq) — primary completion: 2029-08-31 → 2029-09-30`. That is a
+sentence. Nothing can apply it, no approval attaches to it, and closing the
+issue moves no data — today a person reads it and hand-edits the record, which
+is the step being removed.
+
+Each collector needs the same addition, written once and shared rather than six
+times: `fetch-trials.js`, `fetch-regulatory.js`, `fetch-nafdac.js`,
+`fetch-tmda.js`, `fetch-globalfund.js`, `normalize-pqr.js`. All six can propose
+mechanically — dates, statuses, registrations, volumes.
+
+**The third bullet of that same issue is the counter-example worth keeping.**
+*"NEW NCT07811908 (ganlum) — Platform Study… RECRUITING"* is not a field change:
+somebody has to decide whether the trial belongs on the dashboard and write the
+sentence describing it. The authoring gap, in one screenshot.
+
+### Translation: an overlay keyed to the English, carrying its hash
+
+English stays the only authored language. Translations live in
+`data/i18n/products.fr.js` etc. — same `window.LAUNCH_*` + strict JSON shape as
+every other data file — keyed by data path (`pyramax.journey.registration.note`),
+**each entry storing a hash of the English it was made from**.
+
+That hash is the accuracy mechanism: when the English changes the hash stops
+matching, the entry is stale by construction, the page falls back to English
+*visibly marked*, and the string re-enters the queue. Nobody has to remember to
+re-translate. A stale translation that looks correct is the failure worth
+engineering against; an obviously missing one is not.
+
+**A bad translation is fixed in the glossary, not at the desk.** A bilingual
+reviewer who could retype the French would fix the sentence in front of them and
+the same wrong term would return next month. Because they cannot, the correction
+goes into the glossary, the string is re-drafted, and every future occurrence is
+right too — the constraint pushes the fix to the place that makes it stick. For
+a genuine one-off, the reviewer authors a translation proposal through
+`propose.html` like any other change.
+
+Two consequences worth recording:
+
+- **Translate after English approval, never before.** Otherwise we pay to
+  translate sentences that get rejected, and a reviewer could approve French of
+  a claim nobody has approved in English.
+- **English does not wait for French.** Publish on merge, with marked gaps on
+  the other pages for a day or two. Rejected: holding the release until all
+  languages are complete — one untranslated sentence then blocks a registration
+  update, which is the worse failure.
+
+### Correction: RBM's platform serves three languages, not four
+
+Checked rather than assumed, 22 September 2026:
+
+```
+dashboards.endmalaria.org/en  200
+dashboards.endmalaria.org/fr  200
+dashboards.endmalaria.org/pt  200
+dashboards.endmalaria.org/es  404
+dashboards.endmalaria.org/ar  404
+```
+
+The Spanish buttons on their front pop-up are downloads of the Gap Analysis
+**tool file**, not a site locale. **This corrects "four languages" as used
+throughout §4a and §4b**, including correction 1 and the cost estimate: the
+published dataset needs **en/fr/pt** to cover every page RBM actually has.
+Spanish stays worth shipping for Unitaid and Latin America, but it would be a
+language we publish ahead of the host platform, with no page there to land on —
+a decision to take deliberately, not to inherit from a screenshot.
+
+Volume drops with it: ~21,000 characters × 2 extra languages ≈ **42,000**, not
+63,000. DeepL's free tier covers that about twelve times over. The engine
+recommendation in §4a is unchanged.
+
+### Build order
+
+**Ask RBM IT about GitHub accounts before anything else** — one email, and it
+decides whether steps below are two workflows or two pages.
+
+Then `validate.yml` running on pull requests and branch protection —
+steps 5 and 6 of the drawing both claim a check that does not currently
+execute, and $4/month is what separates the gate from a convention. Then
+`data/proposals.js` + `checkProposals`; then splitting `editor.html` into
+`propose.html` and `review.html`; then the desk itself, generalised out of
+`scripts/import-lib.js` rather than rewritten — it already renders
+creates/updates/skips as `was → now` with tick-to-accept, which is the desk with
+one input; then `data/decisions.js` with the reason list and the fingerprint
+filter; then item 5's pull-request plumbing; then the glossary and the overlay;
+then the public data repository and `/v1/`.
+
+**Files touched by this task:** this document only. No code changed, and the
+verify block was not re-run — nothing it checks moved.
+
 ## 5. Still to do
 
 ### Open questions that need an answer before the next step

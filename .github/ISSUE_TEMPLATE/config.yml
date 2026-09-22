@@ -1,0 +1,11 @@
+# The blank "title + description" issue is switched off deliberately: it is a
+# free-text path to the queue, and the proposal form is meant to be the only
+# way in. See docs/source-registry-notes.md §4c.
+#
+# This affects the web "New issue" chooser only. Workflows that open issues
+# through the API or `gh issue create` — sourcing.yml's watch reports — are
+# unaffected.
+#
+# If people need to report something that is NOT a data proposal (a bug in the
+# dashboard, a question), add a second template rather than turning this back on.
+blank_issues_enabled: false

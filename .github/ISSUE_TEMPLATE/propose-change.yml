@@ -1,0 +1,144 @@
+# Proposal form — the only way a person proposes a change to the dashboard.
+#
+# Nothing filed here changes data/products.js. A workflow snapshots each
+# submission into data/proposals.js, checks it against scripts/data-rules.js,
+# and comments back if something is wrong. A reviewer then labels the issue
+# "approved" or "rejected:<reason>"; only an approval opens a pull request.
+#
+# The "Source" options below are a COPY of data/sources.js. GitHub cannot read
+# the registry at render time, so this list must be regenerated from it and
+# checked for drift in CI — see docs/source-registry-notes.md §4c. Do not edit
+# the list by hand.
+
+name: Propose a data change
+description: Propose one change to the dashboard. It is reviewed before anything is published.
+title: "Proposal: "
+labels: ["proposal", "waiting"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One change per proposal. If you have three, file three — each is approved or rejected on its own.
+
+  - type: dropdown
+    id: product
+    attributes:
+      label: Medicine
+      options:
+        - "GanLum"
+        - "ALAQ"
+        - "ASPY (Pyramax)"
+        - "DHA–PPQ"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Which stage
+      description: The eight stages of the access pathway, in order.
+      options:
+        - "R&D & clinical"
+        - "Regulatory approval (SRA)"
+        - "WHO recommendation"
+        - "WHO PQ listing"
+        - "Country registration"
+        - "National policy adoption"
+        - "Procurement"
+        - "In-country delivery"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: field
+    attributes:
+      label: What changes
+      options:
+        - The sentence shown under this stage
+        - The status of this stage
+        - The date this stage was reached
+        - What happens next
+        - The date that next step is expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: now
+    attributes:
+      label: What it should say
+      description: >-
+        The exact wording or value you are proposing. If you picked "status"
+        above, write one of: done / in progress / delayed / not started —
+        a delayed stage must also carry a substantive reason, so put that here too.
+      placeholder: Registered in Rwanda; Rwanda FDA, 17 Aug 2024.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: src
+    attributes:
+      label: Source
+      description: Where you saw this. Must be a source already in the registry — if it is not listed, say so in the notes below and it will be added first.
+      options:
+        - "WHO malaria guidelines"
+        - "WHO prequalification list"
+        - "WHO Malaria Threat Maps"
+        - "European Medicines Agency"
+        - "Nigeria: NAFDAC Green Book"
+        - "Tanzania: TMDA register"
+        - "Rwanda: Rwanda FDA register"
+        - "Uganda: National Drug Register"
+        - "Global Fund price and quality reporting"
+        - "ClinicalTrials.gov"
+        - "WWARN / IDDO malaria data"
+        - "WHO Essential Medicines List"
+        - "WHO PQ comparator products"
+        - "WHO prequalification guidance"
+        - "WHO assessment report: DHA–PPQ (Guilin)"
+        - "MMV pipeline: ganaplacide–lumefantrine"
+        - "MESA malaria medicines landscape"
+        - "Novartis: GanLum Phase III results"
+        - "PLOS Medicine: ASPY in routine use"
+        - "Frontiers: Ghana efficacy study, 2023"
+        - "US President's Malaria Initiative"
+        - "Manufacturer communications"
+        - "Not in this list — explained in the notes below"
+    validations:
+      required: true
+
+  - type: input
+    id: asOf
+    attributes:
+      label: Date of the source
+      description: The date on the source itself, not today's date. Format YYYY-MM-DD.
+      placeholder: "2026-09-21"
+    validations:
+      required: true
+
+  - type: input
+    id: ref
+    attributes:
+      label: Link or reference
+      description: Direct link, registration number, trial ID or document reference, if there is one.
+      placeholder: "NCT07246525"
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything the reviewer should know
+      description: Why this matters, what you checked, anything you were unsure about.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checked
+    attributes:
+      label: Before you file this
+      options:
+        - label: I read the source myself — I am not relying on a summary of it.
+          required: true
+        - label: This is one change. Anything else goes in its own proposal.
+          required: true
