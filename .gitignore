@@ -6,3 +6,5 @@ __pycache__/
 .venv/
 streamlit-app/*.log
 decks/
+DEV-B-BACKLOG.md
+engine-comparison-*.html
