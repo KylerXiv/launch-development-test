@@ -1,0 +1,224 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>Engine comparison — FR</title>
+<style>
+  :root { color-scheme: light dark; --line:#d5dce4; --muted:#667; --bg:#fff; --alt:#f7f9fb; --ink:#111; }
+  @media (prefers-color-scheme: dark){ :root{ --line:#334; --muted:#99a; --bg:#11151a; --alt:#161b22; --ink:#e6edf3; } }
+  body { font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; margin:0; padding:28px 20px 60px; background:var(--bg); color:var(--ink); }
+  .wrap { max-width:1400px; margin:0 auto; }
+  h1 { font-size:22px; margin:0 0 6px; } .sub { color:var(--muted); margin:0 0 22px; font-size:13px; }
+  .warn { border-left:3px solid #c08400; background:var(--alt); padding:12px 16px; margin:0 0 14px; font-size:13px; border-radius:0 4px 4px 0; }
+  .scorecard { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin:0 0 20px; }
+  .sc { border:1px solid var(--line); border-radius:4px; padding:14px 16px; background:var(--alt); }
+  .sc h3 { margin:0 0 8px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600; }
+  .sc .big { font-size:26px; font-family:ui-monospace,monospace; }
+  .sc .sub2 { font-size:12px; color:var(--muted); margin-top:4px; }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th,td { text-align:left; vertical-align:top; padding:10px 12px; border-bottom:1px solid var(--line); }
+  thead th { position:sticky; top:0; background:var(--bg); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); border-bottom:2px solid var(--line); }
+  tbody tr:nth-child(even) { background:var(--alt); }
+  td.why { width:16%; color:var(--muted); font-size:12px; }
+  td.why .src { display:block; font-family:ui-monospace,monospace; font-size:10.5px; opacity:.7; margin-top:4px; }
+  td.en { width:22%; }
+  .len { display:block; font-family:ui-monospace,monospace; font-size:10.5px; color:var(--muted); margin-top:5px; }
+  .lost { display:block; font-family:ui-monospace,monospace; font-size:10.5px; color:#b3261e; margin-top:3px; }
+  .kept { display:block; font-family:ui-monospace,monospace; font-size:10.5px; color:#1a7f5a; margin-top:3px; }
+  @media (prefers-color-scheme: dark){ .lost{color:#f2917f;} .kept{color:#6ed3a8;} }
+  td.score { width:9%; background:#fffbe6; } @media (prefers-color-scheme: dark){ td.score{ background:#2a2410; } }
+  .foot { margin-top:22px; color:var(--muted); font-size:12px; }
+</style></head><body><div class="wrap">
+<h1>Translation engine comparison — English to FR</h1>
+<p class="sub">Source set <strong>all</strong> · generated 2026-09-22 12:15 UTC</p>
+
+<div class="scorecard">
+  <div class="sc"><h3>Sample</h3><div class="big">25</div>
+    <div class="sub2">strings · 316 words · 2,211 characters<br>16 from products.js · 7 from resistance.js · 2 from molecular-markers.js</div></div>
+  <div class="sc"><h3>Protected tokens kept — DeepL</h3><div class="big">100%</div>
+    <div class="sub2">24 of 24 · avg length +27%</div></div>
+  <div class="sc"><h3>Protected tokens kept — Google</h3><div class="big">100%</div>
+    <div class="sub2">24 of 24 · avg length +33%</div></div>
+</div>
+
+<div class="warn"><strong>The only percentage here is the automated one.</strong> &ldquo;Protected tokens kept&rdquo; counts whether every number, percentage, gene identifier (Pfkelch13, K76T), trial ID and brand name in the English survived into the translation. That is objective and a script can judge it. <strong>Whether the meaning is right cannot be checked automatically</strong> — no score for that is generated here. You read the rows and fill in <code>poc/scoring-sheet.md</code>. An engine can keep 100% of its tokens and still invert a negation.</div>
+
+<div class="warn"><strong>The glossary comparison is not fair.</strong> DeepL glossary: <strong>off</strong> · Google glossary: <strong>not available</strong> on the API-key endpoint (needs Translation v3 Advanced with OAuth). Brand names and INNs therefore flatter DeepL — judge prose quality on the sentence rows, where both engines are unaided.</div>
+
+<table>
+<thead><tr><th>What this row tests</th><th>English</th><th>DeepL</th><th>Google</th><th>Better?</th></tr></thead>
+<tbody>
+    <tr>
+      <td class="why">Long technical sentence — the hardest thing either engine does<span class="src">resistance.js · 52 words</span></td>
+      <td class="en">Each dot is the most recent study year for that country, drug and species, averaged across every site studied that year and weighted by the number of patients — so a large study counts for more than a small one. No study is excluded; click a dot to see all of them.</td>
+      <td>Chaque point correspond à l'année d'étude la plus récente pour ce pays, ce médicament et cette espèce, en moyenne sur l'ensemble des sites étudiés cette année-là et pondérée par le nombre de patients — ainsi, une étude de grande envergure a plus de poids qu'une étude de petite envergure. Aucune étude n'est exclue ; cliquez sur un point pour les voir toutes.<span class="len">+35%</span></td>
+      <td>Chaque point représente l'année d'étude la plus récente pour ce pays, ce médicament et cette espèce, la moyenne étant calculée sur l'ensemble des sites étudiés cette année-là et pondérée par le nombre de patients ; ainsi, une étude de grande envergure a plus d'impact qu'une étude de petite envergure. Aucune étude n'est exclue ; cliquez sur un point pour les consulter toutes.<span class="len">+42%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Metric definition with a percentage and a qualifier<span class="src">resistance.js · 7 words</span></td>
+      <td class="en">Treatment failure (per-protocol), % of evaluable patients</td>
+      <td>Échec thérapeutique (selon le protocole), % des patients évaluables<span class="len">+18%</span></td>
+      <td>Échec du traitement (selon le protocole), % des patients évaluables<span class="len">+18%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Clinical threshold language — WHO has settled wording for this<span class="src">resistance.js · 23 words</span></td>
+      <td class="en">Patients still parasitaemic on day 3, % of those tested — WHO treats over 10% as a signal of suspected artemisinin partial resistance</td>
+      <td>Patients présentant encore une parasitémie au jour 3, en % des patients testés — L’OMS considère un taux supérieur à 10 % comme un signe de résistance partielle présumée à l’artémisinine<span class="len">+40%</span><span class="kept">3/3 kept</span></td>
+      <td>Patients présentant encore une parasitémie au jour 3, % des patients testés — L’OMS considère un taux supérieur à 10 % comme un signe de suspicion de résistance partielle à l’artémisinine<span class="len">+41%</span><span class="kept">3/3 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Methodological caveat — tone and hedging matter<span class="src">molecular-markers.js · 18 words</span></td>
+      <td class="en">Derived from WHO genotype proportions, which carry no resistant/susceptible classification of their own. See the header of scripts/normalize-molecular-markers.js.</td>
+      <td>Ces données sont issues des proportions de génotypes de l'OMS, qui ne comportent pas de classification propre en termes de résistance ou de sensibilité. Voir l'en-tête du fichier scripts/normalize-molecular-markers.js.<span class="len">+35%</span><span class="kept">1/1 kept</span></td>
+      <td>Ces données sont issues des proportions de génotypes de l'OMS, qui ne comportent pas de classification de résistance/sensibilité propre. Voir l'en-tête du fichier scripts/normalize-molecular-markers.js.<span class="len">+25%</span><span class="kept">1/1 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Drug name that must survive unchanged<span class="src">molecular-markers.js · 1 words</span></td>
+      <td class="en">Chloroquine</td>
+      <td>Chloroquine<span class="len">+0%</span></td>
+      <td>Chloroquine<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Product description with a domain term<span class="src">products.js · 34 words</span></td>
+      <td class="en">Non-artemisinin combination — the first major innovation in malaria treatment since ACTs were introduced over 25 years ago (Novartis) — candidate for artemisinin partial-resistance settings and MFT strategies; kills resistant parasites and blocks transmission.</td>
+      <td>Association médicamenteuse sans artémisinine — première innovation majeure dans le traitement du paludisme depuis l'introduction des ACT il y a plus de 25 ans (Novartis) — indiquée dans les contextes de résistance partielle à l'artémisinine et dans le cadre des stratégies MFT ; elle élimine les parasites résistants et empêche la transmission.<span class="len">+32%</span><span class="kept">2/2 kept</span></td>
+      <td>Combinaison sans artémisinine — la première innovation majeure dans le traitement du paludisme depuis l'introduction des ACT il y a plus de 25 ans (Novartis) — candidate pour les contextes de résistance partielle à l'artémisinine et les stratégies MFT ; tue les parasites résistants et bloque la transmission.<span class="len">+19%</span><span class="kept">2/2 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Trial name, registry ID and figures inside prose<span class="src">products.js · 26 words</span></td>
+      <td class="en">Phase III (KALUMA, NCT05842954) met primary endpoint: 97.4% PCR-corrected cure rate; registry records 1,720 participants and trial completion 25 Nov 2025 (34 sites, 12 African countries)</td>
+      <td>L'essai de phase III (KALUMA, NCT05842954) a atteint son critère d'évaluation principal : un taux de guérison corrigé par PCR de 97,4 % ; le registre recense 1 720 participants et l'essai s'achèvera le 25 novembre 2025 (34 sites, 12 pays africains)<span class="len">+33%</span><span class="kept">9/9 kept</span></td>
+      <td>La phase III (KALUMA, NCT05842954) a atteint son critère d'évaluation principal : taux de guérison corrigé par PCR de 97,4 % ; le registre enregistre 1 720 participants et l'essai devrait se terminer le 25 novembre 2025 (34 sites, 12 pays africains).<span class="len">+34%</span><span class="kept">9/9 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Short label — length growth shows up worst here<span class="src">products.js · 5 words</span></td>
+      <td class="en">Pipeline · new chemical class</td>
+      <td>Pipeline · nouvelle classe de produits chimiques<span class="len">+66%</span></td>
+      <td>Pipeline · nouvelle classe chimique<span class="len">+21%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Access commitment — formal register<span class="src">products.js · 6 words</span></td>
+      <td class="en">Co-developed with MMV under access-oriented partnership</td>
+      <td>Développé en collaboration avec MMV dans le cadre d'un partenariat axé sur l'accès<span class="len">+49%</span><span class="kept">1/1 kept</span></td>
+      <td>Développé en collaboration avec MMV dans le cadre d'un partenariat axé sur l'accès<span class="len">+49%</span><span class="kept">1/1 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Adoption note, often a sentence fragment<span class="src">products.js · 7 words</span></td>
+      <td class="en">New chemical class — pharmacovigilance planning required</td>
+      <td>Nouvelle classe de substances chimiques — planification de la pharmacovigilance requise<span class="len">+55%</span></td>
+      <td>Nouvelle classe chimique — planification de la pharmacovigilance requise<span class="len">+29%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Glossary definition — dense, defines a term of art<span class="src">products.js · 19 words</span></td>
+      <td class="en">Artemisinin-based combination therapy — the standard class of malaria treatments pairing an artemisinin derivative with a longer-acting partner drug.</td>
+      <td>Traitement combiné à base d'artémisinine — classe de traitements standard contre le paludisme associant un dérivé de l'artémisinine à un autre médicament à action prolongée.<span class="len">+16%</span></td>
+      <td>Les traitements combinés à base d'artémisinine constituent la classe standard de traitements contre le paludisme, associant un dérivé de l'artémisinine à un médicament partenaire à action prolongée.<span class="len">+33%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Glossary definition with an embedded policy concept<span class="src">products.js · 17 words</span></td>
+      <td class="en">Multiple first-line therapies — deploying several first-line treatments in parallel to reduce drug pressure and slow resistance.</td>
+      <td>Thérapies de première intention multiples — utilisation parallèle de plusieurs traitements de première intention afin de réduire la pression pharmacologique et de ralentir l'apparition d'une résistance.<span class="len">+58%</span></td>
+      <td>Traitements de première ligne multiples — déploiement parallèle de plusieurs traitements de première ligne pour réduire la pression médicamenteuse et ralentir l'apparition de résistances.<span class="len">+46%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Glossary definition naming an institution<span class="src">products.js · 30 words</span></td>
+      <td class="en">WHO prequalification — the quality, safety and efficacy assessment whose outcome, a listing on the WHO prequalified-products list, makes a product eligible for procurement by UN agencies and major donors.</td>
+      <td>Préqualification de l’OMS — évaluation de la qualité, de la sécurité et de l’efficacité dont le résultat, à savoir l’inscription sur la liste des produits préqualifiés de l’OMS, permet à un produit d’être acheté par les agences des Nations unies et les principaux bailleurs de fonds.<span class="len">+39%</span><span class="kept">1/1 kept</span></td>
+      <td>Préqualification de l'OMS — l'évaluation de la qualité, de la sécurité et de l'efficacité dont le résultat, une inscription sur la liste des produits préqualifiés de l'OMS, rend un produit admissible à l'achat par les agences des Nations Unies et les principaux donateurs.<span class="len">+33%</span><span class="kept">1/1 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Plain-language summary written for a lay reader<span class="src">products.js · 24 words</span></td>
+      <td class="en">We now call a blocked step an "access barrier" instead of a "bottleneck". Only the wording changed — no figures or dates were altered.</td>
+      <td>Nous appelons désormais une étape bloquée une « barrière d'accès » plutôt qu'un « goulot d'étranglement ». Seule la formulation a changé : aucun chiffre ni aucune date n'ont été modifiés.<span class="len">+40%</span></td>
+      <td>On parle désormais de « barrière d'accès » au lieu de « goulot d'étranglement ». Seul le vocabulaire a changé ; ni les chiffres ni les dates n'ont été modifiés.<span class="len">+19%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">UI-adjacent stage name — very short, must stay short<span class="src">products.js · 3 words</span></td>
+      <td class="en">R&amp;D &amp; clinical</td>
+      <td>R&amp;D et essais cliniques<span class="len">+64%</span></td>
+      <td>Recherche et développement et clinique<span class="len">+171%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Stage name containing an acronym<span class="src">products.js · 3 words</span></td>
+      <td class="en">WHO PQ listing</td>
+      <td>Liste PQ de l'OMS<span class="len">+21%</span><span class="kept">1/1 kept</span></td>
+      <td>Liste des questions périodiques de l'OMS<span class="len">+186%</span><span class="kept">1/1 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Research question — interrogative form<span class="src">products.js · 7 words</span></td>
+      <td class="en">Efficacy against resistant parasites and transmission blocking</td>
+      <td>Efficacité contre les parasites résistants et blocage de la transmission<span class="len">+16%</span></td>
+      <td>Efficacité contre les parasites résistants et blocage de la transmission<span class="len">+16%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Milestone label with a trial name in brackets<span class="src">products.js · 3 words</span></td>
+      <td class="en">Phase III (KALUMA)</td>
+      <td>Phase III (KALUMA)<span class="len">+0%</span><span class="kept">1/1 kept</span></td>
+      <td>Phase III (KALUMA)<span class="len">+0%</span><span class="kept">1/1 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Warning sentence — meaning must not soften<span class="src">products.js · 24 words</span></td>
+      <td class="en">Adoption is the current access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited</td>
+      <td>Son adoption constitue actuellement un obstacle à l'accès : fortement recommandée par l'OMS depuis 2022 et enregistrée dans plus de 25 pays, son intégration dans les recommandations nationales reste toutefois limitée.<span class="len">+35%</span><span class="kept">3/3 kept</span></td>
+      <td>L'adoption constitue actuellement l'obstacle à l'accès : fortement recommandée par l'OMS depuis 2022 et enregistrée dans plus de 25 pays, son intégration dans les recommandations nationales reste toutefois limitée.<span class="len">+33%</span><span class="kept">3/3 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Brand name — MUST come back identical<span class="src">products.js · 1 words</span></td>
+      <td class="en">GanLum</td>
+      <td>GanLum<span class="len">+0%</span><span class="kept">1/1 kept</span></td>
+      <td>GanLum<span class="len">+0%</span><span class="kept">1/1 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">INN — MUST come back identical or correctly localised<span class="src">products.js · 2 words</span></td>
+      <td class="en">Ganaplacide–lumefantrine (KLU156)</td>
+      <td>Ganaplacide-luméfantrine (KLU156)<span class="len">+0%</span><span class="kept">1/1 kept</span></td>
+      <td>Ganaplacide–luméfantrine (KLU156)<span class="len">+0%</span><span class="kept">1/1 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Country name<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Afghanistan</td>
+      <td>Afghanistan<span class="len">+0%</span></td>
+      <td>Afghanistan<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Country name where FR and EN differ<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Chad</td>
+      <td>Tchad<span class="len">+25%</span></td>
+      <td>Chad<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Drug INN — glossary target<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Amodiaquine+sulfadoxine-pyrimethamine</td>
+      <td>Amodiaquine + sulfadoxine-pyriméthamine<span class="len">+5%</span></td>
+      <td>Amodiaquine + sulfadoxine-pyriméthamine<span class="len">+5%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">Combination drug name with a separator<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Arterolane-piperaquine</td>
+      <td>Arterolane-pipéraquine<span class="len">+0%</span></td>
+      <td>Artérolane-pipéraquine<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr></tbody></table>
+<p class="foot">Percentages beside each translation are length growth against English. French and Portuguese commonly run 15–30% longer; an engine consistently above that costs layout work later. Score each row in <code>poc/scoring-sheet.md</code>.</p>
+</div></body></html>

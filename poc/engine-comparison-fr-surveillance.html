@@ -1,0 +1,245 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>Engine comparison — FR</title>
+<style>
+  :root { color-scheme: light dark; --line:#d5dce4; --muted:#667; --bg:#fff; --alt:#f7f9fb; --ink:#111; }
+  @media (prefers-color-scheme: dark){ :root{ --line:#334; --muted:#99a; --bg:#11151a; --alt:#161b22; --ink:#e6edf3; } }
+  body { font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; margin:0; padding:28px 20px 60px; background:var(--bg); color:var(--ink); }
+  .wrap { max-width:1400px; margin:0 auto; }
+  h1 { font-size:22px; margin:0 0 6px; } .sub { color:var(--muted); margin:0 0 22px; font-size:13px; }
+  .warn { border-left:3px solid #c08400; background:var(--alt); padding:12px 16px; margin:0 0 14px; font-size:13px; border-radius:0 4px 4px 0; }
+  .scorecard { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin:0 0 20px; }
+  .sc { border:1px solid var(--line); border-radius:4px; padding:14px 16px; background:var(--alt); }
+  .sc h3 { margin:0 0 8px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600; }
+  .sc .big { font-size:26px; font-family:ui-monospace,monospace; }
+  .sc .sub2 { font-size:12px; color:var(--muted); margin-top:4px; }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th,td { text-align:left; vertical-align:top; padding:10px 12px; border-bottom:1px solid var(--line); }
+  thead th { position:sticky; top:0; background:var(--bg); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); border-bottom:2px solid var(--line); }
+  tbody tr:nth-child(even) { background:var(--alt); }
+  td.why { width:16%; color:var(--muted); font-size:12px; }
+  td.why .src { display:block; font-family:ui-monospace,monospace; font-size:10.5px; opacity:.7; margin-top:4px; }
+  td.en { width:22%; }
+  .len { display:block; font-family:ui-monospace,monospace; font-size:10.5px; color:var(--muted); margin-top:5px; }
+  .lost { display:block; font-family:ui-monospace,monospace; font-size:10.5px; color:#b3261e; margin-top:3px; }
+  .kept { display:block; font-family:ui-monospace,monospace; font-size:10.5px; color:#1a7f5a; margin-top:3px; }
+  @media (prefers-color-scheme: dark){ .lost{color:#f2917f;} .kept{color:#6ed3a8;} }
+  td.score { width:9%; background:#fffbe6; } @media (prefers-color-scheme: dark){ td.score{ background:#2a2410; } }
+  .foot { margin-top:22px; color:var(--muted); font-size:12px; }
+</style></head><body><div class="wrap">
+<h1>Translation engine comparison — English to FR</h1>
+<p class="sub">Source set <strong>surveillance</strong> · generated 2026-09-22 12:15 UTC</p>
+
+<div class="scorecard">
+  <div class="sc"><h3>Sample</h3><div class="big">28</div>
+    <div class="sub2">strings · 236 words · 1,646 characters<br>17 from resistance.js · 11 from molecular-markers.js</div></div>
+  <div class="sc"><h3>Protected tokens kept — DeepL</h3><div class="big">100%</div>
+    <div class="sub2">7 of 7 · avg length +13%</div></div>
+  <div class="sc"><h3>Protected tokens kept — Google</h3><div class="big">100%</div>
+    <div class="sub2">7 of 7 · avg length +12%</div></div>
+</div>
+
+<div class="warn"><strong>The only percentage here is the automated one.</strong> &ldquo;Protected tokens kept&rdquo; counts whether every number, percentage, gene identifier (Pfkelch13, K76T), trial ID and brand name in the English survived into the translation. That is objective and a script can judge it. <strong>Whether the meaning is right cannot be checked automatically</strong> — no score for that is generated here. You read the rows and fill in <code>poc/scoring-sheet.md</code>. An engine can keep 100% of its tokens and still invert a negation.</div>
+
+<div class="warn"><strong>The glossary comparison is not fair.</strong> DeepL glossary: <strong>off</strong> · Google glossary: <strong>not available</strong> on the API-key endpoint (needs Translation v3 Advanced with OAuth). Brand names and INNs therefore flatter DeepL — judge prose quality on the sentence rows, where both engines are unaided.</div>
+
+<table>
+<thead><tr><th>What this row tests</th><th>English</th><th>DeepL</th><th>Google</th><th>Better?</th></tr></thead>
+<tbody>
+    <tr>
+      <td class="why">resistance · meta.metric — the headline metric definition<span class="src">resistance.js · 7 words</span></td>
+      <td class="en">Treatment failure (per-protocol), % of evaluable patients</td>
+      <td>Échec thérapeutique (selon le protocole), % des patients évaluables<span class="len">+18%</span></td>
+      <td>Échec du traitement (selon le protocole), % des patients évaluables<span class="len">+18%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · meta.rule — the longest technical sentence in the dataset<span class="src">resistance.js · 52 words</span></td>
+      <td class="en">Each dot is the most recent study year for that country, drug and species, averaged across every site studied that year and weighted by the number of patients — so a large study counts for more than a small one. No study is excluded; click a dot to see all of them.</td>
+      <td>Chaque point correspond à l'année d'étude la plus récente pour ce pays, ce médicament et cette espèce ; il s'agit de la moyenne calculée sur l'ensemble des sites étudiés cette année-là et pondérée en fonction du nombre de patients — ainsi, une étude de grande envergure a plus de poids qu'une étude de petite envergure. Aucune étude n'est exclue ; cliquez sur un point pour toutes les afficher.<span class="len">+49%</span></td>
+      <td>Chaque point représente l'année d'étude la plus récente pour ce pays, ce médicament et cette espèce, la moyenne étant calculée sur l'ensemble des sites étudiés cette année-là et pondérée par le nombre de patients ; ainsi, une étude de grande envergure a plus d'impact qu'une étude de petite envergure. Aucune étude n'est exclue ; cliquez sur un point pour les consulter toutes.<span class="len">+42%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · metrics.treatmentFailure.short — short label, length growth shows worst here<span class="src">resistance.js · 2 words</span></td>
+      <td class="en">Treatment failure</td>
+      <td>Échec thérapeutique<span class="len">+12%</span></td>
+      <td>Échec du traitement<span class="len">+12%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · metrics.delayedClearance.short — short label, length growth shows worst here<span class="src">resistance.js · 3 words</span></td>
+      <td class="en">Delayed parasite clearance</td>
+      <td>Élimination retardée des parasites<span class="len">+31%</span></td>
+      <td>Élimination retardée des parasites<span class="len">+31%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · metrics.delayedClearance.full — definition carrying a threshold or percentage<span class="src">resistance.js · 23 words</span></td>
+      <td class="en">Patients still parasitaemic on day 3, % of those tested — WHO treats over 10% as a signal of suspected artemisinin partial resistance</td>
+      <td>Patients encore parasitémiques au 3e jour, en % des patients testés — L’OMS considère un taux supérieur à 10 % comme un signe de résistance partielle présumée à l’artémisinine<span class="len">+32%</span><span class="kept">3/3 kept</span></td>
+      <td>Patients présentant encore une parasitémie au jour 3, % des patients testés — L’OMS considère un taux supérieur à 10 % comme un signe de suspicion de résistance partielle à l’artémisinine<span class="len">+41%</span><span class="kept">3/3 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.country[0] — country name<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Afghanistan</td>
+      <td>Afghanistan<span class="len">+0%</span></td>
+      <td>Afghanistan<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.country[1] — country name<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Angola</td>
+      <td>Angola<span class="len">+0%</span></td>
+      <td>Angola<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.country[2] — country name<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Bangladesh</td>
+      <td>Bangladesh<span class="len">+0%</span></td>
+      <td>Bangladesh<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.country[3] — country name<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Benin</td>
+      <td>Bénin<span class="len">+0%</span></td>
+      <td>Bénin<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.country[4] — country name<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Bhutan</td>
+      <td>Bhoutan<span class="len">+17%</span></td>
+      <td>Bhoutan<span class="len">+17%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.country[5] — country name<span class="src">resistance.js · 4 words</span></td>
+      <td class="en">Bolivia (Plurinational State of)</td>
+      <td>Bolivie (État plurinational de)<span class="len">-3%</span></td>
+      <td>Bolivie (État plurinational de)<span class="len">-3%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.drug[0] — drug INN, glossary target<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Amodiaquine+sulfadoxine-pyrimethamine</td>
+      <td>Amodiaquine + sulfadoxine-pyriméthamine<span class="len">+5%</span></td>
+      <td>Amodiaquine + sulfadoxine-pyriméthamine<span class="len">+5%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.drug[1] — drug INN, glossary target<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Artemether-lumefantrine</td>
+      <td>artéméther-luméfantrine<span class="len">+0%</span></td>
+      <td>Artéméther-luméfantrine<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.drug[2] — drug INN, glossary target<span class="src">resistance.js · 3 words</span></td>
+      <td class="en">Artemether-lumefantrine + amodiaquine</td>
+      <td>Artéméther-luméfantrine + amodiaquine<span class="len">+0%</span></td>
+      <td>Artéméther-luméfantrine + amodiaquine<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.drug[3] — drug INN, glossary target<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Artemether-lumefantrine+primaquine</td>
+      <td>Artéméther-luméfantrine + primaquine<span class="len">+6%</span></td>
+      <td>Artéméther-luméfantrine + primaquine<span class="len">+6%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.drug[4] — drug INN, glossary target<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Artemisinin-piperaquine</td>
+      <td>Artémisinine-pipéraquine<span class="len">+4%</span></td>
+      <td>Artémisinine-pipéraquine<span class="len">+4%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">resistance · dict.drug[5] — drug INN, glossary target<span class="src">resistance.js · 1 words</span></td>
+      <td class="en">Arterolane-piperaquine</td>
+      <td>Arterolane-pipéraquine<span class="len">+0%</span></td>
+      <td>Artérolane-pipéraquine<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · meta.metric — the headline metric definition<span class="src">molecular-markers.js · 6 words</span></td>
+      <td class="en">Resistance-associated genotype, % of samples genotyped</td>
+      <td>Génotype associé à la résistance, % des échantillons génotypés<span class="len">+15%</span></td>
+      <td>Génotype associé à la résistance, % des échantillons génotypés<span class="len">+15%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · meta.rule — the longest technical sentence in the dataset<span class="src">molecular-markers.js · 72 words</span></td>
+      <td class="en">Each dot is the most recent survey year for that country, marker and species, averaged across every site surveyed that year and weighted by the number of samples genotyped — so a large survey counts for more than a small one. The value is the share of samples carrying a resistance-associated genotype, not the share carrying any mutation at all. No survey is excluded; click a dot to see all of them.</td>
+      <td>Chaque point correspond à l'année d'étude la plus récente pour ce pays, ce marqueur et cette espèce ; il s'agit de la moyenne calculée sur l'ensemble des sites étudiés cette année-là, pondérée par le nombre d'échantillons génotypés — ainsi, une étude de grande envergure a plus de poids qu'une étude de petite envergure. La valeur correspond à la proportion d'échantillons porteurs d'un génotype associé à une résistance, et non à la proportion d'échantillons porteurs d'une mutation quelconque. Aucune enquête n’est exclue ; cliquez sur un point pour les voir toutes.<span class="len">+42%</span></td>
+      <td>Chaque point représente l'année d'étude la plus récente pour ce pays, ce marqueur et cette espèce, la moyenne étant calculée sur l'ensemble des sites étudiés cette année-là et pondérée par le nombre d'échantillons génotypés ; ainsi, une étude de grande envergure a plus d'impact qu'une étude de petite envergure. La valeur indiquée correspond à la proportion d'échantillons porteurs d'un génotype associé à la résistance, et non à la proportion d'échantillons porteurs d'une mutation quelconque. Aucune étude n'est exclue ; cliquez sur un point pour les afficher toutes.<span class="len">+42%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · meta.derivation — methodological caveat, hedging must survive<span class="src">molecular-markers.js · 18 words</span></td>
+      <td class="en">Derived from WHO genotype proportions, which carry no resistant/susceptible classification of their own. See the header of scripts/normalize-molecular-markers.js.</td>
+      <td>Ces données sont issues des proportions de génotypes de l'OMS, qui ne comportent pas de classification propre en termes de résistance ou de sensibilité. Voir l'en-tête du fichier scripts/normalize-molecular-markers.js.<span class="len">+35%</span><span class="kept">1/1 kept</span></td>
+      <td>Ces données sont issues des proportions de génotypes de l'OMS, qui ne comportent pas de classification de résistance/sensibilité propre. Voir l'en-tête du fichier scripts/normalize-molecular-markers.js.<span class="len">+25%</span><span class="kept">1/1 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · metrics.molecularMarkers.short — short label, length growth shows worst here<span class="src">molecular-markers.js · 2 words</span></td>
+      <td class="en">Molecular markers</td>
+      <td>Marqueurs moléculaires<span class="len">+29%</span></td>
+      <td>Marqueurs moléculaires<span class="len">+29%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · metrics.molecularMarkers.full — definition carrying a threshold or percentage<span class="src">molecular-markers.js · 25 words</span></td>
+      <td class="en">Samples carrying a resistance-associated genotype, % of those genotyped — for Pfkelch13 this counts WHO-validated markers of artemisinin partial resistance only, not every mutation found</td>
+      <td>Échantillons présentant un génotype associé à une résistance, en % des échantillons génotypés — pour le gène Pfkelch13, ce chiffre ne prend en compte que les marqueurs de résistance partielle à l'artémisinine validés par l'OMS, et non l'ensemble des mutations identifiées<span class="len">+46%</span><span class="kept">3/3 kept</span></td>
+      <td>Pourcentage d'échantillons porteurs d'un génotype associé à la résistance parmi ceux génotypés — pour Pfkelch13, ce pourcentage ne prend en compte que les marqueurs de résistance partielle à l'artémisinine validés par l'OMS, et non toutes les mutations détectées.<span class="len">+41%</span><span class="kept">3/3 kept</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · markerDrug[Pfkelch13] — drug name that must survive unchanged<span class="src">molecular-markers.js · 3 words</span></td>
+      <td class="en">Artemisinin (all ACTs)</td>
+      <td>Artémisinine (tous les ACT)<span class="len">+23%</span></td>
+      <td>Artémisinine (tous les ACT)<span class="len">+23%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · markerDrug[Pfplasmepsin 2-3 amplifications] — drug name that must survive unchanged<span class="src">molecular-markers.js · 1 words</span></td>
+      <td class="en">Piperaquine</td>
+      <td>pipéraquine<span class="len">+0%</span></td>
+      <td>Pipéraquine<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · markerDrug[Pfmdr1 amplifications] — drug name that must survive unchanged<span class="src">molecular-markers.js · 2 words</span></td>
+      <td class="en">Mefloquine, lumefantrine</td>
+      <td>Méfloquine, luméfantrine<span class="len">+0%</span></td>
+      <td>Méfloquine, luméfantrine<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · markerDrug[Pfcrt K76T] — drug name that must survive unchanged<span class="src">molecular-markers.js · 1 words</span></td>
+      <td class="en">Chloroquine</td>
+      <td>Chloroquine<span class="len">+0%</span></td>
+      <td>Chloroquine<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · dict.country[4] — country name<span class="src">molecular-markers.js · 1 words</span></td>
+      <td class="en">Botswana</td>
+      <td>Botswana<span class="len">+0%</span></td>
+      <td>Botswana<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr>
+    <tr>
+      <td class="why">markers · dict.country[5] — country name<span class="src">molecular-markers.js · 1 words</span></td>
+      <td class="en">Brazil</td>
+      <td>Brésil<span class="len">+0%</span></td>
+      <td>Brésil<span class="len">+0%</span></td>
+      <td class="score"></td>
+    </tr></tbody></table>
+<p class="foot">Percentages beside each translation are length growth against English. French and Portuguese commonly run 15–30% longer; an engine consistently above that costs layout work later. Score each row in <code>poc/scoring-sheet.md</code>.</p>
+</div></body></html>

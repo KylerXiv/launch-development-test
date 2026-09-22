@@ -1,0 +1,335 @@
+{
+  "locale": "pt",
+  "source": "all",
+  "generated_at": "2026-09-22T12:15:41.152Z",
+  "deepl_glossary": false,
+  "google_glossary": false,
+  "totals": {
+    "strings": 25,
+    "words": 316,
+    "characters": 2211,
+    "by_file": {
+      "resistance.js": 7,
+      "molecular-markers.js": 2,
+      "products.js": 16
+    },
+    "protected_tokens": {
+      "deepl": {
+        "total": 24,
+        "kept": 24,
+        "pct": 100
+      },
+      "google": {
+        "total": 24,
+        "kept": 24,
+        "pct": 100
+      }
+    },
+    "avg_length_growth": {
+      "deepl": 15,
+      "google": 10
+    }
+  },
+  "rows": [
+    {
+      "tests": "Long technical sentence — the hardest thing either engine does",
+      "file": "data/resistance.js",
+      "words": 52,
+      "en": "Each dot is the most recent study year for that country, drug and species, averaged across every site studied that year and weighted by the number of patients — so a large study counts for more than a small one. No study is excluded; click a dot to see all of them.",
+      "deepl": "Cada ponto representa o ano de estudo mais recente para esse país, medicamento e espécie, calculado com base na média de todos os locais estudados nesse ano e ponderado pelo número de doentes — pelo que um estudo de grande dimensão tem mais peso do que um de pequena dimensão. Nenhum estudo é excluído; clique num ponto para ver todos eles.",
+      "google": "Cada ponto representa o ano do estudo mais recente para esse país, medicamento e espécie, sendo a média calculada para todos os locais estudados nesse ano e ponderada pelo número de doentes — assim, um estudo grande tem mais peso do que um pequeno. Nenhum estudo está excluído; clique num ponto para ver todos eles.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Metric definition with a percentage and a qualifier",
+      "file": "data/resistance.js",
+      "words": 7,
+      "en": "Treatment failure (per-protocol), % of evaluable patients",
+      "deepl": "Falha do tratamento (conforme o protocolo), % de doentes avaliáveis",
+      "google": "Falha do tratamento (por protocolo), % de doentes avaliáveis",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Clinical threshold language — WHO has settled wording for this",
+      "file": "data/resistance.js",
+      "words": 23,
+      "en": "Patients still parasitaemic on day 3, % of those tested — WHO treats over 10% as a signal of suspected artemisinin partial resistance",
+      "deepl": "Doentes que ainda apresentam parasitemia no 3.º dia, % dos que foram testados — a OMS considera que um valor superior a 10 % constitui um indício de suspeita de resistência parcial à artemisinina",
+      "google": "Doentes ainda parasitémicos ao 3.º dia, % dos testados — a OMS considera mais de 10% como sinal de suspeita de resistência parcial à artemisinina.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Methodological caveat — tone and hedging matter",
+      "file": "data/molecular-markers.js",
+      "words": 18,
+      "en": "Derived from WHO genotype proportions, which carry no resistant/susceptible classification of their own. See the header of scripts/normalize-molecular-markers.js.",
+      "deepl": "Derivado das proporções de genótipos da OMS, que não incluem uma classificação própria de resistência/suscetibilidade. Consulte o cabeçalho do ficheiro scripts/normalize-molecular-markers.js.",
+      "google": "Derivado das proporções de genótipos da OMS, que não têm uma classificação própria de resistência/suscetibilidade. Veja o cabeçalho de scripts/normalize-molecular-markers.js.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Drug name that must survive unchanged",
+      "file": "data/molecular-markers.js",
+      "words": 1,
+      "en": "Chloroquine",
+      "deepl": "Cloroquina",
+      "google": "Cloroquina",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Product description with a domain term",
+      "file": "data/products.js",
+      "words": 34,
+      "en": "Non-artemisinin combination — the first major innovation in malaria treatment since ACTs were introduced over 25 years ago (Novartis) — candidate for artemisinin partial-resistance settings and MFT strategies; kills resistant parasites and blocks transmission.",
+      "deepl": "Combinação sem artemisinina — a primeira grande inovação no tratamento da malária desde que as ACT foram introduzidas há mais de 25 anos (Novartis) — candidata para contextos de resistência parcial à artemisinina e estratégias de MFT; elimina os parasitas resistentes e bloqueia a transmissão.",
+      "google": "A combinação sem artemisinina — a primeira grande inovação no tratamento da malária desde a introdução das ACT, há mais de 25 anos (Novartis) — é uma candidata promissora para contextos de resistência parcial à artemisinina e estratégias de MFT; elimina os parasitas resistentes e bloqueia a transmissão.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Trial name, registry ID and figures inside prose",
+      "file": "data/products.js",
+      "words": 26,
+      "en": "Phase III (KALUMA, NCT05842954) met primary endpoint: 97.4% PCR-corrected cure rate; registry records 1,720 participants and trial completion 25 Nov 2025 (34 sites, 12 African countries)",
+      "deepl": "A Fase III (KALUMA, NCT05842954) atingiu o desfecho primário: taxa de cura corrigida por PCR de 97,4%; o registo conta com 1 720 participantes e a conclusão do ensaio está prevista para 25 de novembro de 2025 (34 centros, 12 países africanos)",
+      "google": "A Fase III (KALUMA, NCT05842954) atingiu o objetivo primário: taxa de cura corrigida por PCR de 97,4%; o registo inclui 1.720 participantes e a conclusão do estudo está prevista para 25 de novembro de 2025 (34 centros, 12 países africanos).",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Short label — length growth shows up worst here",
+      "file": "data/products.js",
+      "words": 5,
+      "en": "Pipeline · new chemical class",
+      "deepl": "Pipeline · nova classe química",
+      "google": "Gasoduto · nova classe química",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Access commitment — formal register",
+      "file": "data/products.js",
+      "words": 6,
+      "en": "Co-developed with MMV under access-oriented partnership",
+      "deepl": "Desenvolvido em colaboração com a MMV no âmbito de uma parceria orientada para o acesso",
+      "google": "Desenvolvido em conjunto com a MMV no âmbito de uma parceria orientada para o acesso.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Adoption note, often a sentence fragment",
+      "file": "data/products.js",
+      "words": 7,
+      "en": "New chemical class — pharmacovigilance planning required",
+      "deepl": "Nova classe química — é necessário um plano de farmacovigilância",
+      "google": "Nova classe química — planeamento de farmacovigilância necessário",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Glossary definition — dense, defines a term of art",
+      "file": "data/products.js",
+      "words": 19,
+      "en": "Artemisinin-based combination therapy — the standard class of malaria treatments pairing an artemisinin derivative with a longer-acting partner drug.",
+      "deepl": "Terapia combinada à base de artemisinina — a classe padrão de tratamentos contra a malária que associa um derivado da artemisinina a um fármaco de ação prolongada.",
+      "google": "Terapia combinada à base de artemisinina — a classe padrão de tratamentos para a malária que combina um derivado da artemisinina com um medicamento parceiro de ação mais prolongada.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Glossary definition with an embedded policy concept",
+      "file": "data/products.js",
+      "words": 17,
+      "en": "Multiple first-line therapies — deploying several first-line treatments in parallel to reduce drug pressure and slow resistance.",
+      "deepl": "Terapias de primeira linha múltiplas — a utilização de vários tratamentos de primeira linha em paralelo para reduzir a pressão farmacológica e retardar o desenvolvimento de resistência.",
+      "google": "Terapias múltiplas de primeira linha — implementação de vários tratamentos de primeira linha em paralelo para reduzir a pressão medicamentosa e retardar a resistência.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Glossary definition naming an institution",
+      "file": "data/products.js",
+      "words": 30,
+      "en": "WHO prequalification — the quality, safety and efficacy assessment whose outcome, a listing on the WHO prequalified-products list, makes a product eligible for procurement by UN agencies and major donors.",
+      "deepl": "Pré-qualificação da OMS — a avaliação da qualidade, segurança e eficácia cujo resultado, a inclusão na lista de produtos pré-qualificados da OMS, torna um produto elegível para aquisição por parte de agências da ONU e dos principais doadores.",
+      "google": "Pré-qualificação da OMS — a avaliação da qualidade, segurança e eficácia cujo resultado, a inclusão na lista de produtos pré-qualificados da OMS, torna um produto elegível para aquisição por agências da ONU e grandes doadores.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Plain-language summary written for a lay reader",
+      "file": "data/products.js",
+      "words": 24,
+      "en": "We now call a blocked step an \"access barrier\" instead of a \"bottleneck\". Only the wording changed — no figures or dates were altered.",
+      "deepl": "Passamos agora a designar uma etapa bloqueada como «barreira de acesso», em vez de «estrangulamento». Apenas a formulação mudou — não foram alterados quaisquer números nem datas.",
+      "google": "Agora chamamos a um degrau bloqueado \"barreira de acesso\" em vez de \"gargalo\". Apenas a terminologia foi alterada — nenhum número ou data foi alterado.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "UI-adjacent stage name — very short, must stay short",
+      "file": "data/products.js",
+      "words": 3,
+      "en": "R&D & clinical",
+      "deepl": "I&D e clínica",
+      "google": "I&D e clínica",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Stage name containing an acronym",
+      "file": "data/products.js",
+      "words": 3,
+      "en": "WHO PQ listing",
+      "deepl": "Lista PQ da OMS",
+      "google": "Lista PQ da OMS",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Research question — interrogative form",
+      "file": "data/products.js",
+      "words": 7,
+      "en": "Efficacy against resistant parasites and transmission blocking",
+      "deepl": "Eficácia contra parasitas resistentes e bloqueio da transmissão",
+      "google": "Eficácia contra parasitas resistentes e bloqueio da transmissão",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Milestone label with a trial name in brackets",
+      "file": "data/products.js",
+      "words": 3,
+      "en": "Phase III (KALUMA)",
+      "deepl": "Fase III (KALUMA)",
+      "google": "Fase III (KALUMA)",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Warning sentence — meaning must not soften",
+      "file": "data/products.js",
+      "words": 24,
+      "en": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
+      "deepl": "A adoção desta prática constitui atualmente um obstáculo ao acesso — fortemente recomendada pela OMS desde 2022 e registada em mais de 25 países, mas a sua inclusão nas diretrizes nacionais continua a ser limitada",
+      "google": "A adoção é a atual barreira de acesso — fortemente recomendada pela OMS desde 2022 e registada em mais de 25 países, mas a inclusão nas orientações nacionais continua limitada.",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Brand name — MUST come back identical",
+      "file": "data/products.js",
+      "words": 1,
+      "en": "GanLum",
+      "deepl": "GanLum",
+      "google": "GanLum",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "INN — MUST come back identical or correctly localised",
+      "file": "data/products.js",
+      "words": 2,
+      "en": "Ganaplacide–lumefantrine (KLU156)",
+      "deepl": "Ganaplacida–lumefantrina (KLU156)",
+      "google": "Ganaplacida-lumefantrina (KLU156)",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Country name",
+      "file": "data/resistance.js",
+      "words": 1,
+      "en": "Afghanistan",
+      "deepl": "Afeganistão",
+      "google": "Afeganistão",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Country name where FR and EN differ",
+      "file": "data/resistance.js",
+      "words": 1,
+      "en": "Chad",
+      "deepl": "Chade",
+      "google": "Chade",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Drug INN — glossary target",
+      "file": "data/resistance.js",
+      "words": 1,
+      "en": "Amodiaquine+sulfadoxine-pyrimethamine",
+      "deepl": "Amodiaquina + sulfadoxina-pirimetamina",
+      "google": "Amodiaquina + sulfadoxina-pirimetamina",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    },
+    {
+      "tests": "Combination drug name with a separator",
+      "file": "data/resistance.js",
+      "words": 1,
+      "en": "Arterolane-piperaquine",
+      "deepl": "Arterolane-piperaquina",
+      "google": "Arterolano-piperaquina",
+      "protected_lost": {
+        "deepl": [],
+        "google": []
+      }
+    }
+  ]
+}

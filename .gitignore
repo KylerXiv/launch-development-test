@@ -7,7 +7,4 @@ __pycache__/
 streamlit-app/*.log
 decks/
 DEV-B-BACKLOG.md
-engine-comparison-*.html
 
-# DEV-28 engine comparison — proof of concept, not part of the product
-poc/
