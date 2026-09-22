@@ -266,6 +266,107 @@ French and Portuguese**. Both already publish in these languages; matching
 their vocabulary is something no engine gets right unprompted, and RBM is the
 future host.
 
+## 4b. Publication architecture (22 Sep 2026)
+
+Proposed by the team engineer, reviewed here. **The handover artefact becomes a
+published dataset, not a rendered page**, with RBM's own Next.js platform as
+one consumer of it. Two repositories:
+
+| Repo | Holds | Visibility |
+| --- | --- | --- |
+| Pipeline | fetchers, proposals, decisions, the review dashboard, all code | **private**, institution-owned |
+| Published data | the approved dataset only — versioned, four languages, no code, no secrets, no proposals | public |
+
+This is right, and it fixes a live problem: the cron currently runs in
+`kochrisdev/launch-transparency-dashboard`, which is **public**, so every raw
+snapshot and watch report is already world-readable. Under the new split,
+unapproved data cannot be public by construction rather than by care.
+
+It is also less novel than it looks — `powerbi/queries.m` line 17 already
+fetches `data/products.js` over HTTPS as a data source. The data layer
+formalises something that exists informally, and serves Power BI, Streamlit,
+RBM and our own pages from one approved set of figures.
+
+### Corrections made to the proposal
+
+1. **Localisation cannot move to RBM.** Their platform localises its own
+   chrome; it cannot translate our ~2,758 words of analyst-written clinical
+   sentences. Publishing English only would put French navigation around
+   English claims. **The published dataset must carry all four languages**, so
+   the overlay and its second review stay upstream of publication, on our side.
+2. **Prefer server-side fetch to browser fetch.** The proposal had every
+   visitor's browser call the data host from RBM's domain — a third-party
+   request needing privacy review at a UN-adjacent organisation, and a hard
+   dependency (host unreachable in a country ⇒ broken tab). Next.js can fetch
+   server-side and serve from RBM's own origin: same freshness, no third-party
+   call, degrades to the last good copy.
+3. **Keep publishing our own rendered page.** Same data, second consumer. It
+   already exists, Unitaid gets a page it controls (`unitaid/` edition), and
+   the project is not hostage to RBM's roadmap.
+4. **The address must be institution-owned.** Once a production site depends on
+   a fixed URL, that account owns the dashboard's availability. `README.md` and
+   `powerbi/queries.m` both point at a personal account today.
+5. **Versioning scheme before the first consumer** — `/v1/latest/` plus dated
+   snapshots. Once production fetches it the shape can never break. Fold in
+   `history/` and `feed.xml`; the "as of" playback is an asset.
+
+### GitHub Pages is not an access-controlled host
+
+The proposal put the *internal* staging dashboard on GitHub Pages "restricted
+to repo collaborators". **That does not exist outside GitHub Enterprise Cloud,
+and it is an organisation feature** (checked against GitHub's docs, 22 Sep
+2026). This repo is a private repo on a **personal** account: enabling Pages
+publishes a *public* site at any tier they would realistically buy.
+
+Verified state: `Keith-paradox/launch-development` has Pages off;
+`kochrisdev/launch-transparency-dashboard` has Pages on with `public=true`, and
+`editor.html` 404s there because `build-public-site.sh` excludes it — that
+protection is working.
+
+Host the review dashboard **locally** (what we do today; zero exposure, zero
+cost) or behind **Cloudflare Access** (free to 50 users) when analysts sit
+outside the dev team.
+
+### Sign-in: two doors, and tokens do not go away
+
+- **Front door** — who may *open* the page and read unapproved data. Answered
+  by running locally, or by an access gate.
+- **Write door** — who may *commit and open the PR*, and whose name is on it.
+  Answered by the reviewer's own GitHub token, per item 6.
+
+An access gate cannot do the second job: the review dashboard has no server, so
+it cannot hold a credential. And the token cannot do the first. Keeping item
+6's plan is right, and worth keeping for three properties: the page holds no
+secret of its own; every approval is attributable to a real account; and
+`editor.html` loads **zero external resources** (verified), so a token in
+`sessionStorage` is reachable only by first-party code.
+
+Two caveats. Without **branch protection** a `contents: write` token can push
+straight to `main` and skip the PR, so "the editor can only propose" stays a
+convention — item 7, still blocked on GitHub Pro. And if **RBM staff cannot
+have GitHub accounts** (already an open question for RBM IT), sign-in moves to
+work email with a machine account, which needs a server and weakens
+attribution: the one answer that replaces this design rather than adjusting it.
+
+### Fork still open — embedded, or built in
+
+The earlier decision recorded in
+[data-sourcing-plan.md](data-sourcing-plan.md) was that we cannot deploy into
+RBM's app, and that their site **already embeds outside dashboards in iframes**
+— the WHO Malaria Threats Map is on it today — "that is the route in." The new
+proposal reverses this: a React component living in RBM's repository, rendered
+as a platform tab.
+
+Better experience, but it is a rewrite of a 3,689-line vanilla page with
+MapLibre, and **once the code lives in their repository we cannot ship a UI fix
+without their release cycle** — data would flow automatically while a button
+fix waits on someone else. It also needs RBM to agree to accept and maintain
+our code, which is a larger ask than hosting an iframe. Their decision to make,
+and the data layer serves both routes, so it does not block.
+
+Diagrams for all of the above, in deliberately plain language for RBM and the
+wider team: <https://claude.ai/artifact/6TDdHARL6EdrKgLU5ANqD7>
+
 ## 5. Still to do
 
 ### Open questions that need an answer before the next step
