@@ -8,3 +8,6 @@ streamlit-app/*.log
 decks/
 DEV-B-BACKLOG.md
 
+
+# generated locale pages — rebuild with scripts/build-locale-pages.js
+dist/
