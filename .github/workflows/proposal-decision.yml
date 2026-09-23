@@ -1,0 +1,168 @@
+name: Proposal decision
+
+# Runs when a reviewer labels a proposal issue.
+#
+#   approved      -> applies the SNAPSHOT taken at intake, opens a pull
+#                    request, and lets the checks merge it.
+#   rejected:...  -> records the reason and the fingerprint in
+#                    data/decisions.js, and closes the issue. The fingerprint
+#                    is what stops the same suggestion being offered again.
+#
+# The reviewer never types a value anywhere in this flow. The only thing this
+# workflow will apply is what was proposed and snapshotted.
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: bot-push-main
+  cancel-in-progress: false
+
+jobs:
+  approve:
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # The one rule a person could otherwise walk around. GitHub's own
+      # "you cannot approve your own pull request" does not apply here,
+      # because the pull request is opened by a workflow, not by the author.
+      - name: Refuse a self-approval
+        if: github.event.sender.login == github.event.issue.user.login
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --body \
+            "**Not approved.** @${{ github.event.sender.login }} proposed this, so somebody else has to approve it. The label has been removed."
+          gh issue edit "${{ github.event.issue.number }}" --remove-label approved
+          exit 1
+
+      - name: Take the snapshot recorded at intake
+        run: |
+          node -e '
+            const fs = require("fs");
+            const rules = require("./scripts/data-rules.js");
+            const got = rules.extractData(fs.readFileSync("data/proposals.js", "utf8"), "LAUNCH_PROPOSALS");
+            if (!got.ok) throw new Error("cannot read data/proposals.js");
+            const n = Number(process.env.ISSUE_NUMBER);
+            const p = got.data.proposals.find((x) => x.issue === n);
+            if (!p) { console.error("No recorded proposal for issue #" + n + ". Re-file it, or edit the issue to re-run intake."); process.exit(1); }
+            p.state = "approved";
+            p.decision = { by: process.env.APPROVER, on: new Date().toISOString().slice(0, 10) };
+            fs.writeFileSync("/tmp/proposal.json", JSON.stringify(p, null, 2));
+          '
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          APPROVER: ${{ github.event.sender.login }}
+
+      - name: Apply it to the record
+        run: node scripts/proposal-lib.js apply /tmp/proposal.json
+
+      - name: Check the whole file, exactly as CI would
+        run: node scripts/validate-data.js
+
+      - name: Open a pull request, and let the checks merge it
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="proposal/${{ github.event.issue.number }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add data/products.js data/proposals.js
+          git commit -m "Apply proposal #${{ github.event.issue.number }}, approved by @${{ github.event.sender.login }}
+
+          Closes #${{ github.event.issue.number }}"
+          git push -u origin "$BRANCH"
+          URL=$(gh pr create \
+            --base main --head "$BRANCH" \
+            --title "Apply proposal #${{ github.event.issue.number }}" \
+            --body "Approved by @${{ github.event.sender.login }} on issue #${{ github.event.issue.number }}. The change applied here is the snapshot taken when the proposal was filed.
+
+          Closes #${{ github.event.issue.number }}")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          # Needs auto-merge switched on for the repository and a branch
+          # protection rule with required checks. Without those this is a
+          # no-op and the pull request simply waits for a human to merge it.
+          gh pr merge --auto --squash "$URL" || echo "auto-merge not available — the pull request is open and waiting"
+
+      - name: Say where it went
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --body \
+            "**Approved by @${{ github.event.sender.login }}.** Applied and opened as ${{ steps.pr.outputs.url }} — it merges itself once the checks pass. If they fail, nothing lands and the dashboard keeps yesterday's version."
+
+  reject:
+    if: startsWith(github.event.label.name, 'rejected')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Record the decision, with the fingerprint that suppresses a repeat
+        run: |
+          node -e '
+            const fs = require("fs");
+            const rules = require("./scripts/data-rules.js");
+            const read = (f, g) => {
+              const raw = fs.readFileSync(f, "utf8");
+              const got = rules.extractData(raw, g);
+              if (!got.ok) throw new Error("cannot read " + f);
+              return { raw, head: raw.slice(0, raw.indexOf("window." + g)), data: got.data };
+            };
+            const n = Number(process.env.ISSUE_NUMBER);
+            const props = read("data/proposals.js", "LAUNCH_PROPOSALS");
+            const p = props.data.proposals.find((x) => x.issue === n);
+            const dec = read("data/decisions.js", "LAUNCH_DECISIONS");
+            dec.data.decisions.push({
+              issue: n,
+              state: "rejected",
+              reason: process.env.LABEL,
+              by: process.env.DECIDER,
+              on: new Date().toISOString().slice(0, 10),
+              target: p ? p.target : null,
+              proposed: p ? p.now : null,
+              fingerprint: p ? p.fingerprint : null,
+            });
+            dec.data.meta = { updated: new Date().toISOString().slice(0, 10) };
+            fs.writeFileSync("data/decisions.js", dec.head + "window.LAUNCH_DECISIONS =\n" + JSON.stringify({ meta: dec.data.meta, decisions: dec.data.decisions }, null, 2) + "\n");
+            props.data.proposals = props.data.proposals.filter((x) => x.issue !== n);
+            fs.writeFileSync("data/proposals.js", props.head + "window.LAUNCH_PROPOSALS =\n" + JSON.stringify({ meta: { updated: new Date().toISOString().slice(0, 10) }, proposals: props.data.proposals }, null, 2) + "\n");
+          '
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          LABEL: ${{ github.event.label.name }}
+          DECIDER: ${{ github.event.sender.login }}
+
+      - name: Commit it and close the issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/decisions.js data/proposals.js
+          git diff --cached --quiet || git commit -m "Proposal #${{ github.event.issue.number }}: rejected (${{ github.event.label.name }})"
+          git push
+          gh issue comment "${{ github.event.issue.number }}" --body \
+            "**Rejected by @${{ github.event.sender.login }} — ${{ github.event.label.name }}.** Nothing was published. The decision is recorded in \`data/decisions.js\`, and the same change will not be proposed again by a fetcher."
+          gh issue close "${{ github.event.issue.number }}"

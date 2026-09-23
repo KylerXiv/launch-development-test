@@ -19,6 +19,9 @@ body:
   - type: markdown
     attributes:
       value: |
+        **Finish the title first** — add the medicine and what changes, e.g.
+        `Proposal: ASPY · country registration`. It is how reviewers find this in the queue.
+
         One change per proposal. If you have three, file three — each is approved or rejected on its own.
 
   - type: dropdown
@@ -68,9 +71,13 @@ body:
     attributes:
       label: What it should say
       description: >-
-        The exact wording or value you are proposing. If you picked "status"
-        above, write one of: done / in progress / delayed / not started —
-        a delayed stage must also carry a substantive reason, so put that here too.
+        This REPLACES the whole sentence — it is not added to it. If you are
+        adding a country or a fact, include everything that should still be
+        there as well, or it will disappear from the dashboard. Write the
+        wording itself and nothing else; do not repeat the question. If you
+        picked "status" above, write one of: done / in progress / delayed / not
+        started; a delayed stage must also carry a substantive reason, so put
+        that here too.
       placeholder: Registered in Rwanda; Rwanda FDA, 17 Aug 2024.
     validations:
       required: true

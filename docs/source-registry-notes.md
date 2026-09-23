@@ -571,6 +571,113 @@ Verify block after adding the two files: `validate-data.js` **0 errors, 5
 warnings**; synthetic **0 errors, 0 warnings**. Unchanged, as expected — no data
 file was touched.
 
+### Built 22 Sep: the whole proposal flow
+
+Files added, all on `sources-registry`:
+
+| File | Does |
+| --- | --- |
+| `.github/ISSUE_TEMPLATE/propose-change.yml` | the form (already on `main`) |
+| `.github/ISSUE_TEMPLATE/config.yml` | blank issues off (already on `main`) |
+| `scripts/proposal-lib.js` | parse the filed form → proposal → apply it → house-style write. Also a CLI and a 20-check self-test |
+| `.github/workflows/proposal-intake.yml` | on issue filed/edited: check, comment, rename, snapshot to `data/proposals.js`, label |
+| `.github/workflows/proposal-decision.yml` | on label: `approved` → apply, PR, auto-merge · `rejected:*` → record + close |
+| `data/proposals.js`, `data/decisions.js` | the queue and the decision log |
+| `scripts/setup-labels.sh` | creates the nine labels the flow needs |
+| `test-data/proposal/sample-issue.md` | the fixture, taken from the real issue #11 body |
+
+**`main` has none of the machinery, and that is the blocker.** Workflows fire
+from the default branch, but `main` carries no `scripts/data-rules.js`, no
+`serialize-products.js` and no `data/sources.js` — they exist only here.
+`sources-registry` is 18 commits ahead of `main`. **Nothing built above can run
+until that lands**, and merging it is not free: a push to `main` fires
+`vercel-deploy.yml`, so it publishes the new dashboard and the sources footer at
+the same time.
+
+### The reviewer sees the rendered page, without a page being built
+
+Asked 22 Sep: could approval happen on `preview.html` rather than on GitHub?
+**Approving *on* it: no.** A static page cannot write anything without holding a
+credential, which means building it, hosting it, gating it and storing a token —
+the whole pile the GitHub-native route deleted, reintroduced so a button can sit
+somewhere nicer.
+
+**Looking at it before approving: yes, and it costs nothing.** `intake` now
+applies the proposal to its checkout, runs `scripts/make-preview.js`, restores
+`data/products.js`, and uploads the result as a workflow artifact linked from
+its comment. `preview.html` is a single self-contained file, so this needs no
+host: GitHub serves it to people with repository access and to nobody else.
+
+**This closes the one real weakness of the no-page route** — that a reviewer
+judging a written sentence could not see it in context. The preview is the
+window; GitHub stays the switch.
+
+Verified by running exactly what the workflow runs: the built `preview.html`
+contains the proposed wording, and `data/products.js` is byte-clean afterwards.
+The commit step adds `data/proposals.js` by name, so a modified products file
+cannot ride along — do not change that to `git add -A`.
+
+### Decisions inside the build
+
+**An approval applies the snapshot, never the issue body.** Intake commits the
+parsed proposal to `data/proposals.js`; `proposal-decision.yml` reads from
+there. This is what closes the hole recorded above — an issue body is editable
+by anyone with write access, so applying the live body would hand the reviewer
+an amend path through the back door.
+
+**The citation travels with the value.** Applying a proposal overwrites the
+stage's `source` and `asOf` with the proposal's own. Deliberate: a figure cites
+where its *current* wording came from. It is lossy when the old wording carried
+several sources, which is why the reviewer sees the swap in the comment before
+approving.
+
+**Self-approval is refused in the workflow, not by GitHub.** GitHub's native
+block does not apply because the PR is opened by a workflow, not by the author.
+`proposal-decision.yml` compares `sender.login` against `issue.user.login`,
+comments, removes the label and exits non-zero.
+
+**A shortened replacement is flagged, not refused.** Found while dry-running the
+real fixture: the proposal replaced ASPY's country-registration note wholesale,
+silently dropping the verified Tanzania and Nigeria registrations. The form now
+says in terms that the field REPLACES the sentence, and `shortfall()` raises a
+warning block in the bot's comment when a `note` loses a third or more of its
+length. Not an error — sometimes a sentence really is being cut down.
+
+**Found by the self-test, and the code was right:** `serializeProducts(data,
+sourceText)` already calls `fileHeader` internally, so prepending
+`fileHeader()` as well wrote the assignment line twice and the file no longer
+parsed. Per CLAUDE.md, established which side was wrong before changing either
+— the caller was.
+
+### Dry run, 22 September
+
+Ran the whole chain by hand, without GitHub: form → proposal (`p-11`,
+`pyramax/4/note`, `src: rwanda-fda`) → apply → `validate-data.js`. Result:
+**0 errors, 5 warnings**, and a **3-insertion, 2-deletion** diff with house
+style untouched. `data/products.js` was reverted afterwards; nothing from the
+dry run is committed.
+
+**Verify block, 22 September — all passing:**
+
+```
+normalize-resistance.js          byte-identical
+normalize-molecular-markers.js   byte-identical
+validate-data.js                 0 errors, 5 warnings
+validate-data.js (synthetic)     0 errors, 0 warnings
+test-serializer.js               0 failures
+test-import.js                   127 passed
+proposal-lib.js selftest         20 passed
+make-preview.js                  wrote preview.html (154 KB)
+```
+
+### Still not built
+
+Fetchers still emit prose, not proposals — the six scripts in §4c are unchanged.
+The provenance check (every changed value traces to an approved proposal) is not
+written. Auto-merge degrades to "the PR waits for a human" until branch
+protection and repository auto-merge are switched on, and the workflow says so
+in its own comment rather than failing.
+
 ### One surface, and one enforced way in
 
 Clarified 22 Sep: **nobody edits the data on a second website, and there is one
@@ -830,6 +937,61 @@ then the public data repository and `/v1/`.
 **Files touched by this task:** this document only. No code changed, and the
 verify block was not re-run — nothing it checks moved.
 
+## 4d. Handover plan (22 Sep 2026)
+
+Plan, sequenced with owners: <https://claude.ai/artifact/2hhT7Q5f9PYgUnKXZp7BdQ>.
+The screen-by-screen walkthrough for non-technical readers:
+<https://claude.ai/artifact/2C8NRSUZ2wdqXF7FesRoFv>.
+
+### The repository question is closed
+
+**`Keith-paradox/launch-development` is home.** Decided by the owner, 22 Sep.
+Its automation does not run yet and will be fixed; `kochrisdev` is retired.
+
+Two things that must happen before that retirement, or work is lost:
+
+1. **The unread watch reports there are real findings** — including the GanLum
+   trial NCT07811908, recruiting, picked up 14 Sep. They should enter the new
+   flow as proposals, not be deleted with the repo.
+2. **The scheduled fetchers have only ever run there.** They have never run once
+   here. Moving them is not a copy — it is the first time they will execute in
+   this repository, and that should be treated as new work.
+
+`README.md`, `powerbi/queries.m` and `streamlit-app/README.md` all point at the
+old public address. Leave that address alive with a notice rather than deleting
+it: it may be cited in documents nobody here can edit.
+
+### Definition of done, and it is not a document
+
+Handover is finished when **RBM staff file a proposal, approve it and see it
+published, with nobody from this team touching a keyboard — twice, on two days,
+with two different pairs of people.** The failure this catches is the system that
+works only while its author is in the room.
+
+### Sequence
+
+| Phase | What | Owner |
+| --- | --- | --- |
+| 0 | Unblock Actions; buy Pro; branch protection with an Actions-only bypass | Repo owner |
+| 1 | One repository: rescue the unread findings, move the fetchers, repoint the URLs, switch the proposal flow on | Dev |
+| 2 | **Transfer to an institution-owned org, early** — plus hosting, domain and an institutional card | RBM / Unitaid |
+| 3 | Publish the versioned dataset; RBM fetches it server-side; keep publishing our own page from the same data | Dev |
+| 4 | Three languages (en/fr/pt), glossary first, overlay with staleness | Dev |
+| 5 | Two unassisted rehearsals; name who reads the queue; failure runbook; settle the emblem permissions | RBM + Dev |
+
+**Phase 2 is deliberately early.** The instinct is to transfer ownership as the
+final act; that is backwards. Transferring now means months of operating under
+the final ownership — finding the secret that lived in the wrong account, the
+notification nobody receives — while the people who can fix it are still here.
+
+### The three that decide whether it survives
+
+Off personal accounts; a named person reading the queue monthly; and a rehearsal
+where nobody helps. Everything else is recoverable by a competent developer
+reading the code. An account nobody can log into is not, and a queue nobody
+reads produces a dashboard that is stale while still looking authoritative —
+which is worse than one that is visibly broken, because people keep citing it.
+
 ## 5. Still to do
 
 ### Open questions that need an answer before the next step
@@ -839,7 +1001,7 @@ verify block was not re-run — nothing it checks moved.
 | **WHO EML: cite the 2023 list as confirmed, or the current 2025 one?** | The dashboard currently links a superseded edition |
 | **Uganda is `public: true` but we draw no data from it.** Keep it listed, or hide until ingested? | The footer claims everything on the page is traceable to a source below; listing one that contributes nothing overstates it |
 | **Do `findings` / `relevance` go on the public page?** | Currently stored, not rendered |
-| **Which repository is home?** | No fetcher added here will ever run in this one |
+| ~~**Which repository is home?**~~ | **Answered 22 Sep: this one.** `Keith-paradox/launch-development`. Its automation is broken and will be fixed; `kochrisdev` is retired once its unread findings are brought across — see §4d |
 
 ### Phase 2 — the 50 citations
 

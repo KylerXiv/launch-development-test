@@ -1,0 +1,138 @@
+name: Proposal intake
+
+# Runs when someone files (or edits) a proposal issue. It reads the form,
+# checks the change against the real governance rules with the change applied,
+# and answers on the issue.
+#
+# It also SNAPSHOTS the proposal into data/proposals.js. That snapshot — not
+# the issue body — is what an approval later applies, because an issue body
+# can be edited by anyone with write access, and "the reviewer cannot change
+# the proposal" has to be true rather than merely intended.
+#
+# Nothing here touches data/products.js.
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: bot-push-main
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: contains(github.event.issue.labels.*.name, 'proposal')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Via an env var, never interpolated into the script: an issue body is
+      # untrusted text and `${{ }}` inside run: would execute it.
+      - name: Write the filed form to a file
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: printf '%s' "$BODY" > /tmp/issue-body.md
+
+      - name: Read it as a proposal, and check the result
+        id: check
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_USER: ${{ github.event.issue.user.login }}
+        run: |
+          set +e
+          node scripts/proposal-lib.js check /tmp/issue-body.md > /tmp/comment.md
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          set -e
+          node scripts/proposal-lib.js parse /tmp/issue-body.md > /tmp/proposal.json 2>/dev/null || true
+
+      # So a reviewer can see the change on the real dashboard before deciding.
+      # preview.html is one self-contained file, so this needs no hosting: it
+      # is attached to the run, and only people with access to the repository
+      # can download it.
+      #
+      # This modifies data/products.js in the checkout on purpose. Nothing
+      # commits it — the snapshot step below adds data/proposals.js by name,
+      # and the file is put back immediately after the preview is built.
+      - name: Build a preview of the dashboard with the change in it
+        if: steps.check.outputs.status == '0'
+        run: |
+          node scripts/proposal-lib.js apply /tmp/proposal.json
+          node scripts/make-preview.js
+          git checkout data/products.js
+
+      - uses: actions/upload-artifact@v4
+        if: steps.check.outputs.status == '0'
+        with:
+          name: preview-proposal-${{ github.event.issue.number }}
+          path: preview.html
+          retention-days: 30
+
+      - name: Say what it would change, or what is wrong
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ steps.check.outputs.status }}" = "0" ]; then
+            {
+              echo
+              echo "### See it on the page first"
+              echo
+              echo "A copy of the dashboard with this change in it is attached to [this run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) \
+          — download \`preview-proposal-${{ github.event.issue.number }}\` and open \`preview.html\`. Nothing is public; it is only visible to people with access to this repository."
+            } >> /tmp/comment.md
+          fi
+          gh issue comment "${{ github.event.issue.number }}" --body-file /tmp/comment.md
+
+      - name: Name the issue after what it proposes
+        if: steps.check.outputs.status == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE=$(node -e '
+            const p = require("/tmp/proposal.json");
+            process.stdout.write(require("./scripts/proposal-lib.js").titleFor(p));
+          ')
+          gh issue edit "${{ github.event.issue.number }}" --title "$TITLE"
+
+      - name: Snapshot the proposal, so an approval applies this and not a later edit
+        if: steps.check.outputs.status == '0'
+        run: |
+          node -e '
+            const fs = require("fs");
+            const rules = require("./scripts/data-rules.js");
+            const file = "data/proposals.js";
+            const raw = fs.readFileSync(file, "utf8");
+            const head = raw.slice(0, raw.indexOf("window.LAUNCH_PROPOSALS"));
+            const got = rules.extractData(raw, "LAUNCH_PROPOSALS");
+            if (!got.ok) throw new Error("cannot read " + file);
+            const p = JSON.parse(fs.readFileSync("/tmp/proposal.json", "utf8"));
+            const list = got.data.proposals.filter((x) => x.issue !== p.issue);
+            list.push(p);
+            list.sort((a, b) => (a.issue || 0) - (b.issue || 0));
+            const out = { meta: { updated: new Date().toISOString().slice(0, 10) }, proposals: list };
+            fs.writeFileSync(file, head + "window.LAUNCH_PROPOSALS =\n" + JSON.stringify(out, null, 2) + "\n");
+          '
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/proposals.js
+          git diff --cached --quiet || git commit -m "Proposal #${{ github.event.issue.number }}: recorded, waiting for review"
+          git push
+
+      - name: Label it waiting, or needing a fix
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ steps.check.outputs.status }}" = "0" ]; then
+            gh issue edit "${{ github.event.issue.number }}" --add-label waiting --remove-label needs-fixing || true
+          else
+            gh issue edit "${{ github.event.issue.number }}" --add-label needs-fixing --remove-label waiting || true
+          fi
