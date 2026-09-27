@@ -11,3 +11,4 @@ DEV-B-BACKLOG.md
 
 # generated locale pages — rebuild with scripts/build-locale-pages.js
 dist/
+DEV-B-PLAN.md
