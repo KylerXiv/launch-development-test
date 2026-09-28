@@ -1,0 +1,145 @@
+name: Proposal intake
+
+# Runs when someone files (or edits) a proposal issue. It reads the form,
+# checks the change against the real governance rules with the change applied,
+# and answers on the issue.
+#
+# It also SNAPSHOTS the proposal into data/proposals.js. That snapshot — not
+# the issue body — is what an approval later applies, because an issue body
+# can be edited by anyone with write access, and "the reviewer cannot change
+# the proposal" has to be true rather than merely intended.
+#
+# And it opens the proposal as a pull request (scripts/proposal-pr.sh), then
+# asks pr-preview.yml to build the public dashboard from it, so the reviewer
+# sees the diff and the real page before deciding. The pull request is the
+# only place data/products.js changes; main is not touched until approval.
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  actions: write   # to dispatch pr-preview.yml — a bot-opened PR triggers nothing by itself
+
+concurrency:
+  group: bot-push-main
+  cancel-in-progress: false
+
+jobs:
+  check:
+    # Not on a closed issue: editing a rejected proposal must not reopen its PR.
+    if: contains(github.event.issue.labels.*.name, 'proposal') && github.event.issue.state == 'open'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Via an env var, never interpolated into the script: an issue body is
+      # untrusted text and `${{ }}` inside run: would execute it.
+      - name: Write the filed form to a file
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: printf '%s' "$BODY" > /tmp/issue-body.md
+
+      - name: Read it as a proposal, and check the result
+        id: check
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_USER: ${{ github.event.issue.user.login }}
+        run: |
+          set +e
+          node scripts/proposal-lib.js check /tmp/issue-body.md > /tmp/comment.md
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          set -e
+          node scripts/proposal-lib.js parse /tmp/issue-body.md > /tmp/proposal.json 2>/dev/null || true
+
+      # The proposal applied to main, on proposal/<n>, with an open pull request
+      # carrying it. Rebuilt from scratch on every edit. The branch commit is
+      # the only place data/products.js changes; this checkout of main is
+      # returned to clean.
+      - name: Open the proposal as a pull request
+        id: pr
+        if: steps.check.outputs.status == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: bash scripts/proposal-pr.sh "$ISSUE_NUMBER" /tmp/proposal.json
+
+      # The push above was made with GITHUB_TOKEN, so it fired no workflow.
+      - name: Build the public dashboard preview on it
+        if: steps.check.outputs.status == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.pr }}
+        run: gh workflow run pr-preview.yml --ref main -f pr="$PR"
+
+      - name: Say what it would change, or what is wrong
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.pr }}
+        run: |
+          if [ "${{ steps.check.outputs.status }}" = "0" ]; then
+            {
+              echo
+              echo "### See it on the page first"
+              echo
+              echo "The change is applied in #$PR. Its diff is exactly what would change, and a link to the public dashboard with the change in it appears there in a minute or two. Production does not change until this is approved."
+            } >> /tmp/comment.md
+          fi
+          gh issue comment "${{ github.event.issue.number }}" --body-file /tmp/comment.md
+
+      - name: Name the issue after what it proposes
+        if: steps.check.outputs.status == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE=$(node -e '
+            const p = require("/tmp/proposal.json");
+            process.stdout.write(require("./scripts/proposal-lib.js").titleFor(p));
+          ')
+          gh issue edit "${{ github.event.issue.number }}" --title "$TITLE"
+
+      - name: Snapshot the proposal, so an approval applies this and not a later edit
+        if: steps.check.outputs.status == '0'
+        run: |
+          node -e '
+            const fs = require("fs");
+            const rules = require("./scripts/data-rules.js");
+            const file = "data/proposals.js";
+            const raw = fs.readFileSync(file, "utf8");
+            // The assignment at a line start, as extractData finds it — the
+            // header comment quotes the same text, and a plain indexOf cut
+            // the file there and dropped the real assignment.
+            const head = raw.slice(0, raw.search(/^window\.LAUNCH_PROPOSALS\s*=/m));
+            const got = rules.extractData(raw, "LAUNCH_PROPOSALS");
+            if (!got.ok) throw new Error("cannot read " + file);
+            const p = JSON.parse(fs.readFileSync("/tmp/proposal.json", "utf8"));
+            const list = got.data.proposals.filter((x) => x.issue !== p.issue);
+            list.push(p);
+            list.sort((a, b) => (a.issue || 0) - (b.issue || 0));
+            const out = { meta: { updated: new Date().toISOString().slice(0, 10) }, proposals: list };
+            fs.writeFileSync(file, head + "window.LAUNCH_PROPOSALS =\n" + JSON.stringify(out, null, 2) + "\n");
+          '
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/proposals.js
+          git diff --cached --quiet || git commit -m "Proposal #${{ github.event.issue.number }}: recorded, waiting for review"
+          git push
+
+      - name: Label it waiting, or needing a fix
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ steps.check.outputs.status }}" = "0" ]; then
+            gh issue edit "${{ github.event.issue.number }}" --add-label waiting --remove-label needs-fixing || true
+          else
+            gh issue edit "${{ github.event.issue.number }}" --add-label needs-fixing --remove-label waiting || true
+          fi

@@ -1,0 +1,501 @@
+name,manufacturer,inn,countries registered,in guidelines,price,R&D & clinical,Regulatory approval (SRA)
+Artemine 100,Novartis,artem-ine,0,0,US$0.50,Complete,Submitted
+Lumefanoquine 101,Fosun Pharma,lumefan-azine,1,1,US$0.60,In progress,Not started
+Pyronarine 102,Shin Poong Pharmaceutical,pyronar-antrine,2,2,US$0.70,Not started,at risk
+Ferroquinoquine 103,Cipla,ferroquin-oquine,3,3,US$0.80,Delayed,Complete
+Ganaplacine 104,Ipca Laboratories,ganaplac-amine,4,4,US$0.90,Complete,Submitted
+Cipargamoquine 105,Guilin Pharmaceutical,cipargam-idine,5,5,US$1.00,In progress,Not started
+Tafenoqine 106,Sanofi,tafenoq-ine,6,6,US$1.10,Not started,at risk
+Piperaqoquine 107,Ajanta Pharma,piperaq-azine,7,7,US$1.20,Delayed,Complete
+Artemine 108,Strides,artem-antrine,8,8,US$1.30,Complete,Submitted
+Lumefanoquine 109,Macleods,lumefan-oquine,9,9,US$1.40,In progress,Not started
+Pyronarine 110,Novartis,pyronar-amine,10,10,US$1.50,Not started,at risk
+Ferroquinoquine 111,Fosun Pharma,ferroquin-idine,11,11,US$1.60,Delayed,Complete
+Ganaplacine 112,Shin Poong Pharmaceutical,ganaplac-ine,12,12,US$1.70,Complete,Submitted
+Cipargamoquine 113,Cipla,cipargam-azine,13,13,US$1.80,In progress,Not started
+Tafenoqine 114,Ipca Laboratories,tafenoq-antrine,14,14,US$1.90,Not started,at risk
+Piperaqoquine 115,Guilin Pharmaceutical,piperaq-oquine,15,15,US$2.00,Delayed,Complete
+Artemine 116,Sanofi,artem-amine,16,16,US$2.10,Complete,Submitted
+Lumefanoquine 117,Ajanta Pharma,lumefan-idine,17,17,US$2.20,In progress,Not started
+Pyronarine 118,Strides,pyronar-ine,18,18,US$2.30,Not started,at risk
+Ferroquinoquine 119,Macleods,ferroquin-azine,19,19,US$2.40,Delayed,Complete
+Ganaplacine 120,Novartis,ganaplac-antrine,20,20,US$2.50,Complete,Submitted
+Cipargamoquine 121,Fosun Pharma,cipargam-oquine,21,21,US$2.60,In progress,Not started
+Tafenoqine 122,Shin Poong Pharmaceutical,tafenoq-amine,22,22,US$2.70,Not started,at risk
+Piperaqoquine 123,Cipla,piperaq-idine,23,23,US$2.80,Delayed,Complete
+Artemine 124,Ipca Laboratories,artem-ine,24,24,US$2.90,Complete,Submitted
+Lumefanoquine 125,Guilin Pharmaceutical,lumefan-azine,25,25,US$3.00,In progress,Not started
+Pyronarine 126,Sanofi,pyronar-antrine,26,26,US$3.10,Not started,at risk
+Ferroquinoquine 127,Ajanta Pharma,ferroquin-oquine,27,27,US$3.20,Delayed,Complete
+Ganaplacine 128,Strides,ganaplac-amine,28,28,US$3.30,Complete,Submitted
+Cipargamoquine 129,Macleods,cipargam-idine,29,29,US$3.40,In progress,Not started
+Tafenoqine 130,Novartis,tafenoq-ine,30,30,US$3.50,Not started,at risk
+Piperaqoquine 131,Fosun Pharma,piperaq-azine,31,31,US$3.60,Delayed,Complete
+Artemine 132,Shin Poong Pharmaceutical,artem-antrine,32,32,US$3.70,Complete,Submitted
+Lumefanoquine 133,Cipla,lumefan-oquine,33,33,US$3.80,In progress,Not started
+Pyronarine 134,Ipca Laboratories,pyronar-amine,34,34,US$3.90,Not started,at risk
+Ferroquinoquine 135,Guilin Pharmaceutical,ferroquin-idine,35,35,US$4.00,Delayed,Complete
+Ganaplacine 136,Sanofi,ganaplac-ine,36,36,US$4.10,Complete,Submitted
+Cipargamoquine 137,Ajanta Pharma,cipargam-azine,37,37,US$4.20,In progress,Not started
+Tafenoqine 138,Strides,tafenoq-antrine,38,38,US$4.30,Not started,at risk
+Piperaqoquine 139,Macleods,piperaq-oquine,39,39,US$4.40,Delayed,Complete
+Artemine 140,Novartis,artem-amine,40,40,US$0.50,Complete,Submitted
+Lumefanoquine 141,Fosun Pharma,lumefan-idine,41,41,US$0.60,In progress,Not started
+Pyronarine 142,Shin Poong Pharmaceutical,pyronar-ine,42,42,US$0.70,Not started,at risk
+Ferroquinoquine 143,Cipla,ferroquin-azine,43,43,US$0.80,Delayed,Complete
+Ganaplacine 144,Ipca Laboratories,ganaplac-antrine,44,44,US$0.90,Complete,Submitted
+Cipargamoquine 145,Guilin Pharmaceutical,cipargam-oquine,45,45,US$1.00,In progress,Not started
+Tafenoqine 146,Sanofi,tafenoq-amine,46,46,US$1.10,Not started,at risk
+Piperaqoquine 147,Ajanta Pharma,piperaq-idine,47,47,US$1.20,Delayed,Complete
+Artemine 148,Strides,artem-ine,48,48,US$1.30,Complete,Submitted
+Lumefanoquine 149,Macleods,lumefan-azine,49,49,US$1.40,In progress,Not started
+Pyronarine 150,Novartis,pyronar-antrine,50,50,US$1.50,Not started,at risk
+Ferroquinoquine 151,Fosun Pharma,ferroquin-oquine,51,51,US$1.60,Delayed,Complete
+Ganaplacine 152,Shin Poong Pharmaceutical,ganaplac-amine,52,52,US$1.70,Complete,Submitted
+Cipargamoquine 153,Cipla,cipargam-idine,53,53,US$1.80,In progress,Not started
+Tafenoqine 154,Ipca Laboratories,tafenoq-ine,54,54,US$1.90,Not started,at risk
+Piperaqoquine 155,Guilin Pharmaceutical,piperaq-azine,55,55,US$2.00,Delayed,Complete
+Artemine 156,Sanofi,artem-antrine,56,56,US$2.10,Complete,Submitted
+Lumefanoquine 157,Ajanta Pharma,lumefan-oquine,57,57,US$2.20,In progress,Not started
+Pyronarine 158,Strides,pyronar-amine,58,58,US$2.30,Not started,at risk
+Ferroquinoquine 159,Macleods,ferroquin-idine,59,59,US$2.40,Delayed,Complete
+Ganaplacine 160,Novartis,ganaplac-ine,60,0,US$2.50,Complete,Submitted
+Cipargamoquine 161,Fosun Pharma,cipargam-azine,61,1,US$2.60,In progress,Not started
+Tafenoqine 162,Shin Poong Pharmaceutical,tafenoq-antrine,62,2,US$2.70,Not started,at risk
+Piperaqoquine 163,Cipla,piperaq-oquine,63,3,US$2.80,Delayed,Complete
+Artemine 164,Ipca Laboratories,artem-amine,64,4,US$2.90,Complete,Submitted
+Lumefanoquine 165,Guilin Pharmaceutical,lumefan-idine,65,5,US$3.00,In progress,Not started
+Pyronarine 166,Sanofi,pyronar-ine,66,6,US$3.10,Not started,at risk
+Ferroquinoquine 167,Ajanta Pharma,ferroquin-azine,67,7,US$3.20,Delayed,Complete
+Ganaplacine 168,Strides,ganaplac-antrine,68,8,US$3.30,Complete,Submitted
+Cipargamoquine 169,Macleods,cipargam-oquine,69,9,US$3.40,In progress,Not started
+Tafenoqine 170,Novartis,tafenoq-amine,70,10,US$3.50,Not started,at risk
+Piperaqoquine 171,Fosun Pharma,piperaq-idine,71,11,US$3.60,Delayed,Complete
+Artemine 172,Shin Poong Pharmaceutical,artem-ine,72,12,US$3.70,Complete,Submitted
+Lumefanoquine 173,Cipla,lumefan-azine,73,13,US$3.80,In progress,Not started
+Pyronarine 174,Ipca Laboratories,pyronar-antrine,74,14,US$3.90,Not started,at risk
+Ferroquinoquine 175,Guilin Pharmaceutical,ferroquin-oquine,75,15,US$4.00,Delayed,Complete
+Ganaplacine 176,Sanofi,ganaplac-amine,76,16,US$4.10,Complete,Submitted
+Cipargamoquine 177,Ajanta Pharma,cipargam-idine,77,17,US$4.20,In progress,Not started
+Tafenoqine 178,Strides,tafenoq-ine,78,18,US$4.30,Not started,at risk
+Piperaqoquine 179,Macleods,piperaq-azine,79,19,US$4.40,Delayed,Complete
+Artemine 180,Novartis,artem-antrine,80,20,US$0.50,Complete,Submitted
+Lumefanoquine 181,Fosun Pharma,lumefan-oquine,81,21,US$0.60,In progress,Not started
+Pyronarine 182,Shin Poong Pharmaceutical,pyronar-amine,82,22,US$0.70,Not started,at risk
+Ferroquinoquine 183,Cipla,ferroquin-idine,83,23,US$0.80,Delayed,Complete
+Ganaplacine 184,Ipca Laboratories,ganaplac-ine,84,24,US$0.90,Complete,Submitted
+Cipargamoquine 185,Guilin Pharmaceutical,cipargam-azine,85,25,US$1.00,In progress,Not started
+Tafenoqine 186,Sanofi,tafenoq-antrine,86,26,US$1.10,Not started,at risk
+Piperaqoquine 187,Ajanta Pharma,piperaq-oquine,87,27,US$1.20,Delayed,Complete
+Artemine 188,Strides,artem-amine,88,28,US$1.30,Complete,Submitted
+Lumefanoquine 189,Macleods,lumefan-idine,89,29,US$1.40,In progress,Not started
+Pyronarine 190,Novartis,pyronar-ine,90,30,US$1.50,Not started,at risk
+Ferroquinoquine 191,Fosun Pharma,ferroquin-azine,91,31,US$1.60,Delayed,Complete
+Ganaplacine 192,Shin Poong Pharmaceutical,ganaplac-antrine,92,32,US$1.70,Complete,Submitted
+Cipargamoquine 193,Cipla,cipargam-oquine,93,33,US$1.80,In progress,Not started
+Tafenoqine 194,Ipca Laboratories,tafenoq-amine,94,34,US$1.90,Not started,at risk
+Piperaqoquine 195,Guilin Pharmaceutical,piperaq-idine,95,35,US$2.00,Delayed,Complete
+Artemine 196,Sanofi,artem-ine,96,36,US$2.10,Complete,Submitted
+Lumefanoquine 197,Ajanta Pharma,lumefan-azine,97,37,US$2.20,In progress,Not started
+Pyronarine 198,Strides,pyronar-antrine,98,38,US$2.30,Not started,at risk
+Ferroquinoquine 199,Macleods,ferroquin-oquine,99,39,US$2.40,Delayed,Complete
+Ganaplacine 200,Novartis,ganaplac-amine,100,40,US$2.50,Complete,Submitted
+Cipargamoquine 201,Fosun Pharma,cipargam-idine,101,41,US$2.60,In progress,Not started
+Tafenoqine 202,Shin Poong Pharmaceutical,tafenoq-ine,102,42,US$2.70,Not started,at risk
+Piperaqoquine 203,Cipla,piperaq-azine,103,43,US$2.80,Delayed,Complete
+Artemine 204,Ipca Laboratories,artem-antrine,104,44,US$2.90,Complete,Submitted
+Lumefanoquine 205,Guilin Pharmaceutical,lumefan-oquine,105,45,US$3.00,In progress,Not started
+Pyronarine 206,Sanofi,pyronar-amine,106,46,US$3.10,Not started,at risk
+Ferroquinoquine 207,Ajanta Pharma,ferroquin-idine,107,47,US$3.20,Delayed,Complete
+Ganaplacine 208,Strides,ganaplac-ine,108,48,US$3.30,Complete,Submitted
+Cipargamoquine 209,Macleods,cipargam-azine,109,49,US$3.40,In progress,Not started
+Tafenoqine 210,Novartis,tafenoq-antrine,110,50,US$3.50,Not started,at risk
+Piperaqoquine 211,Fosun Pharma,piperaq-oquine,111,51,US$3.60,Delayed,Complete
+Artemine 212,Shin Poong Pharmaceutical,artem-amine,112,52,US$3.70,Complete,Submitted
+Lumefanoquine 213,Cipla,lumefan-idine,113,53,US$3.80,In progress,Not started
+Pyronarine 214,Ipca Laboratories,pyronar-ine,114,54,US$3.90,Not started,at risk
+Ferroquinoquine 215,Guilin Pharmaceutical,ferroquin-azine,115,55,US$4.00,Delayed,Complete
+Ganaplacine 216,Sanofi,ganaplac-antrine,116,56,US$4.10,Complete,Submitted
+Cipargamoquine 217,Ajanta Pharma,cipargam-oquine,117,57,US$4.20,In progress,Not started
+Tafenoqine 218,Strides,tafenoq-amine,118,58,US$4.30,Not started,at risk
+Piperaqoquine 219,Macleods,piperaq-idine,119,59,US$4.40,Delayed,Complete
+Artemine 220,Novartis,artem-ine,120,0,US$0.50,Complete,Submitted
+Lumefanoquine 221,Fosun Pharma,lumefan-azine,121,1,US$0.60,In progress,Not started
+Pyronarine 222,Shin Poong Pharmaceutical,pyronar-antrine,122,2,US$0.70,Not started,at risk
+Ferroquinoquine 223,Cipla,ferroquin-oquine,123,3,US$0.80,Delayed,Complete
+Ganaplacine 224,Ipca Laboratories,ganaplac-amine,124,4,US$0.90,Complete,Submitted
+Cipargamoquine 225,Guilin Pharmaceutical,cipargam-idine,125,5,US$1.00,In progress,Not started
+Tafenoqine 226,Sanofi,tafenoq-ine,126,6,US$1.10,Not started,at risk
+Piperaqoquine 227,Ajanta Pharma,piperaq-azine,127,7,US$1.20,Delayed,Complete
+Artemine 228,Strides,artem-antrine,128,8,US$1.30,Complete,Submitted
+Lumefanoquine 229,Macleods,lumefan-oquine,129,9,US$1.40,In progress,Not started
+Pyronarine 230,Novartis,pyronar-amine,130,10,US$1.50,Not started,at risk
+Ferroquinoquine 231,Fosun Pharma,ferroquin-idine,131,11,US$1.60,Delayed,Complete
+Ganaplacine 232,Shin Poong Pharmaceutical,ganaplac-ine,132,12,US$1.70,Complete,Submitted
+Cipargamoquine 233,Cipla,cipargam-azine,133,13,US$1.80,In progress,Not started
+Tafenoqine 234,Ipca Laboratories,tafenoq-antrine,134,14,US$1.90,Not started,at risk
+Piperaqoquine 235,Guilin Pharmaceutical,piperaq-oquine,135,15,US$2.00,Delayed,Complete
+Artemine 236,Sanofi,artem-amine,136,16,US$2.10,Complete,Submitted
+Lumefanoquine 237,Ajanta Pharma,lumefan-idine,137,17,US$2.20,In progress,Not started
+Pyronarine 238,Strides,pyronar-ine,138,18,US$2.30,Not started,at risk
+Ferroquinoquine 239,Macleods,ferroquin-azine,139,19,US$2.40,Delayed,Complete
+Ganaplacine 240,Novartis,ganaplac-antrine,140,20,US$2.50,Complete,Submitted
+Cipargamoquine 241,Fosun Pharma,cipargam-oquine,141,21,US$2.60,In progress,Not started
+Tafenoqine 242,Shin Poong Pharmaceutical,tafenoq-amine,142,22,US$2.70,Not started,at risk
+Piperaqoquine 243,Cipla,piperaq-idine,143,23,US$2.80,Delayed,Complete
+Artemine 244,Ipca Laboratories,artem-ine,144,24,US$2.90,Complete,Submitted
+Lumefanoquine 245,Guilin Pharmaceutical,lumefan-azine,145,25,US$3.00,In progress,Not started
+Pyronarine 246,Sanofi,pyronar-antrine,146,26,US$3.10,Not started,at risk
+Ferroquinoquine 247,Ajanta Pharma,ferroquin-oquine,147,27,US$3.20,Delayed,Complete
+Ganaplacine 248,Strides,ganaplac-amine,148,28,US$3.30,Complete,Submitted
+Cipargamoquine 249,Macleods,cipargam-idine,149,29,US$3.40,In progress,Not started
+Tafenoqine 250,Novartis,tafenoq-ine,150,30,US$3.50,Not started,at risk
+Piperaqoquine 251,Fosun Pharma,piperaq-azine,151,31,US$3.60,Delayed,Complete
+Artemine 252,Shin Poong Pharmaceutical,artem-antrine,152,32,US$3.70,Complete,Submitted
+Lumefanoquine 253,Cipla,lumefan-oquine,153,33,US$3.80,In progress,Not started
+Pyronarine 254,Ipca Laboratories,pyronar-amine,154,34,US$3.90,Not started,at risk
+Ferroquinoquine 255,Guilin Pharmaceutical,ferroquin-idine,155,35,US$4.00,Delayed,Complete
+Ganaplacine 256,Sanofi,ganaplac-ine,156,36,US$4.10,Complete,Submitted
+Cipargamoquine 257,Ajanta Pharma,cipargam-azine,157,37,US$4.20,In progress,Not started
+Tafenoqine 258,Strides,tafenoq-antrine,158,38,US$4.30,Not started,at risk
+Piperaqoquine 259,Macleods,piperaq-oquine,159,39,US$4.40,Delayed,Complete
+Artemine 260,Novartis,artem-amine,160,40,US$0.50,Complete,Submitted
+Lumefanoquine 261,Fosun Pharma,lumefan-idine,161,41,US$0.60,In progress,Not started
+Pyronarine 262,Shin Poong Pharmaceutical,pyronar-ine,162,42,US$0.70,Not started,at risk
+Ferroquinoquine 263,Cipla,ferroquin-azine,163,43,US$0.80,Delayed,Complete
+Ganaplacine 264,Ipca Laboratories,ganaplac-antrine,164,44,US$0.90,Complete,Submitted
+Cipargamoquine 265,Guilin Pharmaceutical,cipargam-oquine,165,45,US$1.00,In progress,Not started
+Tafenoqine 266,Sanofi,tafenoq-amine,166,46,US$1.10,Not started,at risk
+Piperaqoquine 267,Ajanta Pharma,piperaq-idine,167,47,US$1.20,Delayed,Complete
+Artemine 268,Strides,artem-ine,168,48,US$1.30,Complete,Submitted
+Lumefanoquine 269,Macleods,lumefan-azine,169,49,US$1.40,In progress,Not started
+Pyronarine 270,Novartis,pyronar-antrine,170,50,US$1.50,Not started,at risk
+Ferroquinoquine 271,Fosun Pharma,ferroquin-oquine,171,51,US$1.60,Delayed,Complete
+Ganaplacine 272,Shin Poong Pharmaceutical,ganaplac-amine,172,52,US$1.70,Complete,Submitted
+Cipargamoquine 273,Cipla,cipargam-idine,173,53,US$1.80,In progress,Not started
+Tafenoqine 274,Ipca Laboratories,tafenoq-ine,174,54,US$1.90,Not started,at risk
+Piperaqoquine 275,Guilin Pharmaceutical,piperaq-azine,175,55,US$2.00,Delayed,Complete
+Artemine 276,Sanofi,artem-antrine,176,56,US$2.10,Complete,Submitted
+Lumefanoquine 277,Ajanta Pharma,lumefan-oquine,177,57,US$2.20,In progress,Not started
+Pyronarine 278,Strides,pyronar-amine,178,58,US$2.30,Not started,at risk
+Ferroquinoquine 279,Macleods,ferroquin-idine,179,59,US$2.40,Delayed,Complete
+Ganaplacine 280,Novartis,ganaplac-ine,180,0,US$2.50,Complete,Submitted
+Cipargamoquine 281,Fosun Pharma,cipargam-azine,181,1,US$2.60,In progress,Not started
+Tafenoqine 282,Shin Poong Pharmaceutical,tafenoq-antrine,182,2,US$2.70,Not started,at risk
+Piperaqoquine 283,Cipla,piperaq-oquine,183,3,US$2.80,Delayed,Complete
+Artemine 284,Ipca Laboratories,artem-amine,184,4,US$2.90,Complete,Submitted
+Lumefanoquine 285,Guilin Pharmaceutical,lumefan-idine,185,5,US$3.00,In progress,Not started
+Pyronarine 286,Sanofi,pyronar-ine,186,6,US$3.10,Not started,at risk
+Ferroquinoquine 287,Ajanta Pharma,ferroquin-azine,187,7,US$3.20,Delayed,Complete
+Ganaplacine 288,Strides,ganaplac-antrine,188,8,US$3.30,Complete,Submitted
+Cipargamoquine 289,Macleods,cipargam-oquine,189,9,US$3.40,In progress,Not started
+Tafenoqine 290,Novartis,tafenoq-amine,0,10,US$3.50,Not started,at risk
+Piperaqoquine 291,Fosun Pharma,piperaq-idine,1,11,US$3.60,Delayed,Complete
+Artemine 292,Shin Poong Pharmaceutical,artem-ine,2,12,US$3.70,Complete,Submitted
+Lumefanoquine 293,Cipla,lumefan-azine,3,13,US$3.80,In progress,Not started
+Pyronarine 294,Ipca Laboratories,pyronar-antrine,4,14,US$3.90,Not started,at risk
+Ferroquinoquine 295,Guilin Pharmaceutical,ferroquin-oquine,5,15,US$4.00,Delayed,Complete
+Ganaplacine 296,Sanofi,ganaplac-amine,6,16,US$4.10,Complete,Submitted
+Cipargamoquine 297,Ajanta Pharma,cipargam-idine,7,17,US$4.20,In progress,Not started
+Tafenoqine 298,Strides,tafenoq-ine,8,18,US$4.30,Not started,at risk
+Piperaqoquine 299,Macleods,piperaq-azine,9,19,US$4.40,Delayed,Complete
+Artemine 300,Novartis,artem-antrine,10,20,US$0.50,Complete,Submitted
+Lumefanoquine 301,Fosun Pharma,lumefan-oquine,11,21,US$0.60,In progress,Not started
+Pyronarine 302,Shin Poong Pharmaceutical,pyronar-amine,12,22,US$0.70,Not started,at risk
+Ferroquinoquine 303,Cipla,ferroquin-idine,13,23,US$0.80,Delayed,Complete
+Ganaplacine 304,Ipca Laboratories,ganaplac-ine,14,24,US$0.90,Complete,Submitted
+Cipargamoquine 305,Guilin Pharmaceutical,cipargam-azine,15,25,US$1.00,In progress,Not started
+Tafenoqine 306,Sanofi,tafenoq-antrine,16,26,US$1.10,Not started,at risk
+Piperaqoquine 307,Ajanta Pharma,piperaq-oquine,17,27,US$1.20,Delayed,Complete
+Artemine 308,Strides,artem-amine,18,28,US$1.30,Complete,Submitted
+Lumefanoquine 309,Macleods,lumefan-idine,19,29,US$1.40,In progress,Not started
+Pyronarine 310,Novartis,pyronar-ine,20,30,US$1.50,Not started,at risk
+Ferroquinoquine 311,Fosun Pharma,ferroquin-azine,21,31,US$1.60,Delayed,Complete
+Ganaplacine 312,Shin Poong Pharmaceutical,ganaplac-antrine,22,32,US$1.70,Complete,Submitted
+Cipargamoquine 313,Cipla,cipargam-oquine,23,33,US$1.80,In progress,Not started
+Tafenoqine 314,Ipca Laboratories,tafenoq-amine,24,34,US$1.90,Not started,at risk
+Piperaqoquine 315,Guilin Pharmaceutical,piperaq-idine,25,35,US$2.00,Delayed,Complete
+Artemine 316,Sanofi,artem-ine,26,36,US$2.10,Complete,Submitted
+Lumefanoquine 317,Ajanta Pharma,lumefan-azine,27,37,US$2.20,In progress,Not started
+Pyronarine 318,Strides,pyronar-antrine,28,38,US$2.30,Not started,at risk
+Ferroquinoquine 319,Macleods,ferroquin-oquine,29,39,US$2.40,Delayed,Complete
+Ganaplacine 320,Novartis,ganaplac-amine,30,40,US$2.50,Complete,Submitted
+Cipargamoquine 321,Fosun Pharma,cipargam-idine,31,41,US$2.60,In progress,Not started
+Tafenoqine 322,Shin Poong Pharmaceutical,tafenoq-ine,32,42,US$2.70,Not started,at risk
+Piperaqoquine 323,Cipla,piperaq-azine,33,43,US$2.80,Delayed,Complete
+Artemine 324,Ipca Laboratories,artem-antrine,34,44,US$2.90,Complete,Submitted
+Lumefanoquine 325,Guilin Pharmaceutical,lumefan-oquine,35,45,US$3.00,In progress,Not started
+Pyronarine 326,Sanofi,pyronar-amine,36,46,US$3.10,Not started,at risk
+Ferroquinoquine 327,Ajanta Pharma,ferroquin-idine,37,47,US$3.20,Delayed,Complete
+Ganaplacine 328,Strides,ganaplac-ine,38,48,US$3.30,Complete,Submitted
+Cipargamoquine 329,Macleods,cipargam-azine,39,49,US$3.40,In progress,Not started
+Tafenoqine 330,Novartis,tafenoq-antrine,40,50,US$3.50,Not started,at risk
+Piperaqoquine 331,Fosun Pharma,piperaq-oquine,41,51,US$3.60,Delayed,Complete
+Artemine 332,Shin Poong Pharmaceutical,artem-amine,42,52,US$3.70,Complete,Submitted
+Lumefanoquine 333,Cipla,lumefan-idine,43,53,US$3.80,In progress,Not started
+Pyronarine 334,Ipca Laboratories,pyronar-ine,44,54,US$3.90,Not started,at risk
+Ferroquinoquine 335,Guilin Pharmaceutical,ferroquin-azine,45,55,US$4.00,Delayed,Complete
+Ganaplacine 336,Sanofi,ganaplac-antrine,46,56,US$4.10,Complete,Submitted
+Cipargamoquine 337,Ajanta Pharma,cipargam-oquine,47,57,US$4.20,In progress,Not started
+Tafenoqine 338,Strides,tafenoq-amine,48,58,US$4.30,Not started,at risk
+Piperaqoquine 339,Macleods,piperaq-idine,49,59,US$4.40,Delayed,Complete
+Artemine 340,Novartis,artem-ine,50,0,US$0.50,Complete,Submitted
+Lumefanoquine 341,Fosun Pharma,lumefan-azine,51,1,US$0.60,In progress,Not started
+Pyronarine 342,Shin Poong Pharmaceutical,pyronar-antrine,52,2,US$0.70,Not started,at risk
+Ferroquinoquine 343,Cipla,ferroquin-oquine,53,3,US$0.80,Delayed,Complete
+Ganaplacine 344,Ipca Laboratories,ganaplac-amine,54,4,US$0.90,Complete,Submitted
+Cipargamoquine 345,Guilin Pharmaceutical,cipargam-idine,55,5,US$1.00,In progress,Not started
+Tafenoqine 346,Sanofi,tafenoq-ine,56,6,US$1.10,Not started,at risk
+Piperaqoquine 347,Ajanta Pharma,piperaq-azine,57,7,US$1.20,Delayed,Complete
+Artemine 348,Strides,artem-antrine,58,8,US$1.30,Complete,Submitted
+Lumefanoquine 349,Macleods,lumefan-oquine,59,9,US$1.40,In progress,Not started
+Pyronarine 350,Novartis,pyronar-amine,60,10,US$1.50,Not started,at risk
+Ferroquinoquine 351,Fosun Pharma,ferroquin-idine,61,11,US$1.60,Delayed,Complete
+Ganaplacine 352,Shin Poong Pharmaceutical,ganaplac-ine,62,12,US$1.70,Complete,Submitted
+Cipargamoquine 353,Cipla,cipargam-azine,63,13,US$1.80,In progress,Not started
+Tafenoqine 354,Ipca Laboratories,tafenoq-antrine,64,14,US$1.90,Not started,at risk
+Piperaqoquine 355,Guilin Pharmaceutical,piperaq-oquine,65,15,US$2.00,Delayed,Complete
+Artemine 356,Sanofi,artem-amine,66,16,US$2.10,Complete,Submitted
+Lumefanoquine 357,Ajanta Pharma,lumefan-idine,67,17,US$2.20,In progress,Not started
+Pyronarine 358,Strides,pyronar-ine,68,18,US$2.30,Not started,at risk
+Ferroquinoquine 359,Macleods,ferroquin-azine,69,19,US$2.40,Delayed,Complete
+Ganaplacine 360,Novartis,ganaplac-antrine,70,20,US$2.50,Complete,Submitted
+Cipargamoquine 361,Fosun Pharma,cipargam-oquine,71,21,US$2.60,In progress,Not started
+Tafenoqine 362,Shin Poong Pharmaceutical,tafenoq-amine,72,22,US$2.70,Not started,at risk
+Piperaqoquine 363,Cipla,piperaq-idine,73,23,US$2.80,Delayed,Complete
+Artemine 364,Ipca Laboratories,artem-ine,74,24,US$2.90,Complete,Submitted
+Lumefanoquine 365,Guilin Pharmaceutical,lumefan-azine,75,25,US$3.00,In progress,Not started
+Pyronarine 366,Sanofi,pyronar-antrine,76,26,US$3.10,Not started,at risk
+Ferroquinoquine 367,Ajanta Pharma,ferroquin-oquine,77,27,US$3.20,Delayed,Complete
+Ganaplacine 368,Strides,ganaplac-amine,78,28,US$3.30,Complete,Submitted
+Cipargamoquine 369,Macleods,cipargam-idine,79,29,US$3.40,In progress,Not started
+Tafenoqine 370,Novartis,tafenoq-ine,80,30,US$3.50,Not started,at risk
+Piperaqoquine 371,Fosun Pharma,piperaq-azine,81,31,US$3.60,Delayed,Complete
+Artemine 372,Shin Poong Pharmaceutical,artem-antrine,82,32,US$3.70,Complete,Submitted
+Lumefanoquine 373,Cipla,lumefan-oquine,83,33,US$3.80,In progress,Not started
+Pyronarine 374,Ipca Laboratories,pyronar-amine,84,34,US$3.90,Not started,at risk
+Ferroquinoquine 375,Guilin Pharmaceutical,ferroquin-idine,85,35,US$4.00,Delayed,Complete
+Ganaplacine 376,Sanofi,ganaplac-ine,86,36,US$4.10,Complete,Submitted
+Cipargamoquine 377,Ajanta Pharma,cipargam-azine,87,37,US$4.20,In progress,Not started
+Tafenoqine 378,Strides,tafenoq-antrine,88,38,US$4.30,Not started,at risk
+Piperaqoquine 379,Macleods,piperaq-oquine,89,39,US$4.40,Delayed,Complete
+Artemine 380,Novartis,artem-amine,90,40,US$0.50,Complete,Submitted
+Lumefanoquine 381,Fosun Pharma,lumefan-idine,91,41,US$0.60,In progress,Not started
+Pyronarine 382,Shin Poong Pharmaceutical,pyronar-ine,92,42,US$0.70,Not started,at risk
+Ferroquinoquine 383,Cipla,ferroquin-azine,93,43,US$0.80,Delayed,Complete
+Ganaplacine 384,Ipca Laboratories,ganaplac-antrine,94,44,US$0.90,Complete,Submitted
+Cipargamoquine 385,Guilin Pharmaceutical,cipargam-oquine,95,45,US$1.00,In progress,Not started
+Tafenoqine 386,Sanofi,tafenoq-amine,96,46,US$1.10,Not started,at risk
+Piperaqoquine 387,Ajanta Pharma,piperaq-idine,97,47,US$1.20,Delayed,Complete
+Artemine 388,Strides,artem-ine,98,48,US$1.30,Complete,Submitted
+Lumefanoquine 389,Macleods,lumefan-azine,99,49,US$1.40,In progress,Not started
+Pyronarine 390,Novartis,pyronar-antrine,100,50,US$1.50,Not started,at risk
+Ferroquinoquine 391,Fosun Pharma,ferroquin-oquine,101,51,US$1.60,Delayed,Complete
+Ganaplacine 392,Shin Poong Pharmaceutical,ganaplac-amine,102,52,US$1.70,Complete,Submitted
+Cipargamoquine 393,Cipla,cipargam-idine,103,53,US$1.80,In progress,Not started
+Tafenoqine 394,Ipca Laboratories,tafenoq-ine,104,54,US$1.90,Not started,at risk
+Piperaqoquine 395,Guilin Pharmaceutical,piperaq-azine,105,55,US$2.00,Delayed,Complete
+Artemine 396,Sanofi,artem-antrine,106,56,US$2.10,Complete,Submitted
+Lumefanoquine 397,Ajanta Pharma,lumefan-oquine,107,57,US$2.20,In progress,Not started
+Pyronarine 398,Strides,pyronar-amine,108,58,US$2.30,Not started,at risk
+Ferroquinoquine 399,Macleods,ferroquin-idine,109,59,US$2.40,Delayed,Complete
+Ganaplacine 400,Novartis,ganaplac-ine,110,0,US$2.50,Complete,Submitted
+Cipargamoquine 401,Fosun Pharma,cipargam-azine,111,1,US$2.60,In progress,Not started
+Tafenoqine 402,Shin Poong Pharmaceutical,tafenoq-antrine,112,2,US$2.70,Not started,at risk
+Piperaqoquine 403,Cipla,piperaq-oquine,113,3,US$2.80,Delayed,Complete
+Artemine 404,Ipca Laboratories,artem-amine,114,4,US$2.90,Complete,Submitted
+Lumefanoquine 405,Guilin Pharmaceutical,lumefan-idine,115,5,US$3.00,In progress,Not started
+Pyronarine 406,Sanofi,pyronar-ine,116,6,US$3.10,Not started,at risk
+Ferroquinoquine 407,Ajanta Pharma,ferroquin-azine,117,7,US$3.20,Delayed,Complete
+Ganaplacine 408,Strides,ganaplac-antrine,118,8,US$3.30,Complete,Submitted
+Cipargamoquine 409,Macleods,cipargam-oquine,119,9,US$3.40,In progress,Not started
+Tafenoqine 410,Novartis,tafenoq-amine,120,10,US$3.50,Not started,at risk
+Piperaqoquine 411,Fosun Pharma,piperaq-idine,121,11,US$3.60,Delayed,Complete
+Artemine 412,Shin Poong Pharmaceutical,artem-ine,122,12,US$3.70,Complete,Submitted
+Lumefanoquine 413,Cipla,lumefan-azine,123,13,US$3.80,In progress,Not started
+Pyronarine 414,Ipca Laboratories,pyronar-antrine,124,14,US$3.90,Not started,at risk
+Ferroquinoquine 415,Guilin Pharmaceutical,ferroquin-oquine,125,15,US$4.00,Delayed,Complete
+Ganaplacine 416,Sanofi,ganaplac-amine,126,16,US$4.10,Complete,Submitted
+Cipargamoquine 417,Ajanta Pharma,cipargam-idine,127,17,US$4.20,In progress,Not started
+Tafenoqine 418,Strides,tafenoq-ine,128,18,US$4.30,Not started,at risk
+Piperaqoquine 419,Macleods,piperaq-azine,129,19,US$4.40,Delayed,Complete
+Artemine 420,Novartis,artem-antrine,130,20,US$0.50,Complete,Submitted
+Lumefanoquine 421,Fosun Pharma,lumefan-oquine,131,21,US$0.60,In progress,Not started
+Pyronarine 422,Shin Poong Pharmaceutical,pyronar-amine,132,22,US$0.70,Not started,at risk
+Ferroquinoquine 423,Cipla,ferroquin-idine,133,23,US$0.80,Delayed,Complete
+Ganaplacine 424,Ipca Laboratories,ganaplac-ine,134,24,US$0.90,Complete,Submitted
+Cipargamoquine 425,Guilin Pharmaceutical,cipargam-azine,135,25,US$1.00,In progress,Not started
+Tafenoqine 426,Sanofi,tafenoq-antrine,136,26,US$1.10,Not started,at risk
+Piperaqoquine 427,Ajanta Pharma,piperaq-oquine,137,27,US$1.20,Delayed,Complete
+Artemine 428,Strides,artem-amine,138,28,US$1.30,Complete,Submitted
+Lumefanoquine 429,Macleods,lumefan-idine,139,29,US$1.40,In progress,Not started
+Pyronarine 430,Novartis,pyronar-ine,140,30,US$1.50,Not started,at risk
+Ferroquinoquine 431,Fosun Pharma,ferroquin-azine,141,31,US$1.60,Delayed,Complete
+Ganaplacine 432,Shin Poong Pharmaceutical,ganaplac-antrine,142,32,US$1.70,Complete,Submitted
+Cipargamoquine 433,Cipla,cipargam-oquine,143,33,US$1.80,In progress,Not started
+Tafenoqine 434,Ipca Laboratories,tafenoq-amine,144,34,US$1.90,Not started,at risk
+Piperaqoquine 435,Guilin Pharmaceutical,piperaq-idine,145,35,US$2.00,Delayed,Complete
+Artemine 436,Sanofi,artem-ine,146,36,US$2.10,Complete,Submitted
+Lumefanoquine 437,Ajanta Pharma,lumefan-azine,147,37,US$2.20,In progress,Not started
+Pyronarine 438,Strides,pyronar-antrine,148,38,US$2.30,Not started,at risk
+Ferroquinoquine 439,Macleods,ferroquin-oquine,149,39,US$2.40,Delayed,Complete
+Ganaplacine 440,Novartis,ganaplac-amine,150,40,US$2.50,Complete,Submitted
+Cipargamoquine 441,Fosun Pharma,cipargam-idine,151,41,US$2.60,In progress,Not started
+Tafenoqine 442,Shin Poong Pharmaceutical,tafenoq-ine,152,42,US$2.70,Not started,at risk
+Piperaqoquine 443,Cipla,piperaq-azine,153,43,US$2.80,Delayed,Complete
+Artemine 444,Ipca Laboratories,artem-antrine,154,44,US$2.90,Complete,Submitted
+Lumefanoquine 445,Guilin Pharmaceutical,lumefan-oquine,155,45,US$3.00,In progress,Not started
+Pyronarine 446,Sanofi,pyronar-amine,156,46,US$3.10,Not started,at risk
+Ferroquinoquine 447,Ajanta Pharma,ferroquin-idine,157,47,US$3.20,Delayed,Complete
+Ganaplacine 448,Strides,ganaplac-ine,158,48,US$3.30,Complete,Submitted
+Cipargamoquine 449,Macleods,cipargam-azine,159,49,US$3.40,In progress,Not started
+Tafenoqine 450,Novartis,tafenoq-antrine,160,50,US$3.50,Not started,at risk
+Piperaqoquine 451,Fosun Pharma,piperaq-oquine,161,51,US$3.60,Delayed,Complete
+Artemine 452,Shin Poong Pharmaceutical,artem-amine,162,52,US$3.70,Complete,Submitted
+Lumefanoquine 453,Cipla,lumefan-idine,163,53,US$3.80,In progress,Not started
+Pyronarine 454,Ipca Laboratories,pyronar-ine,164,54,US$3.90,Not started,at risk
+Ferroquinoquine 455,Guilin Pharmaceutical,ferroquin-azine,165,55,US$4.00,Delayed,Complete
+Ganaplacine 456,Sanofi,ganaplac-antrine,166,56,US$4.10,Complete,Submitted
+Cipargamoquine 457,Ajanta Pharma,cipargam-oquine,167,57,US$4.20,In progress,Not started
+Tafenoqine 458,Strides,tafenoq-amine,168,58,US$4.30,Not started,at risk
+Piperaqoquine 459,Macleods,piperaq-idine,169,59,US$4.40,Delayed,Complete
+Artemine 460,Novartis,artem-ine,170,0,US$0.50,Complete,Submitted
+Lumefanoquine 461,Fosun Pharma,lumefan-azine,171,1,US$0.60,In progress,Not started
+Pyronarine 462,Shin Poong Pharmaceutical,pyronar-antrine,172,2,US$0.70,Not started,at risk
+Ferroquinoquine 463,Cipla,ferroquin-oquine,173,3,US$0.80,Delayed,Complete
+Ganaplacine 464,Ipca Laboratories,ganaplac-amine,174,4,US$0.90,Complete,Submitted
+Cipargamoquine 465,Guilin Pharmaceutical,cipargam-idine,175,5,US$1.00,In progress,Not started
+Tafenoqine 466,Sanofi,tafenoq-ine,176,6,US$1.10,Not started,at risk
+Piperaqoquine 467,Ajanta Pharma,piperaq-azine,177,7,US$1.20,Delayed,Complete
+Artemine 468,Strides,artem-antrine,178,8,US$1.30,Complete,Submitted
+Lumefanoquine 469,Macleods,lumefan-oquine,179,9,US$1.40,In progress,Not started
+Pyronarine 470,Novartis,pyronar-amine,180,10,US$1.50,Not started,at risk
+Ferroquinoquine 471,Fosun Pharma,ferroquin-idine,181,11,US$1.60,Delayed,Complete
+Ganaplacine 472,Shin Poong Pharmaceutical,ganaplac-ine,182,12,US$1.70,Complete,Submitted
+Cipargamoquine 473,Cipla,cipargam-azine,183,13,US$1.80,In progress,Not started
+Tafenoqine 474,Ipca Laboratories,tafenoq-antrine,184,14,US$1.90,Not started,at risk
+Piperaqoquine 475,Guilin Pharmaceutical,piperaq-oquine,185,15,US$2.00,Delayed,Complete
+Artemine 476,Sanofi,artem-amine,186,16,US$2.10,Complete,Submitted
+Lumefanoquine 477,Ajanta Pharma,lumefan-idine,187,17,US$2.20,In progress,Not started
+Pyronarine 478,Strides,pyronar-ine,188,18,US$2.30,Not started,at risk
+Ferroquinoquine 479,Macleods,ferroquin-azine,189,19,US$2.40,Delayed,Complete
+Ganaplacine 480,Novartis,ganaplac-antrine,0,20,US$2.50,Complete,Submitted
+Cipargamoquine 481,Fosun Pharma,cipargam-oquine,1,21,US$2.60,In progress,Not started
+Tafenoqine 482,Shin Poong Pharmaceutical,tafenoq-amine,2,22,US$2.70,Not started,at risk
+Piperaqoquine 483,Cipla,piperaq-idine,3,23,US$2.80,Delayed,Complete
+Artemine 484,Ipca Laboratories,artem-ine,4,24,US$2.90,Complete,Submitted
+Lumefanoquine 485,Guilin Pharmaceutical,lumefan-azine,5,25,US$3.00,In progress,Not started
+Pyronarine 486,Sanofi,pyronar-antrine,6,26,US$3.10,Not started,at risk
+Ferroquinoquine 487,Ajanta Pharma,ferroquin-oquine,7,27,US$3.20,Delayed,Complete
+Ganaplacine 488,Strides,ganaplac-amine,8,28,US$3.30,Complete,Submitted
+Cipargamoquine 489,Macleods,cipargam-idine,9,29,US$3.40,In progress,Not started
+Tafenoqine 490,Novartis,tafenoq-ine,10,30,US$3.50,Not started,at risk
+Piperaqoquine 491,Fosun Pharma,piperaq-azine,11,31,US$3.60,Delayed,Complete
+Artemine 492,Shin Poong Pharmaceutical,artem-antrine,12,32,US$3.70,Complete,Submitted
+Lumefanoquine 493,Cipla,lumefan-oquine,13,33,US$3.80,In progress,Not started
+Pyronarine 494,Ipca Laboratories,pyronar-amine,14,34,US$3.90,Not started,at risk
+Ferroquinoquine 495,Guilin Pharmaceutical,ferroquin-idine,15,35,US$4.00,Delayed,Complete
+Ganaplacine 496,Sanofi,ganaplac-ine,16,36,US$4.10,Complete,Submitted
+Cipargamoquine 497,Ajanta Pharma,cipargam-azine,17,37,US$4.20,In progress,Not started
+Tafenoqine 498,Strides,tafenoq-antrine,18,38,US$4.30,Not started,at risk
+Piperaqoquine 499,Macleods,piperaq-oquine,19,39,US$4.40,Delayed,Complete
+Artemine 500,Novartis,artem-amine,20,40,US$0.50,Complete,Submitted
+Lumefanoquine 501,Fosun Pharma,lumefan-idine,21,41,US$0.60,In progress,Not started
+Pyronarine 502,Shin Poong Pharmaceutical,pyronar-ine,22,42,US$0.70,Not started,at risk
+Ferroquinoquine 503,Cipla,ferroquin-azine,23,43,US$0.80,Delayed,Complete
+Ganaplacine 504,Ipca Laboratories,ganaplac-antrine,24,44,US$0.90,Complete,Submitted
+Cipargamoquine 505,Guilin Pharmaceutical,cipargam-oquine,25,45,US$1.00,In progress,Not started
+Tafenoqine 506,Sanofi,tafenoq-amine,26,46,US$1.10,Not started,at risk
+Piperaqoquine 507,Ajanta Pharma,piperaq-idine,27,47,US$1.20,Delayed,Complete
+Artemine 508,Strides,artem-ine,28,48,US$1.30,Complete,Submitted
+Lumefanoquine 509,Macleods,lumefan-azine,29,49,US$1.40,In progress,Not started
+Pyronarine 510,Novartis,pyronar-antrine,30,50,US$1.50,Not started,at risk
+Ferroquinoquine 511,Fosun Pharma,ferroquin-oquine,31,51,US$1.60,Delayed,Complete
+Ganaplacine 512,Shin Poong Pharmaceutical,ganaplac-amine,32,52,US$1.70,Complete,Submitted
+Cipargamoquine 513,Cipla,cipargam-idine,33,53,US$1.80,In progress,Not started
+Tafenoqine 514,Ipca Laboratories,tafenoq-ine,34,54,US$1.90,Not started,at risk
+Piperaqoquine 515,Guilin Pharmaceutical,piperaq-azine,35,55,US$2.00,Delayed,Complete
+Artemine 516,Sanofi,artem-antrine,36,56,US$2.10,Complete,Submitted
+Lumefanoquine 517,Ajanta Pharma,lumefan-oquine,37,57,US$2.20,In progress,Not started
+Pyronarine 518,Strides,pyronar-amine,38,58,US$2.30,Not started,at risk
+Ferroquinoquine 519,Macleods,ferroquin-idine,39,59,US$2.40,Delayed,Complete
+Ganaplacine 520,Novartis,ganaplac-ine,40,0,US$2.50,Complete,Submitted
+Cipargamoquine 521,Fosun Pharma,cipargam-azine,41,1,US$2.60,In progress,Not started
+Tafenoqine 522,Shin Poong Pharmaceutical,tafenoq-antrine,42,2,US$2.70,Not started,at risk
+Piperaqoquine 523,Cipla,piperaq-oquine,43,3,US$2.80,Delayed,Complete
+Artemine 524,Ipca Laboratories,artem-amine,44,4,US$2.90,Complete,Submitted
+Lumefanoquine 525,Guilin Pharmaceutical,lumefan-idine,45,5,US$3.00,In progress,Not started
+Pyronarine 526,Sanofi,pyronar-ine,46,6,US$3.10,Not started,at risk
+Ferroquinoquine 527,Ajanta Pharma,ferroquin-azine,47,7,US$3.20,Delayed,Complete
+Ganaplacine 528,Strides,ganaplac-antrine,48,8,US$3.30,Complete,Submitted
+Cipargamoquine 529,Macleods,cipargam-oquine,49,9,US$3.40,In progress,Not started
+Tafenoqine 530,Novartis,tafenoq-amine,50,10,US$3.50,Not started,at risk
+Piperaqoquine 531,Fosun Pharma,piperaq-idine,51,11,US$3.60,Delayed,Complete
+Artemine 532,Shin Poong Pharmaceutical,artem-ine,52,12,US$3.70,Complete,Submitted
+Lumefanoquine 533,Cipla,lumefan-azine,53,13,US$3.80,In progress,Not started
+Pyronarine 534,Ipca Laboratories,pyronar-antrine,54,14,US$3.90,Not started,at risk
+Ferroquinoquine 535,Guilin Pharmaceutical,ferroquin-oquine,55,15,US$4.00,Delayed,Complete
+Ganaplacine 536,Sanofi,ganaplac-amine,56,16,US$4.10,Complete,Submitted
+Cipargamoquine 537,Ajanta Pharma,cipargam-idine,57,17,US$4.20,In progress,Not started
+Tafenoqine 538,Strides,tafenoq-ine,58,18,US$4.30,Not started,at risk
+Piperaqoquine 539,Macleods,piperaq-azine,59,19,US$4.40,Delayed,Complete
+Artemine 540,Novartis,artem-antrine,60,20,US$0.50,Complete,Submitted
+Lumefanoquine 541,Fosun Pharma,lumefan-oquine,61,21,US$0.60,In progress,Not started
+Pyronarine 542,Shin Poong Pharmaceutical,pyronar-amine,62,22,US$0.70,Not started,at risk
+Ferroquinoquine 543,Cipla,ferroquin-idine,63,23,US$0.80,Delayed,Complete
+Ganaplacine 544,Ipca Laboratories,ganaplac-ine,64,24,US$0.90,Complete,Submitted
+Cipargamoquine 545,Guilin Pharmaceutical,cipargam-azine,65,25,US$1.00,In progress,Not started
+Tafenoqine 546,Sanofi,tafenoq-antrine,66,26,US$1.10,Not started,at risk
+Piperaqoquine 547,Ajanta Pharma,piperaq-oquine,67,27,US$1.20,Delayed,Complete
+Artemine 548,Strides,artem-amine,68,28,US$1.30,Complete,Submitted
+Lumefanoquine 549,Macleods,lumefan-idine,69,29,US$1.40,In progress,Not started
+Pyronarine 550,Novartis,pyronar-ine,70,30,US$1.50,Not started,at risk
+Ferroquinoquine 551,Fosun Pharma,ferroquin-azine,71,31,US$1.60,Delayed,Complete
+Ganaplacine 552,Shin Poong Pharmaceutical,ganaplac-antrine,72,32,US$1.70,Complete,Submitted
+Cipargamoquine 553,Cipla,cipargam-oquine,73,33,US$1.80,In progress,Not started
+Tafenoqine 554,Ipca Laboratories,tafenoq-amine,74,34,US$1.90,Not started,at risk
+Piperaqoquine 555,Guilin Pharmaceutical,piperaq-idine,75,35,US$2.00,Delayed,Complete
+Artemine 556,Sanofi,artem-ine,76,36,US$2.10,Complete,Submitted
+Lumefanoquine 557,Ajanta Pharma,lumefan-azine,77,37,US$2.20,In progress,Not started
+Pyronarine 558,Strides,pyronar-antrine,78,38,US$2.30,Not started,at risk
+Ferroquinoquine 559,Macleods,ferroquin-oquine,79,39,US$2.40,Delayed,Complete
+Ganaplacine 560,Novartis,ganaplac-amine,80,40,US$2.50,Complete,Submitted
+Cipargamoquine 561,Fosun Pharma,cipargam-idine,81,41,US$2.60,In progress,Not started
+Tafenoqine 562,Shin Poong Pharmaceutical,tafenoq-ine,82,42,US$2.70,Not started,at risk
+Piperaqoquine 563,Cipla,piperaq-azine,83,43,US$2.80,Delayed,Complete
+Artemine 564,Ipca Laboratories,artem-antrine,84,44,US$2.90,Complete,Submitted
+Lumefanoquine 565,Guilin Pharmaceutical,lumefan-oquine,85,45,US$3.00,In progress,Not started
+Pyronarine 566,Sanofi,pyronar-amine,86,46,US$3.10,Not started,at risk
+Ferroquinoquine 567,Ajanta Pharma,ferroquin-idine,87,47,US$3.20,Delayed,Complete
+Ganaplacine 568,Strides,ganaplac-ine,88,48,US$3.30,Complete,Submitted
+Cipargamoquine 569,Macleods,cipargam-azine,89,49,US$3.40,In progress,Not started
+Tafenoqine 570,Novartis,tafenoq-antrine,90,50,US$3.50,Not started,at risk
+Piperaqoquine 571,Fosun Pharma,piperaq-oquine,91,51,US$3.60,Delayed,Complete
+Artemine 572,Shin Poong Pharmaceutical,artem-amine,92,52,US$3.70,Complete,Submitted
+Lumefanoquine 573,Cipla,lumefan-idine,93,53,US$3.80,In progress,Not started
+Pyronarine 574,Ipca Laboratories,pyronar-ine,94,54,US$3.90,Not started,at risk
+Ferroquinoquine 575,Guilin Pharmaceutical,ferroquin-azine,95,55,US$4.00,Delayed,Complete
+Ganaplacine 576,Sanofi,ganaplac-antrine,96,56,US$4.10,Complete,Submitted
+Cipargamoquine 577,Ajanta Pharma,cipargam-oquine,97,57,US$4.20,In progress,Not started
+Tafenoqine 578,Strides,tafenoq-amine,98,58,US$4.30,Not started,at risk
+Piperaqoquine 579,Macleods,piperaq-idine,99,59,US$4.40,Delayed,Complete
+Artemine 580,Novartis,artem-ine,100,0,US$0.50,Complete,Submitted
+Lumefanoquine 581,Fosun Pharma,lumefan-azine,101,1,US$0.60,In progress,Not started
+Pyronarine 582,Shin Poong Pharmaceutical,pyronar-antrine,102,2,US$0.70,Not started,at risk
+Ferroquinoquine 583,Cipla,ferroquin-oquine,103,3,US$0.80,Delayed,Complete
+Ganaplacine 584,Ipca Laboratories,ganaplac-amine,104,4,US$0.90,Complete,Submitted
+Cipargamoquine 585,Guilin Pharmaceutical,cipargam-idine,105,5,US$1.00,In progress,Not started
+Tafenoqine 586,Sanofi,tafenoq-ine,106,6,US$1.10,Not started,at risk
+Piperaqoquine 587,Ajanta Pharma,piperaq-azine,107,7,US$1.20,Delayed,Complete
+Artemine 588,Strides,artem-antrine,108,8,US$1.30,Complete,Submitted
+Lumefanoquine 589,Macleods,lumefan-oquine,109,9,US$1.40,In progress,Not started
+Pyronarine 590,Novartis,pyronar-amine,110,10,US$1.50,Not started,at risk
+Ferroquinoquine 591,Fosun Pharma,ferroquin-idine,111,11,US$1.60,Delayed,Complete
+Ganaplacine 592,Shin Poong Pharmaceutical,ganaplac-ine,112,12,US$1.70,Complete,Submitted
+Cipargamoquine 593,Cipla,cipargam-azine,113,13,US$1.80,In progress,Not started
+Tafenoqine 594,Ipca Laboratories,tafenoq-antrine,114,14,US$1.90,Not started,at risk
+Piperaqoquine 595,Guilin Pharmaceutical,piperaq-oquine,115,15,US$2.00,Delayed,Complete
+Artemine 596,Sanofi,artem-amine,116,16,US$2.10,Complete,Submitted
+Lumefanoquine 597,Ajanta Pharma,lumefan-idine,117,17,US$2.20,In progress,Not started
+Pyronarine 598,Strides,pyronar-ine,118,18,US$2.30,Not started,at risk
+Ferroquinoquine 599,Macleods,ferroquin-azine,119,19,US$2.40,Delayed,Complete

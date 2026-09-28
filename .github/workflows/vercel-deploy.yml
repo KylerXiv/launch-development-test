@@ -1,8 +1,12 @@
 name: Trigger Vercel deploy
 
+# workflow_dispatch: proposal-decision.yml merges approved proposals with
+# GITHUB_TOKEN, and a push made that way fires no push workflows — so it
+# starts this one by hand. Production still builds only from main.
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy-hook:

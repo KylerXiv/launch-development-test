@@ -4,7 +4,10 @@
 #
 # Deliberately excluded, and never copied here: briefs/, sourcing/, ontology/,
 # docs/, history/, powerbi/, streamlit-app/, scripts/ itself, and repo files
-# like README.md/CLAUDE.md. Vercel reads the whole private repo to run this
+# like README.md/CLAUDE.md.
+#
+# editor.html is excluded too, and that omission is the ONLY thing keeping the
+# data editor off the public site. It is not an oversight — do not add it. Vercel reads the whole private repo to run this
 # script, but only files copied into $OUT end up on the public URL.
 set -euo pipefail
 
@@ -26,7 +29,8 @@ cp synthetic/index.html synthetic/option-b.html synthetic/pipeline.html \
 
 # Shared data
 cp data/products.js data/products.synthetic.js data/world-map.js \
-   data/world-map-geo.js data/resistance.js data/molecular-markers.js "$OUT/data/"
+   data/world-map-geo.js data/resistance.js data/molecular-markers.js \
+   data/sources.js "$OUT/data/"
 
 # Shared assets
 cp assets/journey-icons/icons.js assets/journey-icons/icons-solid.js "$OUT/assets/journey-icons/"

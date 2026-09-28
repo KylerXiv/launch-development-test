@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Coartem Dispersible",
+    "inn": "artemether-lumefantrine",
+    "manufacturer": "Novartis",
+    "detail": {
+      "price": {
+        "value": "US$1.20",
+        "confirmedInWriting": true
+      },
+      "country": {
+        "registered": 42
+      }
+    }
+  },
+  {
+    "name": "Pyramax Granules",
+    "inn": "pyronaridine-artesunate",
+    "manufacturer": "Shin Poong Pharmaceutical",
+    "detail": {
+      "price": {
+        "value": "US$0.95",
+        "confirmedInWriting": false
+      },
+      "country": {
+        "registered": 25
+      }
+    }
+  }
+]

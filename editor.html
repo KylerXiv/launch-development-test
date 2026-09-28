@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>RBM staging dashboard</title>
+<!--
+  RBM staging dashboard — where analysts edit the LAUNCH dashboard's data.
+
+  INTERNAL. This page is never copied into the public bundle: it is not in the
+  allowlist in scripts/build-public-site.sh, and that omission is deliberate.
+  Do not add it.
+
+  Plain HTML, no build step, no dependencies — same as every other page in this
+  repo, so the editor hands over to RBM inside the same file set as the
+  dashboard it feeds.
+
+  Edits accumulate in a draft. The draft is checked live by the same rules the
+  command line runs (scripts/data-rules.js). Saving requires zero errors and a
+  changelog entry, bumps meta.lastUpdated, and writes the file in house style
+  (scripts/serialize-products.js) so the diff shows only what changed.
+
+  Saving currently downloads the file. Committing it to a branch through the
+  GitHub API is the next piece of work; the gate and the serializer it runs
+  through do not change when that lands.
+
+  Run it with a local server, not file://, or the browser will refuse to fetch
+  the data file. Bind to localhost: without --bind, http.server listens on
+  every network interface and serves this whole private repo to anyone who can
+  reach the machine.
+      python3 -m http.server 8001 --bind 127.0.0.1
+      open http://localhost:8001/editor.html
+-->
+<style>
+  /* Palette taken from the reference image: a deep navy ground with cyan,
+     indigo and magenta. Indigo carries interaction (focus, selection,
+     primary actions); cyan / amber / magenta carry STATUS, so a colour here
+     means the same thing it means on the public dashboard even though the
+     ground is inverted. This is an internal tool and deliberately does not
+     match the dashboard's light skin. */
+  :root{
+    --bg:#080B1F; --bg-2:#0B0F2B;
+    --surface:#0F1535; --surface-2:#141B42; --raised:#18204D;
+    --line:#212B5B; --line-soft:#1A2248;
+    --ink:#EAEEFF; --ink-2:#AFB8E6; --soft:#8B96C9; --faint:#616CA0;
+
+    --accent:#5468FF; --accent-2:#7B8CFF; --accent-dim:#2C3780;
+    --glow:rgba(84,104,255,.40);
+
+    --cyan:#2FE0CE; --cyan-dim:#0E3F44;
+    --amber:#FFB23D; --amber-dim:#4A3316;
+    --magenta:#F42C74; --magenta-dim:#4C1030;
+    --idle:#5A67A0; --idle-dim:#181E44;
+
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --r:10px;
+  }
+  *{box-sizing:border-box;}
+  /* The top bar is sticky, so anything scrolled to would otherwise arrive
+     underneath it. One offset, applied to every scroll target and to the
+     browser's own anchor scrolling. */
+  html{background:var(--bg);scroll-padding-top:76px;scroll-behavior:smooth;}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} }
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+       font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
+       text-rendering:optimizeLegibility;}
+  .wrap{max-width:1240px;margin:0 auto;padding-inline:22px;}
+  ::selection{background:var(--accent);color:#fff;}
+
+  /* ---------- sticky top bar ---------- */
+  /* One background declaration, layered: dots over gradient over a solid
+     base. A `background:` shorthand followed by a `background-image:` longhand
+     silently discards the gradient and leaves the bar see-through — which is
+     exactly what happened here. */
+  .top{position:sticky;top:0;z-index:30;
+       border-bottom:1px solid var(--line);
+       background-color:#090C22;
+       background-image:
+         radial-gradient(circle at 1px 1px,rgba(122,140,255,.16) 1px,transparent 0),
+         linear-gradient(180deg,#0A0E28 0%,#090C22 100%);
+       background-size:22px 22px,100% 100%;
+       background-repeat:repeat,no-repeat;}
+  .top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
+              background:linear-gradient(90deg,transparent,var(--cyan),var(--accent),var(--magenta),transparent);
+              opacity:.55;}
+  .top .wrap{display:flex;flex-wrap:wrap;gap:9px 18px;align-items:center;
+             padding-block:13px;}
+  .top h1{margin:0;font-size:15.5px;font-weight:650;letter-spacing:-0.01em;}
+  .top .file{font-family:var(--mono);font-size:11.5px;color:var(--faint);}
+  .top .who{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+            color:var(--cyan);border:1px solid rgba(47,224,206,.3);background:var(--cyan-dim);
+            padding:3px 9px;border-radius:999px;white-space:nowrap;}
+  .top .spacer{flex:1;}
+
+  .pill{font-size:10.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+        padding:4px 10px;border-radius:999px;white-space:nowrap;border:1px solid;}
+  .pill-draft{color:var(--amber);border-color:rgba(255,178,61,.45);background:var(--amber-dim);}
+  .pill-live{color:var(--cyan);border-color:rgba(47,224,206,.45);background:var(--cyan-dim);}
+  .pill-illustrative,.pill-unknown{color:var(--soft);border-color:var(--line);background:var(--surface);}
+  .pill-dirty{color:var(--accent-2);border-color:rgba(123,140,255,.5);background:rgba(84,104,255,.13);}
+  .pill-clean{color:var(--faint);border-color:var(--line-soft);background:transparent;}
+
+  .mini{display:inline-flex;align-items:baseline;gap:6px;font-size:12px;
+        padding:4px 11px;border-radius:999px;font-variant-numeric:tabular-nums;
+        border:1px solid;}
+  .mini b{font-size:14px;font-weight:700;}
+  .mini-err{color:var(--magenta);border-color:rgba(244,44,116,.5);background:var(--magenta-dim);
+            box-shadow:0 0 16px rgba(244,44,116,.22);}
+  .mini-warn{color:var(--amber);border-color:rgba(255,178,61,.45);background:var(--amber-dim);}
+  .mini-ok{color:var(--cyan);border-color:rgba(47,224,206,.38);background:var(--cyan-dim);}
+
+  /* ---------- buttons ---------- */
+  button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid transparent;
+         padding:7px 14px;font-size:13.5px;font-weight:600;
+         transition:background .15s,border-color .15s,box-shadow .15s,color .15s;}
+  button:focus-visible{outline:none;box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent-2);}
+  .btn-small{background:var(--surface-2);color:var(--ink-2);border-color:var(--line);
+             padding:6px 12px;font-size:12.5px;font-weight:500;}
+  .btn-small:hover{background:var(--raised);border-color:var(--accent-dim);color:var(--ink);}
+  .btn-add{background:rgba(84,104,255,.12);color:var(--accent-2);
+           border-color:rgba(84,104,255,.42);}
+  .btn-add:hover{background:rgba(84,104,255,.22);box-shadow:0 0 18px var(--glow);}
+  .btn-del{background:transparent;color:var(--magenta);border-color:rgba(244,44,116,.32);
+           padding:5px 11px;font-size:12px;font-weight:500;}
+  .btn-del:hover{background:var(--magenta-dim);border-color:var(--magenta);}
+  .btn-save{background:linear-gradient(135deg,var(--accent) 0%,#6E5CFF 100%);color:#fff;
+            padding:10px 22px;font-size:14px;box-shadow:0 0 22px var(--glow);}
+  .btn-save:hover:not(:disabled){box-shadow:0 0 30px var(--glow);}
+  .btn-save:disabled{background:var(--surface-2);color:var(--faint);
+                     border-color:var(--line);box-shadow:none;cursor:not-allowed;}
+  .btn-reset{background:transparent;color:var(--soft);border-color:var(--line);}
+  .btn-reset:hover:not(:disabled){color:var(--magenta);border-color:rgba(244,44,116,.45);}
+  .btn-reset:disabled{color:var(--faint);opacity:.45;cursor:not-allowed;}
+
+  /* ---------- panels ---------- */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+         margin-bottom:18px;overflow:hidden;
+         box-shadow:0 1px 0 rgba(255,255,255,.03) inset;}
+  .panel-h{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;
+           padding:14px 18px;border-bottom:1px solid var(--line-soft);
+           background:linear-gradient(180deg,rgba(255,255,255,.022),transparent);}
+  .panel-h h2{margin:0;font-size:13px;font-weight:700;letter-spacing:0.09em;
+              text-transform:uppercase;color:var(--ink);}
+  .panel-h .sub{font-size:12.5px;color:var(--soft);}
+  .panel-h .spacer{flex:1;}
+  .panel-b{padding:16px 18px;}
+
+  /* ---------- findings ---------- */
+  .findings{margin:0;padding:0;list-style:none;max-height:300px;overflow-y:auto;}
+  .findings li{display:grid;grid-template-columns:78px 1fr;gap:13px;
+               padding:9px 18px;border-bottom:1px solid var(--line-soft);font-size:13.5px;
+               color:var(--ink-2);}
+  .findings li:last-child{border-bottom:none;}
+  .findings .lvl{font-family:var(--sans);font-size:11px;font-weight:700;
+                 letter-spacing:0.04em;padding-top:2px;white-space:nowrap;}
+  .findings .where{color:var(--ink);font-weight:600;}
+  .lvl-error{color:var(--magenta);}
+  .lvl-warn{color:var(--amber);}
+  .none{padding:15px 18px;color:var(--soft);font-size:13.5px;}
+
+  /* ---------- product tabs ---------- */
+  .tabs{display:flex;flex-wrap:wrap;gap:7px;padding:14px 18px;
+        border-bottom:1px solid var(--line-soft);align-items:center;}
+  .tab{background:var(--surface-2);border:1px solid var(--line);border-radius:999px;
+       padding:7px 15px;font-size:13px;font-weight:500;color:var(--ink-2);}
+  .tab:hover{border-color:var(--accent-dim);color:var(--ink);}
+  .tab[aria-selected="true"]{background:rgba(84,104,255,.16);border-color:var(--accent);
+       color:#fff;box-shadow:0 0 18px var(--glow);}
+  .tab .edited{color:var(--amber);font-weight:800;margin-left:6px;}
+  .tabs .spacer{flex:1;}
+
+  /* ---------- form fields ---------- */
+  .sect{border-bottom:1px solid var(--line-soft);padding:18px;}
+  .sect:last-child{border-bottom:none;}
+  .sect > h3{margin:0 0 4px 0;font-size:10.5px;font-weight:700;letter-spacing:0.13em;
+             text-transform:uppercase;color:var(--accent-2);}
+  .sect > .hint{margin:0 0 13px 0;font-size:12.5px;color:var(--soft);max-width:70ch;}
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));}
+  .grid.wide{grid-template-columns:repeat(auto-fit,minmax(330px,1fr));}
+  .grid + .grid{margin-top:14px;}
+  .sect > .grid + .rows, .sect > .rows{margin-top:14px;}
+  .sect > .rows + .btn-small,.sect > .rows + .btn-add{margin-top:12px;}
+  .sect > .f.check{margin-top:14px;}
+  .f{display:flex;flex-direction:column;gap:5px;min-width:0;}
+  .f > label{font-size:10.5px;font-weight:600;letter-spacing:0.09em;
+             text-transform:uppercase;color:var(--soft);}
+  .f input[type=text],.f input[type=number],.f select,.f textarea{
+      font:inherit;font-size:13.5px;color:var(--ink);background:var(--bg-2);
+      border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;
+      transition:border-color .15s,box-shadow .15s,background .15s;}
+  .f textarea{resize:vertical;min-height:62px;line-height:1.5;}
+  .f input::placeholder,.f textarea::placeholder{color:var(--faint);}
+  .f input:hover,.f select:hover,.f textarea:hover{border-color:var(--accent-dim);}
+  .f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--accent);
+      background:var(--surface);box-shadow:0 0 0 3px rgba(84,104,255,.18);}
+  .f select{appearance:none;cursor:pointer;
+      background-image:linear-gradient(45deg,transparent 50%,var(--soft) 50%),
+                       linear-gradient(135deg,var(--soft) 50%,transparent 50%);
+      background-position:calc(100% - 17px) 52%,calc(100% - 12px) 52%;
+      background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px;}
+  .f select option{background:var(--surface);color:var(--ink);}
+  .f .help{font-size:11.5px;color:var(--faint);}
+  .f.check{flex-direction:row;align-items:center;gap:10px;}
+  .f.check input{width:auto;accent-color:var(--accent);width:16px;height:16px;cursor:pointer;}
+  .f.check label{text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;
+                 color:var(--ink-2);cursor:pointer;}
+  .f.mono input,.f.mono textarea{font-family:var(--mono);font-size:12.5px;}
+  .f.bad input,.f.bad textarea{border-color:var(--magenta);
+      box-shadow:0 0 0 3px rgba(244,44,116,.15);}
+
+  /* ---------- medicine summary ---------- */
+  .mhead{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding:18px;
+         border-bottom:1px solid var(--line-soft);
+         background:radial-gradient(120% 140% at 0% 0%,rgba(84,104,255,.10),transparent 60%);}
+  .ring{flex:0 0 auto;position:relative;width:104px;height:104px;}
+  .ring svg{width:104px;height:104px;display:block;}
+  .ring .rc{position:absolute;inset:0;display:flex;flex-direction:column;
+            align-items:center;justify-content:center;pointer-events:none;}
+  .ring .rn{font-size:25px;font-weight:700;line-height:1;letter-spacing:-0.02em;}
+  .ring .rl{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;
+            color:var(--faint);margin-top:3px;}
+  .mfacts{flex:1;min-width:230px;display:flex;flex-direction:column;gap:9px;}
+  .mfacts .mt{font-size:20px;font-weight:650;letter-spacing:-0.02em;line-height:1.15;}
+  .mfacts .ms{font-size:12.5px;color:var(--soft);}
+  .counts{display:flex;flex-wrap:wrap;gap:7px;}
+  .cnt{display:inline-flex;align-items:baseline;gap:6px;font-size:12px;
+       padding:4px 10px;border-radius:999px;border:1px solid;
+       font-variant-numeric:tabular-nums;}
+  .cnt b{font-size:13px;font-weight:700;}
+  .cnt-done{color:var(--cyan);border-color:rgba(47,224,206,.34);background:var(--cyan-dim);}
+  .cnt-prog{color:var(--amber);border-color:rgba(255,178,61,.34);background:var(--amber-dim);}
+  .cnt-late{color:var(--magenta);border-color:rgba(244,44,116,.38);background:var(--magenta-dim);
+            box-shadow:0 0 16px rgba(244,44,116,.18);}
+  .cnt-idle{color:var(--soft);border-color:var(--line);background:transparent;}
+  .mbar{font-size:12.5px;color:var(--magenta);display:flex;gap:8px;align-items:flex-start;
+        max-width:62ch;}
+  .mbar svg{flex:0 0 auto;margin-top:3px;}
+
+  /* ---------- step track ---------- */
+  .steps{display:flex;align-items:flex-start;gap:0;padding:16px 18px 6px;
+         overflow-x:auto;}
+  .stepn{flex:1 1 0;min-width:72px;background:none;border:0;padding:0;
+         display:flex;flex-direction:column;align-items:center;gap:7px;
+         cursor:pointer;position:relative;color:inherit;font-weight:500;}
+  .stepn::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;
+                 background:var(--line);z-index:0;}
+  .stepn:first-child::before{display:none;}
+  .stepn.after-done::before{background:var(--cyan);opacity:.5;}
+  .stepn .dot{width:22px;height:22px;border-radius:50%;z-index:1;position:relative;
+              border:2px solid var(--line);background:var(--surface);
+              display:flex;align-items:center;justify-content:center;
+              transition:transform .18s,box-shadow .18s;}
+  .stepn .dot::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--idle);}
+  .stepn.done .dot{border-color:var(--cyan);}
+  .stepn.done .dot::after{background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+  .stepn.prog .dot{border-color:var(--amber);}
+  .stepn.prog .dot::after{background:var(--amber);box-shadow:0 0 10px var(--amber);}
+  .stepn.late .dot{border-color:var(--magenta);}
+  .stepn.late .dot::after{background:var(--magenta);box-shadow:0 0 12px var(--magenta);}
+  .stepn.current .dot{transform:scale(1.28);box-shadow:0 0 0 4px rgba(84,104,255,.22);}
+  .stepn:hover .dot{transform:scale(1.18);}
+  .stepn .sl{font-size:10px;line-height:1.3;text-align:center;color:var(--soft);
+             max-width:94px;}
+  .stepn.current .sl{color:var(--ink);font-weight:600;}
+  .stepn:focus-visible{outline:none;}
+  .stepn:focus-visible .dot{box-shadow:0 0 0 3px var(--accent-2);}
+
+  /* ---------- import ---------- */
+  .imp-drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:26px 18px;
+            text-align:center;color:var(--soft);font-size:13.5px;margin:0 18px 16px;
+            transition:border-color .15s,background .15s;}
+  .imp-drop.over{border-color:var(--accent);background:rgba(84,104,255,.08);color:var(--ink);}
+  .imp-drop b{display:block;color:var(--ink);font-size:15px;margin-bottom:5px;}
+  .imp-notice{display:flex;flex-direction:column;gap:4px;margin:0 18px 14px;
+              padding:12px 14px;border-radius:8px;border:1px solid;font-size:13px;
+              line-height:1.55;}
+  .imp-notice b{font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;}
+  .imp-notice.stop{color:var(--magenta);border-color:rgba(244,44,116,.45);
+                   background:var(--magenta-dim);box-shadow:0 0 22px rgba(244,44,116,.16);}
+  .imp-notice.stop span{color:var(--ink);}
+  .imp-notice.warn{color:var(--amber);border-color:rgba(255,178,61,.4);background:var(--amber-dim);}
+  .imp-notice.warn span{color:var(--ink-2);}
+  .imp-sum{display:flex;flex-wrap:wrap;gap:9px;padding:0 18px 14px;}
+  .imp-files{padding:0 18px 12px;font-size:12.5px;color:var(--soft);}
+  .imp-files code{font-family:var(--mono);color:var(--ink-2);}
+  .maps{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+        padding:0 18px 14px;}
+  .map{display:flex;align-items:center;gap:9px;background:var(--surface-2);
+       border:1px solid var(--line);border-radius:8px;padding:8px 10px;}
+  .map .col{flex:1;min-width:0;font-family:var(--mono);font-size:12px;color:var(--ink);
+            overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .map .arw{color:var(--faint);}
+  .map select{flex:1.1;font:inherit;font-size:12.5px;color:var(--ink);background:var(--bg-2);
+              border:1px solid var(--line);border-radius:6px;padding:5px 7px;min-width:0;}
+  .map.off{opacity:.55;}
+  .plan{max-height:420px;overflow-y:auto;border-top:1px solid var(--line-soft);}
+  .prow{display:grid;grid-template-columns:26px 1fr;gap:11px;padding:11px 18px;
+        border-bottom:1px solid var(--line-soft);}
+  .prow:last-child{border-bottom:none;}
+  .prow input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin-top:3px;}
+  .prow .pt{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:4px;}
+  .prow .pn{font-weight:600;font-size:14px;}
+  .kind{font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;
+        padding:2px 7px;border-radius:999px;border:1px solid;}
+  .kind-new{color:var(--cyan);border-color:rgba(47,224,206,.4);background:var(--cyan-dim);}
+  .kind-upd{color:var(--accent-2);border-color:rgba(84,104,255,.45);background:rgba(84,104,255,.12);}
+  .kind-skip{color:var(--faint);border-color:var(--line);}
+  .prow .src{font-family:var(--mono);font-size:10.5px;color:var(--faint);}
+  .chg{font-size:12.5px;color:var(--ink-2);line-height:1.6;}
+  .chg .chg-k{color:var(--soft);}
+  .chg .was{color:var(--faint);text-decoration:line-through;}
+  .chg .now{color:var(--cyan);}
+  .pissue{font-size:12px;color:var(--amber);margin-top:4px;}
+  .imp-act{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 18px;
+           border-top:1px solid var(--line-soft);}
+  .imp-act .note{font-size:12.5px;color:var(--soft);}
+  .btn-apply{background:linear-gradient(135deg,var(--accent),#6E5CFF);color:#fff;
+             padding:9px 20px;box-shadow:0 0 20px var(--glow);}
+  .btn-apply:disabled{background:var(--surface-2);color:var(--faint);
+                      border-color:var(--line);box-shadow:none;cursor:not-allowed;}
+
+  /* ---------- tab status dot ---------- */
+  .tab .tdot{display:inline-block;width:7px;height:7px;border-radius:50%;
+             margin-right:7px;vertical-align:1px;background:var(--idle);}
+  .tab .tdot.ok{background:var(--cyan);box-shadow:0 0 7px var(--cyan);}
+  .tab .tdot.warn{background:var(--amber);box-shadow:0 0 7px var(--amber);}
+  .tab .tdot.err{background:var(--magenta);box-shadow:0 0 8px var(--magenta);}
+
+  /* ---------- stage cards ---------- */
+  .track{display:grid;gap:11px;grid-template-columns:repeat(4,1fr);}
+  @media (max-width:1060px){ .track{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:640px){ .track{grid-template-columns:1fr;} }
+  .stage{border:1px solid var(--line);border-radius:var(--r);padding:12px;
+         display:flex;flex-direction:column;gap:9px;background:var(--surface-2);
+         position:relative;overflow:hidden;}
+  .stage::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:var(--idle);}
+  .stage.done::before{background:var(--cyan);box-shadow:0 0 12px rgba(47,224,206,.6);}
+  .stage.prog::before{background:var(--amber);box-shadow:0 0 12px rgba(255,178,61,.55);}
+  .stage.late::before{background:var(--magenta);box-shadow:0 0 12px rgba(244,44,116,.6);}
+  .stage.late{background:linear-gradient(180deg,rgba(244,44,116,.07),transparent 60%),var(--surface-2);}
+  .stage.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 24px var(--glow);}
+  .stage > .nm{font-size:10.5px;font-weight:700;letter-spacing:0.09em;
+               text-transform:uppercase;color:var(--ink-2);}
+  .stage .row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+
+  /* ---------- row tables ---------- */
+  .rows{display:flex;flex-direction:column;gap:10px;}
+  .row-item{border:1px solid var(--line);border-radius:var(--r);padding:12px;
+            display:flex;flex-direction:column;gap:10px;background:var(--surface-2);}
+  .row-item .row-top{display:flex;gap:10px;align-items:center;}
+  .row-item .row-top .n{font-family:var(--mono);font-size:11px;color:var(--faint);
+                        min-width:24px;}
+  .row-item .row-top .spacer{flex:1;}
+  .inline{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));}
+  .add-row{align-self:flex-start;}
+
+  /* ---------- danger zone ---------- */
+  .danger{border-top:1px solid rgba(244,44,116,.25);padding:16px 18px;
+          background:linear-gradient(180deg,rgba(244,44,116,.05),transparent);}
+  .danger h3{margin:0 0 4px 0;font-size:10.5px;font-weight:700;letter-spacing:0.13em;
+             text-transform:uppercase;color:var(--magenta);}
+  .danger p{margin:0 0 11px 0;font-size:12.5px;color:var(--soft);max-width:70ch;}
+  .danger .confirm{display:flex;flex-wrap:wrap;gap:9px;align-items:center;
+                   font-size:13px;color:var(--magenta);}
+
+  /* ---------- preview ---------- */
+  .prev-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 18px;
+            border-bottom:1px solid var(--line-soft);}
+  .prev-bar .spacer{flex:1;}
+  .prev-state{font-size:12.5px;color:var(--soft);}
+  .prev-state.stale{color:var(--amber);}
+  .prev-frame{width:100%;height:74vh;min-height:440px;border:0;display:block;
+              background:#fff;}
+  .prev-empty{padding:28px 18px;color:var(--soft);font-size:13.5px;}
+
+  /* ---------- save ---------- */
+  .save .panel-b{display:flex;flex-direction:column;gap:14px;}
+  .gate{display:flex;flex-direction:column;gap:7px;margin:0;padding:0;list-style:none;}
+  .gate li{display:flex;gap:10px;align-items:baseline;font-size:13.5px;color:var(--ink-2);}
+  .gate .mark{font-weight:800;min-width:16px;}
+  .gate li.pass .mark{color:var(--cyan);}
+  .gate li.fail .mark{color:var(--magenta);}
+  .gate li.fail{color:var(--soft);}
+  .changes{font-size:13px;color:var(--soft);background:var(--bg-2);border-radius:8px;
+           padding:11px 13px;border:1px solid var(--line-soft);}
+  .changes b{color:var(--accent-2);}
+  .save-actions{display:flex;flex-wrap:wrap;gap:11px;align-items:center;}
+  .save-actions .note{font-size:12.5px;}
+
+  /* ---------- changelog ---------- */
+  .cl{margin:0;padding:0;list-style:none;max-height:280px;overflow-y:auto;}
+  .cl li{display:grid;grid-template-columns:100px 124px 1fr;gap:13px;padding:9px 18px;
+         border-bottom:1px solid var(--line-soft);font-size:13.5px;color:var(--ink-2);}
+  .cl li:last-child{border-bottom:none;}
+  .cl .d{font-family:var(--mono);font-size:11.5px;color:var(--faint);}
+  .cl .p{font-weight:600;font-size:13px;color:var(--ink);}
+  .cl li.new{background:rgba(84,104,255,.10);}
+
+  .boot{padding:30px 18px;font-size:14px;color:var(--ink-2);}
+  .boot code{display:block;font-family:var(--mono);font-size:13px;background:var(--bg-2);
+             color:var(--cyan);padding:12px 15px;border-radius:8px;margin-top:12px;
+             white-space:pre-wrap;border:1px solid var(--line);}
+  .boot .bad{color:var(--magenta);font-weight:600;}
+  .foot{padding-block:8px 64px;font-size:12.5px;color:var(--faint);max-width:80ch;}
+  .foot code{font-family:var(--mono);color:var(--soft);}
+
+  ::-webkit-scrollbar{width:11px;height:11px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;
+                            border:3px solid var(--bg);}
+  ::-webkit-scrollbar-thumb:hover{background:var(--accent-dim);}
+
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+  @media (max-width:660px){
+    .cl li{grid-template-columns:1fr;gap:3px;}
+    .findings li{grid-template-columns:1fr;gap:2px;}
+    .stage .row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <h1>RBM staging dashboard</h1>
+    <span class="who">for analysts</span>
+    <span class="file">data/products.js</span>
+    <span id="statusPill" class="pill pill-unknown">…</span>
+    <span class="spacer"></span>
+    <span id="dirtyPill" class="pill pill-clean">No changes</span>
+    <span id="miniChecks"></span>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="boot" class="panel"><div class="boot">Loading…</div></div>
+
+  <div id="app" hidden>
+    <div class="panel">
+      <div class="panel-h">
+        <h2>Checks</h2>
+        <span class="sub">Your changes are checked as you type, using the same rules the whole team uses</span>
+      </div>
+      <div id="findings"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">
+        <h2>Medicines</h2>
+        <span class="sub" id="prodSub"></span>
+      </div>
+      <div class="tabs" id="tabs" role="tablist"></div>
+      <div id="editor"></div>
+    </div>
+
+    <div class="panel" id="importPanel" hidden>
+      <div class="panel-h">
+        <h2>Import</h2>
+        <span class="sub" id="impSub">Nothing loaded yet</span>
+        <span class="spacer"></span>
+        <button type="button" class="btn-small" id="impClose">Close</button>
+      </div>
+      <div id="impBody"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">
+        <h2>Preview</h2>
+        <span class="sub">See your changes on the real dashboard page, before anyone else does</span>
+      </div>
+      <div class="prev-bar">
+        <button type="button" class="btn-small" id="btnPreview">Show preview</button>
+        <button type="button" class="btn-small" id="btnPreviewRefresh" hidden>Refresh</button>
+        <span class="prev-state" id="prevState"></span>
+        <span class="spacer"></span>
+        <button type="button" class="btn-small" id="btnPreviewTab" hidden>Open in new tab</button>
+      </div>
+      <div id="prevHost"></div>
+    </div>
+
+    <div class="panel save">
+      <div class="panel-h">
+        <h2>Save</h2>
+        <span class="sub">Every change needs a short note saying what changed. It becomes the public record.</span>
+      </div>
+      <div class="panel-b">
+        <div class="grid wide">
+          <div class="f">
+            <label for="clProduct">Which medicine?</label>
+            <select id="clProduct"></select>
+            <span class="help">Choose All if it affects more than one.</span>
+          </div>
+          <div class="f">
+            <label for="clChange">What changed?</label>
+            <textarea id="clChange" placeholder="e.g. Pyramax: WHO PQ listing confirmed, 14 March 2026."></textarea>
+            <span class="help">At least 10 characters. This gets published.</span>
+          </div>
+          <div class="f">
+            <label for="clPlain">Simpler wording <span style="text-transform:none;font-weight:400">(optional)</span></label>
+            <textarea id="clPlain" placeholder="For readers who are not specialists."></textarea>
+          </div>
+        </div>
+        <ul class="gate" id="gate"></ul>
+        <div class="changes" id="changes"></div>
+        <div class="save-actions">
+          <button type="button" class="btn-save" id="btnSave" disabled>Save changes</button>
+          <button type="button" class="btn-reset" id="btnReset" disabled>Discard changes</button>
+          <span class="note" id="saveNote"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">
+        <h2>Recent changes</h2>
+        <span class="sub">Newest first</span>
+      </div>
+      <ul class="cl" id="changelog"></ul>
+    </div>
+
+    <p class="foot">Anything without its own box appears under “Other fields” for each
+      medicine, in its raw format. The drug-resistance and marker maps are not edited
+      here — those are rebuilt automatically from WHO data.</p>
+  </div>
+</div>
+
+<input type="file" id="impFile" multiple hidden
+       accept=".csv,.tsv,.txt,.tab,.json,.js,.jsonl,.ndjson,.xlsx,.xls,text/csv,text/plain,application/json">
+<script src="scripts/data-rules.js"></script>
+<script src="scripts/import-lib.js"></script>
+<script src="scripts/serialize-products.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var STATUSES = ["done", "prog", "late", "idle"];
+  var STATUS_LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
+  // Stored values stay exactly as the data contract defines them; only the
+  // words on screen change, so nothing downstream has to know about this.
+  var PHASES = [
+    { value: "preclinical", label: "Preclinical" },
+    { value: "phase1", label: "Phase I trials" },
+    { value: "phase2", label: "Phase II trials" },
+    { value: "phase3", label: "Phase III trials" },
+    { value: "regulatory", label: "With regulators" },
+    { value: "access", label: "Reaching patients" }
+  ];
+  var CLASSES = [
+    { value: "pipeline", label: "Still in development" },
+    { value: "market", label: "Already on the market" }
+  ];
+  var DATA_STATUSES = [
+    { value: "illustrative", label: "Illustrative \u2014 example figures only" },
+    { value: "draft", label: "Draft \u2014 not yet verified" },
+    { value: "live", label: "Live \u2014 verified and quotable" }
+  ];
+  var COUNTRY_STATUSES = [
+    { value: "illustrative", label: "Illustrative \u2014 example only" },
+    { value: "draft", label: "Draft \u2014 not yet checked" },
+    { value: "verified", label: "Verified" }
+  ];
+  var LEVELS = [
+    { value: "registered", label: "Approved for sale" },
+    { value: "guidelines", label: "In national guidelines" },
+    { value: "mft", label: "Used alongside other treatments" }
+  ];
+  var COUNT_KEYS = ["registered", "inGuidelines", "inMft", "forecastDemand"];
+  // Rendered by a dedicated form above; everything else falls to the raw box,
+  // so a schema addition degrades to "editable as JSON" rather than "invisible".
+  var FORMED_DETAIL = ["price", "country", "countries", "journey", "milestones"];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { raw: "", original: null, draft: null, selected: 0, saved: false };
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined && text !== null) n.textContent = String(text);
+    return n;
+  }
+  function clone(v) { return JSON.parse(JSON.stringify(v)); }
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") +
+           "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  // ---------------------------------------------------------------- fields
+  // Every builder binds straight to the draft object it is given, so typing
+  // never re-renders the form — only the checks panel refreshes. Re-rendering
+  // inputs on keystroke would steal focus mid-word.
+
+  function field(labelText, cls) {
+    var f = el("div", "f" + (cls ? " " + cls : ""));
+    var id = "f" + (field.n = (field.n || 0) + 1);
+    var l = el("label", null, labelText);
+    l.setAttribute("for", id);
+    f.appendChild(l);
+    f._id = id;
+    return f;
+  }
+  function help(f, text) { if (text) f.appendChild(el("span", "help", text)); return f; }
+
+  function autosize(t) {
+    t.style.height = "auto";
+    t.style.height = Math.min(t.scrollHeight + 2, 340) + "px";
+  }
+  function autosizeAll(root) {
+    var list = root.querySelectorAll("textarea");
+    for (var i = 0; i < list.length; i++) autosize(list[i]);
+  }
+
+  function textField(label, obj, key, opts) {
+    opts = opts || {};
+    var f = field(label, opts.mono ? "mono" : null);
+    var i = document.createElement(opts.area ? "textarea" : "input");
+    if (!opts.area) i.type = "text";
+    i.id = f._id;
+    i.value = obj[key] === undefined || obj[key] === null ? "" : String(obj[key]);
+    if (opts.placeholder) i.placeholder = opts.placeholder;
+    i.addEventListener("input", function () {
+      var v = i.value;
+      if (v === "" && opts.dropEmpty) delete obj[key];
+      else obj[key] = v;
+      if (opts.area) autosize(i);
+      touched();
+    });
+    f.insertBefore(i, f.firstChild.nextSibling);
+    return help(f, opts.help);
+  }
+
+  function selectField(label, obj, key, options, opts) {
+    opts = opts || {};
+    var f = field(label);
+    var s = document.createElement("select");
+    s.id = f._id;
+    options.forEach(function (o) {
+      var v = typeof o === "object" ? o.value : o;
+      var t = typeof o === "object" ? o.label : o;
+      var op = el("option", null, t);
+      op.value = v;
+      s.appendChild(op);
+    });
+    s.value = obj[key];
+    s.addEventListener("change", function () {
+      obj[key] = opts.number ? Number(s.value) : s.value;
+      if (opts.onChange) opts.onChange();
+      touched();
+    });
+    f.appendChild(s);
+    return help(f, opts.help);
+  }
+
+  function checkField(label, obj, key) {
+    var f = el("div", "f check");
+    var id = "f" + (field.n = (field.n || 0) + 1);
+    var i = document.createElement("input");
+    i.type = "checkbox";
+    i.id = id;
+    i.checked = obj[key] === true;
+    i.addEventListener("change", function () { obj[key] = i.checked; touched(); });
+    var l = el("label", null, label);
+    l.setAttribute("for", id);
+    f.appendChild(i);
+    f.appendChild(l);
+    return f;
+  }
+
+  // Counts are an integer or the literal "TBC" — an admitted gap is better
+  // than an invented number, so the field accepts both and nothing else.
+  function countField(label, obj, key) {
+    var f = field(label);
+    var i = document.createElement("input");
+    i.type = "text";
+    i.id = f._id;
+    i.value = obj[key] === undefined ? "" : String(obj[key]);
+    i.addEventListener("input", function () {
+      var v = i.value.trim();
+      if (v === "") { delete obj[key]; }
+      else if (/^\d+$/.test(v)) { obj[key] = parseInt(v, 10); }
+      else { obj[key] = v; }
+      f.classList.toggle("bad", v !== "" && v !== "TBC" && !/^\d+$/.test(v));
+      touched();
+    });
+    f.appendChild(i);
+    return help(f, "A number, or write TBC if not known yet");
+  }
+
+  // Gate years are the same shape: a year, or "TBC" for one not yet reached.
+  function yearField(label, obj, key) {
+    var f = field(label);
+    var i = document.createElement("input");
+    i.type = "text";
+    i.id = f._id;
+    i.value = obj[key] === undefined ? "" : String(obj[key]);
+    i.addEventListener("input", function () {
+      var v = i.value.trim();
+      if (v === "") delete obj[key];
+      else if (/^\d{4}$/.test(v)) obj[key] = parseInt(v, 10);
+      else obj[key] = v;
+      f.classList.toggle("bad", v !== "" && v !== "TBC" && !/^\d{4}$/.test(v));
+      touched();
+    });
+    f.appendChild(i);
+    return help(f, "A year, or write TBC if not reached yet");
+  }
+
+  // The product id is the key everything else joins on — the changelog, the
+  // ontology export, the widget's ?product= parameter. It has the validator's
+  // own shape rule (lowercase letters, digits, hyphens) and must be unique, so
+  // it gets its own field rather than a plain text box.
+  function idField(p) {
+    var f = field("Short name (for links)", "mono");
+    var i = document.createElement("input");
+    i.type = "text";
+    i.id = f._id;
+    i.value = p.id || "";
+    var msg = el("span", "help", "Lowercase letters, numbers and hyphens. Appears in web links.");
+    i.addEventListener("input", function () {
+      var v = i.value.trim();
+      p.id = v;
+      var taken = state.draft.products.filter(function (o) { return o !== p && o.id === v; }).length > 0;
+      var badShape = v !== "" && !/^[a-z0-9-]+$/.test(v);
+      f.classList.toggle("bad", badShape || taken || v === "");
+      msg.textContent = v === "" ? "This is required."
+        : badShape ? "Only lowercase letters, numbers and hyphens."
+        : taken ? "Another medicine is already using this."
+        : "Lowercase letters, numbers and hyphens. Appears in web links.";
+      touched();
+    });
+    f.appendChild(i);
+    f.appendChild(msg);
+    return f;
+  }
+
+  function jsonField(label, holder, key, hint) {
+    var f = field(label, "mono");
+    var t = document.createElement("textarea");
+    t.id = f._id;
+    t.rows = 6;
+    t.value = JSON.stringify(holder[key], null, 2);
+    var msg = el("span", "help", hint || "");
+    t.addEventListener("input", function () {
+      autosize(t);
+      try {
+        holder[key] = JSON.parse(t.value);
+        f.classList.remove("bad");
+        msg.textContent = hint || "";
+        touched();
+      } catch (e) {
+        f.classList.add("bad");
+        msg.textContent = "Not valid JSON — " + e.message + " (not applied)";
+      }
+    });
+    f.appendChild(t);
+    f.appendChild(msg);
+    return f;
+  }
+
+  var STATUS_COLOUR = { done: "var(--cyan)", prog: "var(--amber)",
+                        late: "var(--magenta)", idle: "var(--idle)" };
+
+  function svgEl(tag, attrs) {
+    var n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) if (attrs.hasOwnProperty(k)) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  // One arc per step, coloured by its status. A plain percentage would hide
+  // the thing worth seeing — not "how far along" but "where it is stuck".
+  function progressRing(p) {
+    var n = p.stages.length, R = 42, C = 2 * Math.PI * R, seg = C / n, gap = 5;
+    var wrap = el("div", "ring");
+    var svg = svgEl("svg", { viewBox: "0 0 104 104", role: "img" });
+    var done = 0;
+    p.stages.forEach(function (st) { if (st.status === "done") done++; });
+    svg.setAttribute("aria-label", done + " of " + n + " steps complete");
+
+    svg.appendChild(svgEl("circle", {
+      cx: 52, cy: 52, r: R, fill: "none", stroke: "var(--line-soft)", "stroke-width": 8
+    }));
+    p.stages.forEach(function (st, i) {
+      svg.appendChild(svgEl("circle", {
+        cx: 52, cy: 52, r: R, fill: "none",
+        stroke: STATUS_COLOUR[st.status] || STATUS_COLOUR.idle,
+        "stroke-width": st.status === "idle" ? 6 : 8,
+        "stroke-linecap": "round",
+        "stroke-dasharray": (seg - gap) + " " + (C - seg + gap),
+        "stroke-dashoffset": -i * seg,
+        transform: "rotate(-90 52 52)",
+        opacity: st.status === "idle" ? ".45" : "1"
+      }));
+    });
+    wrap.appendChild(svg);
+    var c = el("div", "rc");
+    var num = el("div", "rn", done + "/" + n);
+    num.style.color = done === n ? "var(--cyan)" : "var(--ink)";
+    c.appendChild(num);
+    c.appendChild(el("div", "rl", "steps done"));
+    wrap.appendChild(c);
+    return wrap;
+  }
+
+  function medicineHeader(p, data) {
+    var h = el("div", "mhead");
+    h.appendChild(progressRing(p));
+    var f = el("div", "mfacts");
+    f.appendChild(el("div", "mt", p.name || "(unnamed medicine)"));
+    var bits = [p.manufacturer, p.inn].filter(Boolean).join("  \u00b7  ");
+    if (bits) f.appendChild(el("div", "ms", bits));
+
+    var tally = { done: 0, prog: 0, late: 0, idle: 0 };
+    p.stages.forEach(function (st) { tally[st.status] = (tally[st.status] || 0) + 1; });
+    var counts = el("div", "counts");
+    [["done", "complete"], ["prog", "in progress"], ["late", "delayed"], ["idle", "not started"]]
+      .forEach(function (pair) {
+        if (!tally[pair[0]]) return;
+        var c = el("span", "cnt cnt-" + pair[0]);
+        c.appendChild(el("b", null, tally[pair[0]]));
+        c.appendChild(el("span", null, pair[1]));
+        counts.appendChild(c);
+      });
+    f.appendChild(counts);
+
+    if (p.flag) {
+      var bar = el("div", "mbar");
+      var ic = svgEl("svg", { width: 13, height: 13, viewBox: "0 0 16 16" });
+      ic.appendChild(svgEl("path", {
+        d: "M8 1.5 15 14H1z", fill: "none", stroke: "var(--magenta)", "stroke-width": 1.6,
+        "stroke-linejoin": "round"
+      }));
+      ic.appendChild(svgEl("path", {
+        d: "M8 6v3.6M8 11.4v.9", stroke: "var(--magenta)", "stroke-width": 1.6,
+        "stroke-linecap": "round"
+      }));
+      bar.appendChild(ic);
+      bar.appendChild(el("span", null, p.flag));
+      f.appendChild(bar);
+    }
+    h.appendChild(f);
+    return h;
+  }
+
+  // A navigator, not decoration: it shows the journey's shape the way the
+  // public page does, and clicking a step jumps to the card that edits it.
+  function stepTrack(p, data) {
+    var t = el("div", "steps");
+    p.stages.forEach(function (st, i) {
+      var prevDone = i > 0 && p.stages[i - 1].status === "done";
+      var b = el("button", "stepn " + (st.status || "idle") +
+        (i === p.currentStage ? " current" : "") + (prevDone ? " after-done" : ""));
+      b.type = "button";
+      b.title = (data.stages[i] || "") + " \u2014 " + (STATUS_LABEL[st.status] || st.status);
+      b.appendChild(el("span", "dot"));
+      b.appendChild(el("span", "sl", data.stages[i] || ("Step " + (i + 1))));
+      b.addEventListener("click", function () {
+        var card = document.querySelectorAll("#editor .stage")[i];
+        if (card && card.scrollIntoView) card.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (card) {
+          card.style.transition = "box-shadow .25s";
+          card.style.boxShadow = "0 0 0 2px var(--accent), 0 0 26px var(--glow)";
+          setTimeout(function () { card.style.boxShadow = ""; }, 1100);
+        }
+      });
+      t.appendChild(b);
+    });
+    return t;
+  }
+
+  // ---------------------------------------------------------------- sections
+  function section(title, hint) {
+    var s = el("div", "sect");
+    s.appendChild(el("h3", null, title));
+    if (hint) s.appendChild(el("p", "hint", hint));
+    return s;
+  }
+  function grid(wide) { return el("div", "grid" + (wide ? " wide" : "")); }
+
+  function identitySection(p, data) {
+    var s = section("About this medicine");
+    var g = grid();
+    g.appendChild(idField(p));
+    g.appendChild(textField("Name", p, "name"));
+    g.appendChild(textField("Generic name (INN)", p, "inn"));
+    g.appendChild(textField("Manufacturer", p, "manufacturer"));
+    g.appendChild(textField("Short description", p, "classLabel"));
+    g.appendChild(selectField("In development or on market", p, "class", CLASSES));
+    g.appendChild(selectField("Development phase", p, "phase", PHASES,
+      { help: "Where it appears on the pipeline chart" }));
+    g.appendChild(selectField("Step reached so far", p, "currentStage",
+      data.stages.map(function (n, i) { return { value: i, label: n }; }),
+      { number: true, onChange: function () { renderProduct(); } }));
+    s.appendChild(g);
+
+    var fg = grid(true);
+    fg.appendChild(textField("Access barrier", p, "flag", {
+      area: true, dropEmpty: true,
+      help: "Needed if any step below is marked Delayed. Leave empty otherwise.",
+      placeholder: "One sentence naming what is blocking progress."
+    }));
+    s.appendChild(fg);
+    return s;
+  }
+
+  function stagesSection(p, data) {
+    var s = section("Steps in detail",
+      "If you mark a step Delayed, you have to explain why in its note. You cannot save without that.");
+    var track = el("div", "track");
+    p.stages.forEach(function (st, i) {
+      var c = el("div", "stage " + (st.status || "idle") + (i === p.currentStage ? " current" : ""));
+      c.appendChild(el("div", "nm", data.stages[i] || ("stage " + i)));
+      c.appendChild(selectField("Status", st, "status",
+        STATUSES.map(function (k) { return { value: k, label: STATUS_LABEL[k] }; }),
+        { onChange: function () { renderProduct(); } }));
+      c.appendChild(textField("Note", st, "note", { area: true, dropEmpty: true }));
+      var r1 = el("div", "row");
+      r1.appendChild(textField("Date", st, "date", { dropEmpty: true }));
+      r1.appendChild(textField("Last checked", st, "asOf",
+        { dropEmpty: true, placeholder: "2026-09-17" }));
+      c.appendChild(r1);
+      c.appendChild(textField("Next step", st, "next", { area: true, dropEmpty: true }));
+      var r2 = el("div", "row");
+      r2.appendChild(textField("Expected date", st, "nextDate", { dropEmpty: true }));
+      r2.appendChild(textField("Source", st, "source", { dropEmpty: true }));
+      c.appendChild(r2);
+      track.appendChild(c);
+    });
+    s.appendChild(track);
+    return s;
+  }
+
+  function priceSection(p) {
+    var d = p.detail;
+    if (!d.price || typeof d.price !== "object") return null;
+    var s = section("Price",
+      "A price can only be shown if the manufacturer confirmed it in writing, or you add a public source. That is a rule, not a suggestion.");
+    var g = grid();
+    g.appendChild(textField("Price", d.price, "value", { help: "Write TBC if you do not have a confirmed figure" }));
+    g.appendChild(textField("Last checked", d.price, "asOf", { dropEmpty: true, placeholder: "2026-09-17" }));
+    g.appendChild(textField("Source", d.price, "source", { dropEmpty: true }));
+    s.appendChild(g);
+    var g2 = grid(true);
+    g2.appendChild(textField("Note", d.price, "note", { area: true, dropEmpty: true }));
+    s.appendChild(g2);
+    s.appendChild(checkField("Manufacturer confirmed this figure in writing",
+      d.price, "confirmedInWriting"));
+    return s;
+  }
+
+  function countsSection(p) {
+    var d = p.detail;
+    if (!d.country || typeof d.country !== "object") return null;
+    var s = section("How many countries");
+    var g = grid();
+    var COUNT_LABEL = {
+      registered: "Approved for sale in",
+      inGuidelines: "In national guidelines in",
+      inMft: "Used alongside other treatments in",
+      forecastDemand: "Forecast demand"
+    };
+    COUNT_KEYS.forEach(function (k) {
+      if (k in d.country || k !== "forecastDemand") {
+        g.appendChild(countField(COUNT_LABEL[k] || k, d.country, k));
+      }
+    });
+    s.appendChild(g);
+    return s;
+  }
+
+  function countriesSection(p) {
+    var d = p.detail;
+    if (!d.countries) return null;
+    var s = section("Country map",
+      "Anything not marked Verified shows a warning on the map, so the note has to say what is still provisional.");
+    var g = grid();
+    g.appendChild(selectField("How reliable is this map?", d.countries, "status", COUNTRY_STATUSES));
+    s.appendChild(g);
+    var g2 = grid(true);
+    g2.appendChild(textField("Map warning note", d.countries, "note", { area: true }));
+    s.appendChild(g2);
+
+    var list = d.countries.list || (d.countries.list = []);
+    var rows = el("div", "rows");
+    list.forEach(function (e, i) {
+      var r = el("div", "row-item");
+      var top = el("div", "row-top");
+      top.appendChild(el("span", "n", i + 1));
+      top.appendChild(el("span", "spacer"));
+      top.appendChild(removeBtn(list, i));
+      r.appendChild(top);
+      var inl = el("div", "inline");
+      inl.appendChild(textField("Country code", e, "iso3", { mono: true, help: "Three capital letters, e.g. NGA" }));
+      inl.appendChild(selectField("Status in that country", e, "level", LEVELS));
+      r.appendChild(inl);
+      rows.appendChild(r);
+    });
+    s.appendChild(rows);
+    s.appendChild(addBtn("Add country", list, { iso3: "", level: "registered" }));
+    return s;
+  }
+
+  function journeySection(p) {
+    var d = p.detail;
+    if (!d.journey) return null;
+    var s = section("Timeline",
+      "The order matters. These are read top to bottom to build the timeline chart.");
+    var rows = el("div", "rows");
+    d.journey.forEach(function (g, i) {
+      var r = el("div", "row-item");
+      var top = el("div", "row-top");
+      top.appendChild(el("span", "n", i + 1));
+      top.appendChild(el("span", "spacer"));
+      top.appendChild(removeBtn(d.journey, i));
+      r.appendChild(top);
+      var inl = el("div", "inline");
+      inl.appendChild(textField("Label", g, "label"));
+      inl.appendChild(yearField("Year", g, "year"));
+      r.appendChild(inl);
+      rows.appendChild(r);
+    });
+    s.appendChild(rows);
+    s.appendChild(addBtn("Add gate", d.journey, { label: "", year: "TBC" }));
+    return s;
+  }
+
+  function milestonesSection(p) {
+    var d = p.detail;
+    if (!Array.isArray(d.milestones)) return null;
+    var s = section("Milestones",
+      "A completed milestone with no source link raises a warning. It will not stop you saving, but it is a gap someone will eventually ask about.");
+    var rows = el("div", "rows");
+    d.milestones.forEach(function (m, i) {
+      var r = el("div", "row-item");
+      var top = el("div", "row-top");
+      top.appendChild(el("span", "n", i + 1));
+      top.appendChild(el("span", "spacer"));
+      top.appendChild(removeBtn(d.milestones, i));
+      r.appendChild(top);
+      var inl = el("div", "inline");
+      inl.appendChild(textField("Milestone", m, "milestone"));
+      inl.appendChild(selectField("Status", m, "status",
+        STATUSES.map(function (k) { return { value: k, label: STATUS_LABEL[k] }; })));
+      inl.appendChild(textField("Label", m, "label"));
+      inl.appendChild(textField("Date", m, "date"));
+      inl.appendChild(textField("Next", m, "next"));
+      inl.appendChild(textField("Expected", m, "anticipated"));
+      inl.appendChild(textField("Source", m, "source", { dropEmpty: true }));
+      r.appendChild(inl);
+      rows.appendChild(r);
+    });
+    s.appendChild(rows);
+    s.appendChild(addBtn("Add milestone", d.milestones,
+      { milestone: "", status: "idle", label: "", date: "", next: "", anticipated: "" }));
+    return s;
+  }
+
+  function otherSection(p) {
+    var d = p.detail;
+    var keys = Object.keys(d).filter(function (k) { return FORMED_DETAIL.indexOf(k) === -1; });
+    if (!keys.length) return null;
+    var s = section("Other fields",
+      "Anything without its own box appears here in its raw format. Take care with the punctuation — the layout matters.");
+    var g = grid(true);
+    keys.forEach(function (k) { g.appendChild(jsonField(k, d, k)); });
+    s.appendChild(g);
+    return s;
+  }
+
+  // A new medicine starts structurally complete but factually empty: every
+  // shape the validator needs is present, and every field that requires human
+  // judgement is blank, so the checks name exactly what is still missing
+  // rather than the editor inventing a plausible-looking placeholder.
+  function uniqueId(base) {
+    var ids = state.draft.products.map(function (p) { return p.id; });
+    if (ids.indexOf(base) === -1) return base;
+    for (var n = 2; n < 999; n++) {
+      if (ids.indexOf(base + "-" + n) === -1) return base + "-" + n;
+    }
+    return base + "-" + Date.now();
+  }
+
+  function newMedicine() {
+    var nStages = state.draft.stages.length;
+    var stages = [];
+    for (var i = 0; i < nStages; i++) stages.push({ status: "idle", note: "" });
+    return {
+      id: uniqueId("new-medicine"),
+      name: "", inn: "", manufacturer: "", classLabel: "",
+      class: "pipeline",
+      phase: "preclinical",
+      currentStage: 0,
+      stages: stages,
+      detail: {
+        price: { value: "TBC", note: "", source: "", confirmedInWriting: false },
+        useCase: "",
+        access: [],
+        adoption: [],
+        research: {},
+        country: { registered: "TBC", inGuidelines: "TBC", inMft: "TBC" },
+        milestones: [],
+        // Present but empty on purpose. The validator warns when there is
+        // neither volume data nor a note explaining its absence, and the
+        // "Other fields" box only renders keys that exist — so without this
+        // the warning would name a field the interface gave no way to fill.
+        volumeNote: ""
+      }
+    };
+  }
+
+  // Placeholders (e.g. spatial emanators) carry identity and a note only.
+  function newPlaceholder() {
+    return {
+      id: uniqueId("new-placeholder"),
+      name: "", inn: "", manufacturer: "", classLabel: "",
+      placeholder: true,
+      note: ""
+    };
+  }
+
+  function addProduct(maker) {
+    state.draft.products.push(maker());
+    state.selected = state.draft.products.length - 1;
+    renderTabs();
+    renderProduct();
+    touched();
+    var host = $("editor");
+    if (host.scrollIntoView) host.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Deleting a product removes published history from the live board, so it
+  // asks twice rather than relying on an easily-missed browser dialog.
+  function dangerZone(p) {
+    var d = el("div", "danger");
+    d.appendChild(el("h3", null, "Delete this medicine"));
+    d.appendChild(el("p", null,
+      "Removes " + (p.name || p.id || "this medicine") + " from the dashboard. Older " +
+      "versions are kept, so it can be brought back \u2014 but it stops appearing publicly " +
+      "as soon as this is published."));
+    var wrap = el("div");
+    var first = el("button", "btn-del", "Delete medicine");
+    first.type = "button";
+    first.addEventListener("click", function () {
+      wrap.innerHTML = "";
+      var c = el("div", "confirm");
+      c.appendChild(el("span", null, "Really delete " + (p.name || p.id) + "?"));
+      var yes = el("button", "btn-del", "Yes, delete");
+      yes.type = "button";
+      yes.addEventListener("click", function () {
+        var i = state.draft.products.indexOf(p);
+        if (i > -1) state.draft.products.splice(i, 1);
+        if (state.selected >= state.draft.products.length) {
+          state.selected = Math.max(0, state.draft.products.length - 1);
+        }
+        renderTabs();
+        renderProduct();
+        touched();
+      });
+      var no = el("button", "btn-small", "Cancel");
+      no.type = "button";
+      no.addEventListener("click", function () { renderProduct(); });
+      c.appendChild(yes);
+      c.appendChild(no);
+      wrap.appendChild(c);
+    });
+    wrap.appendChild(first);
+    d.appendChild(wrap);
+    return d;
+  }
+
+  function removeBtn(arr, i) {
+    var b = el("button", "btn-del", "Remove");
+    b.type = "button";
+    b.addEventListener("click", function () {
+      arr.splice(i, 1);
+      renderProduct();
+      touched();
+    });
+    return b;
+  }
+  function addBtn(label, arr, template) {
+    var b = el("button", "btn-small add-row", label);
+    b.type = "button";
+    b.addEventListener("click", function () {
+      arr.push(clone(template));
+      renderProduct();
+      touched();
+    });
+    return b;
+  }
+
+  // ---------------------------------------------------------------- import
+  // Nothing here writes to the draft on its own. Files become a PLAN, the
+  // plan is shown with every proposed change spelled out, and only the rows a
+  // human ticks are applied — into the draft, which still has to pass the
+  // save gate like any other edit.
+  var imp = { plan: null, mapping: null, records: [], headers: [], notes: [], files: [] };
+
+  function openImport() {
+    $("importPanel").hidden = false;
+    $("impBody").innerHTML = "";
+    $("impBody").appendChild(dropZone());
+    $("impSub").textContent = "Nothing loaded yet";
+    $("importPanel").scrollIntoView({ block: "start" });
+  }
+
+  function dropZone() {
+    var z = el("div", "imp-drop");
+    z.appendChild(el("b", null, "Drop files here, or choose them"));
+    z.appendChild(el("div", null,
+      "Spreadsheets and data files — CSV, tab-separated, semicolon-separated, JSON. " +
+      "Several at once is fine. Nothing is changed until you say so."));
+    var b = el("button", "btn-add", "Choose files");
+    b.type = "button";
+    b.style.marginTop = "12px";
+    b.addEventListener("click", function () { $("impFile").click(); });
+    z.appendChild(b);
+    ["dragenter", "dragover"].forEach(function (e) {
+      z.addEventListener(e, function (ev) { ev.preventDefault(); z.classList.add("over"); });
+    });
+    ["dragleave", "drop"].forEach(function (e) {
+      z.addEventListener(e, function (ev) { ev.preventDefault(); z.classList.remove("over"); });
+    });
+    z.addEventListener("drop", function (ev) {
+      if (ev.dataTransfer && ev.dataTransfer.files) takeFiles(ev.dataTransfer.files);
+    });
+    return z;
+  }
+
+  function takeFiles(fileList) {
+    var files = Array.prototype.slice.call(fileList);
+    if (!files.length) return;
+    $("impSub").textContent = "Reading " + files.length + " file(s)…";
+    // Blob.text() / Blob.arrayBuffer() rather than nested FileReader
+    // callbacks: one promise per file, no callback pyramid, and a failure on
+    // one file cannot silently strand the whole batch.
+    var read = files.map(function (f) {
+      return f.slice(0, 4).arrayBuffer().then(function (buf) {
+        var b = new Uint8Array(buf);
+        // A spreadsheet binary is a zip. There is no honest way to read one
+        // here without pulling in a large library, so say so plainly.
+        if (b[0] === 0x50 && b[1] === 0x4B) {
+          return { name: f.name, error: "Excel files cannot be read directly. In Excel choose File \u203a Save As \u203a CSV, then import that." };
+        }
+        return f.text().then(function (text) { return { name: f.name, text: text }; });
+      }).catch(function (e) {
+        return { name: f.name, error: "Could not read this file \u2014 " + e.message };
+      });
+    });
+
+    Promise.all(read).then(function (results) {
+      imp.records = []; imp.headers = []; imp.notes = []; imp.files = [];
+      results.forEach(function (res) {
+        if (res.error) { imp.files.push({ name: res.name, error: res.error }); return; }
+        var parsed = window.LAUNCH_IMPORT.readFile(res.name, res.text);
+        parsed.headers.forEach(function (h) { if (imp.headers.indexOf(h) === -1) imp.headers.push(h); });
+        parsed.records.forEach(function (r) { r.__file = res.name; imp.records.push(r); });
+        parsed.notes.forEach(function (n) { imp.notes.push(res.name + ": " + n); });
+        imp.files.push({ name: res.name, rows: parsed.records.length });
+      });
+      imp.mapping = window.LAUNCH_IMPORT.guessMapping(imp.headers, state.draft.stages);
+      replan();
+      // Reset only now: clearing the picker while its reads are still in
+      // flight releases the file handles and the reads never settle.
+      $("impFile").value = "";
+    }).catch(function (e) {
+      $("impFile").value = "";
+      $("impSub").textContent = "Could not read these files";
+      $("impBody").innerHTML = "";
+      var b = el("div", "boot");
+      b.appendChild(el("p", "bad", "Something went wrong reading the files \u2014 " + e.message));
+      b.appendChild(el("p", null, "This is a fault in the dashboard, not in your files."));
+      b.appendChild(el("code", null, (e.stack || "").split("\n").slice(0, 3).join("\n")));
+      $("impBody").appendChild(b);
+    });
+  }
+
+  function replan() {
+    imp.plan = window.LAUNCH_IMPORT.planImport(imp.records, imp.mapping, state.draft);
+    renderImport();
+  }
+
+  function renderImport() {
+    var body = $("impBody");
+    body.innerHTML = "";
+    var p = imp.plan;
+    $("impSub").textContent = imp.records.length + " row(s) read from " + imp.files.length + " file(s)";
+
+    (p.notices || []).forEach(function (n) {
+      var box = el("div", "imp-notice " + (n.level === "stop" ? "stop" : "warn"));
+      box.appendChild(el("b", null, n.level === "stop" ? "Check this file" : "Worth a look"));
+      box.appendChild(el("span", null, n.text));
+      body.appendChild(box);
+    });
+
+    var sum = el("div", "imp-sum");
+    sum.appendChild(pillCount(p.creates.length, p.creates.length === 1 ? "new medicine" : "new medicines",
+      p.creates.length ? "mini-ok" : "mini-ok"));
+    sum.appendChild(pillCount(p.updates.length, "to update", "mini-warn"));
+    sum.appendChild(pillCount(p.skipped.length, "skipped", "mini-ok"));
+    body.appendChild(sum);
+
+    var fl = el("div", "imp-files");
+    imp.files.forEach(function (f) {
+      var line = el("div");
+      var c = el("code", null, f.name);
+      line.appendChild(c);
+      line.appendChild(document.createTextNode(f.error ? " — " + f.error : " — " + f.rows + " row(s)"));
+      if (f.error) line.style.color = "var(--amber)";
+      fl.appendChild(line);
+    });
+    imp.notes.forEach(function (n) {
+      var line = el("div", null, n);
+      line.style.color = "var(--amber)";
+      fl.appendChild(line);
+    });
+    body.appendChild(fl);
+
+    // --- column mapping, correctable by hand ---
+    if (imp.headers.length) {
+      var maps = el("div", "maps");
+      imp.headers.forEach(function (h) {
+        if (h === "__row" || h === "__file") return;
+        var row = el("div", "map");
+        row.appendChild(el("span", "col", h));
+        row.appendChild(el("span", "arw", "→"));
+        var sel = document.createElement("select");
+        sel.appendChild(new Option("(ignore this column)", ""));
+        window.LAUNCH_IMPORT.FIELDS.forEach(function (f) {
+          sel.appendChild(new Option(f.label, "field:" + f.key));
+        });
+        (state.draft.stages || []).forEach(function (sn, i) {
+          sel.appendChild(new Option("Step — " + sn + " (status)", "stage:" + i + ":status"));
+          sel.appendChild(new Option("Step — " + sn + " (note)", "stage:" + i + ":note"));
+        });
+        var current = "";
+        Object.keys(imp.mapping.fields).forEach(function (k) {
+          if (imp.mapping.fields[k] === h) current = "field:" + k;
+        });
+        Object.keys(imp.mapping.stages).forEach(function (i) {
+          var m = imp.mapping.stages[i];
+          if (m.status === h) current = "stage:" + i + ":status";
+          if (m.note === h) current = "stage:" + i + ":note";
+        });
+        sel.value = current;
+        if (!current) row.classList.add("off");
+        sel.addEventListener("change", function () {
+          // clear any previous claim on this column, then apply the new one
+          Object.keys(imp.mapping.fields).forEach(function (k) {
+            if (imp.mapping.fields[k] === h) delete imp.mapping.fields[k];
+          });
+          Object.keys(imp.mapping.stages).forEach(function (i) {
+            var m = imp.mapping.stages[i];
+            if (m.status === h) delete m.status;
+            if (m.note === h) delete m.note;
+          });
+          var v = sel.value;
+          if (v.indexOf("field:") === 0) imp.mapping.fields[v.slice(6)] = h;
+          else if (v.indexOf("stage:") === 0) {
+            var bits = v.split(":");
+            imp.mapping.stages[bits[1]] = imp.mapping.stages[bits[1]] || {};
+            imp.mapping.stages[bits[1]][bits[2]] = h;
+          }
+          replan();
+        });
+        row.appendChild(sel);
+        maps.appendChild(row);
+      });
+      body.appendChild(maps);
+    }
+
+    // --- the proposed changes ---
+    var plan = el("div", "plan");
+    var any = false;
+    p.creates.forEach(function (c, i) { plan.appendChild(planRow("new", c, "c" + i)); any = true; });
+    p.updates.forEach(function (u, i) { plan.appendChild(planRow("upd", u, "u" + i)); any = true; });
+    p.skipped.forEach(function (s2) {
+      var r = el("div", "prow");
+      r.appendChild(el("span"));
+      var b = el("div");
+      var t = el("div", "pt");
+      t.appendChild(el("span", "kind kind-skip", "skipped"));
+      t.appendChild(el("span", "src", "row " + s2.row));
+      b.appendChild(t);
+      b.appendChild(el("div", "chg", s2.reason));
+      (s2.issues || []).forEach(function (is2) { b.appendChild(el("div", "pissue", is2)); });
+      r.appendChild(b);
+      plan.appendChild(r);
+    });
+    if (!any && !p.skipped.length) {
+      plan.appendChild(el("div", "none", "Nothing in these files matched anything we can use."));
+    }
+    body.appendChild(plan);
+
+    var act = el("div", "imp-act");
+    var apply = el("button", "btn-apply", "Apply selected changes");
+    apply.type = "button";
+    apply.disabled = !any;
+    apply.addEventListener("click", applyImport);
+    act.appendChild(apply);
+    var cancel = el("button", "btn-small", "Cancel");
+    cancel.type = "button";
+    cancel.addEventListener("click", function () { $("importPanel").hidden = true; });
+    act.appendChild(cancel);
+    act.appendChild(el("span", "note",
+      "Applying puts these into your draft. Nothing is published until you save."));
+    body.appendChild(act);
+  }
+
+  function planRow(kind, item, key) {
+    var r = el("div", "prow");
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = true;
+    cb.id = "imp-" + key;
+    cb.setAttribute("data-key", key);
+    r.appendChild(cb);
+    var b = el("div");
+    var t = el("div", "pt");
+    t.appendChild(el("span", "pn", item.label));
+    t.appendChild(el("span", "kind kind-" + kind, kind === "new" ? "new medicine" : "update"));
+    t.appendChild(el("span", "src", "row " + item.row));
+    b.appendChild(t);
+    item.changes.forEach(function (c) {
+      var line = el("div", "chg");
+      line.appendChild(el("span", "chg-k", c.label + ": "));
+      if (c.from !== undefined && c.from !== null && c.from !== "") {
+        line.appendChild(el("span", "was", String(c.from)));
+        line.appendChild(document.createTextNode("  →  "));
+      }
+      line.appendChild(el("span", "now", String(c.value)));
+      b.appendChild(line);
+    });
+    (item.issues || []).forEach(function (is2) { b.appendChild(el("div", "pissue", is2)); });
+    r.appendChild(b);
+    return r;
+  }
+
+  function applyImport() {
+    var picked = function (key) {
+      var cb = $("imp-" + key);
+      return cb && cb.checked;
+    };
+    var made = 0, changed = 0;
+    imp.plan.creates.forEach(function (c, i) {
+      if (!picked("c" + i)) return;
+      var p = newMedicine();
+      c.changes.forEach(function (ch) { window.LAUNCH_IMPORT.setValue(p, ch.field, ch.value); });
+      if (!p.id || p.id === "new-medicine") p.id = uniqueId(window.LAUNCH_IMPORT.norm(p.name || "imported").replace(/ /g, "-") || "imported");
+      state.draft.products.push(p);
+      made++;
+    });
+    imp.plan.updates.forEach(function (u, i) {
+      if (!picked("u" + i)) return;
+      u.changes.forEach(function (ch) {
+        window.LAUNCH_IMPORT.setValue(state.draft.products[u.index], ch.field, ch.value);
+      });
+      changed++;
+    });
+    $("importPanel").hidden = true;
+    renderTabs();
+    renderProduct();
+    refresh();
+    note("Imported: " + made + " new medicine(s), " + changed + " updated. " +
+         "Check the list above, then save when you are happy.", false);
+    $("gate").scrollIntoView({ block: "center" });
+  }
+
+  // ---------------------------------------------------------------- render
+  function renderTabs() {
+    var tabs = $("tabs");
+    tabs.innerHTML = "";
+    state.draft.products.forEach(function (p, i) {
+      var b = el("button", "tab");
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", i === state.selected ? "true" : "false");
+      var tag = "products[" + i + "]";
+      var f = state.found || { errors: [], warnings: [] };
+      var mine = function (list) {
+        return list.filter(function (m) { return m.indexOf(tag) === 0; }).length;
+      };
+      var nErr = mine(f.errors), nWarn = mine(f.warnings);
+      var dot = el("span", "tdot " + (nErr ? "err" : nWarn ? "warn" : "ok"));
+      dot.title = nErr ? nErr + " thing(s) to fix"
+        : nWarn ? nWarn + " thing(s) worth checking" : "Nothing to fix";
+      b.appendChild(dot);
+      b.appendChild(document.createTextNode(p.name || p.id || "(unnamed)"));
+      if (JSON.stringify(p) !== JSON.stringify(state.original.products[i])) {
+        b.appendChild(el("span", "edited", "●"));
+      }
+      b.addEventListener("click", function () {
+        state.selected = i;
+        renderTabs();
+        renderProduct();
+      });
+      tabs.appendChild(b);
+    });
+
+    tabs.appendChild(el("span", "spacer"));
+    var addMed = el("button", "btn-add", "+ Add medicine");
+    addMed.type = "button";
+    addMed.addEventListener("click", function () { addProduct(newMedicine); });
+    tabs.appendChild(addMed);
+    var impBtn = el("button", "btn-small", "\u2913 Import data");
+    impBtn.type = "button";
+    impBtn.title = "Bring in medicines from a spreadsheet or data file";
+    impBtn.addEventListener("click", openImport);
+    tabs.appendChild(impBtn);
+
+    var addPh = el("button", "btn-small", "+ Placeholder");
+    addPh.type = "button";
+    addPh.title = "A medicine tracked by name only, with no steps or detail yet";
+    addPh.addEventListener("click", function () { addProduct(newPlaceholder); });
+    tabs.appendChild(addPh);
+
+    var tracked = state.draft.products.filter(function (p) { return !p.placeholder; }).length;
+    $("prodSub").textContent = tracked + " tracked, " +
+      (state.draft.products.length - tracked) + " placeholder";
+  }
+
+  function renderProduct() {
+    var host = $("editor");
+    host.innerHTML = "";
+    var p = state.draft.products[state.selected];
+    if (!p) return;
+
+    if (p.placeholder) {
+      var ph = section("Placeholder medicine",
+        "A placeholder is tracked by name only — no steps, no detail yet.");
+      var g = grid();
+      g.appendChild(idField(p));
+      g.appendChild(textField("Name", p, "name"));
+      g.appendChild(textField("Generic name (INN)", p, "inn"));
+      g.appendChild(textField("Manufacturer", p, "manufacturer"));
+      g.appendChild(textField("Short description", p, "classLabel"));
+      ph.appendChild(g);
+      var g2 = grid(true);
+      g2.appendChild(textField("Note", p, "note", { area: true }));
+      ph.appendChild(g2);
+      host.appendChild(ph);
+      host.appendChild(dangerZone(p));
+      autosizeAll(host);
+      return;
+    }
+
+    host.appendChild(medicineHeader(p, state.draft));
+    host.appendChild(stepTrack(p, state.draft));
+
+    [identitySection(p, state.draft),
+     stagesSection(p, state.draft),
+     priceSection(p),
+     countsSection(p),
+     countriesSection(p),
+     journeySection(p),
+     milestonesSection(p),
+     otherSection(p)
+    ].forEach(function (s) { if (s) host.appendChild(s); });
+    host.appendChild(dangerZone(p));
+    autosizeAll(host);
+  }
+
+  function renderFindings(found) {
+    var box = $("findings");
+    box.innerHTML = "";
+    if (!found.errors.length && !found.warnings.length) {
+      box.appendChild(el("div", "none",
+        "Nothing to fix. (A few warnings about the drug-resistance maps only show up in the technical checks \u2014 those files are not edited here.)"));
+      return;
+    }
+    var ul = el("ul", "findings");
+    found.errors.forEach(function (m) { ul.appendChild(finding("error", m)); });
+    found.warnings.forEach(function (m) { ul.appendChild(finding("warn", m)); });
+    box.appendChild(ul);
+  }
+  // [pattern, plain wording]. $1/$2 carry captured text through. Anything that
+  // matches nothing is shown as written — a rule we add later is then merely
+  // worded technically, never hidden.
+  var PLAIN = [
+    [/^"(\w+)" is required$/, "Needs a $1"],
+    [/^id required \(lowercase letters\/digits\/hyphens\)$/, "Needs a short name for web links — lowercase letters, numbers and hyphens only"],
+    [/^duplicate id "(.+)"$/, "Another medicine is already using the short name \u201c$1\u201d"],
+    [/^class must be "pipeline" or "market".*$/, "Say whether this is still in development or already on the market"],
+    [/^phase must be one of .*$/, "Pick a development phase"],
+    [/^no "phase" .*$/, "No development phase set, so it will not appear on the pipeline chart"],
+    [/^stages must have exactly (\d+) entries.*$/, "Should have all $1 steps listed"],
+    [/^status must be one of .*$/, "Pick a status for this step"],
+    [/^a delayed stage must carry a substantive reason in "note"$/, "Marked Delayed, so it needs a note explaining why"],
+    [/^no "asOf" verification date$/, "No date saying when this was last checked"],
+    [/^asOf must be YYYY-MM-DD, got "(.*)"$/, "The last-checked date should look like 2026-09-17, not \u201c$1\u201d"],
+    [/^has a delayed stage but no top-level "flag" sentence explaining the bottleneck$/, "A step is Delayed, so the Access barrier box needs a sentence explaining what is blocking it"],
+    [/^has a "flag" but no stage is marked late .*$/, "There is an Access barrier sentence but no step is marked Delayed"],
+    [/^currentStage must be an integer 0.*$/, "Pick which step it has currently reached"],
+    [/^"detail" is required$/, "Missing all of its detail"],
+    [/^detail\.(\w+) is required \(and must not be null\)$/, "Missing its $1 information"],
+    [/^detail\.price\.confirmedInWriting must be true or false$/, "Tick or untick the written-confirmation box for the price"],
+    [/^a displayed price needs confirmedInWriting=true or a public "source".*$/, "A price can only be shown if the manufacturer confirmed it in writing, or you add a public source"],
+    [/^detail\.price has no "asOf" date$/, "The price has no date saying when it was last checked"],
+    [/^detail\.country\.(\w+) must be a non-negative integer or "TBC"$/, "The $1 count should be a number, or TBC"],
+    [/^detail\.countries\.status must be .*$/, "Pick whether the country map is illustrative, draft or verified"],
+    [/^unverified detail\.countries needs a substantive "note".*$/, "The country map is not verified yet, so it needs a note saying what is still provisional"],
+    [/^detail\.countries\.list must be a non-empty array$/, "The country map has no countries in it"],
+    [/^countries\.list\[(\d+)\]\.iso3 must be a 3-letter uppercase ISO code$/, "Country $1 needs a three-letter country code, in capitals"],
+    [/^countries\.list has duplicate iso3 "(.+)"$/, "The country $1 is listed twice on the map"],
+    [/^countries\.list\[(\d+)\]\.level must be .*$/, "Country $1 needs a level choosing"],
+    [/^detail\.journey must be an array of at least 2 gates$/, "The timeline needs at least two points"],
+    [/^journey\[(\d+)\] needs a "label"$/, "Timeline point $1 needs a name"],
+    [/^journey\[(\d+)\]\.year must be a year .*$/, "Timeline point $1 needs a year, or TBC"],
+    [/^journey\[(\d+)\] year (\d+) is earlier than the previous.*$/, "Timeline point $1 is dated $2, earlier than the point before it \u2014 check the order"],
+    [/^no volume data and no "volumeNote" explaining why$/, "Does not say how many doses have been bought, or why that is not known"],
+    [/^detail\.volume needs total, period and split\[\]$/, "The purchase figures are incomplete"],
+    [/^detail\.volume\.split percentages sum to (\S+), expected 100$/, "The purchase split adds up to $1%, not 100%"],
+    [/^bad status "(.*)"$/, "\u201c$1\u201d is not a status we recognise"],
+    [/^completed milestone "(.+)" has no source citation$/, "The completed milestone \u201c$1\u201d has no source link"],
+    [/^placeholder products need a "note"$/, "Needs a note saying what it is"],
+    [/^glossary\["(.+)"\]: definition must be a real sentence$/, "The glossary entry for \u201c$1\u201d needs a proper sentence"],
+    [/^meta\.lastUpdated: .*$/, "The last-updated date is not in the right format"],
+    [/^meta\.dataStatus: .*$/, "Pick a data status at the top of the page"],
+    [/^changelog\[(\d+)\]: date must be YYYY-MM-DD$/, "Change $1 in the list below has a bad date"],
+    [/^changelog\[(\d+)\]: "product" is required.*$/, "Change $1 in the list below does not say which medicine it is about"],
+    [/^changelog\[(\d+)\]: "change" must describe what changed$/, "Change $1 in the list below needs a description"],
+    [/^changelog\[(\d+)\]: dates not newest-first.*$/, "The list of changes is out of order \u2014 newest must come first"]
+  ];
+
+  // "products[2] (pyramax) stage \"National policy adoption\": ..." becomes
+  // a readable place and a readable problem.
+  function splitFinding(message) {
+    var where = "", rest = message;
+    var m = rest.match(/^products\[(\d+)\] \(([^)]*)\)(.*)$/);
+    if (m) {
+      var prod = state.draft.products[Number(m[1])];
+      where = (prod && (prod.name || prod.id)) || m[2] || "A medicine";
+      rest = m[3];
+      var st = rest.match(/^ stage "([^"]+)":\s*(.*)$/);
+      if (st) { where += " \u2192 " + st[1]; rest = st[2]; }
+      var ms = rest.match(/^ milestone\[(\d+)\]:\s*(.*)$/);
+      if (ms) { where += " \u2192 milestone " + (Number(ms[1]) + 1); rest = ms[2]; }
+      rest = rest.replace(/^:\s*/, "");
+    } else if (/^(meta|changelog|glossary|stages|stageColumns)\b/.test(rest)) {
+      where = "This document";
+    }
+    return { where: where, rest: rest };
+  }
+
+  function plainly(message) {
+    var parts = splitFinding(message);
+    var text = parts.rest;
+    for (var i = 0; i < PLAIN.length; i++) {
+      if (PLAIN[i][0].test(text)) { text = text.replace(PLAIN[i][0], PLAIN[i][1]); break; }
+    }
+    return { where: parts.where, text: text };
+  }
+
+  function finding(level, message) {
+    var p = plainly(message);
+    var li = el("li");
+    li.appendChild(el("span", "lvl lvl-" + level,
+      level === "error" ? "Must fix" : "Check"));
+    var body = el("span");
+    if (p.where) body.appendChild(el("b", "where", p.where + " \u2014 "));
+    body.appendChild(document.createTextNode(p.text));
+    li.appendChild(body);
+    // the exact wording the command line uses, for anyone who needs it
+    li.title = message;
+    return li;
+  }
+
+  function renderChangelog(pending) {
+    var ul = $("changelog");
+    ul.innerHTML = "";
+    var entries = (state.draft.changelog || []).slice(0, 12);
+    if (pending) entries = [pending].concat(entries).slice(0, 12);
+    entries.forEach(function (c, i) {
+      var li = el("li", pending && i === 0 ? "new" : null);
+      li.appendChild(el("span", "d", c.date || "—"));
+      li.appendChild(el("span", "p", c.product || "—"));
+      li.appendChild(el("span", null,
+        (pending && i === 0 ? "(about to be added) " : "") + (c.change || "")));
+      ul.appendChild(li);
+    });
+  }
+
+  // ---------------------------------------------------------------- state
+  var timer = null;
+  function touched() {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(refresh, 120);
+  }
+
+  function changedProducts() {
+    var out = [];
+    state.draft.products.forEach(function (p, i) {
+      if (JSON.stringify(p) !== JSON.stringify(state.original.products[i])) {
+        out.push(p.name || p.id);
+      }
+    });
+    return out;
+  }
+
+  function refresh() {
+    var found = window.LAUNCH_RULES.checkData(state.draft);
+    state.found = found;
+    renderFindings(found);
+
+    var mini = $("miniChecks");
+    mini.innerHTML = "";
+    mini.appendChild(pillCount(found.errors.length,
+      found.errors.length === 1 ? "error" : "errors",
+      found.errors.length ? "mini-err" : "mini-ok"));
+    mini.appendChild(document.createTextNode(" "));
+    mini.appendChild(pillCount(found.warnings.length,
+      found.warnings.length === 1 ? "warning" : "warnings",
+      found.warnings.length ? "mini-warn" : "mini-ok"));
+
+    var changed = changedProducts();
+    var metaChanged = JSON.stringify(state.draft.meta) !== JSON.stringify(state.original.meta);
+    var dirty = changed.length > 0 || metaChanged;
+    var dp = $("dirtyPill");
+    dp.textContent = dirty
+      ? (changed.length ? changed.length + " medicine" + (changed.length === 1 ? "" : "s") + " edited"
+                        : "Edited")
+      : "No changes";
+    dp.className = "pill " + (dirty ? "pill-dirty" : "pill-clean");
+
+    var ch = $("changes");
+    ch.innerHTML = "";
+    if (!dirty) {
+      ch.appendChild(document.createTextNode("You have not changed anything yet."));
+    } else {
+      ch.appendChild(document.createTextNode("Changed: "));
+      var b = el("b", null, changed.length ? changed.join(", ") : "document metadata");
+      ch.appendChild(b);
+      ch.appendChild(document.createTextNode(
+        ". Saving will add your note to the record and date it " + today() + "."));
+    }
+
+    var change = $("clChange").value.trim();
+    var product = $("clProduct").value;
+    var gate = [
+      { ok: dirty, text: "You have changed something" },
+      { ok: found.errors.length === 0,
+        text: found.errors.length === 0 ? "Nothing left to fix"
+          : found.errors.length + " thing(s) above still need fixing" },
+      { ok: !!product, text: "You have said which medicine it is about" },
+      { ok: change.length >= 10, text: "You have described what changed" }
+    ];
+    var gl = $("gate");
+    gl.innerHTML = "";
+    gate.forEach(function (g) {
+      var li = el("li", g.ok ? "pass" : "fail");
+      li.appendChild(el("span", "mark", g.ok ? "✓" : "✕"));
+      li.appendChild(el("span", null, g.text));
+      gl.appendChild(li);
+    });
+
+    var canSave = gate.every(function (g) { return g.ok; });
+    $("btnSave").disabled = !canSave;
+    $("btnReset").disabled = !dirty;
+
+    renderChangelog(canSave ? {
+      date: today(), product: product, change: change
+    } : null);
+
+    renderTabs();
+    refreshProductChoices();
+    updateStatusPill();
+    updatePreviewState();
+  }
+
+  // Rebuilt whenever products change, so an added medicine is immediately
+  // choosable and a deleted one stops being offered.
+  function refreshProductChoices() {
+    var sel = $("clProduct");
+    var was = sel.value;
+    sel.innerHTML = "";
+    sel.appendChild(new Option("All", "All"));
+    state.draft.products.forEach(function (p) {
+      var label = p.name || p.id || "(unnamed)";
+      sel.appendChild(new Option(label, label));
+    });
+    sel.value = was;
+    if (!sel.value) sel.value = "All";
+  }
+
+  function pillCount(n, label, cls) {
+    var s = el("span", "mini " + cls);
+    s.appendChild(el("b", null, n));
+    s.appendChild(el("span", null, label));
+    return s;
+  }
+
+  function updateStatusPill() {
+    var st = (state.draft.meta && state.draft.meta.dataStatus) || "unknown";
+    var pill = $("statusPill");
+    pill.textContent = st;
+    pill.className = "pill pill-" + st;
+  }
+
+  // ------------------------------------------------------------- finished
+  // What publishing would actually produce. Save serializes this; the preview
+  // renders it. Sharing one function is what stops the preview from showing
+  // something the save would not write — the same reason the rules live in
+  // one module rather than two.
+  function isDirty() {
+    return changedProducts().length > 0 ||
+           JSON.stringify(state.draft.meta) !== JSON.stringify(state.original.meta);
+  }
+
+  function finished() {
+    var out = clone(state.draft);
+    if (!isDirty()) return out;
+    var change = $("clChange").value.trim();
+    var product = $("clProduct").value;
+    if (change.length >= 10 && product) {
+      var entry = { date: today(), product: product, change: change };
+      var plain = $("clPlain").value.trim();
+      if (plain) entry.plain = plain;
+      out.changelog = [entry].concat(out.changelog || []);
+    }
+    out.meta.lastUpdated = today();
+    return out;
+  }
+
+  // ---------------------------------------------------------------- preview
+  // The journey page is fetched once and kept as a template. Each build swaps
+  // its data/products.js script tag for the draft inline, and injects a <base>
+  // so the remaining relative paths (the map, the WHO overlays, the icons)
+  // still resolve from a blob: URL.
+  var preview = { template: null, shownFingerprint: null, url: null, open: false };
+
+  function previewFingerprint() { return JSON.stringify(finished()); }
+
+  function buildPreview() {
+    var host = $("prevHost");
+    var data = finished();
+
+    var html = preview.template
+      .replace('<script src="data/products.js"><\/script>',
+               '<script>window.LAUNCH_DATA = ' + JSON.stringify(data) + ';<\/script>')
+      .replace('<meta charset="utf-8">',
+               '<meta charset="utf-8">\n<base href="' +
+                 new URL(".", location.href).href + '">');
+
+    if (preview.url) URL.revokeObjectURL(preview.url);
+    preview.url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+
+    host.innerHTML = "";
+    var f = document.createElement("iframe");
+    f.className = "prev-frame";
+    f.title = "The public dashboard, rendered from the current draft";
+    f.src = preview.url;
+    host.appendChild(f);
+
+    preview.shownFingerprint = previewFingerprint();
+    updatePreviewState();
+  }
+
+  function updatePreviewState() {
+    var st = $("prevState");
+    if (!preview.open) { st.textContent = ""; st.className = "prev-state"; return; }
+    if (preview.shownFingerprint === previewFingerprint()) {
+      st.textContent = "Showing the current draft.";
+      st.className = "prev-state";
+    } else {
+      st.textContent = "The draft has changed since this was rendered — refresh to see it.";
+      st.className = "prev-state stale";
+    }
+  }
+
+  function togglePreview() {
+    if (preview.open) {
+      preview.open = false;
+      $("prevHost").innerHTML = "";
+      $("btnPreview").textContent = "Show preview";
+      $("btnPreviewRefresh").hidden = true;
+      $("btnPreviewTab").hidden = true;
+      updatePreviewState();
+      return;
+    }
+    var start = function () {
+      preview.open = true;
+      $("btnPreview").textContent = "Hide preview";
+      $("btnPreviewRefresh").hidden = false;
+      $("btnPreviewTab").hidden = false;
+      buildPreview();
+    };
+    if (preview.template) return start();
+
+    $("prevHost").innerHTML = "";
+    $("prevHost").appendChild(el("div", "prev-empty", "Loading the journey page…"));
+    fetch("illustrated-journey-dashboard.html", { cache: "no-store" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.text();
+      })
+      .then(function (t) {
+        if (t.indexOf('<script src="data/products.js"><\/script>') === -1) {
+          throw new Error("could not find the data/products.js script tag to substitute");
+        }
+        preview.template = t;
+        start();
+      })
+      .catch(function (e) {
+        $("prevHost").innerHTML = "";
+        $("prevHost").appendChild(el("div", "prev-empty",
+          "Could not load illustrated-journey-dashboard.html — " + e.message));
+      });
+  }
+
+  // ---------------------------------------------------------------- save
+  // Everything the analyst guide's update loop requires, in one place: the
+  // changelog entry goes on newest-first (the RSS feed reads from the top),
+  // lastUpdated moves to today, and the result is re-checked before it is
+  // allowed out. Serialization goes through the same house-style writer the
+  // round-trip test covers, so the diff shows only the real change.
+  function save() {
+    var out = finished();
+
+    var recheck = window.LAUNCH_RULES.checkData(out);
+    if (recheck.errors.length) {
+      note("Not saved \u2014 " + recheck.errors.length +
+           " problem(s) remain. Nothing was written.", true);
+      renderFindings(recheck);
+      return;
+    }
+
+    var text = window.LAUNCH_SERIALIZE.serializeProducts(out, state.raw);
+
+    var blob = new Blob([text], { type: "text/javascript;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "products.js";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+
+    // The draft becomes the new baseline, so the dirty markers reset and a
+    // second save does not re-add the same changelog entry.
+    state.draft = out;
+    state.original = clone(out);
+    $("clChange").value = "";
+    $("clPlain").value = "";
+    renderProduct();
+    refresh();
+    note("Saved. The file is in your Downloads folder \u2014 pass it to whoever " +
+         "updates the site.", false);
+  }
+
+  function note(text, bad) {
+    var n = $("saveNote");
+    n.textContent = text;
+    n.style.color = bad ? "var(--crit)" : "var(--good)";
+  }
+
+  function reset() {
+    state.draft = clone(state.original);
+    $("clChange").value = "";
+    $("clPlain").value = "";
+    note("", false);
+    renderProduct();
+    refresh();
+  }
+
+  // ---------------------------------------------------------------- boot
+  function boot(msg, detail, cmd) {
+    // Always bring the panel back: start() hides it, so a failure raised after
+    // that point would otherwise be written somewhere nobody can see.
+    $("boot").hidden = false;
+    $("app").hidden = true;
+    var b = el("div", "boot");
+    b.appendChild(el("p", "bad", msg));
+    if (detail) b.appendChild(el("p", null, detail));
+    if (cmd) b.appendChild(el("code", null, cmd));
+    $("boot").innerHTML = "";
+    $("boot").appendChild(b);
+  }
+
+  fetch("data/products.js", { cache: "no-store" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.text();
+    })
+    .then(function (raw) {
+      // Separated from the fetch failure below: a bug in rendering is a
+      // different problem from an unreachable file, and saying "could not read
+      // the file" when the file read fine sends you looking in the wrong place.
+      try {
+        start(raw);
+      } catch (e) {
+        boot("The staging dashboard failed to start — " + e.message,
+             "This is a fault in the dashboard itself, not in your data.",
+             (e.stack || "").split("\n").slice(0, 4).join("\n"));
+      }
+    })
+    .catch(function (e) {
+      boot(
+        "Could not read data/products.js — " + e.message,
+        "Browsers refuse to fetch local files from a file:// page. Serve the repo over HTTP instead, from the repo root — --bind keeps it off the network:",
+        "python3 -m http.server 8001 --bind 127.0.0.1\nopen http://localhost:8001/editor.html"
+      );
+    });
+
+  function start(raw) {
+    var extracted = window.LAUNCH_RULES.extractData(raw);
+    if (!extracted.ok) {
+      boot(
+        extracted.reason === "no-marker"
+          ? "data/products.js has no `window.LAUNCH_DATA =` line to read."
+          : "data/products.js is not strict JSON — " + extracted.message,
+        "The data file has to be repaired before this can open. Ask a developer \u2014 it is not something to fix here."
+      );
+      return;
+    }
+
+    // If the serializer disagrees with the file as loaded, every save would
+    // rewrite the whole thing. Better to refuse than to hand someone an
+    // unreviewable diff.
+    var faithful = window.LAUNCH_SERIALIZE.serializeProducts(extracted.data, raw) === raw;
+    if (!faithful) {
+      boot(
+        "The serializer does not reproduce data/products.js byte for byte.",
+        "Saving would rewrite the whole file and hide your change among hundreds of others. A developer needs to look at this before anyone edits here."
+      );
+      return;
+    }
+
+    state.raw = raw;
+    state.original = clone(extracted.data);
+    state.draft = clone(extracted.data);
+
+    $("boot").hidden = true;
+    $("app").hidden = false;
+
+    // dataStatus controls the banner on the public page, so it belongs with
+    // the governance checks rather than buried in a product form.
+    var bar = el("div", "sect");
+    var g = grid();
+    g.appendChild(selectField("Data status", state.draft.meta, "dataStatus", DATA_STATUSES,
+      { help: "Controls the banner shown on the public dashboard" }));
+    var lu = field("Last updated");
+    var luInput = document.createElement("input");
+    luInput.type = "text";
+    luInput.id = lu._id;
+    luInput.value = state.draft.meta.lastUpdated || "";
+    luInput.readOnly = true;
+    luInput.style.background = "var(--band)";
+    luInput.style.color = "var(--soft)";
+    lu.appendChild(luInput);
+    help(lu, "Set to today automatically when you save");
+    g.appendChild(lu);
+    bar.appendChild(g);
+    $("findings").parentNode.insertBefore(bar, $("findings"));
+
+    refreshProductChoices();
+
+    $("clChange").addEventListener("input", touched);
+    $("clPlain").addEventListener("input", touched);
+    $("clProduct").addEventListener("change", touched);
+    $("btnSave").addEventListener("click", save);
+    $("btnReset").addEventListener("click", reset);
+    $("impFile").addEventListener("change", function (e) {
+      takeFiles(e.target.files);
+    });
+    $("impClose").addEventListener("click", function () { $("importPanel").hidden = true; });
+    $("btnPreview").addEventListener("click", togglePreview);
+    $("btnPreviewRefresh").addEventListener("click", buildPreview);
+    $("btnPreviewTab").addEventListener("click", function () {
+      if (preview.url) window.open(preview.url, "_blank", "noopener");
+    });
+
+    window.addEventListener("beforeunload", function (e) {
+      if (changedProducts().length ||
+          JSON.stringify(state.draft.meta) !== JSON.stringify(state.original.meta)) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    });
+
+    renderTabs();
+    renderProduct();
+    refresh();
+  }
+})();
+</script>
+</body>
+</html>
