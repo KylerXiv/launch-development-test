@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-09-23T10:34:48.344Z",
+  "generated_at": "2026-09-28T10:38:24.118Z",
   "page": "illustrated-journey-dashboard.html",
   "note": "Inventory only. The js bucket is regex candidates and must be reviewed before any substitution.",
   "counts": {
-    "data": 258,
+    "data": 228,
     "markup": 80,
-    "js": 117
+    "js": 115
   },
   "strings": {
     "data": [
@@ -842,110 +842,6 @@
         "where": "resistance.dict.country[69]"
       },
       {
-        "text": "Amodiaquine+sulfadoxine-pyrimethamine",
-        "where": "resistance.dict.drug[0]"
-      },
-      {
-        "text": "Artemether-lumefantrine",
-        "where": "resistance.dict.drug[1]"
-      },
-      {
-        "text": "Artemether-lumefantrine + amodiaquine",
-        "where": "resistance.dict.drug[2]"
-      },
-      {
-        "text": "Artemether-lumefantrine+primaquine",
-        "where": "resistance.dict.drug[3]"
-      },
-      {
-        "text": "Artemisinin-piperaquine",
-        "where": "resistance.dict.drug[4]"
-      },
-      {
-        "text": "Arterolane-piperaquine",
-        "where": "resistance.dict.drug[5]"
-      },
-      {
-        "text": "Arterolane–piperaquine–mefloquine",
-        "where": "resistance.dict.drug[6]"
-      },
-      {
-        "text": "Artesunate",
-        "where": "resistance.dict.drug[7]"
-      },
-      {
-        "text": "Artesunate+atovaquone-proguanil",
-        "where": "resistance.dict.drug[8]"
-      },
-      {
-        "text": "Artesunate+dihydroartemisinin-piperaquine",
-        "where": "resistance.dict.drug[9]"
-      },
-      {
-        "text": "Artesunate+primaquine",
-        "where": "resistance.dict.drug[10]"
-      },
-      {
-        "text": "Artesunate+sulfadoxine-pyrimethamine",
-        "where": "resistance.dict.drug[11]"
-      },
-      {
-        "text": "Artesunate+sulfadoxine-pyrimethamine+primaquine",
-        "where": "resistance.dict.drug[12]"
-      },
-      {
-        "text": "Artesunate-amodiaquine",
-        "where": "resistance.dict.drug[13]"
-      },
-      {
-        "text": "Artesunate-amodiaquine+primaquine",
-        "where": "resistance.dict.drug[14]"
-      },
-      {
-        "text": "Artesunate-mefloquine",
-        "where": "resistance.dict.drug[15]"
-      },
-      {
-        "text": "Artesunate-mefloquine+primaquine",
-        "where": "resistance.dict.drug[16]"
-      },
-      {
-        "text": "Artesunate-pyronaridine",
-        "where": "resistance.dict.drug[17]"
-      },
-      {
-        "text": "Artesunate-pyronaridine+primaquine",
-        "where": "resistance.dict.drug[18]"
-      },
-      {
-        "text": "Atovaquone-proguanil",
-        "where": "resistance.dict.drug[19]"
-      },
-      {
-        "text": "Chloroquine",
-        "where": "resistance.dict.drug[20]"
-      },
-      {
-        "text": "Chloroquine-primaquine",
-        "where": "resistance.dict.drug[21]"
-      },
-      {
-        "text": "Dihydroartemisinin-piperaquine",
-        "where": "resistance.dict.drug[22]"
-      },
-      {
-        "text": "Dihydroartemisinin-piperaquine+mefloquine",
-        "where": "resistance.dict.drug[23]"
-      },
-      {
-        "text": "Dihydroartemisinin-piperaquine+primaquine",
-        "where": "resistance.dict.drug[24]"
-      },
-      {
-        "text": "Quinine+primaquine",
-        "where": "resistance.dict.drug[25]"
-      },
-      {
         "text": "Resistance-associated genotype, % of samples genotyped",
         "where": "markers.meta.metric"
       },
@@ -1024,22 +920,6 @@
       {
         "text": "South Sudan",
         "where": "markers.dict.country[63]"
-      },
-      {
-        "text": "Pfcrt K76T",
-        "where": "markers.dict.marker[0]"
-      },
-      {
-        "text": "Pfkelch13",
-        "where": "markers.dict.marker[1]"
-      },
-      {
-        "text": "Pfmdr1 amplifications",
-        "where": "markers.dict.marker[2]"
-      },
-      {
-        "text": "Pfplasmepsin 2-3 amplifications",
-        "where": "markers.dict.marker[3]"
       }
     ],
     "markup": [
@@ -1498,10 +1378,6 @@
         "where": "line 2615"
       },
       {
-        "text": "P. falciparum",
-        "where": "line 2639"
-      },
-      {
         "text": "Delayed parasite clearance",
         "where": "line 2666"
       },
@@ -1520,10 +1396,6 @@
       {
         "text": "Sites too close to draw apart at this zoom merge into one numbered dot, pooled across them by patient count. Zoom in to separate them; click any dot for the studies behind it.",
         "where": "line 2859"
-      },
-      {
-        "text": "Pfplasmepsin 2-3 amplifications",
-        "where": "line 2924"
       },
       {
         "text": "Study year",
