@@ -152,6 +152,17 @@ GitHub, for the test repository:
   nothing.
 - Not in this commit: the uncommitted `.DS_Store` line in `.gitignore`, which
   belongs to the parked staging work.
+- **Merged `main` in, 28 Sep.** PR #1 on the test repository conflicted with
+  `main`, and GitHub runs no `pull_request` workflows on a conflicting PR — 0
+  Actions runs were registered. The two green "Vercel" checks on it came from
+  Vercel's Git integration, not from `pr-preview.yml`. `main` had three commits
+  the branch lacked: the issue form committed separately (`93e2f19` against the
+  branch's `6079702`), Keith's 10 Sep "disable button" (`7e7b219`), and the
+  merge of PR #10. The only conflict was `propose-change.yml`, add/add. Kept the
+  branch's copy: the three lines only `main` has are the old "What it should
+  say" description, which the branch rewrote without dropping its status
+  guidance. `illustrated-journey-dashboard.html` merged cleanly: 24 lines that
+  make the Subscribe and Send buttons inert. All 3 inline scripts still parse.
 - `actionlint` 1.7.12 with `shellcheck` 0.11.0: clean on every changed workflow.
   The one finding is a pre-existing style note in `sourcing.yml`.
 - **Local simulation: 36/36.** It runs the workflows' own `run:` blocks, taken
