@@ -1,10 +1,15 @@
 #!/usr/bin/env node
 /**
- * scripts/translate-strings.js  —  DEV-31 step 2
+ * scripts/translate-strings.js
  *
- * Translates the inventory from extract-strings.js into French and Portuguese
- * using Google Cloud Translation, and saves the results in a translation
- * memory at i18n/translations.json.
+ * Translates the TEXT section of i18n/content.en.json into French and
+ * Portuguese using Google Cloud Translation, and saves the results in a
+ * translation memory at i18n/translations.json.
+ *
+ * It never reads the page or data/*.js, and never opens the VALUES section of
+ * content.en.json, so figures, URLs and citations cannot reach the engine. It
+ * does no hashing either: each string's key was computed once, by
+ * scripts/assemble-content.js, and is read from content.en.json.
  *
  *   node scripts/translate-strings.js --dry-run          # cost, no API calls
  *   node scripts/translate-strings.js --locale=fr
@@ -18,7 +23,7 @@
  *      no lock flags and no state to maintain.
  *
  *   2. CONTENT-ADDRESSED. Each entry is keyed by a fingerprint of the ENGLISH,
- *      sha256(text).slice(0,16). Edit the English and its fingerprint changes,
+ *      key(text) in scripts/i18n-hash.js. Edit the English and its fingerprint changes,
  *      nothing matches, and it re-translates by itself. Nobody has to keep a
  *      list of translations that went stale.
  *
@@ -28,9 +33,8 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
-const { execFileSync } = require("child_process");
 const { identifiers } = require("./i18n-identifiers");
+const { requireFresh } = require("./assemble-content");
 
 const ROOT = path.resolve(__dirname, "..");
 const MEM = path.join(ROOT, "i18n", "translations.json");
@@ -56,21 +60,21 @@ const DENY_PATTERN = [
 const IDENT = identifiers(ROOT);
 const denied = (t) => IDENT.has(t) || DENY_EXACT.has(t) || DENY_PATTERN.some((r) => r.test(t));
 
-const fp = (s) => crypto.createHash("sha256").update(s, "utf8").digest("hex").slice(0, 16);
+// ---------------------------------------------------------------------------
+// inventory — the text section of content.en.json, nothing else
+// ---------------------------------------------------------------------------
+// requireFresh() re-hashes the source first and exits if content.en.json is
+// stale or was edited by hand, so nothing is ever translated from an old file.
+function inventory(content) {
+  return content.text.map((e) => ({ key: e.key, text: e.en, where: e.where, bucket: e.bucket }));
+}
 
-// ---------------------------------------------------------------------------
-// inventory — reuse the extractor rather than re-deriving the string list
-// ---------------------------------------------------------------------------
-function inventory() {
-  const tmp = path.join(ROOT, "i18n", "strings.en.json");
-  execFileSync(process.execPath, [path.join(__dirname, "extract-strings.js"), "--write"],
-               { cwd: ROOT, stdio: "pipe" });
-  const j = JSON.parse(fs.readFileSync(tmp, "utf8"));
-  const all = [];
-  for (const b of ["data", "markup", "js"]) {
-    for (const s of j.strings[b]) all.push({ ...s, bucket: b });
-  }
-  return all;
+// CP-4 — the approval gate. NOT WIRED YET: where the approval record lives (a
+// file in the repo, a git tag or a merged PR) is still to be settled. Once it
+// is, this must exit unless content.contentHash is approved, because nothing
+// may reach a translation engine before approval. Until then it only reports.
+function approvalGate(content) {
+  return `${content.contentHash.slice(0, 12)}…  (approval check not wired yet, CP-4)`;
 }
 
 function loadMemory() {
@@ -177,7 +181,8 @@ async function main() {
     process.exit(1);
   }
 
-  const all = inventory();
+  const content = requireFresh();
+  const all = inventory(content);
   const mem = loadMemory();
 
   const kept = all.filter((s) => !denied(s.text));
@@ -188,14 +193,15 @@ async function main() {
   const report = {};
   for (const loc of locales) {
     const todo = kept.filter((s) => {
-      const e = mem.entries[fp(s.text)];
+      const e = mem.entries[s.key];
       return !e || !e[loc];
     });
     report[loc] = todo;
   }
 
   console.log("");
-  console.log(`  inventory        ${all.length} strings`);
+  console.log(`  contentHash      ${approvalGate(content)}`);
+  console.log(`  content.en.json  ${all.length} strings`);
   console.log(`  deny-listed      ${skipped} skipped (species, gene markers, selectors)`);
   console.log(`  translatable     ${kept.length}`);
   for (const loc of locales) {
@@ -222,7 +228,7 @@ async function main() {
     slice.forEach((s, j) => {
       const back = restore(outs[j], masked[j].holes);
       if (back === null) { rejected.push(s.text); return; }   // keep English
-      const k = fp(s.text);
+      const k = s.key;
       const e = (mem.entries[k] ||= { en: s.text, where: s.where, bucket: s.bucket });
       if (!e[locale]) e[locale] = back;          // empty-locale-only, enforced here too
     });

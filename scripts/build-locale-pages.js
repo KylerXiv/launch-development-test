@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/build-locale-pages.js  —  DEV-31 step 3
+ * scripts/build-locale-pages.js
  *
  * Produces French and Portuguese copies of the illustrated journey dashboard
  * by substitution at build time. The source page and the source data files are
@@ -21,6 +21,11 @@
  * the page's JavaScript is to serve it French data. The copies are generated,
  * never hand-edited, and never written back into data/.
  *
+ * Which strings may be substituted comes from i18n/content.en.json: a string is
+ * replaced only if it is in the approved text section AND has a translation in
+ * i18n/translations.json. Keys are read from content.en.json, not recomputed.
+ * The build exits first if content.en.json is stale (assemble-content.js).
+ *
  * Substitution is exact-match only, and each kind is handled separately:
  *
  *   data    the JSON is parsed, values replaced at the allow-listed paths,
@@ -33,8 +38,9 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
 const { identifiers } = require("./i18n-identifiers");
+const { normalise } = require("./i18n-hash");
+const { requireFresh } = require("./assemble-content");
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "dist", "locale");
@@ -49,7 +55,6 @@ const GLOBALS = {
   "data/molecular-markers.js": "window.LAUNCH_MOLECULAR_MARKERS",
 };
 
-const fp = (s) => crypto.createHash("sha256").update(s, "utf8").digest("hex").slice(0, 16);
 
 // Drug, marker and species names are LOOKUP KEYS. The build never translates an
 // object key, so translating the same string anywhere else — a dict column, a
@@ -69,11 +74,24 @@ if (!fs.existsSync(MEM)) {
 }
 const MEMORY = JSON.parse(fs.readFileSync(MEM, "utf8")).entries;
 
+// English -> key, from the approved text section of content.en.json. The builder
+// does no hashing: a string that is not in content.en.json has no key, so it is
+// never substituted, whatever the memory holds. --verify only inspects dist/ and
+// does not need the content file.
+const KEY_OF = new Map();
+if (!verifyOnly) {
+  for (const e of requireFresh().text) KEY_OF.set(normalise(e.en), e.key);
+}
+const entryOf = (text) => {
+  const k = KEY_OF.get(normalise(text));
+  return k ? MEMORY[k] : undefined;
+};
+
 const stat = {};
 function tr(locale, text) {
   const t = String(text == null ? "" : text);
   if (IDENT.has(t.trim())) return t;          // identifier, not a label
-  const e = MEMORY[fp(t.trim())];
+  const e = entryOf(t);
   const v = e && e[locale];
   const s = (stat[locale] ||= { hit: 0, miss: 0, missed: new Set() });
   if (v) { s.hit++; return v; }
@@ -191,7 +209,7 @@ function localisePage(html, loc) {
     const t = body.trim();
     if (!t) return whole;
     if (IDENT.has(t)) return whole;             // PRODUCT_DRUG and friends are lookup keys
-    const e = MEMORY[fp(t)];
+    const e = entryOf(t);
     if (!e || !e[loc]) return whole;
     const out = e[loc];
     // never introduce a quote that would close the literal early
@@ -211,7 +229,7 @@ function localisePage(html, loc) {
     // a text node, and substituting into it rewrites live code
     if (!/^[\p{L}\d\u2022\u00b7\u26a0"'(]/u.test(norm)) return whole;
     if (isCodeChars(norm)) return whole;
-    const e = MEMORY[fp(norm)];
+    const e = entryOf(norm);
     if (!e || !e[loc]) return whole;
     if (/["'`\\]/.test(e[loc])) return whole;      // never inject a quote into a literal
     stat[loc].hit++;
@@ -318,7 +336,7 @@ function verify() {
   if (failures) {
     console.error(`\n  BUILD FAILED \u2014 ${failures} check(s) did not pass.`);
     console.error("  A lookup key has been translated. The page would render fine and the");
-    console.error("  threat map would be EMPTY. See docs/TRANSLATION-PIPELINE.md \u00a73 rule 1b,");
+    console.error("  threat map would be EMPTY. See docs/jackson/DEV-31.md (rule 1b)");
     console.error("  and scripts/i18n-identifiers.js.\n");
     process.exit(1);
   }
