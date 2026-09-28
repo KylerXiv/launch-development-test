@@ -2,14 +2,18 @@ name: Proposal decision
 
 # Runs when a reviewer labels a proposal issue.
 #
-#   approved      -> applies the SNAPSHOT taken at intake, opens a pull
-#                    request, and lets the checks merge it.
+#   approved      -> merges the proposal's pull request, which intake opened
+#                    and pr-preview.yml previewed — but only once it has
+#                    checked that the PR's data file is exactly the SNAPSHOT
+#                    taken at intake, applied to main as main is now. If main
+#                    has moved or the branch was edited, it rebuilds the PR
+#                    and its preview instead and asks for the approval again:
+#                    what merges is always what the reviewer was shown.
 #   rejected:...  -> records the reason and the fingerprint in
-#                    data/decisions.js, and closes the issue. The fingerprint
-#                    is what stops the same suggestion being offered again.
+#                    data/decisions.js, closes the issue and its PR.
 #
 # The reviewer never types a value anywhere in this flow. The only thing this
-# workflow will apply is what was proposed and snapshotted.
+# workflow will merge is what was proposed and snapshotted.
 
 on:
   issues:
@@ -19,6 +23,7 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  actions: write   # to start pr-preview, vercel-deploy and publish; see below
 
 concurrency:
   group: bot-push-main
@@ -50,6 +55,19 @@ jobs:
           gh issue edit "${{ github.event.issue.number }}" --remove-label approved
           exit 1
 
+      - name: Refuse while intake says the proposal is broken
+        if: contains(github.event.issue.labels.*.name, 'needs-fixing')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ github.event.issue.number }}" --body \
+            "**Not approved.** The current version of this proposal could not be read — see the bot's comment above. Fix the issue first; the label has been removed."
+          gh issue edit "${{ github.event.issue.number }}" --remove-label approved
+          exit 1
+
+      # Written out unchanged, with no approver in it: the pull request was
+      # built from exactly this, and the check below rebuilds it to compare.
+      # The approver's name goes on the merge commit and the issue instead.
       - name: Take the snapshot recorded at intake
         run: |
           node -e '
@@ -60,52 +78,110 @@ jobs:
             const n = Number(process.env.ISSUE_NUMBER);
             const p = got.data.proposals.find((x) => x.issue === n);
             if (!p) { console.error("No recorded proposal for issue #" + n + ". Re-file it, or edit the issue to re-run intake."); process.exit(1); }
-            p.state = "approved";
-            p.decision = { by: process.env.APPROVER, on: new Date().toISOString().slice(0, 10) };
             fs.writeFileSync("/tmp/proposal.json", JSON.stringify(p, null, 2));
           '
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          APPROVER: ${{ github.event.sender.login }}
 
-      - name: Apply it to the record
-        run: node scripts/proposal-lib.js apply /tmp/proposal.json
-
-      - name: Check the whole file, exactly as CI would
-        run: node scripts/validate-data.js
-
-      - name: Open a pull request, and let the checks merge it
+      - name: Find the pull request that carries it
         id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          BRANCH="proposal/${{ github.event.issue.number }}"
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
-          git add data/products.js data/proposals.js
-          git commit -m "Apply proposal #${{ github.event.issue.number }}, approved by @${{ github.event.sender.login }}
+          read -r PR SHA < <(gh pr list --head "proposal/$ISSUE_NUMBER" --state open --json number,headRefOid \
+            --jq '.[0] // {} | [.number // "", .headRefOid // ""] | @tsv')
+          if [ -z "$PR" ]; then
+            gh issue comment "$ISSUE_NUMBER" --body \
+              "**Not approved.** No open pull request carries this proposal. Edit the issue (any change) to rebuild it, then approve again. The label has been removed."
+            gh issue edit "$ISSUE_NUMBER" --remove-label approved
+            exit 1
+          fi
+          echo "pr=$PR" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
-          Closes #${{ github.event.issue.number }}"
-          git push -u origin "$BRANCH"
-          URL=$(gh pr create \
-            --base main --head "$BRANCH" \
-            --title "Apply proposal #${{ github.event.issue.number }}" \
-            --body "Approved by @${{ github.event.sender.login }} on issue #${{ github.event.issue.number }}. The change applied here is the snapshot taken when the proposal was filed.
-
-          Closes #${{ github.event.issue.number }}")
-          echo "url=$URL" >> "$GITHUB_OUTPUT"
-          # Needs auto-merge switched on for the repository and a branch
-          # protection rule with required checks. Without those this is a
-          # no-op and the pull request simply waits for a human to merge it.
-          gh pr merge --auto --squash "$URL" || echo "auto-merge not available — the pull request is open and waiting"
-
-      - name: Say where it went
+      # The reviewer saw the diff and the preview of $SHA. Merge it only if
+      # its data file is byte-for-byte the snapshot applied to main as main is
+      # NOW, and it touches nothing else. Rebuilt with the date intake stamped,
+      # so an approval on a later day still matches.
+      - name: Check it is still exactly the proposal, on main as it is now
+        id: verify
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          PR: ${{ steps.pr.outputs.pr }}
+          SHA: ${{ steps.pr.outputs.sha }}
         run: |
-          gh issue comment "${{ github.event.issue.number }}" --body \
-            "**Approved by @${{ github.event.sender.login }}.** Applied and opened as ${{ steps.pr.outputs.url }} — it merges itself once the checks pass. If they fail, nothing lands and the dashboard keeps yesterday's version."
+          git fetch --quiet --depth=1 origin "refs/heads/proposal/$ISSUE_NUMBER"
+          if [ "$(git rev-parse FETCH_HEAD)" != "$SHA" ]; then
+            echo "The branch moved while this ran."
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ON=$(git show "$SHA:data/products.js" | node -e '
+            const rules = require("./scripts/data-rules.js");
+            let raw = "";
+            process.stdin.on("data", (c) => (raw += c)).on("end", () => {
+              const got = rules.extractData(raw, "LAUNCH_DATA");
+              process.stdout.write(got.ok ? String(got.data.meta.lastUpdated || "") : "");
+            });
+          ')
+          FILES=$(gh pr diff "$PR" --name-only)
+          node scripts/proposal-lib.js apply /tmp/proposal.json ${ON:+"$ON"}
+          if [ "$FILES" = "data/products.js" ] && git diff --quiet "$SHA" -- data/products.js; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Changed files: $FILES"
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            git checkout data/products.js
+          fi
+
+      - name: Check the whole file, exactly as CI would
+        if: steps.verify.outputs.current == 'true'
+        run: node scripts/validate-data.js
+
+      # A merge made with GITHUB_TOKEN fires no push workflows, so this starts
+      # the two that a push to main would have started. A person merging the
+      # pull request by hand starts them the ordinary way.
+      - name: Merge it, and rebuild production
+        if: steps.verify.outputs.current == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          PR: ${{ steps.pr.outputs.pr }}
+          SHA: ${{ steps.pr.outputs.sha }}
+          APPROVER: ${{ github.event.sender.login }}
+        run: |
+          gh pr merge "$PR" --squash --match-head-commit "$SHA" --delete-branch \
+            --subject "Apply proposal #$ISSUE_NUMBER, approved by @$APPROVER" \
+            --body "Closes #$ISSUE_NUMBER"
+          gh workflow run vercel-deploy.yml --ref main
+          gh workflow run publish.yml --ref main
+          gh issue comment "$ISSUE_NUMBER" --body \
+            "**Approved by @$APPROVER.** #$PR is merged and the production dashboard is being rebuilt from it."
+
+      - name: Main has moved, or the branch was changed — rebuild, and ask again
+        if: steps.verify.outputs.current == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          PR=$(bash scripts/proposal-pr.sh "$ISSUE_NUMBER" /tmp/proposal.json | sed -n 's/^pr=//p')
+          gh workflow run pr-preview.yml --ref main -f pr="$PR"
+          gh issue edit "$ISSUE_NUMBER" --remove-label approved
+          gh issue comment "$ISSUE_NUMBER" --body \
+            "**Not merged yet.** Since the preview was built, \`main\` has changed underneath #$PR, or the branch itself was edited — so what would merge is no longer what was reviewed. #$PR has been rebuilt from the proposal on today's \`main\`, and its preview is being rebuilt. Check the new preview, then label \`approved\` again."
+
+      # "Approved but not landed" must never look like success.
+      - name: Say that nothing was merged
+        if: failure() && steps.pr.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body \
+            "**Not merged.** The approval stopped before anything landed — see [the run]($RUN). Production is unchanged."
 
   reject:
     if: startsWith(github.event.label.name, 'rejected')
@@ -128,7 +204,9 @@ jobs:
               const raw = fs.readFileSync(f, "utf8");
               const got = rules.extractData(raw, g);
               if (!got.ok) throw new Error("cannot read " + f);
-              return { raw, head: raw.slice(0, raw.indexOf("window." + g)), data: got.data };
+              // Line-start match, as extractData does: proposals.js quotes
+              // the assignment in its header comment.
+              return { raw, head: raw.slice(0, raw.search(new RegExp("^window\\." + g + "\\s*=", "m"))), data: got.data };
             };
             const n = Number(process.env.ISSUE_NUMBER);
             const props = read("data/proposals.js", "LAUNCH_PROPOSALS");
@@ -154,15 +232,21 @@ jobs:
           LABEL: ${{ github.event.label.name }}
           DECIDER: ${{ github.event.sender.login }}
 
-      - name: Commit it and close the issue
+      # The label name reaches the shell through env only. Anyone who can
+      # create labels chooses it, and `${{ }}` inside run: would execute it.
+      - name: Commit it, and close the issue and its pull request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          LABEL: ${{ github.event.label.name }}
+          DECIDER: ${{ github.event.sender.login }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/decisions.js data/proposals.js
-          git diff --cached --quiet || git commit -m "Proposal #${{ github.event.issue.number }}: rejected (${{ github.event.label.name }})"
+          git diff --cached --quiet || git commit -m "Proposal #$ISSUE_NUMBER: rejected ($LABEL)"
           git push
-          gh issue comment "${{ github.event.issue.number }}" --body \
-            "**Rejected by @${{ github.event.sender.login }} — ${{ github.event.label.name }}.** Nothing was published. The decision is recorded in \`data/decisions.js\`, and the same change will not be proposed again by a fetcher."
-          gh issue close "${{ github.event.issue.number }}"
+          gh pr close "proposal/$ISSUE_NUMBER" --delete-branch --comment "Rejected on #$ISSUE_NUMBER ($LABEL)." || echo "No open pull request for proposal/$ISSUE_NUMBER."
+          gh issue comment "$ISSUE_NUMBER" --body \
+            "**Rejected by @$DECIDER — $LABEL.** Nothing was published. The decision and its fingerprint are recorded in \`data/decisions.js\`."
+          gh issue close "$ISSUE_NUMBER"

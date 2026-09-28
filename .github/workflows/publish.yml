@@ -4,10 +4,15 @@ name: Snapshot history and rebuild feed
 # touches history/, feed.xml and the two generated ontology exports
 # (launch-data.jsonld, launch-history.jsonld), which do NOT match this path
 # filter, so it cannot retrigger itself.
+#
+# workflow_dispatch: proposal-decision.yml merges approved proposals with
+# GITHUB_TOKEN, which fires no push workflows, so it starts this one by hand
+# on main. Re-running it on an unchanged file commits nothing.
 on:
   push:
     branches: [main]
     paths: ["data/products.js"]
+  workflow_dispatch:
 
 permissions:
   contents: write

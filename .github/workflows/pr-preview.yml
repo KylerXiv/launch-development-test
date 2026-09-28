@@ -1,0 +1,145 @@
+name: Proposal preview
+
+# Builds the public dashboard from the exact commit a pull request carries and
+# deploys it as a Vercel PREVIEW — never production — so the reviewer can open
+# the real pages, with the proposed change in them, before anyone decides.
+#
+# THE BUILD IS THE PRODUCTION BUILD. `vercel build` runs vercel.json's
+# buildCommand, which is scripts/build-public-site.sh and its fixed list of
+# public files. Only that output is uploaded (--prebuilt), so data/proposals.js,
+# data/decisions.js, sourcing/, docs/ and editor.html never leave GitHub. A
+# preview can show nothing production would not, except the proposed values.
+#
+# THE VALIDATOR RUNS FIRST. A pull request that fails it gets no preview, and
+# the comment says so — a stale link must never look like a current one.
+#
+# TRIGGERS. A pull request opened or updated by a person fires pull_request as
+# usual. One opened or updated by the proposal bot does not: events made with
+# GITHUB_TOKEN start no workflows. proposal-intake.yml and
+# proposal-decision.yml therefore dispatch this workflow themselves, which
+# GITHUB_TOKEN is allowed to do; a dispatched run uses this file as it stands
+# on main, not the pull request's copy of it.
+#
+# ACCESS. Anyone holding a preview URL can open it — Deployment Protection is
+# off on the preview project, a deliberate choice recorded in
+# docs/pr-preview-notes.md. The URL is posted only on the pull request.
+#
+# Needs repository secrets VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "Pull request number to preview"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+# A newer commit on the same pull request makes an in-flight build pointless.
+concurrency:
+  group: preview-${{ github.event.pull_request.number || inputs.pr }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Pull requests from forks get no secrets, so there is nothing to deploy with.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find the commit under review
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number || inputs.pr }}
+        run: |
+          [[ "$PR" =~ ^[0-9]+$ ]] || { echo "::error::not a pull request number: $PR"; exit 1; }
+          read -r STATE BASE SHA < <(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" \
+            --json state,baseRefName,headRefOid --jq '[.state, .baseRefName, .headRefOid] | @tsv')
+          [ "$STATE" = "OPEN" ] || { echo "::error::#$PR is $STATE, not open"; exit 1; }
+          [ "$BASE" = "main" ] || { echo "::error::#$PR targets $BASE, not main"; exit 1; }
+          echo "number=$PR" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      # No stored credential: nothing in this job pushes, and the pull request's
+      # own scripts run in the build step below.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate the data, exactly as CI does
+        run: |
+          node scripts/validate-data.js
+          node scripts/validate-data.js data/products.synthetic.js
+
+      - name: Install the Vercel CLI
+        run: npm install --global vercel@60.1.3
+
+      - name: Fetch the preview project's settings
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+
+      # Runs build-public-site.sh from the pull request, into .vercel/output.
+      - name: Build the public dashboard from this commit
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel build
+
+      - name: Deploy it as a preview
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          URL=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Preview: $URL" >> "$GITHUB_STEP_SUMMARY"
+
+      # One comment per pull request, edited in place, so the link on the page
+      # is always the one for the commit being reviewed.
+      - name: Put the link on the pull request
+        if: ${{ !cancelled() && steps.pr.outputs.number != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.number }}
+          SHA: ${{ steps.pr.outputs.sha }}
+          URL: ${{ steps.deploy.outputs.url }}
+          STATUS: ${{ job.status }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          MARK='<!-- proposal-preview -->'
+          if [ "$STATUS" = "success" ] && [ -n "$URL" ]; then
+            BODY=$(printf '%s\n' "$MARK" \
+              "### Public dashboard preview" "" \
+              "This preview shows what the public dashboard will look like if this pull request is merged." "" \
+              "**Preview:** $URL" "" \
+              "Built from \`${SHA:0:7}\`, the commit on this pull request now. Production is unchanged until it merges.")
+          else
+            BODY=$(printf '%s\n' "$MARK" \
+              "### Public dashboard preview — failed" "" \
+              "No preview could be built for \`${SHA:0:7}\`. **Do not approve on an earlier preview link** — it shows an older commit." "" \
+              "What went wrong is in [the run]($RUN). If it is the validator, the proposal breaks the data rules as it stands.")
+          fi
+          ID=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$MARK\"))) | .id" | head -n 1)
+          if [ -n "$ID" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$ID" -f body="$BODY" > /dev/null
+          else
+            gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -f body="$BODY" > /dev/null
+          fi

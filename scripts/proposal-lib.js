@@ -9,7 +9,8 @@
 //
 //   node scripts/proposal-lib.js parse    <issue-body.md>   -> the proposal, as JSON
 //   node scripts/proposal-lib.js check    <issue-body.md>   -> what the bot would comment
-//   node scripts/proposal-lib.js apply    <proposal.json>   -> writes data/products.js
+//   node scripts/proposal-lib.js apply    <proposal.json> [YYYY-MM-DD]
+//                                                           -> writes data/products.js
 //   node scripts/proposal-lib.js selftest                   -> runs the fixture end to end
 //
 // It never publishes anything. `apply` writes the data file and stops; the
@@ -309,8 +310,15 @@ function cli(argv) {
 
   if (cmd === "apply") {
     const proposal = JSON.parse(fs.readFileSync(arg, "utf8"));
+    // Optional fixed date, so the approval can rebuild the proposal commit
+    // exactly as intake built it and compare the two — see proposal-decision.yml.
+    const on = argv[2];
+    if (on && !/^\d{4}-\d{2}-\d{2}$/.test(on)) {
+      console.error("apply: the date must be YYYY-MM-DD, got " + on);
+      process.exit(2);
+    }
     const got = readData();
-    const res = checkApplied(got.data, proposal);
+    const res = checkApplied(got.data, proposal, on);
     if (res.errors.length) {
       console.error("Refusing to apply — the result would break the data rules:");
       res.errors.forEach((e) => console.error("  " + e));
@@ -325,7 +333,7 @@ function cli(argv) {
 
   if (cmd === "selftest") return selftest();
 
-  console.error("usage: proposal-lib.js parse|check <issue-body.md> | apply <proposal.json> | selftest");
+  console.error("usage: proposal-lib.js parse|check <issue-body.md> | apply <proposal.json> [YYYY-MM-DD] | selftest");
   process.exit(2);
 }
 

@@ -596,6 +596,10 @@ the same time.
 
 ### The reviewer sees the rendered page, without a page being built
 
+> **Superseded 28 Sep** by a Vercel preview of the whole public site, built
+> from the proposal's pull request — see `docs/pr-preview-notes.md`. The
+> `preview.html` artifact described below is no longer produced.
+
 Asked 22 Sep: could approval happen on `preview.html` rather than on GitHub?
 **Approving *on* it: no.** A static page cannot write anything without holding a
 credential, which means building it, hosting it, gating it and storing a token —

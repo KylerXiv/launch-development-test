@@ -468,6 +468,10 @@ one waiting on Unitaid's plan tier.**
 artifact, readable by people with repository access and nobody else. No host, no
 cost, no account tier.
 
+> **Superseded 28 Sep:** the viewer is now a link-only Vercel preview of the
+> whole public site, built from the proposal's pull request —
+> `docs/pr-preview-notes.md`.
+
 | Rejected | Because |
 |---|---|
 | Pages on the private repo | The site is public regardless of the repo. Personal account, no Enterprise Cloud |

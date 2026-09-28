@@ -9,7 +9,10 @@ name: Proposal intake
 # can be edited by anyone with write access, and "the reviewer cannot change
 # the proposal" has to be true rather than merely intended.
 #
-# Nothing here touches data/products.js.
+# And it opens the proposal as a pull request (scripts/proposal-pr.sh), then
+# asks pr-preview.yml to build the public dashboard from it, so the reviewer
+# sees the diff and the real page before deciding. The pull request is the
+# only place data/products.js changes; main is not touched until approval.
 
 on:
   issues:
@@ -18,6 +21,8 @@ on:
 permissions:
   contents: write
   issues: write
+  pull-requests: write
+  actions: write   # to dispatch pr-preview.yml — a bot-opened PR triggers nothing by itself
 
 concurrency:
   group: bot-push-main
@@ -25,7 +30,8 @@ concurrency:
 
 jobs:
   check:
-    if: contains(github.event.issue.labels.*.name, 'proposal')
+    # Not on a closed issue: editing a rejected proposal must not reopen its PR.
+    if: contains(github.event.issue.labels.*.name, 'proposal') && github.event.issue.state == 'open'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,39 +61,37 @@ jobs:
           set -e
           node scripts/proposal-lib.js parse /tmp/issue-body.md > /tmp/proposal.json 2>/dev/null || true
 
-      # So a reviewer can see the change on the real dashboard before deciding.
-      # preview.html is one self-contained file, so this needs no hosting: it
-      # is attached to the run, and only people with access to the repository
-      # can download it.
-      #
-      # This modifies data/products.js in the checkout on purpose. Nothing
-      # commits it — the snapshot step below adds data/proposals.js by name,
-      # and the file is put back immediately after the preview is built.
-      - name: Build a preview of the dashboard with the change in it
+      # The proposal applied to main, on proposal/<n>, with an open pull request
+      # carrying it. Rebuilt from scratch on every edit. The branch commit is
+      # the only place data/products.js changes; this checkout of main is
+      # returned to clean.
+      - name: Open the proposal as a pull request
+        id: pr
         if: steps.check.outputs.status == '0'
-        run: |
-          node scripts/proposal-lib.js apply /tmp/proposal.json
-          node scripts/make-preview.js
-          git checkout data/products.js
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: bash scripts/proposal-pr.sh "$ISSUE_NUMBER" /tmp/proposal.json
 
-      - uses: actions/upload-artifact@v4
+      # The push above was made with GITHUB_TOKEN, so it fired no workflow.
+      - name: Build the public dashboard preview on it
         if: steps.check.outputs.status == '0'
-        with:
-          name: preview-proposal-${{ github.event.issue.number }}
-          path: preview.html
-          retention-days: 30
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.pr }}
+        run: gh workflow run pr-preview.yml --ref main -f pr="$PR"
 
       - name: Say what it would change, or what is wrong
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.pr }}
         run: |
           if [ "${{ steps.check.outputs.status }}" = "0" ]; then
             {
               echo
               echo "### See it on the page first"
               echo
-              echo "A copy of the dashboard with this change in it is attached to [this run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) \
-          — download \`preview-proposal-${{ github.event.issue.number }}\` and open \`preview.html\`. Nothing is public; it is only visible to people with access to this repository."
+              echo "The change is applied in #$PR. Its diff is exactly what would change, and a link to the public dashboard with the change in it appears there in a minute or two. Production does not change until this is approved."
             } >> /tmp/comment.md
           fi
           gh issue comment "${{ github.event.issue.number }}" --body-file /tmp/comment.md
@@ -111,7 +115,10 @@ jobs:
             const rules = require("./scripts/data-rules.js");
             const file = "data/proposals.js";
             const raw = fs.readFileSync(file, "utf8");
-            const head = raw.slice(0, raw.indexOf("window.LAUNCH_PROPOSALS"));
+            // The assignment at a line start, as extractData finds it — the
+            // header comment quotes the same text, and a plain indexOf cut
+            // the file there and dropped the real assignment.
+            const head = raw.slice(0, raw.search(/^window\.LAUNCH_PROPOSALS\s*=/m));
             const got = rules.extractData(raw, "LAUNCH_PROPOSALS");
             if (!got.ok) throw new Error("cannot read " + file);
             const p = JSON.parse(fs.readFileSync("/tmp/proposal.json", "utf8"));
