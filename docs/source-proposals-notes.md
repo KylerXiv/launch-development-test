@@ -108,8 +108,22 @@ sentence. Two things the simulation could not show:
 The test data was then reverted (`git revert` of `dc8cb36`), not fixed forward.
 The revert restores the file byte for byte as `history/products-2026-09-08.js`
 holds it. A new edit dated the same day would have collided with
-`history/products-2026-09-29.js`, which stays, because history is
-append-only.
+`history/products-2026-09-29.js`.
+
+**Test snapshot removed, 29 Sep.** Leaving that snapshot in place was wrong.
+The revert moves `lastUpdated` back to 8 Sep. The history graph treats the
+newest snapshot as the current state and appends the live file only when that
+is newer. So `launch-history.jsonld` recorded the test state as current: after
+#6, GanLum WHO PQ "done from 29 Sep"; after the EMA test (#10 → #11) was
+reverted in #13, SRA "done from 29 Sep, ongoing". Every version of the file
+held only test data (`TEST-0001`, then `TEST-EMA-0001`), and 8 Sep is
+identical to the live file. So the 29 Sep snapshot was removed and the graph
+rebuilt, which now ends on the real state. This is the one deliberate exception
+to append-only, for a file that never recorded anything real; it stays in git.
+
+**For the next test run:** reject the test proposal, which leaves no trace in
+the record. Or, if you approve it to watch production change, revert it *and*
+remove that day's history snapshot.
 
 ## Deferred, and left alone
 
