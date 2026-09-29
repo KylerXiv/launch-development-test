@@ -62,6 +62,9 @@ const NOT_LISTED = "not in this list";
 const BOT = "github-actions[bot]";
 const SEVERAL = "several fields at once (filed by the source watcher)";
 const SHORT = { note: "sentence", status: "status", date: "date", next: "next step", nextDate: "next-step date" };
+// In a several-field proposal, empties a field — a stage that is now done has
+// no next step. An empty form section cannot say that: it reads as "not given".
+const CLEAR = "(clear)";
 
 // ---- reading the repo ----------------------------------------------------
 
@@ -149,9 +152,14 @@ function buildProposal(fields, ctx) {
     } else {
       // One "### <field label>" section per field, labelled as in the form.
       several = [];
-      for (const [label, field] of Object.entries(FIELD_BY_LABEL)) {
+      // In reading order — status first — since this order is the changelog
+      // line's. The fingerprint sorts, so it does not depend on it.
+      const byField = Object.fromEntries(Object.entries(FIELD_BY_LABEL).map(([l, f]) => [f, l]));
+      for (const field of ["status", "date", "note", "next", "nextDate"]) {
+        const label = byField[field];
         let v = fields[label];
         if (!v) continue;
+        if (norm(v) === CLEAR && field !== "status") { several.push({ field, now: "" }); continue; }
         if (field === "status") v = statusCode(v);
         if (v) several.push({ field, now: v });
       }
@@ -256,7 +264,7 @@ function applyProposal(data, proposal, today) {
 
   const label = Object.keys(FIELD_BY_LABEL).find((k) => FIELD_BY_LABEL[k] === proposal.target.field);
   const what = proposal.changes
-    ? proposal.changes.map((c) => SHORT[c.field] + " set to “" + c.now + "”").join("; ")
+    ? proposal.changes.map((c) => SHORT[c.field] + (c.now === "" ? " cleared" : " set to “" + c.now + "”")).join("; ")
     : label + " updated to “" + proposal.now + "”";
   const by = proposal.decision && proposal.decision.by ? proposal.decision.by : "review";
   next.changelog.unshift({
@@ -300,7 +308,7 @@ function summaryMarkdown(p, findings) {
   if (p.changes) {
     L.push("| | Now says | Would say |");
     L.push("| --- | --- | --- |");
-    p.changes.forEach((c) => L.push("| **" + SHORT[c.field] + "** | " + bar(c.was || "_(empty)_") + " | " + bar(c.now) + " |"));
+    p.changes.forEach((c) => L.push("| **" + SHORT[c.field] + "** | " + bar(c.was || "_(empty)_") + " | " + (c.now === "" ? "_(cleared)_" : bar(c.now)) + " |"));
     L.push("");
     L.push("| | |");
     L.push("| --- | --- |");
@@ -515,6 +523,21 @@ function selftest() {
       { data, sources, issue: { number: 33, user: BOT } });
     ok("a different value is a different fingerprint", later.proposal.fingerprint !== bp.fingerprint);
     ok("names the watcher as proposer", /source watcher \(automated\)/.test(summaryMarkdown(bp, bres)));
+
+    // A stage that is now done has no next step: the watcher can clear it.
+    const clearing = buildProposal(Object.assign({}, several, {
+      "medicine": "alaq", "what happens next": "(clear)", "the date that next step is expected": "(clear)",
+    }), { data, sources, issue: { number: 34, user: BOT } });
+    const cn = clearing.ok && clearing.proposal.changes;
+    ok("clears the next step when asked", cn && cn.find((c) => c.field === "next").now === "" &&
+      cn.find((c) => c.field === "next").was !== "" && cn.find((c) => c.field === "nextDate").now === "", clearing.ok ? "" : clearing.errors.join("; "));
+    if (clearing.ok) {
+      const cres = checkApplied(data, clearing.proposal, "2026-09-22");
+      const as = cres.applied.products.find((x) => x.id === "alaq").stages[3];
+      ok("cleared fields apply empty, and pass the rules", as.next === "" && as.nextDate === "" && cres.errors.length === 0, cres.errors.join("; "));
+      ok("the summary shows them as cleared", /_\(cleared\)_/.test(summaryMarkdown(clearing.proposal, cres)));
+      ok("the changelog says cleared", /next step cleared/.test(cres.applied.changelog[0].change));
+    }
   }
 
   // Nothing at all would change: refused. Only the citation changing: fine.
@@ -545,6 +568,7 @@ function selftest() {
 module.exports = {
   BOT,
   SEVERAL_LABEL: "Several fields at once (filed by the source watcher)",
+  CLEAR,
   FIELD_BY_LABEL,
   parseIssueBody,
   buildProposal,

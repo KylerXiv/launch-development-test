@@ -8,8 +8,8 @@ through an approved proposal — its own issue, pull request and preview — wit
 checking it on the way. An analyst files most proposals with the issue form. For
 what a source states outright, the **source watcher** files them
 (`scripts/propose-regulatory.js`, run by `.github/workflows/source-proposals.yml`
-after every fetch; today: WHO PQ listing a portfolio medicine). Either way a
-person approves it.
+after every fetch; today: WHO PQ listing a portfolio medicine, and EMA giving
+one a positive EU-M4all / Article 58 opinion). Either way a person approves it.
 
 ## Layout
 

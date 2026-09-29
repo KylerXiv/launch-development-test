@@ -2,10 +2,11 @@ name: Propose changes from public sources
 
 # After every scheduled fetch, turns what a public source now states outright
 # into proposals — the same issues, pull requests, previews and approvals as a
-# person's proposal. Today that is one thing: WHO Prequalification listing a
-# portfolio medicine the dashboard does not yet show as listed
-# (scripts/propose-regulatory.js). Anything that needs judgement stays in the
-# watch report for a person.
+# person's proposal. Today, from the regulatory list
+# (scripts/propose-regulatory.js): WHO Prequalification listing a portfolio
+# medicine, and EMA giving one a positive EU-M4all / Article 58 opinion, where
+# the dashboard does not yet show that stage as done. Anything that needs
+# judgement stays in the watch report for a person.
 #
 # Nothing here writes data/products.js, or anything under data/: it files
 # issues, and intake, the PR, the preview and a person's approval do the rest.
@@ -16,8 +17,9 @@ name: Propose changes from public sources
 # the first.
 #
 # Manual run: Actions → "Propose changes from public sources" → Run workflow.
-# The test fixture adds one invented listing (GanLum, WHO ref TEST-0001) so the
-# whole route can be seen working; see test-data/regulatory/README.md.
+# The test fixtures add invented rows — a WHO listing for GanLum (TEST-0001),
+# or an EMA opinion for GanLum (TEST-EMA-0001) — so the whole route can be seen
+# working; see test-data/regulatory/README.md.
 
 on:
   workflow_run:
@@ -31,6 +33,7 @@ on:
         options:
           - sourcing/staging/regulatory_events.csv
           - test-data/regulatory/who-pq-ganlum-listed.csv
+          - test-data/regulatory/ema-ganlum-opinion.csv
         default: sourcing/staging/regulatory_events.csv
 
 permissions:
@@ -58,7 +61,11 @@ jobs:
         with:
           node-version: 22
 
+      # A source whose list shrank sharply is blocked (exit 1), but the other
+      # source's proposals are still written — so file those, then fail the
+      # run at the end rather than here.
       - name: Work out what the sources now say
+        id: work
         env:
           STAGING: ${{ inputs.staging || 'sourcing/staging/regulatory_events.csv' }}
         run: |
@@ -70,8 +77,14 @@ jobs:
               PREVIOUS=(--previous "$RUNNER_TEMP/previous.csv")
             fi
           fi
+          set +e
           node scripts/propose-regulatory.js --staging "$STAGING" "${PREVIOUS[@]}" --out "$RUNNER_TEMP/proposals" \
             | tee -a "$GITHUB_STEP_SUMMARY"
+          STATUS=${PIPESTATUS[0]}
+          set -e
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          # No manifest means it failed before writing anything: stop here.
+          [ -f "$RUNNER_TEMP/proposals/manifest.json" ] || exit "$STATUS"
 
       - name: File each one, and put it through intake
         env:
@@ -101,3 +114,9 @@ jobs:
               *)                echo "::warning::#$N: $TITLE — intake did not finish within 10 minutes; see the Actions tab" ;;
             esac
           done
+
+      - name: Fail the run if a source was blocked
+        if: steps.work.outputs.status != '0'
+        run: |
+          echo "::error::A source was blocked by the shrink guard or another check — see the summary above. Proposals from the other sources were still filed."
+          exit 1
