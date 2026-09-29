@@ -86,6 +86,46 @@ window.LAUNCH_DECISIONS =
       "fingerprint": "sha1:851aa6af792b30ec",
       "pr": 16,
       "commit": "ec496358fbb4288e790197fc728fd9589e04d256"
+    },
+    {
+      "issue": 17,
+      "state": "rejected",
+      "reason": "rejected:evidence-missing",
+      "by": "KylerXiv",
+      "on": "2026-09-29",
+      "target": {
+        "product": "ganlum",
+        "stage": 1,
+        "field": "several"
+      },
+      "proposed": [
+        {
+          "field": "status",
+          "was": "prog",
+          "now": "done"
+        },
+        {
+          "field": "date",
+          "was": "",
+          "now": "18 Sep 2026"
+        },
+        {
+          "field": "note",
+          "was": "Regulatory submissions in preparation following Phase III success",
+          "now": "EMA positive scientific opinion under EU-M4all (Article 58) on 18 Sep 2026 — GanLum [TEST ROW - not real EMA data] (TEST-EMA-0001)."
+        },
+        {
+          "field": "next",
+          "was": "Dossier submission (SRA pathway)",
+          "now": ""
+        },
+        {
+          "field": "nextDate",
+          "was": "TBC",
+          "now": ""
+        }
+      ],
+      "fingerprint": "sha1:ae1ec5d6c4cb475c"
     }
   ]
 }

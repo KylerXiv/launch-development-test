@@ -56,54 +56,6 @@ window.LAUNCH_PROPOSALS =
       "origin": "watcher:github-actions[bot]",
       "state": "waiting",
       "fingerprint": "sha1:851aa6af792b30ec"
-    },
-    {
-      "id": "p-17",
-      "issue": 17,
-      "target": {
-        "product": "ganlum",
-        "stage": 1,
-        "field": "several"
-      },
-      "stageName": "Regulatory approval (SRA)",
-      "productName": "GanLum",
-      "changes": [
-        {
-          "field": "status",
-          "was": "prog",
-          "now": "done"
-        },
-        {
-          "field": "date",
-          "was": "",
-          "now": "18 Sep 2026"
-        },
-        {
-          "field": "note",
-          "was": "Regulatory submissions in preparation following Phase III success",
-          "now": "EMA positive scientific opinion under EU-M4all (Article 58) on 18 Sep 2026 — GanLum [TEST ROW - not real EMA data] (TEST-EMA-0001)."
-        },
-        {
-          "field": "next",
-          "was": "Dossier submission (SRA pathway)",
-          "now": ""
-        },
-        {
-          "field": "nextDate",
-          "was": "TBC",
-          "now": ""
-        }
-      ],
-      "evidence": {
-        "src": "ema",
-        "srcLabel": "European Medicines Agency",
-        "asOf": "2026-09-21",
-        "ref": "TEST-EMA-0001 — https://www.ema.europa.eu/en/medicines/download-medicine-data"
-      },
-      "notes": "**Test data** — read from `test-data/regulatory/ema-ganlum-opinion.csv`, not from the fetched list.\n\nFiled automatically by the source watcher (EMA) from `test-data/regulatory/ema-ganlum-opinion.csv`, fetched 2026-09-21.\n\n- TEST-EMA-0001 · GanLum [TEST ROW - not real EMA data] — ganaplacide;lumefantrine · opinion (EU-M4all / Art. 58) 2026-09-18 · Positive opinion\n\nThe sentence is a factual draft. If it should read differently, reject with `rejected:wrong-value` and file your own wording.\nWhat happens next is cleared: a stage that is done has no next step.\nNot changed: which stage the dashboard shows as current.",
-      "origin": "watcher:github-actions[bot]",
-      "state": "waiting",
-      "fingerprint": "sha1:ae1ec5d6c4cb475c"
     }
   ]
 }
