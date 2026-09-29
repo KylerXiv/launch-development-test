@@ -5,7 +5,14 @@
     <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
     <description>Changes to tracked antimalarial product statuses on the LAUNCH dashboard (draft data).</description>
     <language>en</language>
-    <lastBuildDate>Tue, 08 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 29 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>GanLum: Regulatory approval (SRA): status set to “done”; date set to “18 Sep 2026”; s…</title>
+      <description>Regulatory approval (SRA): status set to “done”; date set to “18 Sep 2026”; sentence set to “EMA positive scientific opinion under EU-M4all (Article 58) on 18 Sep 2026 — GanLum [TEST ROW - not real EMA data] (TEST-EMA-0001).”; next step cleared; next-step date cleared. Source: European Medicines Agency, 2026-09-21. Proposed in issue #10, approved by review.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-09-29:GanLum:Regulatory approval (SRA): status set to</guid>
+      <pubDate>Tue, 29 Sep 2026 12:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>All: Terminology: the two product `flag` sentences now say "access barrier" rather…</title>
       <description>Terminology: the two product `flag` sentences now say "access barrier" rather than "bottleneck", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed.</description>

@@ -22,7 +22,16 @@
       "periodProduct": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
       "atStage": "launch:stage-1",
       "hasStatus": "launch:status-prog",
-      "validFrom": "2026-08-15"
+      "validFrom": "2026-08-15",
+      "validUntil": "2026-09-29"
+    },
+    {
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-history.jsonld#period-ganlum-s1-1",
+      "@type": "StatusPeriod",
+      "periodProduct": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
+      "atStage": "launch:stage-1",
+      "hasStatus": "launch:status-done",
+      "validFrom": "2026-09-29"
     },
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-history.jsonld#period-ganlum-s2-0",
@@ -38,16 +47,7 @@
       "periodProduct": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
       "atStage": "launch:stage-3",
       "hasStatus": "launch:status-idle",
-      "validFrom": "2026-08-15",
-      "validUntil": "2026-09-29"
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-history.jsonld#period-ganlum-s3-1",
-      "@type": "StatusPeriod",
-      "periodProduct": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
-      "atStage": "launch:stage-3",
-      "hasStatus": "launch:status-done",
-      "validFrom": "2026-09-29"
+      "validFrom": "2026-08-15"
     },
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-history.jsonld#period-ganlum-s4-0",
