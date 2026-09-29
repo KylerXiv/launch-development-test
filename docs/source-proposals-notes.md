@@ -191,6 +191,73 @@ Verification:
   newest commit on main, and the approval log now follows it. Corrected to look
   at `main~1`.
 
+## EMA watcher, 29 Sep
+
+Branch `ema-watcher`. The adapter is now a table of watchers, one row per
+source, in `scripts/propose-regulatory.js`. The workflow, the library and the
+route are the same. The EMA row proposes **"Regulatory approval (SRA)" done**
+when EMA gives a portfolio medicine a **positive** EU-M4all / Article 58
+opinion.
+
+**What the data allows.** The staged EMA table has 19 rows, all EU-M4all.
+Statuses: 12 positive opinions (7 of them carrying a later outcome date), 6
+withdrawn opinions, 1 withdrawn application. Only one matches the portfolio:
+ASPY's `H-W-2319`, whose SRA stage already shows done. So, as with WHO PQ, the
+real list yields nothing today. DHA–PPQ's SRA approval (Eurartesim) is an
+ordinary EU marketing authorisation, not an EU-M4all opinion, so it is not in
+this table at all.
+
+**Decisions:**
+- **Only positive opinions are proposed.** A withdrawn opinion or application
+  says the medicine did *not* get there, and why is a story a person has to
+  tell. The watch report already flags the change. The run summary now lists
+  every portfolio row it left for a person, with the reason. Today that is
+  ASPY's two undated WHO rows.
+- **The date is the opinion date.** The "(outcome …)" in a status belongs to a
+  later procedure on the same opinion, such as a variation. A first SRA
+  milestone is the opinion itself.
+- **When a stage becomes done, "what happens next" is cleared.** GanLum's SRA
+  stage says next "Dossier submission (SRA pathway)", TBC. Approving done while
+  keeping that would contradict itself, and every stage already done on the
+  dashboard has both next-step fields empty. An empty form section reads as
+  "not given", so the watcher writes `(clear)`. The library accepts that only in
+  a several-field proposal, which only the bot can file. This applies to WHO
+  PQ too: ALAQ's WHO PQ stage still says "PQ targeted by ~2027". GanLum's WHO
+  PQ proposal is unchanged, since that stage has no next step; its fingerprint
+  is still `sha1:851aa6af792b30ec`.
+- **The shrink guard is per source.** A sharp drop in EMA rows blocks EMA only.
+  WHO PQ proposals are still written and filed, and the run then fails at the
+  end, so the blocked source is visible without holding the other one back.
+  Rejected: failing before filing anything, which would let one broken export
+  silence every source.
+
+**Not covered.** This watcher only sees what EMA publishes in EU-M4all. An SRA
+approval through another route — Swissmedic's MAGHP procedure, say — is not
+fetched, so it still arrives through a person's proposal.
+
+- **The fields are listed in reading order: status, date, sentence, next
+  step.** That order is the public changelog line's. Found by the simulation:
+  in form order the line opened with the full sentence, and "status set to
+  done" came halfway along. The fingerprint sorts the changes, so no recorded
+  fingerprint moved.
+
+**Fixture:** `test-data/regulatory/ema-ganlum-opinion.csv` — the real list,
+plus a positive GanLum opinion (`TEST-EMA-0001`) and a withdrawn ALAQ
+application (`TEST-EMA-0002`), which must not be proposed.
+
+**Verification:**
+- `selftest`: 36/36, including four new checks on clearing a field.
+- Simulation: 77/77. New scenarios 11 and 12:
+  - the EMA fixture files one bot issue, and the PR sets SRA done, the opinion
+    date and the sentence, and clears the next step;
+  - the withdrawn ALAQ row is reported as left for a person;
+  - one approval merges it, and it passes the validator;
+  - with EMA blocked, WHO PQ still proposes ALAQ, clearing its "~2027" next
+    step, and the run fails at the end.
+- Two older checks were wrong, not the code. The shrink-block message moved to
+  the summary, and "already shown as listed" became "…as done". Both were
+  corrected to match.
+
 ## Setup
 
 None new. The watcher uses `GITHUB_TOKEN`, and the labels and Vercel secrets
