@@ -23,7 +23,6 @@
 const fs = require("fs");
 const path = require("path");
 const lib = require("./proposal-lib.js");
-const rules = require("./data-rules.js");
 const { parseCsv } = require("./fetch-regulatory.js");
 
 const ROOT = path.join(__dirname, "..");
@@ -61,9 +60,7 @@ if (!src) fail(`source "${SOURCE_ID}" is not in data/sources.js`);
 const stageIdx = data.stages.indexOf(STAGE);
 if (stageIdx < 0) fail(`no stage named "${STAGE}" in data/products.js`);
 
-const decided = rules.extractData(read("data/decisions.js"), "LAUNCH_DECISIONS");
-const rejected = new Set(((decided.ok && decided.data.decisions) || [])
-  .filter((d) => d.state === "rejected" && d.fingerprint).map((d) => d.fingerprint));
+const decisions = lib.readDecisions();
 
 fs.mkdirSync(outDir, { recursive: true });
 const manifest = [];
@@ -117,7 +114,7 @@ for (const product of data.products) {
   if (!built.ok) { log.push(`${product.name}: NOT proposed — ${built.errors.join(" ")}`); continue; }
   const checked = lib.checkApplied(data, built.proposal);
   if (checked.errors.length) { log.push(`${product.name}: NOT proposed — it would break the data rules: ${checked.errors.join("; ")}`); continue; }
-  if (rejected.has(built.proposal.fingerprint)) {
+  if (lib.rejectionsOf(built.proposal, decisions).length) {
     log.push(`${product.name}: rejected before with exactly this content (${built.proposal.fingerprint}) — not proposed again.`);
     continue;
   }

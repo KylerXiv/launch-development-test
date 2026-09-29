@@ -72,6 +72,21 @@ function readData(file) {
   return { raw, data: got.data };
 }
 
+const DECISIONS = path.join(ROOT, "data", "decisions.js");
+
+function readDecisions() {
+  if (!fs.existsSync(DECISIONS)) return [];
+  const got = rules.extractData(fs.readFileSync(DECISIONS, "utf8"), "LAUNCH_DECISIONS");
+  return (got.ok && got.data && got.data.decisions) || [];
+}
+
+// Earlier rejections of exactly this change. The fingerprint is the change,
+// not its evidence — so for a person's proposal this is a warning to the
+// reviewer, not a refusal; the source watcher, which cannot judge evidence,
+// skips it outright.
+const rejectionsOf = (p, decisions) =>
+  decisions.filter((d) => d.state === "rejected" && d.fingerprint && d.fingerprint === p.fingerprint);
+
 function readSources() {
   if (!fs.existsSync(SOURCES)) return [];
   const got = rules.extractData(fs.readFileSync(SOURCES, "utf8"), "LAUNCH_SOURCES");
@@ -193,6 +208,15 @@ function buildProposal(fields, ctx) {
     state: "waiting",
   };
   proposal.fingerprint = fingerprint(proposal);
+
+  // Nothing at all would change — not the value, not the citation. Merging it
+  // would only add a changelog line claiming an update. Re-confirming a value
+  // against a newer source changes the citation, so that still counts.
+  const after = applyProposal(data, proposal, data.meta.lastUpdated).products
+    .find((x) => x.id === product.id).stages[stageIdx];
+  if (JSON.stringify(after) === JSON.stringify(stage))
+    return { ok: false, errors: ["This would change nothing: the dashboard already says exactly this, with the same source and date."] };
+
   return { ok: true, proposal };
 }
 
@@ -298,6 +322,14 @@ function summaryMarkdown(p, findings) {
       lost.wasLen + " characters down to " + lost.nowLen + "). Anything in the current wording that is not repeated above will disappear from the dashboard. If you meant to *add* to it, the proposal needs the complete new sentence, not just the new part.");
     L.push("");
   }
+  const before = (findings && findings.rejectedBefore) || [];
+  if (before.length) {
+    L.push("> [!WARNING]");
+    L.push("> **This exact change was rejected before** — " +
+      before.map((d) => "#" + d.issue + " by @" + d.by + " on " + d.on + " (" + d.reason + ")").join("; ") +
+      ". That compares the change, not its evidence: approve it only if the evidence is genuinely new.");
+    L.push("");
+  }
   if (findings && findings.errors && findings.errors.length) {
     L.push("### ❌ This cannot be approved yet");
     L.push("");
@@ -354,6 +386,7 @@ function cli(argv) {
       return;
     }
     const res = checkApplied(got.data, built.proposal);
+    res.rejectedBefore = rejectionsOf(built.proposal, readDecisions());
     console.log(summaryMarkdown(built.proposal, res));
     if (res.errors.length) process.exit(1);
     return;
@@ -484,6 +517,22 @@ function selftest() {
     ok("names the watcher as proposer", /source watcher \(automated\)/.test(summaryMarkdown(bp, bres)));
   }
 
+  // Nothing at all would change: refused. Only the citation changing: fine.
+  // The fixture's proposal, filed again against the data it already produced.
+  const noop = buildProposal(fields, { data: res.applied, sources, issue: { number: 40, user: "someone" } });
+  ok("refuses a change that changes nothing", !noop.ok && /change nothing/.test((noop.errors || []).join(" ")),
+    noop.ok ? "it was accepted" : noop.errors.join("; "));
+  const reconfirm = buildProposal(Object.assign({}, fields, { "date of the source": "2026-09-29" }),
+    { data: res.applied, sources, issue: { number: 41, user: "someone" } });
+  ok("accepts the same value re-confirmed against a newer source date", reconfirm.ok, (reconfirm.errors || []).join("; "));
+
+  // A change rejected before is flagged to the reviewer, by fingerprint.
+  const flagged = summaryMarkdown(p, Object.assign({}, res, {
+    rejectedBefore: rejectionsOf(p, [{ issue: 9, state: "rejected", by: "reviewer", on: "2026-09-01", reason: "rejected:wrong-value", fingerprint: p.fingerprint },
+      { issue: 8, state: "approved", fingerprint: p.fingerprint }, { issue: 7, state: "rejected", fingerprint: "sha1:0000000000000000" }]),
+  }));
+  ok("warns when the same change was rejected before", /rejected before/.test(flagged) && /#9 by @reviewer/.test(flagged) && !/#8|#7/.test(flagged));
+
   // The serializer must still round-trip what we hand it.
   const written = ser.serializeProducts(res.applied, got.raw);
   const reread = rules.extractData(written, "LAUNCH_DATA");
@@ -507,6 +556,8 @@ module.exports = {
   titleFor,
   readData,
   readSources,
+  readDecisions,
+  rejectionsOf,
 };
 
 if (require.main === module) cli(process.argv.slice(2));

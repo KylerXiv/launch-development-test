@@ -124,10 +124,72 @@ append-only.
 - **A person's intake started mid-batch can still cancel a pending watcher
   intake**, through the same concurrency group. The watcher then warns after 10
   minutes; starting intake for that issue by hand recovers it.
-- **Intake does not consult `data/decisions.js`** for proposals people file.
-  Only the watcher does. Pre-existing gaps, still open: approvals are not
-  recorded there, and approved proposals are not removed from
-  `data/proposals.js`.
+- ~~Intake does not consult `data/decisions.js` for proposals people file;
+  approvals are not recorded there, nor removed from `data/proposals.js`.~~
+  Fixed 29 Sep — see "Three gaps closed" below.
+
+## Three gaps closed, 29 Sep
+
+Branch `fix/pipeline-gaps`. These three would each have bitten on ordinary
+use once the watcher was live.
+
+**1. Two approvals on one day no longer break `publish.yml`.** Both carry the
+same `meta.lastUpdated`, and history keeps one snapshot per date, so the second
+hit the "never overwrite" guard: the dashboard updated but history, feed and
+ontology did not. Now a later change the same day **replaces** that day's
+snapshot, so it holds the day's final state — but only when
+`scripts/history-continues.js` recognises it as a continuation. The rules:
+- the new file adds at least one changelog entry;
+- every new entry is dated that day;
+- the snapshot's own entries are all still there, unchanged, beneath them.
+
+An edit that forgot to bump the date adds no entry, or one dated later, so it
+is still refused, as the guard intended. Tested on five cases: the continuation
+is replaced; no bump, next-day entry and rewritten history are all refused.
+
+Rejected alternatives:
+- *Suffixed snapshots* (`products-D-2.js`). Both readers,
+  `build-history-graph.js` and `make-brief.js`, match only
+  `products-YYYY-MM-DD.js`, so the second snapshot would be ignored silently.
+- *Allow replacing only on today's date.* An approval merges with the date its
+  PR was built, which can be days earlier. That rule would have refused a
+  delayed approval.
+
+**2. Every decision is logged.** `scripts/record-decision.js` now does what the
+rejection job did inline, for both jobs. It appends
+`{issue, state, reason?, by, on, target, proposed, fingerprint, pr?, commit?}`
+to `data/decisions.js` and removes the proposal from the queue. The approve job
+runs it after the merge, on top of main as the merge left it, then pushes. It
+holds `bot-push-main`, so the `publish.yml` it just started waits and snapshots
+after this commit. If the merge landed but the logging failed, the issue says
+"Merged, but not recorded" instead of the old "Not merged", which would then
+have been false.
+
+**3. People re-filing a rejected change are flagged, not refused.** Intake now
+checks `data/decisions.js`. If a *rejected* decision has the same fingerprint,
+the bot's comment opens with a warning naming the issue, reviewer, date and
+reason. It is not refused, because the fingerprint compares the change, not the
+evidence: the same value with genuinely new evidence is legitimate. The watcher,
+which cannot judge evidence, still skips such a proposal outright. Both now use
+the library's `readDecisions` and `rejectionsOf`.
+
+**Also: a proposal that changes nothing is refused.** If the stage would come
+out identical — value, source and date — merging it would only add a changelog
+line claiming an update. Re-confirming a value against a newer source date
+changes the citation, so that is still accepted. Both cases are covered by
+`selftest`.
+
+Verification:
+- `proposal-lib.js selftest`: 32/32.
+- Simulation: 64/64. New scenarios 8–10:
+  - approvals logged with their PR, merge commit and fingerprint, rejections
+    with their reason, and the queue emptied;
+  - a re-filed rejected change is warned and still filed;
+  - two same-day publishes both succeed, and a no-bump hand edit is still
+    refused.
+- One simulation check was wrong, not the code: it expected the merge to be the
+  newest commit on main, and the approval log now follows it. Corrected to look
+  at `main~1`.
 
 ## Setup
 
