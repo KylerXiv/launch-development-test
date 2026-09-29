@@ -160,6 +160,9 @@ jobs:
           gh workflow run publish.yml --ref main
           gh issue comment "$ISSUE_NUMBER" --body \
             "**Approved by @$APPROVER.** #$PR is merged and the production dashboard is being rebuilt from it."
+          # By hand: GitHub does not act on "Closes #n" when GITHUB_TOKEN both
+          # opened and merged the pull request (seen on #4, 29 Sep).
+          gh issue close "$ISSUE_NUMBER" --reason completed
 
       - name: Main has moved, or the branch was changed — rebuild, and ask again
         if: steps.verify.outputs.current == 'false'
