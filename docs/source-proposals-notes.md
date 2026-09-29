@@ -81,6 +81,36 @@ for the issue from the Actions tab.
 **What it yields.** With the real list, nothing: GanLum and ALAQ are not
 prequalified, and ASPY and DHA–PPQ already show as listed. Hence the fixture.
 
+## First real run, 29 Sep
+
+Run on the test repository with the fixture, after PR #3 merged:
+1. The watcher filed #4.
+2. Intake, started by dispatch, opened PR #5.
+3. The preview was built.
+4. The `approved` label, from the repository's only account, was verified and
+   merged as `dc8cb36`.
+5. `vercel-deploy` and `publish` ran.
+
+Production then served GanLum as done, 15 Sep 2026, with the `TEST-0001`
+sentence. Two things the simulation could not show:
+
+- **Fixed — the issue stayed open.** GitHub did not act on "Closes #4": there
+  was no connected or closed event on the timeline, apparently because
+  `GITHUB_TOKEN` both opened and merged the PR. Approval now closes the issue
+  itself after merging.
+- **Left alone — two red runs on the bot's PR.** GitHub created `pull_request`
+  runs of `validate.yml` and `pr-preview.yml` for PR #5, triggered by
+  `github-actions[bot]`, with 0 jobs and 0 check runs. It marked them failed at
+  05:08:48, when the merge deleted the branch. Nothing was validated or failed:
+  the checks that count ran inside the approval and the dispatched preview.
+  The workflow file cannot stop GitHub creating these.
+
+The test data was then reverted (`git revert` of `dc8cb36`), not fixed forward.
+The revert restores the file byte for byte as `history/products-2026-09-08.js`
+holds it. A new edit dated the same day would have collided with
+`history/products-2026-09-29.js`, which stays, because history is
+append-only.
+
 ## Deferred, and left alone
 
 - **Other sources.** NAFDAC and TMDA (country registration), EMA (SRA approval),
