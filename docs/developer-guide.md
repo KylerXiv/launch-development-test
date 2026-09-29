@@ -29,7 +29,7 @@ upgrade, or break.
 | `data/products.js` | The data contract: `window.LAUNCH_DATA = { …strict JSON… }`. The only file analysts touch; **feeds all three pages**. |
 | `assets/report-issue.js` | The **Report an issue / contact** front end (DEV-04): floating pill, footer link and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. No backend yet; see §9c. |
 | `data/world-map.js` | Generated geometry: `window.LAUNCH_MAP = { w, h, countries: { ISO3: { n, d } } }`. Natural Earth 110m, public domain. Committed output — regenerate with `scripts/build-map.js`, never hand-edit. |
-| `history/` | Dated snapshots of the data file, bot-committed by `publish.yml` on every data change. Append-only; the raw material for future trend charts and playback. |
+| `history/` | Dated snapshots of the data file, bot-committed by `publish.yml` on every data change. Append-only, one per date: a later change the same day replaces that day's snapshot, so it holds the day's final state. The raw material for future trend charts and playback. |
 | `feed.xml` | RSS 2.0 feed of changelog entries, bot-rebuilt by `publish.yml`. |
 | `scripts/validate-data.js` | Node validator: strict-JSON extraction + governance rules. Exit 1 on error. |
 | `scripts/make-preview.js` | Inlines the data **and map** files into `preview.html` (single-file build of option A for email/artifact sharing). Optional; never required to deploy. |

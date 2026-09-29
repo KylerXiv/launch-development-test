@@ -353,7 +353,7 @@ build output — editions, map geometry, history, feeds, briefs, CSV exports:
 | Workflow | Trigger | What it does |
 | --- | --- | --- |
 | `validate.yml` | Every push and PR | Validates both datasets (real + synthetic), re-proves the SHACL governance shapes against fresh linked-data projections, and builds the single-file preview as a smoke test. The quality gate. |
-| `publish.yml` | Push to main touching `data/products.js` only | Validates, appends a dated `history/` snapshot (append-only — refuses to overwrite same-day with different content), rebuilds `feed.xml` and both semantic-layer exports (`launch-data.jsonld`, `launch-history.jsonld`), bot-commits. Its own commit can't retrigger it. |
+| `publish.yml` | Push to main touching `data/products.js` only | Validates, appends a dated `history/` snapshot (append-only — refuses to overwrite a snapshot with different content, except a later change the same day, which `scripts/history-continues.js` must recognise as continuing it), rebuilds `feed.xml` and both semantic-layer exports (`launch-data.jsonld`, `launch-history.jsonld`), bot-commits. Its own commit can't retrigger it. |
 | `reminder.yml` | 1st of each month | Opens the milestone-scan checklist issue. Kept as a reminder rather than a scraper — most watched sources are CMS pages where hash-watching would cry wolf. |
 | `sourcing.yml` | Mondays (trials); 3rd of month (Global Fund + regulatory); on demand | Runs the fetchers, commits only under `sourcing/` (ignored by `publish.yml`'s path filter, so a fetch can never trigger a dashboard change), opens watch issues on changes. |
 

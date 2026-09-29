@@ -45,9 +45,16 @@ jobs:
           mkdir -p history
           TARGET="history/products-$DATE.js"
           # History is append-only: never silently overwrite a prior snapshot.
+          # One exception, checked, not assumed: a later change the same day
+          # replaces that day's snapshot, so it holds the day's final state —
+          # otherwise two approvals on one day fail here.
           if [ -f "$TARGET" ] && ! cmp -s data/products.js "$TARGET"; then
-            echo "::error::$TARGET already exists with different content — bump meta.lastUpdated before pushing data edits."
-            exit 1
+            if WHY=$(node scripts/history-continues.js "$TARGET" data/products.js "$DATE"); then
+              echo "Replacing $TARGET: $WHY."
+            else
+              echo "::error::$TARGET already exists with different content ($WHY)."
+              exit 1
+            fi
           fi
           cp data/products.js "$TARGET"
           echo "Snapshot: $TARGET"

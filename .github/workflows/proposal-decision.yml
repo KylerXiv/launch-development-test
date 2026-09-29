@@ -145,6 +145,7 @@ jobs:
       # the two that a push to main would have started. A person merging the
       # pull request by hand starts them the ordinary way.
       - name: Merge it, and rebuild production
+        id: merge
         if: steps.verify.outputs.current == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -164,6 +165,30 @@ jobs:
           # opened and merged the pull request (seen on #4, 29 Sep).
           gh issue close "$ISSUE_NUMBER" --reason completed
 
+      # decisions.js logs every decision, not only rejections, and the queue
+      # drops what has been decided. On top of main as the merge left it:
+      # this job holds bot-push-main, so the publish.yml run started above
+      # waits for this push and snapshots after it.
+      - name: Record the approval, and take it off the queue
+        if: steps.verify.outputs.current == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          STATE: approved
+          DECIDER: ${{ github.event.sender.login }}
+          PR: ${{ steps.pr.outputs.pr }}
+        run: |
+          COMMIT=$(gh pr view "$PR" --json mergeCommit --jq '.mergeCommit.oid // ""')
+          export COMMIT
+          git fetch --quiet --depth=1 origin main
+          git reset --quiet --hard FETCH_HEAD
+          node scripts/record-decision.js
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/decisions.js data/proposals.js
+          git diff --cached --quiet || git commit -m "Proposal #$ISSUE_NUMBER: approved by @$DECIDER, merged in #$PR"
+          git push origin HEAD:main
+
       - name: Main has moved, or the branch was changed — rebuild, and ask again
         if: steps.verify.outputs.current == 'false'
         env:
@@ -178,7 +203,7 @@ jobs:
 
       # "Approved but not landed" must never look like success.
       - name: Say that nothing was merged
-        if: failure() && steps.pr.outcome == 'success'
+        if: failure() && steps.pr.outcome == 'success' && steps.merge.outcome != 'success'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -186,6 +211,17 @@ jobs:
         run: |
           gh issue comment "$ISSUE_NUMBER" --body \
             "**Not merged.** The approval stopped before anything landed — see [the run]($RUN). Production is unchanged."
+
+      # Merged and published, but the log did not get its line.
+      - name: Say that the decision was not recorded
+        if: failure() && steps.merge.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body \
+            "**Merged, but not recorded.** The change is live, but adding it to \`data/decisions.js\` failed — see [the run]($RUN)."
 
   reject:
     if: startsWith(github.event.label.name, 'rejected') && contains(github.event.issue.labels.*.name, 'proposal')
@@ -200,40 +236,11 @@ jobs:
           node-version: "20"
 
       - name: Record the decision, with the fingerprint that suppresses a repeat
-        run: |
-          node -e '
-            const fs = require("fs");
-            const rules = require("./scripts/data-rules.js");
-            const read = (f, g) => {
-              const raw = fs.readFileSync(f, "utf8");
-              const got = rules.extractData(raw, g);
-              if (!got.ok) throw new Error("cannot read " + f);
-              // Line-start match, as extractData does: proposals.js quotes
-              // the assignment in its header comment.
-              return { raw, head: raw.slice(0, raw.search(new RegExp("^window\\." + g + "\\s*=", "m"))), data: got.data };
-            };
-            const n = Number(process.env.ISSUE_NUMBER);
-            const props = read("data/proposals.js", "LAUNCH_PROPOSALS");
-            const p = props.data.proposals.find((x) => x.issue === n);
-            const dec = read("data/decisions.js", "LAUNCH_DECISIONS");
-            dec.data.decisions.push({
-              issue: n,
-              state: "rejected",
-              reason: process.env.LABEL,
-              by: process.env.DECIDER,
-              on: new Date().toISOString().slice(0, 10),
-              target: p ? p.target : null,
-              proposed: p ? (p.changes || p.now) : null,
-              fingerprint: p ? p.fingerprint : null,
-            });
-            dec.data.meta = { updated: new Date().toISOString().slice(0, 10) };
-            fs.writeFileSync("data/decisions.js", dec.head + "window.LAUNCH_DECISIONS =\n" + JSON.stringify({ meta: dec.data.meta, decisions: dec.data.decisions }, null, 2) + "\n");
-            props.data.proposals = props.data.proposals.filter((x) => x.issue !== n);
-            fs.writeFileSync("data/proposals.js", props.head + "window.LAUNCH_PROPOSALS =\n" + JSON.stringify({ meta: { updated: new Date().toISOString().slice(0, 10) }, proposals: props.data.proposals }, null, 2) + "\n");
-          '
+        run: node scripts/record-decision.js
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
-          LABEL: ${{ github.event.label.name }}
+          STATE: rejected
+          REASON: ${{ github.event.label.name }}
           DECIDER: ${{ github.event.sender.login }}
 
       # The label name reaches the shell through env only. Anyone who can

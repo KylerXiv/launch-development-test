@@ -121,14 +121,15 @@ option. Hashes checked before and after.
   comment now says only that the decision and its fingerprint are recorded.
 - **Fixed — editing a closed proposal re-ran intake.** It would have reopened a
   PR for a rejected proposal. Intake now skips closed issues.
-- **Left alone — two approvals on one day break `publish.yml`.** Both get the
-  same `lastUpdated`, and history is append-only, so the second run errors. The
-  same was true before this branch.
-- **Left alone — approvals are not recorded in `decisions.js` or removed from
-  `proposals.js`.** Pre-existing.
-- **Left alone — edit, then approve.** Someone other than the author can edit the
-  issue (which re-runs intake) and then approve it. Pre-existing; the preview
-  does not change it.
+- **Two approvals on one day broke `publish.yml`.** Both get the same
+  `lastUpdated`, and history is append-only, so the second run errored.
+  *Fixed 29 Sep — see `docs/source-proposals-notes.md`, "Three gaps closed".*
+- **Approvals were not recorded in `decisions.js` or removed from
+  `proposals.js`.** *Fixed 29 Sep, same section.*
+- **Edit, then approve.** Someone other than the author could edit the issue
+  (which re-ran intake) and then approve it. *Fixed 29 Sep: intake now
+  rebuilds on an edit only when the author made it — see
+  `docs/source-proposals-notes.md`.*
 - **By design — a person can still approve and merge the PR directly.** "Keep
   both", with no branch protection available on this plan. That path skips the
   self-approval check and the snapshot comparison.
