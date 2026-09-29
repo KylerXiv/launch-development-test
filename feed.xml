@@ -5,7 +5,14 @@
     <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
     <description>Changes to tracked antimalarial product statuses on the LAUNCH dashboard (draft data).</description>
     <language>en</language>
-    <lastBuildDate>Tue, 08 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 29 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>GanLum: WHO PQ listing: sentence set to “Prequalified by WHO on 15 Sep 2026 (WHO ref …</title>
+      <description>WHO PQ listing: sentence set to “Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG).”; status set to “done”; date set to “15 Sep 2026”. Source: WHO prequalification list, 2026-09-21. Proposed in issue #4, approved by review.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-09-29:GanLum:WHO PQ listing: sentence set to “Prequal</guid>
+      <pubDate>Tue, 29 Sep 2026 12:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>All: Terminology: the two product `flag` sentences now say "access barrier" rather…</title>
       <description>Terminology: the two product `flag` sentences now say "access barrier" rather than "bottleneck", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed.</description>
