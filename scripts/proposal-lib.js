@@ -55,6 +55,14 @@ const STATUS_BY_WORD = {
 
 const NOT_LISTED = "not in this list";
 
+// The source watcher (scripts/propose-regulatory.js) proposes what one source
+// event changes as a unit — status, date and sentence together — because
+// approving the status alone would leave a sentence contradicting it. People
+// still file one field per proposal: only the bot may use this.
+const BOT = "github-actions[bot]";
+const SEVERAL = "several fields at once (filed by the source watcher)";
+const SHORT = { note: "sentence", status: "status", date: "date", next: "next step", nextDate: "next-step date" };
+
 // ---- reading the repo ----------------------------------------------------
 
 function readData(file) {
@@ -113,17 +121,35 @@ function buildProposal(fields, ctx) {
   if (!fields["which stage"]) say("No stage was chosen.");
   else if (stageIdx === -1) say("“" + fields["which stage"] + "” is not one of the eight stages.");
 
-  const key = FIELD_BY_LABEL[norm(fields["what changes"])];
-  if (!fields["what changes"]) say("No field was chosen under “What changes”.");
-  else if (!key) say("“" + fields["what changes"] + "” is not a field this form can change.");
+  const statusCode = (v) => {
+    const code = STATUS_BY_WORD[norm(v)];
+    if (!code) say("Status must be one of: done / in progress / delayed / not started — got “" + v + "”.");
+    return code;
+  };
 
-  let now = fields["what it should say"];
-  if (!now) say("“What it should say” is empty — there is nothing to propose.");
+  let key = null, now = null, several = null;
+  if (norm(fields["what changes"]) === SEVERAL) {
+    if (!issue || issue.user !== BOT) {
+      say("Only the source watcher can change several fields in one proposal. File one proposal per field.");
+    } else {
+      // One "### <field label>" section per field, labelled as in the form.
+      several = [];
+      for (const [label, field] of Object.entries(FIELD_BY_LABEL)) {
+        let v = fields[label];
+        if (!v) continue;
+        if (field === "status") v = statusCode(v);
+        if (v) several.push({ field, now: v });
+      }
+      if (!several.length) say("The source watcher proposed no fields.");
+    }
+  } else {
+    key = FIELD_BY_LABEL[norm(fields["what changes"])];
+    if (!fields["what changes"]) say("No field was chosen under “What changes”.");
+    else if (!key) say("“" + fields["what changes"] + "” is not a field this form can change.");
 
-  if (key === "status" && now) {
-    const code = STATUS_BY_WORD[norm(now)];
-    if (!code) say("Status must be one of: done / in progress / delayed / not started — got “" + now + "”.");
-    else now = code;
+    now = fields["what it should say"];
+    if (!now) say("“What it should say” is empty — there is nothing to propose.");
+    if (key === "status" && now) now = statusCode(now);
   }
 
   // source label -> registry id
@@ -146,14 +172,16 @@ function buildProposal(fields, ctx) {
   if (errors.length) return { ok: false, errors };
 
   const stage = product.stages[stageIdx];
+  const wasOf = (f) => (stage[f] === undefined ? "" : stage[f]);
   const proposal = {
     id: issue && issue.number ? "p-" + issue.number : "p-" + Date.now(),
     issue: (issue && issue.number) || null,
-    target: { product: product.id, stage: stageIdx, field: key },
+    target: { product: product.id, stage: stageIdx, field: several ? "several" : key },
     stageName: data.stages[stageIdx],
     productName: product.name,
-    was: stage[key] === undefined ? "" : stage[key],
-    now,
+    ...(several
+      ? { changes: several.map((c) => ({ field: c.field, was: wasOf(c.field), now: c.now })) }
+      : { was: wasOf(key), now }),
     evidence: {
       src,
       srcLabel: (sources.find((s) => s.id === src) || {}).label || srcLabel,
@@ -161,7 +189,7 @@ function buildProposal(fields, ctx) {
       ref: fields["link or reference"] || null,
     },
     notes: fields["anything the reviewer should know"] || null,
-    origin: issue && issue.user ? "analyst:" + issue.user : "analyst:unknown",
+    origin: issue && issue.user ? (issue.user === BOT ? "watcher:" : "analyst:") + issue.user : "analyst:unknown",
     state: "waiting",
   };
   proposal.fingerprint = fingerprint(proposal);
@@ -170,10 +198,17 @@ function buildProposal(fields, ctx) {
 
 // A rejected proposal is remembered by what it proposed, not by its issue
 // number — so the same suggestion arriving again next month is recognised.
+// A single-field proposal's recipe is unchanged, so recorded decisions still
+// match; several fields are hashed together, in field order.
 function fingerprint(p) {
-  const parts = [p.target.product, p.target.stage, p.target.field, String(p.now).trim()];
+  const parts = p.changes
+    ? [p.target.product, p.target.stage].concat(p.changes.map((c) => c.field + "=" + String(c.now).trim()).sort())
+    : [p.target.product, p.target.stage, p.target.field, String(p.now).trim()];
   return "sha1:" + crypto.createHash("sha1").update(parts.join("|")).digest("hex").slice(0, 16);
 }
+
+// Every proposal as a list of field changes, whichever shape it was filed in.
+const changesOf = (p) => p.changes || [{ field: p.target.field, was: p.was, now: p.now }];
 
 // ---- applying it ---------------------------------------------------------
 
@@ -184,7 +219,7 @@ function applyProposal(data, proposal, today) {
   const stage = p.stages[proposal.target.stage];
   if (!stage) throw new Error("no stage " + proposal.target.stage + " on " + p.id);
 
-  stage[proposal.target.field] = proposal.now;
+  for (const c of changesOf(proposal)) stage[c.field] = c.now;
   // The citation travels with the value. This overwrites the previous one on
   // purpose: a figure cites where its CURRENT wording came from, and the
   // reviewer sees the swap in the summary before approving it.
@@ -196,12 +231,15 @@ function applyProposal(data, proposal, today) {
   next.meta.lastUpdated = date;
 
   const label = Object.keys(FIELD_BY_LABEL).find((k) => FIELD_BY_LABEL[k] === proposal.target.field);
+  const what = proposal.changes
+    ? proposal.changes.map((c) => SHORT[c.field] + " set to “" + c.now + "”").join("; ")
+    : label + " updated to “" + proposal.now + "”";
   const by = proposal.decision && proposal.decision.by ? proposal.decision.by : "review";
   next.changelog.unshift({
     date,
     product: proposal.productName,
     change:
-      proposal.stageName + ": " + label + " updated to “" + proposal.now + "”. Source: " +
+      proposal.stageName + ": " + what + ". Source: " +
       proposal.evidence.srcLabel + ", " + proposal.evidence.asOf +
       ". Proposed in issue #" + proposal.issue + ", approved by " + by + ".",
     plain:
@@ -221,9 +259,10 @@ function titleFor(p) {
 // more often a mistake than an intention. Not an error — sometimes a sentence
 // really is being cut down — so it is flagged for the reviewer, not refused.
 function shortfall(p) {
-  if (p.target.field !== "note") return null;
-  const wasLen = String(p.was || "").length;
-  const nowLen = String(p.now || "").length;
+  const note = changesOf(p).find((c) => c.field === "note");
+  if (!note) return null;
+  const wasLen = String(note.was || "").length;
+  const nowLen = String(note.now || "").length;
   if (wasLen < 80 || nowLen >= wasLen * 0.66) return null;
   return { wasLen, nowLen, pct: Math.round((1 - nowLen / wasLen) * 100) };
 }
@@ -233,12 +272,22 @@ function summaryMarkdown(p, findings) {
   const L = [];
   L.push("**" + p.productName + " · " + p.stageName + "**");
   L.push("");
-  L.push("| | |");
-  L.push("| --- | --- |");
-  L.push("| **Now says** | " + bar(p.was || "_(empty)_") + " |");
-  L.push("| **Would say** | " + bar(p.now) + " |");
+  const watcher = /^watcher:/.test(p.origin);
+  if (p.changes) {
+    L.push("| | Now says | Would say |");
+    L.push("| --- | --- | --- |");
+    p.changes.forEach((c) => L.push("| **" + SHORT[c.field] + "** | " + bar(c.was || "_(empty)_") + " | " + bar(c.now) + " |"));
+    L.push("");
+    L.push("| | |");
+    L.push("| --- | --- |");
+  } else {
+    L.push("| | |");
+    L.push("| --- | --- |");
+    L.push("| **Now says** | " + bar(p.was || "_(empty)_") + " |");
+    L.push("| **Would say** | " + bar(p.now) + " |");
+  }
   L.push("| **Source** | " + bar(p.evidence.srcLabel + ", " + p.evidence.asOf + (p.evidence.ref ? " — " + p.evidence.ref : "")) + " |");
-  L.push("| **Proposed by** | " + p.origin.replace("analyst:", "@") + " |");
+  L.push("| **Proposed by** | " + (watcher ? "the source watcher (automated)" : p.origin.replace("analyst:", "@")) + " |");
   L.push("");
   // The form replaces a whole sentence, so someone meaning to ADD a fact can
   // silently delete the ones already there. Cheap to spot, expensive to miss.
@@ -260,7 +309,9 @@ function summaryMarkdown(p, findings) {
     L.push("");
     L.push("Checked against the data rules with the change applied — no errors.");
     L.push("");
-    L.push("A reviewer **other than the person who proposed it** decides:");
+    L.push(watcher
+      ? "Filed automatically from a public source, so **any one reviewer** decides — check the preview against the source first:"
+      : "A reviewer **other than the person who proposed it** decides:");
     L.push("");
     L.push("- label **`approved`** — the change is applied, checked and merged. Nothing else to do.");
     L.push("- label starting **`rejected:`** — the reason is recorded and this will not be proposed again.");
@@ -400,6 +451,39 @@ function selftest() {
   const noWarn = summaryMarkdown(Object.assign({}, p, { was: "short" }), res);
   ok("does not warn when there was little to lose", !/WARNING/.test(noWarn));
 
+  // The source watcher's several-field proposal — built for the bot only.
+  const several = {
+    "medicine": "ganlum",
+    "which stage": "WHO PQ listing",
+    "what changes": "Several fields at once (filed by the source watcher)",
+    "the status of this stage": "done",
+    "the date this stage was reached": "15 Sep 2026",
+    "the sentence shown under this stage": "Prequalified by WHO on 15 Sep 2026 (WHO ref MA999, Novartis Pharma AG).",
+    "source": "WHO prequalification list",
+    "date of the source": "2026-09-21",
+    "link or reference": "",
+    "anything the reviewer should know": "",
+  };
+  const byPerson = buildProposal(several, { data, sources, issue: { number: 30, user: "KylerXiv" } });
+  ok("refuses several fields from a person", !byPerson.ok && /Only the source watcher/.test((byPerson.errors || []).join(" ")));
+  const byBot = buildProposal(several, { data, sources, issue: { number: 31, user: BOT } });
+  ok("builds several fields for the watcher", byBot.ok && byBot.proposal.changes.length === 3, byBot.ok ? "" : byBot.errors.join("; "));
+  if (byBot.ok) {
+    const bp = byBot.proposal;
+    ok("maps the status word to its code", bp.changes.find((c) => c.field === "status").now === "done");
+    ok("records what each field says now", bp.changes.find((c) => c.field === "status").was === "idle");
+    const bres = checkApplied(data, bp, "2026-09-22");
+    const gs = bres.applied.products.find((x) => x.id === "ganlum").stages[3];
+    ok("applies all three fields", gs.status === "done" && gs.date === "15 Sep 2026" && /MA999/.test(gs.note));
+    ok("the several-field result passes the rules", bres.errors.length === 0, bres.errors.join("; "));
+    const again2 = buildProposal(several, { data, sources, issue: { number: 32, user: BOT } });
+    ok("several fields, same fingerprint", again2.proposal.fingerprint === bp.fingerprint);
+    const later = buildProposal(Object.assign({}, several, { "the date this stage was reached": "16 Sep 2026" }),
+      { data, sources, issue: { number: 33, user: BOT } });
+    ok("a different value is a different fingerprint", later.proposal.fingerprint !== bp.fingerprint);
+    ok("names the watcher as proposer", /source watcher \(automated\)/.test(summaryMarkdown(bp, bres)));
+  }
+
   // The serializer must still round-trip what we hand it.
   const written = ser.serializeProducts(res.applied, got.raw);
   const reread = rules.extractData(written, "LAUNCH_DATA");
@@ -410,6 +494,9 @@ function selftest() {
 }
 
 module.exports = {
+  BOT,
+  SEVERAL_LABEL: "Several fields at once (filed by the source watcher)",
+  FIELD_BY_LABEL,
   parseIssueBody,
   buildProposal,
   applyProposal,

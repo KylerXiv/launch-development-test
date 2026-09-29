@@ -275,7 +275,7 @@ function diff(prevRows, rows) {
 }
 
 // Exported for offline re-normalization of existing raw snapshots and tests.
-module.exports = { normalizeFpp, normalizeVc, normalizeEma, readSheet, toCsv, isoDate, mapProductId };
+module.exports = { normalizeFpp, normalizeVc, normalizeEma, readSheet, parseCsv, toCsv, isoDate, mapProductId };
 
 if (require.main === module) (async () => {
   fs.mkdirSync(RAW_PQ, { recursive: true });

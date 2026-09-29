@@ -13,10 +13,20 @@ name: Proposal intake
 # asks pr-preview.yml to build the public dashboard from it, so the reviewer
 # sees the diff and the real page before deciding. The pull request is the
 # only place data/products.js changes; main is not touched until approval.
+#
+# workflow_dispatch: source-proposals.yml files proposal issues with
+# GITHUB_TOKEN, and those start no workflows, so it starts this one for each.
+# Anyone with write access can also use it to rebuild a proposal's PR.
 
 on:
   issues:
     types: [opened, edited]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: "Proposal issue number to (re)build"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -31,7 +41,14 @@ concurrency:
 jobs:
   check:
     # Not on a closed issue: editing a rejected proposal must not reopen its PR.
-    if: contains(github.event.issue.labels.*.name, 'proposal') && github.event.issue.state == 'open'
+    # And an edit rebuilds the proposal only when its own author made it —
+    # otherwise anyone could rewrite a proposal and then approve it themselves,
+    # and nobody could edit one the source watcher filed without that being
+    # the only review it got.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (contains(github.event.issue.labels.*.name, 'proposal') && github.event.issue.state == 'open' &&
+       (github.event.action != 'edited' || github.event.sender.login == github.event.issue.user.login))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,18 +59,39 @@ jobs:
         with:
           node-version: "20"
 
-      # Via an env var, never interpolated into the script: an issue body is
-      # untrusted text and `${{ }}` inside run: would execute it.
-      - name: Write the filed form to a file
+      # Which issue, who filed it, and what it says — from the event when a
+      # person filed or edited it, from the API when this run was dispatched.
+      # The body goes to a file through env, never into the script: an issue
+      # body is untrusted text and `${{ }}` inside run: would execute it.
+      - name: Load the issue
+        id: issue
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT: ${{ github.event_name }}
+          INPUT: ${{ inputs.issue }}
+          NUMBER: ${{ github.event.issue.number }}
+          AUTHOR: ${{ github.event.issue.user.login }}
           BODY: ${{ github.event.issue.body }}
-        run: printf '%s' "$BODY" > /tmp/issue-body.md
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            [[ "$INPUT" =~ ^[0-9]+$ ]] || { echo "::error::not an issue number: $INPUT"; exit 1; }
+            gh api "repos/$GITHUB_REPOSITORY/issues/$INPUT" > /tmp/issue.json
+            jq -e '.state == "open" and .pull_request == null and ([.labels[].name] | index("proposal") != null)' \
+              /tmp/issue.json > /dev/null || { echo "::error::#$INPUT is not an open proposal issue"; exit 1; }
+            NUMBER="$INPUT"
+            AUTHOR=$(jq -r .user.login /tmp/issue.json)
+            jq -r '.body // ""' /tmp/issue.json > /tmp/issue-body.md
+          else
+            printf '%s' "$BODY" > /tmp/issue-body.md
+          fi
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+          echo "author=$AUTHOR" >> "$GITHUB_OUTPUT"
 
       - name: Read it as a proposal, and check the result
         id: check
         env:
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_USER: ${{ github.event.issue.user.login }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
+          ISSUE_USER: ${{ steps.issue.outputs.author }}
         run: |
           set +e
           node scripts/proposal-lib.js check /tmp/issue-body.md > /tmp/comment.md
@@ -70,7 +108,7 @@ jobs:
         if: steps.check.outputs.status == '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
         run: bash scripts/proposal-pr.sh "$ISSUE_NUMBER" /tmp/proposal.json
 
       # The push above was made with GITHUB_TOKEN, so it fired no workflow.
@@ -84,9 +122,11 @@ jobs:
       - name: Say what it would change, or what is wrong
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
+          STATUS: ${{ steps.check.outputs.status }}
           PR: ${{ steps.pr.outputs.pr }}
         run: |
-          if [ "${{ steps.check.outputs.status }}" = "0" ]; then
+          if [ "$STATUS" = "0" ]; then
             {
               echo
               echo "### See it on the page first"
@@ -94,21 +134,24 @@ jobs:
               echo "The change is applied in #$PR. Its diff is exactly what would change, and a link to the public dashboard with the change in it appears there in a minute or two. Production does not change until this is approved."
             } >> /tmp/comment.md
           fi
-          gh issue comment "${{ github.event.issue.number }}" --body-file /tmp/comment.md
+          gh issue comment "$ISSUE_NUMBER" --body-file /tmp/comment.md
 
       - name: Name the issue after what it proposes
         if: steps.check.outputs.status == '0'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
         run: |
           TITLE=$(node -e '
             const p = require("/tmp/proposal.json");
             process.stdout.write(require("./scripts/proposal-lib.js").titleFor(p));
           ')
-          gh issue edit "${{ github.event.issue.number }}" --title "$TITLE"
+          gh issue edit "$ISSUE_NUMBER" --title "$TITLE"
 
       - name: Snapshot the proposal, so an approval applies this and not a later edit
         if: steps.check.outputs.status == '0'
+        env:
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
         run: |
           node -e '
             const fs = require("fs");
@@ -131,15 +174,19 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/proposals.js
-          git diff --cached --quiet || git commit -m "Proposal #${{ github.event.issue.number }}: recorded, waiting for review"
+          git diff --cached --quiet || git commit -m "Proposal #$ISSUE_NUMBER: recorded, waiting for review"
           git push
 
+      # Last on purpose: source-proposals.yml waits for one of these two labels
+      # before starting intake for its next issue.
       - name: Label it waiting, or needing a fix
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
+          STATUS: ${{ steps.check.outputs.status }}
         run: |
-          if [ "${{ steps.check.outputs.status }}" = "0" ]; then
-            gh issue edit "${{ github.event.issue.number }}" --add-label waiting --remove-label needs-fixing || true
+          if [ "$STATUS" = "0" ]; then
+            gh issue edit "$ISSUE_NUMBER" --add-label waiting --remove-label needs-fixing || true
           else
-            gh issue edit "${{ github.event.issue.number }}" --add-label needs-fixing --remove-label waiting || true
+            gh issue edit "$ISSUE_NUMBER" --add-label needs-fixing --remove-label waiting || true
           fi
