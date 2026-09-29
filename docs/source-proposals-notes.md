@@ -147,6 +147,32 @@ An edit that forgot to bump the date adds no entry, or one dated later, so it
 is still refused, as the guard intended. Tested on five cases: the continuation
 is replaced; no bump, next-day entry and rewritten history are all refused.
 
+**Revised the same day: the rule was too strict.** On the test repository:
+1. The WHO test approval made `history/products-2026-09-29.js`.
+2. The revert (#6) removed its changelog entry.
+3. The EMA test approval (#10 → #11) landed that same day.
+
+The rule above demanded that the snapshot's entries all survive, so it refused
+the revert as "no new changelog entry". `publish.yml` failed: production
+deployed, but history, feed and ontology did not update. A day's snapshot is
+that day's final state, so within the day anything the changelog records may
+change. The rule is now:
+- entries dated **before** the day are exactly as the snapshot has them;
+- **no** entry is dated after the day;
+- the day's own entries **differ** from the snapshot's.
+
+Replayed on the real files, the old rule refuses with the live run's exact
+error, and the new one accepts ("1 changelog entry added, 1 from earlier that
+day withdrawn"). Six cases:
+- accepted: a second approval, a same-day revert followed by another approval,
+  a same-day entry corrected;
+- refused: an edit with no bump, an entry dated the next day, a rewritten
+  earlier-day entry.
+
+Simulation: 79/79. Its seed now resets the data file to the 8 Sep snapshot and
+empties the queue and the log, so test data landing on main no longer upsets
+its starting assumptions.
+
 Rejected alternatives:
 - *Suffixed snapshots* (`products-D-2.js`). Both readers,
   `build-history-graph.js` and `make-brief.js`, match only
