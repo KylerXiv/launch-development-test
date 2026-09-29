@@ -2,10 +2,14 @@
 
 Staging ground for datasets collected from public sources, per the
 [data sourcing plan](../docs/data-sourcing-plan.md). **Nothing in here feeds
-the dashboards directly** — `data/products.js` is only ever edited by an
-analyst, and `scripts/validate-data.js` remains the only gate. Collected data
-becomes dashboard values by analyst decision, with `source` / `asOf`
-provenance carried over.
+the dashboards directly.** Collected data becomes a dashboard value only
+through an approved proposal — its own issue, pull request and preview — with
+`source` / `asOf` provenance carried over, and `scripts/validate-data.js`
+checking it on the way. An analyst files most proposals with the issue form. For
+what a source states outright, the **source watcher** files them
+(`scripts/propose-regulatory.js`, run by `.github/workflows/source-proposals.yml`
+after every fetch; today: WHO PQ listing a portfolio medicine). Either way a
+person approves it.
 
 ## Layout
 

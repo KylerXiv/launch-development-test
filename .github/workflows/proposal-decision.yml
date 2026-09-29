@@ -31,7 +31,8 @@ concurrency:
 
 jobs:
   approve:
-    if: github.event.label.name == 'approved'
+    # Proposals only: a watch report labelled by mistake is not one.
+    if: github.event.label.name == 'approved' && contains(github.event.issue.labels.*.name, 'proposal')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -93,7 +94,7 @@ jobs:
             --jq '.[0] // {} | [.number // "", .headRefOid // ""] | @tsv')
           if [ -z "$PR" ]; then
             gh issue comment "$ISSUE_NUMBER" --body \
-              "**Not approved.** No open pull request carries this proposal. Edit the issue (any change) to rebuild it, then approve again. The label has been removed."
+              "**Not approved.** No open pull request carries this proposal. Rebuild it — Actions → Proposal intake → Run workflow, with this issue's number — then approve again. The label has been removed."
             gh issue edit "$ISSUE_NUMBER" --remove-label approved
             exit 1
           fi
@@ -184,7 +185,7 @@ jobs:
             "**Not merged.** The approval stopped before anything landed — see [the run]($RUN). Production is unchanged."
 
   reject:
-    if: startsWith(github.event.label.name, 'rejected')
+    if: startsWith(github.event.label.name, 'rejected') && contains(github.event.issue.labels.*.name, 'proposal')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -219,7 +220,7 @@ jobs:
               by: process.env.DECIDER,
               on: new Date().toISOString().slice(0, 10),
               target: p ? p.target : null,
-              proposed: p ? p.now : null,
+              proposed: p ? (p.changes || p.now) : null,
               fingerprint: p ? p.fingerprint : null,
             });
             dec.data.meta = { updated: new Date().toISOString().slice(0, 10) };

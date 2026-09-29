@@ -98,6 +98,14 @@ option. Hashes checked before and after.
 
 ## Found in passing
 
+- **A project-restricted Vercel token breaks `vercel pull` (28 Sep).** Before
+  it reads the project, the CLI calls `GET /v2/user` and
+  `GET /teams/<id>`. A token limited to one project returned 404 and 403 on
+  those — while `GET /v9/projects/<id>` worked — so the step failed with
+  "Could not retrieve Project Settings", which reads like a wrong ID. The IDs
+  were right. A token with scope **All Projects** on the team fixed it. The
+  local build test missed this because `vercel build` needs no token.
+
 - **Fixed — intake corrupted the queue on its first run.** The snapshot step cut
   `data/proposals.js` at `indexOf("window.LAUNCH_PROPOSALS")`, and the file's own
   header comment quotes that text, so the real assignment was dropped. Every

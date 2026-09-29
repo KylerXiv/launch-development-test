@@ -1,0 +1,103 @@
+name: Propose changes from public sources
+
+# After every scheduled fetch, turns what a public source now states outright
+# into proposals — the same issues, pull requests, previews and approvals as a
+# person's proposal. Today that is one thing: WHO Prequalification listing a
+# portfolio medicine the dashboard does not yet show as listed
+# (scripts/propose-regulatory.js). Anything that needs judgement stays in the
+# watch report for a person.
+#
+# Nothing here writes data/products.js, or anything under data/: it files
+# issues, and intake, the PR, the preview and a person's approval do the rest.
+#
+# Issues filed with GITHUB_TOKEN start no workflows, so this starts intake for
+# each one itself — one at a time, waiting for intake to finish. Intake shares
+# the bot-push-main concurrency group, where a second queued run would cancel
+# the first.
+#
+# Manual run: Actions → "Propose changes from public sources" → Run workflow.
+# The test fixture adds one invented listing (GanLum, WHO ref TEST-0001) so the
+# whole route can be seen working; see test-data/regulatory/README.md.
+
+on:
+  workflow_run:
+    workflows: ["Scheduled source fetch"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      staging:
+        description: "WHO PQ list to read"
+        type: choice
+        options:
+          - sourcing/staging/regulatory_events.csv
+          - test-data/regulatory/who-pq-ganlum-listed.csv
+        default: sourcing/staging/regulatory_events.csv
+
+permissions:
+  contents: read
+  issues: write
+  actions: write   # to start proposal-intake.yml for each issue it files
+
+concurrency:
+  group: source-proposals
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    # Even after a partly failed fetch: the staged WHO list is only ever
+    # replaced whole, by a regulatory fetch that succeeded.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0   # the previous staged list, for the shrink guard
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Work out what the sources now say
+        env:
+          STAGING: ${{ inputs.staging || 'sourcing/staging/regulatory_events.csv' }}
+        run: |
+          PREVIOUS=()
+          if [ "$STAGING" = "sourcing/staging/regulatory_events.csv" ]; then
+            BEFORE=$(git log -2 --format=%H -- "$STAGING" | sed -n 2p)
+            if [ -n "$BEFORE" ]; then
+              git show "$BEFORE:$STAGING" > "$RUNNER_TEMP/previous.csv"
+              PREVIOUS=(--previous "$RUNNER_TEMP/previous.csv")
+            fi
+          fi
+          node scripts/propose-regulatory.js --staging "$STAGING" "${PREVIOUS[@]}" --out "$RUNNER_TEMP/proposals" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: File each one, and put it through intake
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUT: ${{ runner.temp }}/proposals
+        run: |
+          jq -c '.[]' "$OUT/manifest.json" | while read -r p; do
+            TITLE=$(jq -r .title <<< "$p")
+            BODY=$(jq -r .bodyFile <<< "$p")
+            # One open proposal per medicine and stage, whoever filed it.
+            if gh issue list --state open --label proposal --limit 200 --json title --jq '.[].title' | grep -Fxq "$TITLE"; then
+              echo "Already under review, not filed again: $TITLE" | tee -a "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+            URL=$(gh issue create --title "$TITLE" --body-file "$BODY" --label proposal)
+            N="${URL##*/}"
+            gh workflow run proposal-intake.yml --ref main -f issue="$N"
+            LABELS=""
+            for _ in $(seq 1 40); do
+              sleep 15
+              LABELS=$(gh issue view "$N" --json labels --jq '[.labels[].name] | join(",")')
+              case ",$LABELS," in *,waiting,*|*,needs-fixing,*) break ;; esac
+            done
+            case ",$LABELS," in
+              *,waiting,*)      echo "Filed #$N: $TITLE — ready for review" | tee -a "$GITHUB_STEP_SUMMARY" ;;
+              *,needs-fixing,*) echo "::warning::#$N: $TITLE — intake could not read it; see the issue" ;;
+              *)                echo "::warning::#$N: $TITLE — intake did not finish within 10 minutes; see the Actions tab" ;;
+            esac
+          done
