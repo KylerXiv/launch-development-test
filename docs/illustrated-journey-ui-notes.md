@@ -753,6 +753,16 @@ suggested option was accepted.
   The strip's note became an 8px spacer. The group's `aria-label` still says the
   approvals have no defined order, so screen-reader users lose nothing. The
   mock-up for this change showed the text; that was before this request.
+- **Heading, order note and hint removed** (Keith, same day): "How a medicine
+  reaches patients", "Every medicine moves left to right. Step 3 is two separate
+  WHO approvals, in either order." and "Select a step to see what happens there..."
+  are gone, along with their CSS and the two script lines that toggled the hint
+  (leaving those would have thrown on every click). What that costs: the page no
+  longer says in words that the strip is clickable or that step 3 is two parallel
+  approvals. The numbered badges, the chevron on each icon, the bracket and the
+  strip's `aria-label` still carry it, but a first-time reader gets no sentence
+  telling them to click. If readers do not open the steps, restore the hint line
+  first; it was the cheapest of the three.
 - Rejected: a separate explainer page or tooltip per step (the click panel already
   exists and is where the per-medicine answer lives), and putting the wording in
   `index.html`-style hard-coded prose (nothing would keep it in step with the data).
