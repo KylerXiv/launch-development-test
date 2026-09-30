@@ -824,6 +824,10 @@ cut. Reviewed as a mock-up first; built as suggested.
   both WHO dots, which share a column. The header's Journey cell shows the step
   numbers 1-7 above the dots in the same cells, so the number on the strip lines
   up with its column. Closing the panel clears it.
+- **Rings removed, band only** (Keith): the 4px ring on each lit dot made the two
+  stacked WHO dots touch and read as an "8". Options offered were a 4px gap plus a
+  thin ring on the pair only; Keith chose the plainest, the tinted band alone. The
+  dots keep their status colours, so a lit cell reads as "this step, this status".
 - **Header step numbers removed** (Keith, after seeing them live): the small 1-7
   above the dots are gone and the header cell is just "Journey" again. The lit
   column and ring still tie the table to the strip; the numbers on the strip itself
