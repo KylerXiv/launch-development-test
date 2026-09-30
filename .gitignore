@@ -6,3 +6,12 @@ __pycache__/
 .venv/
 streamlit-app/*.log
 decks/
+DEV-B-BACKLOG.md
+
+
+# generated locale pages — rebuild with scripts/build-locale-pages.js
+dist/
+DEV-B-PLAN.md
+
+# translation-engine comparisons (DEV-28) — local only; last committed in 603b305
+poc/

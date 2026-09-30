@@ -1,0 +1,98 @@
+name: Translate new text
+
+# After a change made by hand reaches main — the illustrated page, a data file,
+# the source registry — this rebuilds i18n/content.en.json, translates only the
+# strings that are new into French and Portuguese, checks both pages, commits
+# the two i18n files and redeploys. Until it has run, /fr and /pt show the new
+# text in English: English does not wait for French.
+#
+# Proposals do not depend on it: proposal-decision.yml translates them before
+# it merges. publish.yml starts this after every approval anyway, as a safety
+# net for an engine failure there; normally it finds nothing to do.
+#
+# A push to main is the approval here (docs/translation-notes.md): what it
+# changed is already live in English. The bot commit touches only i18n/, which
+# the path filter ignores, so it cannot retrigger itself.
+#
+# Manual run: Actions → "Translate new text" → Run workflow — for instance once
+# the engine is back after a failure.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - illustrated-journey-dashboard.html
+      - data/products.js
+      - data/resistance.js
+      - data/molecular-markers.js
+      - data/sources.js
+      - scripts/assemble-content.js
+      - scripts/i18n-identifiers.js
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write   # to start vercel-deploy.yml — a push made with GITHUB_TOKEN starts nothing
+
+# One bot push at a time, with intake, the approval job, publish.yml and the
+# source fetch.
+concurrency:
+  group: bot-push-main
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      # main as it is now, not the commit that triggered this: an earlier run
+      # queued in the group may have moved it.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rebuild the English content, and translate what is new
+        id: translate
+        env:
+          TRANSLATE_ENGINE: ${{ vars.TRANSLATE_ENGINE || 'google' }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: |
+          node scripts/assemble-content.js
+          APPROVED_CONTENT_HASH=$(node -p 'require("./i18n/content.en.json").contentHash')
+          export APPROVED_CONTENT_HASH
+          FAILED=""
+          for loc in fr pt; do
+            node scripts/translate-strings.js --locale="$loc" || FAILED="${FAILED:+$FAILED }$loc"
+          done
+          echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
+
+      - name: Check the French and Portuguese pages
+        run: node scripts/build-locale-pages.js
+
+      # Commits what is ready even when the engine failed for a locale: the
+      # content file is then current, and the next run translates the rest.
+      - name: Commit, and redeploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "launch-dashboard-bot"
+          git config user.email "actions@github.com"
+          git add i18n/content.en.json i18n/translations.json
+          if git diff --cached --quiet; then
+            echo "Nothing new to commit."
+            exit 0
+          fi
+          git commit -m "chore: translate new text [bot]"
+          git push
+          gh workflow run vercel-deploy.yml --ref main
+
+      - name: Say that the engine failed
+        if: steps.translate.outputs.failed != ''
+        env:
+          FAILED: ${{ steps.translate.outputs.failed }}
+        run: |
+          echo "::error::Translation failed for: $FAILED. Its new text stays in English on the site; run this workflow again once the engine is back."
+          exit 1

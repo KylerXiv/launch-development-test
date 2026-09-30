@@ -1,0 +1,2854 @@
+{
+  "schema": 1,
+  "entries": {
+    "016f16423ceeff2f": {
+      "en": "Development complete",
+      "where": "products.products[3].stages[0].note",
+      "bucket": "data",
+      "fr": "Développement terminé",
+      "pt": "Desenvolvimento concluído"
+    },
+    "01bc4009390083a7": {
+      "en": "Eritrea",
+      "where": "resistance.dict.country[22]",
+      "bucket": "data",
+      "fr": "Érythrée",
+      "pt": "Eritreia"
+    },
+    "01dca027d3f92d72": {
+      "en": "EOI listing (not on 24th malaria EOI, Feb 2026)",
+      "where": "products.products[0].detail.milestones[3].next",
+      "bucket": "data",
+      "fr": "Liste des déclarations d'intérêt (ne figure pas sur la 24e déclaration d'intérêt pour le paludisme, février 2026)",
+      "pt": "Inclusão na lista de Manifestações de Interesse (não incluída na 24ª Manifestação de Interesse para a Malária, fevereiro de 2026)"
+    },
+    "02340828ad48cf08": {
+      "en": "In-country delivery",
+      "where": "products.stages[7]",
+      "bucket": "data",
+      "fr": "Livraison à l'intérieur du pays",
+      "pt": "Entrega no país"
+    },
+    "0475614aed28ff3f": {
+      "en": "940k packs (GF, to 2025)",
+      "where": "products.products[2].detail.milestones[6].label",
+      "bucket": "data",
+      "fr": "940 000 paquets (GF, jusqu'en 2025)",
+      "pt": "940 mil pacotes (GF, até 2025)"
+    },
+    "04952a0f984dccfa": {
+      "en": "Nigeria",
+      "where": "resistance.dict.country[45]",
+      "bucket": "data",
+      "fr": "Nigéria",
+      "pt": "Nigéria"
+    },
+    "06147c551c69292b": {
+      "en": "reached out of order (line dips back)",
+      "where": "line 1630 (in markup)",
+      "bucket": "js",
+      "fr": "appel hors délai (la ligne reflue)",
+      "pt": "contacto fora de ordem (a linha cai para trás)"
+    },
+    "0679e4172feafdfb": {
+      "en": "Access-pathway status of new antimalarial medicines — stages, milestones, country access and procurement — with public-source provenance on every figure.",
+      "where": "line 1374",
+      "bucket": "js",
+      "fr": "État d’avancement des voies d’accès aux nouveaux médicaments antipaludiques — étapes, jalons, accès par pays et approvisionnement — avec provenance de sources publiques pour chaque figure.",
+      "pt": "Situação das vias de acesso a novos medicamentos antimaláricos — etapas, marcos, acesso por país e aquisição — com informação de fontes públicas sobre cada dado."
+    },
+    "067f9f108ad6bf6f": {
+      "en": "Nine PQ'd presentations across three manufacturers (Alfasigma, Guilin, Beijing Holley) — supply security via diversity",
+      "where": "products.products[3].detail.access[0]",
+      "bucket": "data",
+      "fr": "Neuf présentations préqualifiées (PQ) auprès de trois fabricants (Alfasigma, Guilin, Beijing Holley) — sécurité d’approvisionnement par la diversité",
+      "pt": "Nove apresentações pré-qualificadas (PQ) de três fabricantes (Alfasigma, Guilin, Beijing Holley) — segurança do abastecimento pela diversidade"
+    },
+    "07e9ffda646ae720": {
+      "en": "Pre-submission dialogue",
+      "where": "products.products[0].detail.milestones[2].next",
+      "bucket": "data",
+      "fr": "Dialogue préalable à la soumission",
+      "pt": "Diálogo prévio à submissão"
+    },
+    "07f62b021771d3cf": {
+      "en": "Brazil",
+      "where": "resistance.dict.country[6]",
+      "bucket": "data",
+      "fr": "Brésil",
+      "pt": "Brasil"
+    },
+    "082c2e5febfb6943": {
+      "en": "Ghana only — 1 country confirmed",
+      "where": "products.products[2].detail.milestones[5].label",
+      "bucket": "data",
+      "fr": "Ghana seulement — 1 pays confirmé",
+      "pt": "Apenas Gana — 1 país confirmado"
+    },
+    "084504165b077587": {
+      "en": "Malaysia",
+      "where": "resistance.dict.country[38]",
+      "bucket": "data",
+      "fr": "Malaisie",
+      "pt": "Malásia"
+    },
+    "085807f22f69d2c9": {
+      "en": "Cameroon",
+      "where": "resistance.dict.country[10]",
+      "bucket": "data",
+      "fr": "Cameroun",
+      "pt": "Camarões"
+    },
+    "090f98359da0692b": {
+      "en": "Operational research",
+      "where": "line 1779 (in markup)",
+      "bucket": "js",
+      "fr": "Recherche opérationnelle",
+      "pt": "Pesquisa operacional"
+    },
+    "098c6424557a7811": {
+      "en": "Democratic Republic of the Congo",
+      "where": "resistance.dict.country[19]",
+      "bucket": "data",
+      "fr": "République démocratique du Congo",
+      "pt": "República Democrática do Congo"
+    },
+    "0a8787a41b1d29db": {
+      "en": "' + L().unit + '",
+      "where": "line 3069 (in markup)",
+      "bucket": "js",
+      "fr": "' + L().unité + '",
+      "pt": "' + L().unit + '"
+    },
+    "0ae07a70fd77402f": {
+      "en": "Bolivia (Plurinational State of)",
+      "where": "resistance.dict.country[5]",
+      "bucket": "data",
+      "fr": "Bolivie (État plurinational de)",
+      "pt": "Bolívia (Estado Plurinacional da)"
+    },
+    "0bbfeb155e2239ce": {
+      "en": "Congo",
+      "where": "resistance.dict.country[16]",
+      "bucket": "data",
+      "fr": "Congo",
+      "pt": "Congo"
+    },
+    "0c2cb01a2da18155": {
+      "en": "Cambodia",
+      "where": "resistance.dict.country[9]",
+      "bucket": "data",
+      "fr": "Cambodge",
+      "pt": "Camboja"
+    },
+    "0e5444556eb195c1": {
+      "en": "${esc(STAGES[i])}. ${esc(peekLine(st.status, st.date, st.nextDate))}. Opens the full detail.",
+      "where": "line 1669",
+      "bucket": "js",
+      "fr": "${esc(STAGES[i])}. ${esc(peekLine(st.status, st.date, st.nextDate))}. Ouvre les détails complets.",
+      "pt": "${esc(STAGES[i])}. ${esc(peekLine(st.status, st.date, st.nextDate))}. Abre os detalhes completos."
+    },
+    "0e84899a7849711a": {
+      "en": "· Data confirmed by manufacturers for public release",
+      "where": "line 1333",
+      "bucket": "js",
+      "fr": "· Données confirmées par les fabricants pour publication publique",
+      "pt": "• Dados confirmados pelos fabricantes para divulgação pública"
+    },
+    "0e8d80ae5c7d8b10": {
+      "en": "All statuses, dates, prices and volumes below are illustrative placeholders for layout review — not real programme data.\", draft: '",
+      "where": "line 1324 (in markup)",
+      "bucket": "js",
+      "fr": "Tous les statuts, dates, prix et volumes ci-dessous sont des exemples pour la révision de la mise en page — et non des données réelles du programme.\", brouillon : '",
+      "pt": "Todos os estados, datas, preços e volumes abaixo são meramente ilustrativos para revisão do layout — não são dados reais do programa.\", rascunho: '"
+    },
+    "100e29c10b651ced": {
+      "en": "Purchasing figures added: the Global Fund has bought 11.5 million packs (US$41.5m) since 2008, with a sharp rise in 2025. Nine versions of the medicine have passed World Health Organization quality checks.",
+      "where": "products.changelog[10].plain",
+      "bucket": "data",
+      "fr": "Chiffres d'achat ajoutés : le Fonds mondial a acheté 11,5 millions de boîtes (41,5 millions de dollars US) depuis 2008, avec une forte augmentation en 2025. Neuf versions du médicament ont passé les contrôles de qualité de l'Organisation mondiale de la santé.",
+      "pt": "Dados de compras adicionados: o Fundo Global comprou 11,5 milhões de embalagens (41,5 milhões de dólares) desde 2008, com um aumento acentuado em 2025. Nove versões do medicamento passaram pelos controlos de qualidade da Organização Mundial de Saúde."
+    },
+    "10436829032f361a": {
+      "en": "China",
+      "where": "resistance.dict.country[13]",
+      "bucket": "data",
+      "fr": "Chine",
+      "pt": "China"
+    },
+    "10579cbf3d87622f": {
+      "en": "TZA 10 compliant · NGA 26/47 active",
+      "where": "products.products[3].detail.milestones[5].label",
+      "bucket": "data",
+      "fr": "Conforme TZA 10 · NGA 26/47 actif",
+      "pt": "Compatível com TZA 10 · NGA 26/47 ativo"
+    },
+    "11c54aed94cc218c": {
+      "en": "Once-daily, 3-day granule sachet — no separate paediatric development needed",
+      "where": "products.products[0].detail.access[2]",
+      "bucket": "data",
+      "fr": "Sachet de granulés à prendre une fois par jour pendant 3 jours — aucun développement pédiatrique distinct n'est nécessaire",
+      "pt": "Saqueta de grânulos para uso diário, com duração de 3 dias — sem necessidade de desenvolvimento pediátrico separado."
+    },
+    "11fdf765024e9b31": {
+      "en": "Country registrations",
+      "where": "products.products[2].detail.milestones[4].milestone",
+      "bucket": "data",
+      "fr": "Inscriptions du pays",
+      "pt": "Registos por país"
+    },
+    "12c8f8f4912cbdb3": {
+      "en": "Rwanda",
+      "where": "resistance.dict.country[50]",
+      "bucket": "data",
+      "fr": "Rwanda",
+      "pt": "Ruanda"
+    },
+    "131d28de5b7a5391": {
+      "en": "Pooled across these ' + mk.members.length + \" sites, each at its most recent study",
+      "where": "line 3154 (in markup)",
+      "bucket": "js",
+      "fr": "Regroupées sur ces sites « + mk.members.length + », chacun lors de sa dernière étude",
+      "pt": "Reunidos em todos estes sites ' + mk.members.length + \", cada um no seu estudo mais recente"
+    },
+    "1341e015c4f1509b": {
+      "en": "Global Fund procurement held at 0.9–4.5% of antimalarial spend 2022–24 (US$41.5m / 11.5m packs cumulative since 2008) — chronic underuse; 2025 shows a sharp uptick (US$15.3m, led by Uganda, Madagascar, Mozambique) that needs confirming as reporting completes",
+      "where": "products.products[3].stages[6].note",
+      "bucket": "data",
+      "fr": "Les achats du Fonds mondial se sont maintenus entre 0,9 et 4,5 % des dépenses antipaludiques de 2022 à 2024 (41,5 millions de dollars US / 11,5 millions de boîtes cumulées depuis 2008) — une sous-utilisation chronique ; 2025 montre une forte hausse (15,3 millions de dollars US, principalement grâce à l'Ouganda, Madagascar et le Mozambique) qui reste à confirmer une fois les rapports finalisés.",
+      "pt": "As aquisições do Fundo Global mantiveram-se entre 0,9% e 4,5% das despesas com antimaláricos no período de 2022 a 2024 (41,5 milhões de dólares / 11,5 milhões de embalagens acumuladas desde 2008) — subutilização crónica; em 2025, observa-se um aumento acentuado (15,3 milhões de dólares, liderado pelo Uganda, Madagáscar e Moçambique), que necessita de ser confirmado após a conclusão dos relatórios."
+    },
+    "136e75c456a18829": {
+      "en": "Procurement",
+      "where": "products.stages[6]",
+      "bucket": "data",
+      "fr": "Approvisionnement",
+      "pt": "Aquisição"
+    },
+    "13ce08699c85c1f2": {
+      "en": "Marker",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Marqueur",
+      "pt": "Marcador"
+    },
+    "143b270a32602d41": {
+      "en": "Complete",
+      "where": "products.products[0].detail.milestones[0].label",
+      "bucket": "data",
+      "fr": "Complet",
+      "pt": "Concluir"
+    },
+    "14cb833119ac319e": {
+      "en": "MFT deployment models with pyronaridine–artesunate",
+      "where": "products.products[2].detail.research.question",
+      "bucket": "data",
+      "fr": "MFT Modèles de déploiement avec pyronaridine-artésunate",
+      "pt": "MFT modelos de implantação com pironaridina-artesunato"
+    },
+    "15122738f44e8f3a": {
+      "en": "Study result",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Résultats de l'étude",
+      "pt": "Resultado do estudo"
+    },
+    "159403084fe68a63": {
+      "en": "Democratic People's Republic of Korea",
+      "where": "resistance.dict.country[18]",
+      "bucket": "data",
+      "fr": "République populaire démocratique de Corée",
+      "pt": "República Popular Democrática da Coreia"
+    },
+    "15a06c508876e876": {
+      "en": "Something on the page looks wrong",
+      "where": "line 3667",
+      "bucket": "js",
+      "fr": "Il y a quelque chose qui semble incorrect sur la page.",
+      "pt": "Algo na página parece errado."
+    },
+    "15b61974b2707a7b": {
+      "en": "Location",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Emplacement",
+      "pt": "Localização"
+    },
+    "1622625d0a49a1c6": {
+      "en": "The national register of every medicine approved for sale in Tanzania.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Le registre national de tous les médicaments autorisés à la vente en Tanzanie.",
+      "pt": "O registo nacional de todos os medicamentos aprovados para venda na Tanzânia."
+    },
+    "1672f60c3a9ae94f": {
+      "en": "Botswana",
+      "where": "markers.dict.country[4]",
+      "bucket": "data",
+      "fr": "Botswana",
+      "pt": "Botsuana"
+    },
+    "16fce97b072edc95": {
+      "en": "The whole dashboard",
+      "where": "line 1351",
+      "bucket": "js",
+      "fr": "L'ensemble du tableau de bord",
+      "pt": "Todo o painel de controlo"
+    },
+    "17aa62b663966e62": {
+      "en": "Artemisinin (all ACTs)",
+      "where": "markers.meta.markerDrug[\"Pfkelch13\"]",
+      "bucket": "data",
+      "fr": "Artémisinine (tout ACTs)",
+      "pt": "Artemisinina (todos ACTs)"
+    },
+    "180e12dbab442661": {
+      "en": "MFT rotation partner; mass drug administration and chemoprevention niches; once-daily dosing.",
+      "where": "products.products[3].detail.useCase",
+      "bucket": "data",
+      "fr": "MFT partenaire de rotation ; niches d'administration massive de médicaments et de chimioprévention ; dosage une fois par jour.",
+      "pt": "MFT parceiro de rotação; nichos de administração em massa de fármacos e quimioprevenção; posologia única diária."
+    },
+    "18167202804224b6": {
+      "en": "We corrected the year the World Health Organization first recommended this medicine. It was 2010, not 2015.",
+      "where": "products.changelog[6].plain",
+      "bucket": "data",
+      "fr": "Nous avons corrigé l'année où l'Organisation mondiale de la santé a recommandé ce médicament pour la première fois. Il s'agissait de 2010 et non de 2015.",
+      "pt": "Corrigimos o ano em que a Organização Mundial de Saúde recomendou este medicamento pela primeira vez. Foi em 2010, e não em 2015."
+    },
+    "1860db247c71a3e7": {
+      "en": "Development complete (Shin Poong / MMV co-development)",
+      "where": "products.products[2].stages[0].note",
+      "bucket": "data",
+      "fr": "Développement terminé (co-développement Shin Poong / MMV)",
+      "pt": "Desenvolvimento concluído (Shin Poong / MMV co-desenvolvimento)"
+    },
+    "19a1b952794cc142": {
+      "en": "Treatment failure (per-protocol), % of evaluable patients",
+      "where": "resistance.meta.metric",
+      "bucket": "data",
+      "fr": "Échec du traitement (selon le protocole), % des patients évaluables",
+      "pt": "Falha do tratamento (por protocolo), % de doentes avaliáveis"
+    },
+    "1a01ca0044034abf": {
+      "en": "In national guidelines",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Conformément aux directives nationales",
+      "pt": "Em orientações nacionais"
+    },
+    "1cc4fc382178a964": {
+      "en": "Iran (Islamic Republic of)",
+      "where": "resistance.dict.country[32]",
+      "bucket": "data",
+      "fr": "Iran (République islamique d')",
+      "pt": "Irão (República Islâmica do)"
+    },
+    "1e199b200fcfa3b9": {
+      "en": "Global Fund price and quality reporting",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Rapports sur les prix et la qualité du Fonds mondial",
+      "pt": "Relatórios de preços e qualidade do Fundo Global"
+    },
+    "219c4a6c86a716e9": {
+      "en": "Results",
+      "where": "products.products[1].detail.milestones[1].next",
+      "bucket": "data",
+      "fr": "Résultats",
+      "pt": "Resultados"
+    },
+    "21c1903af25470c6": {
+      "en": "Yemen",
+      "where": "resistance.dict.country[67]",
+      "bucket": "data",
+      "fr": "Yémen",
+      "pt": "Iémen"
+    },
+    "22162612ce5a16e1": {
+      "en": "What adoption needs",
+      "where": "line 2050 (in markup)",
+      "bucket": "js",
+      "fr": "Quels sont les besoins en matière d'adoption ?",
+      "pt": "Quais as necessidades da adoção?"
+    },
+    "22b9653281793ae7": {
+      "en": "Angola",
+      "where": "resistance.dict.country[1]",
+      "bucket": "data",
+      "fr": "Angola",
+      "pt": "Angola"
+    },
+    "2351ee992626bafb": {
+      "en": "Registered",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Inscrit",
+      "pt": "Registrado"
+    },
+    "2368df19bfbb6df9": {
+      "en": "National guideline inclusion",
+      "where": "products.products[2].detail.milestones[5].milestone",
+      "bucket": "data",
+      "fr": "inclusion dans les directives nationales",
+      "pt": "Inclusão de orientações nacionais"
+    },
+    "255cd279e75752c1": {
+      "en": "Added a poster view showing where each medicine sits in development.",
+      "where": "products.changelog[13].plain",
+      "bucket": "data",
+      "fr": "Ajout d'une vue d'ensemble montrant où en est chaque médicament dans son développement.",
+      "pt": "Foi adicionada uma visualização em poster mostrando em que fase do desenvolvimento se encontra cada medicamento."
+    },
+    "270e4a3ea9a08308": {
+      "en": "${nS} sites in ${nM} marks — zoom in to separate.",
+      "where": "line 3193",
+      "bucket": "js",
+      "fr": "${nS} sites dans ${nM} marques — zoom avant pour séparer.",
+      "pt": "${nS} locais em marcas ${nM} — ampliar para separar."
+    },
+    "298a9207a732a11d": {
+      "en": "Next step",
+      "where": "line 2043",
+      "bucket": "js",
+      "fr": "Étape suivante",
+      "pt": "Próximo passo"
+    },
+    "29fc6f28eb69c19e": {
+      "en": "The main trial succeeded, announced on 12 November 2025. Work on the application for approval has now begun.",
+      "where": "products.changelog[17].plain",
+      "bucket": "data",
+      "fr": "L'essai principal a été un succès, annoncé le 12 novembre 2025. Les travaux relatifs à la demande d'autorisation ont maintenant commencé.",
+      "pt": "O ensaio clínico principal foi bem-sucedido, conforme anunciado a 12 de novembro de 2025. O trabalho de preparação do pedido de aprovação já foi iniciado."
+    },
+    "2b457cd87edb3758": {
+      "en": "French Guiana",
+      "where": "markers.dict.country[23]",
+      "bucket": "data",
+      "fr": "Guyane française",
+      "pt": "Guiana Francesa"
+    },
+    "2bd0061f6f572897": {
+      "en": "No cold chain or special administration needs",
+      "where": "products.products[2].detail.adoption[1]",
+      "bucket": "data",
+      "fr": "Aucune obligation de chaîne du froid ni d'administration particulière",
+      "pt": "Não requer cadeia de frio nem administração especial."
+    },
+    "2ca26c60fe0238a7": {
+      "en": "Ecuador",
+      "where": "markers.dict.country[19]",
+      "bucket": "data",
+      "fr": "Équateur",
+      "pt": "Equador"
+    },
+    "2cbebc541f98c7a7": {
+      "en": "Niger",
+      "where": "resistance.dict.country[44]",
+      "bucket": "data",
+      "fr": "Niger",
+      "pt": "Níger"
+    },
+    "2d894fcf5f1859ee": {
+      "en": "Each dot is the most recent study year for that country, drug and species, averaged across every site studied that year and weighted by the number of patients — so a large study counts for more than a small one. No study is excluded; click a dot to see all of them.",
+      "where": "resistance.meta.rule",
+      "bucket": "data",
+      "fr": "Chaque point représente l'année d'étude la plus récente pour ce pays, ce médicament et cette espèce, la moyenne étant calculée sur l'ensemble des sites étudiés cette année-là et pondérée par le nombre de patients ; ainsi, une étude de grande envergure a plus d'impact qu'une étude de petite envergure. Aucune étude n'est exclue ; cliquez sur un point pour les consulter toutes.",
+      "pt": "Cada ponto representa o ano de estudo mais recente para esse país, medicamento e espécie, sendo a média calculada para todos os locais estudados nesse ano e ponderada pelo número de doentes — portanto, um estudo grande tem mais peso do que um pequeno. Nenhum estudo está excluído; clique num ponto para ver todos eles."
+    },
+    "2db943e22de6f94f": {
+      "en": "ECG guidance for specific risk groups in some guidelines",
+      "where": "products.products[3].detail.adoption[0]",
+      "bucket": "data",
+      "fr": "Recommandations relatives à l'ECG pour des groupes à risque spécifiques dans certaines directives",
+      "pt": "Algumas orientações incluem orientações sobre o ECG para grupos de risco específicos."
+    },
+    "2e6cf0ea69d71240": {
+      "en": "you have pointed us to a public source that checks out, we correct the data at the next update.",
+      "where": "line 3682",
+      "bucket": "js",
+      "fr": "Vous nous avez indiqué une source publique fiable ; nous corrigerons les données lors de la prochaine mise à jour.",
+      "pt": "Indicou-nos uma fonte pública confiável; corrigiremos os dados na próxima atualização."
+    },
+    "2e8f30e03f7df769": {
+      "en": "Target use case",
+      "where": "line 1760 (in markup)",
+      "bucket": "js",
+      "fr": "Cas d'utilisation cible",
+      "pt": "Caso de uso alvo"
+    },
+    "2f1d47eb679bb05e": {
+      "en": "Bangladesh",
+      "where": "resistance.dict.country[2]",
+      "bucket": "data",
+      "fr": "Bangladesh",
+      "pt": "Bangladesh"
+    },
+    "2fef055f28856592": {
+      "en": "studies here,",
+      "where": "line 3128",
+      "bucket": "js",
+      "fr": "des études ici,",
+      "pt": "estudos aqui,"
+    },
+    "31a004d8f81b13b8": {
+      "en": "Subscribe for updates",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Abonnez-vous pour recevoir les mises à jour",
+      "pt": "Subscreva para receber atualizações"
+    },
+    "327a26250a864efc": {
+      "en": "Real timing of gates reached for ${esc(p.name)}",
+      "where": "line 1629",
+      "bucket": "js",
+      "fr": "Chronométrage réel des portes atteintes pour ${esc(p.name)}",
+      "pt": "Tempo real de acionamento dos portões para ${esc(p.name)}"
+    },
+    "332383ce1ce107ac": {
+      "en": "Country access",
+      "where": "line 1772 (in markup)",
+      "bucket": "js",
+      "fr": "Accès au pays",
+      "pt": "Acesso ao país"
+    },
+    "33b03e773e0e7c97": {
+      "en": "Guideline inclusion and case-management training",
+      "where": "products.products[2].detail.adoption[0]",
+      "bucket": "data",
+      "fr": "Formation à l'inclusion des lignes directrices et à la gestion des cas",
+      "pt": "Formação em inclusão de guidelines e gestão de casos"
+    },
+    "3456577b72ff9e6a": {
+      "en": "The eight most recent changes we have made to the information on this page, in plain English.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Voici, en langage clair, les huit modifications les plus récentes apportées aux informations de cette page.",
+      "pt": "As oito alterações mais recentes que fizemos à informação desta página, em linguagem simples."
+    },
+    "34b41646ba5b4460": {
+      "en": "Delayed parasite clearance",
+      "where": "resistance.meta.metrics.delayedClearance.short",
+      "bucket": "data",
+      "fr": "Élimination retardée des parasites",
+      "pt": "Eliminação tardia de parasitas"
+    },
+    "35e121b15a0ef956": {
+      "en": "Noted, but not sent: email alerts are not switched on yet. Nothing left your browser.",
+      "where": "line 3614",
+      "bucket": "js",
+      "fr": "Bien noté, mais pas encore envoyé : les alertes par e-mail ne sont pas encore activées. Aucune donnée n'a quitté votre navigateur.",
+      "pt": "Anotado, mas não enviado: os alertas por e-mail ainda não estão ativados. Nada saiu do seu browser."
+    },
+    "364e5f6525c75b81": {
+      "en": "Senegal",
+      "where": "resistance.dict.country[52]",
+      "bucket": "data",
+      "fr": "Sénégal",
+      "pt": "Senegal"
+    },
+    "368e55377d8c2ac7": {
+      "en": "First-line in several SE Asian countries; consideration in African MFT strategies growing; verified country counts pending",
+      "where": "products.products[3].stages[5].note",
+      "bucket": "data",
+      "fr": "Traitement de première intention dans plusieurs pays d’Asie du Sud-Est ; prise en compte croissante dans les stratégies MFT africaines ; décompte vérifié des pays en attente",
+      "pt": "Primeira linha em vários países do Sudeste Asiático; consideração crescente nas estratégias MFT africanas; contagem verificada de países pendente"
+    },
+    "37009d07e34663ef": {
+      "en": "National policy adoption",
+      "where": "products.stages[5]",
+      "bucket": "data",
+      "fr": "adoption de la politique nationale",
+      "pt": "Adoção de política nacional"
+    },
+    "3721ddd922cbe4c1": {
+      "en": "Country registration",
+      "where": "products.stages[4]",
+      "bucket": "data",
+      "fr": "Enregistrement du pays",
+      "pt": "Registo de país"
+    },
+    "37642f9bf90c4139": {
+      "en": "' + esc(layerLabel(LAYER)) + '",
+      "where": "line 3067 (in markup)",
+      "bucket": "js",
+      "fr": "' + esc(layerLabel(LAYER)) + '",
+      "pt": "' + esc(layerLabel(LAYER)) + '"
+    },
+    "3780a1c98314ec7c": {
+      "en": "' + pat + \"",
+      "where": "line 3141 (in markup)",
+      "bucket": "js",
+      "fr": "' + pat + \"",
+      "pt": "' + pat + \""
+    },
+    "382ac5f308f76c24": {
+      "en": "Last updated",
+      "where": "line 1319",
+      "bucket": "js",
+      "fr": "Dernière mise à jour",
+      "pt": "Última atualização"
+    },
+    "38476e7ba81cf18d": {
+      "en": "Further countries",
+      "where": "products.products[3].detail.milestones[5].next",
+      "bucket": "data",
+      "fr": "Autres pays",
+      "pt": "Outros países"
+    },
+    "38a37361a7dabe86": {
+      "en": "Derived from WHO genotype proportions, which carry no resistant/susceptible classification of their own. See the header of scripts/normalize-molecular-markers.js.",
+      "where": "markers.meta.derivation",
+      "bucket": "data",
+      "fr": "Ces données sont issues des proportions de génotypes de l'OMS, qui ne comportent pas de classification de résistance/sensibilité propre. Voir l'en-tête du fichier scripts/normalize-molecular-markers.js.",
+      "pt": "Derivado das proporções de genótipos da OMS, que não têm classificação própria de resistência/suscetibilidade. Consulte o cabeçalho de scripts/normalize-molecular-markers.js."
+    },
+    "39490d8fc8fba044": {
+      "en": "Label update — pregnancy",
+      "where": "products.products[2].detail.milestones[3].milestone",
+      "bucket": "data",
+      "fr": "Mise à jour de l'étiquette — grossesse",
+      "pt": "Atualização do rótulo — gravidez"
+    },
+    "3966d89aaf634bd6": {
+      "en": "Dossier preparation",
+      "where": "products.products[1].detail.milestones[2].next",
+      "bucket": "data",
+      "fr": "Préparation du dossier",
+      "pt": "Preparação do dossier"
+    },
+    "3a02c23fc217e5ec": {
+      "en": "Something look wrong, out of date, or hard to follow? Tell the LAUNCH team what you're seeing.",
+      "where": "line 3664",
+      "bucket": "js",
+      "fr": "Quelque chose vous semble incorrect, obsolète ou difficile à comprendre ? Signalez-le à l’équipe LAUNCH.",
+      "pt": "Algo parece errado, desatualizado ou difícil de acompanhar? Informe a equipa LAUNCH o que está a ver."
+    },
+    "3a716a16ee596314": {
+      "en": "Pivotal Phase III (FD-TACT)",
+      "where": "products.products[1].detail.milestones[1].milestone",
+      "bucket": "data",
+      "fr": "Phase pivotale III (FD-TACT)",
+      "pt": "Fase III Pivotal (FD-TACT)"
+    },
+    "3af18984450120e6": {
+      "en": "Countries on this map, list form",
+      "where": "line 2379",
+      "bucket": "js",
+      "fr": "Pays figurant sur cette carte, liste",
+      "pt": "Países neste mapa, em formato de lista."
+    },
+    "3b41ba9c7cb8c5d6": {
+      "en": "No data",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Aucune donnée",
+      "pt": "Sem dados"
+    },
+    "3bb5bae7b4e4913d": {
+      "en": "Regulatory approval (SRA)",
+      "where": "products.stages[1]",
+      "bucket": "data",
+      "fr": "Approbation réglementaire (SRA)",
+      "pt": "Aprovação regulamentar (SRA)"
+    },
+    "3bf24a10f5ff2767": {
+      "en": "United Republic of Tanzania",
+      "where": "resistance.dict.country[63]",
+      "bucket": "data",
+      "fr": "République-Unie de Tanzanie",
+      "pt": "República Unida da Tanzânia"
+    },
+    "3c315a421f77c785": {
+      "en": "Expression of Interest — the WHO prequalification invitation list; a product must be on it before a PQ dossier can be assessed.",
+      "where": "products.glossary.EOI",
+      "bucket": "data",
+      "fr": "Manifestation d’intérêt — la liste d’invitation à la préqualification de l’OMS ; un produit doit y figurer avant qu’un dossier PQ puisse être évalué.",
+      "pt": "Manifestação de Interesse — a lista de convites para pré-qualificação da OMS; um produto deve estar nela antes de um dossier PQ poder ser avaliado."
+    },
+    "3c789ada0794de04": {
+      "en": "Zoom in to separate them\" + \"",
+      "where": "line 3155 (in markup)",
+      "bucket": "js",
+      "fr": "Zoomez pour les séparer\" + \"",
+      "pt": "Aumente o zoom para os separar\" + \""
+    },
+    "3e049d78d958038a": {
+      "en": "South Africa",
+      "where": "markers.dict.country[62]",
+      "bucket": "data",
+      "fr": "Afrique du Sud",
+      "pt": "África do Sul"
+    },
+    "3ef171d147dae887": {
+      "en": "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026.",
+      "where": "line 3674",
+      "bucket": "js",
+      "fr": "Par exemple, la carte indique que ce médicament n'est pas encore enregistré en Tanzanie, mais il y a été approuvé en juin 2026.",
+      "pt": "Por exemplo, o mapa mostra este medicamento como ainda não registado na Tanzânia, mas foi aí aprovado em Junho de 2026."
+    },
+    "3f852b016c12264a": {
+      "en": "SRA/WLA submission",
+      "where": "products.products[1].detail.milestones[2].milestone",
+      "bucket": "data",
+      "fr": "SRA/Soumission WLA",
+      "pt": "SRA/Submissão WLA"
+    },
+    "3fa7c5ef191f6fdd": {
+      "en": "Your email address",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Votre adresse e-mail",
+      "pt": "O seu endereço de email"
+    },
+    "4080343ee0fe2dc3": {
+      "en": "Togo",
+      "where": "resistance.dict.country[61]",
+      "bucket": "data",
+      "fr": "Aller",
+      "pt": "Ir"
+    },
+    "40a2ba6d3773983d": {
+      "en": "Purchasing figures added: the Global Fund has bought 940,000 packs (US$14.5m) since 2018, most of it in 2025 for Uganda and Burkina Faso. The European medicines decision date is now recorded.",
+      "where": "products.changelog[11].plain",
+      "bucket": "data",
+      "fr": "Des chiffres d'achat ont été ajoutés : le Fonds mondial a acquis 940 000 packs (pour un montant de 14,5 millions de dollars américains) depuis 2018, principalement en 2025 pour l'Ouganda et le Burkina Faso. La date de décision de la Commission européenne sur les médicaments est désormais enregistrée.",
+      "pt": "Dados de compras adicionados: o Fundo Global adquiriu 940.000 embalagens (14,5 milhões de dólares) desde 2018, a maior parte destinada ao Uganda e ao Burkina Faso em 2025. A data da decisão europeia sobre medicamentos já foi registada."
+    },
+    "410de87dcb0d5470": {
+      "en": "Routine use concentrated in Southeast Asia and chemoprevention niches",
+      "where": "products.products[3].stages[7].note",
+      "bucket": "data",
+      "fr": "Son utilisation courante est concentrée en Asie du Sud-Est et dans des créneaux spécifiques de chimioprévention.",
+      "pt": "O uso de rotina concentra-se no Sudeste Asiático e em nichos de quimioprevenção."
+    },
+    "41b15759a97e3679": {
+      "en": "\" + esc(where) + \"",
+      "where": "line 3137 (in markup)",
+      "bucket": "js",
+      "fr": "\" + esc(où) + \"",
+      "pt": "\" + esc(onde) + \""
+    },
+    "4256e512fcfb03ca": {
+      "en": "Chad",
+      "where": "resistance.dict.country[12]",
+      "bucket": "data",
+      "fr": "Tchad",
+      "pt": "Chade"
+    },
+    "43157504da6a73f8": {
+      "en": "As of",
+      "where": "line 3620",
+      "bucket": "js",
+      "fr": "À partir de",
+      "pt": "Até"
+    },
+    "45a15a2470e1d182": {
+      "en": "Guatemala",
+      "where": "markers.dict.country[27]",
+      "bucket": "data",
+      "fr": "Guatemala",
+      "pt": "Guatemala"
+    },
+    "46105bf48674e543": {
+      "en": "ClinicalTrials.gov",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "ClinicalTrials.gov",
+      "pt": "ClinicalTrials.gov"
+    },
+    "461f8f02cd65f09d": {
+      "en": "Western Pacific",
+      "where": "line 2338",
+      "bucket": "js",
+      "fr": "Pacifique occidental",
+      "pt": "Pacífico Ocidental"
+    },
+    "463fc284c793d50f": {
+      "en": "Register verification (NGA, TZA)",
+      "where": "products.products[3].detail.milestones[5].milestone",
+      "bucket": "data",
+      "fr": "Vérification du registre (NGA, TZA)",
+      "pt": "Verificação do registo (NGA, TZA)"
+    },
+    "4678a57b30912b23": {
+      "en": "Djibouti",
+      "where": "resistance.dict.country[20]",
+      "bucket": "data",
+      "fr": "Djibouti",
+      "pt": "Djibuti"
+    },
+    "47d2f7b20b006500": {
+      "en": "Health-worker training on new regimen",
+      "where": "products.products[0].detail.adoption[1]",
+      "bucket": "data",
+      "fr": "Formation du personnel de santé au nouveau protocole",
+      "pt": "Formação dos profissionais de saúde sobre o novo regime"
+    },
+    "487bc4d395b98be0": {
+      "en": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); label updated 2025 to include treatment of pregnant women (EMA outcome 5 Jun 2025; announced 31 Jul 2025)",
+      "where": "products.products[2].stages[1].note",
+      "bucket": "data",
+      "fr": "Avis scientifique positif de l’EMA (Article 58/EU-M4all, 16 février 2012) ; mise à jour de l’étiquetage en 2025 pour inclure le traitement des femmes enceintes (décision de l’EMA le 5 juin 2025 ; annoncée le 31 juillet 2025)",
+      "pt": "Parecer científico positivo da EMA (Artigo 58/EU-M4all, 16 de fevereiro de 2012); folheto informativo atualizado em 2025 para incluir o tratamento de mulheres grávidas (resultado da EMA a 5 de junho de 2025; anunciado a 31 de julho de 2025)."
+    },
+    "48f41421cc02a477": {
+      "en": "data/products.js is missing or has a syntax error — run",
+      "where": "line 1265 (in markup)",
+      "bucket": "js",
+      "fr": "Le fichier data/products.js est manquant ou contient une erreur de syntaxe — exécutez",
+      "pt": "O ficheiro data/products.js está em falta ou contém um erro de sintaxe — execute"
+    },
+    "4909004803e3c17c": {
+      "en": "Artemisinin-based combination therapy — the standard class of malaria treatments pairing an artemisinin derivative with a longer-acting partner drug.",
+      "where": "products.glossary.ACT",
+      "bucket": "data",
+      "fr": "Les traitements combinés à base d'artémisinine constituent la classe standard de traitements contre le paludisme, associant un dérivé de l'artémisinine à un médicament partenaire à action prolongée.",
+      "pt": "Terapia combinada à base de artemisinina — a classe padrão de tratamentos para a malária que combina um derivado da artemisinina com um medicamento parceiro de ação mais prolongada."
+    },
+    "496cb1217c4d24ad": {
+      "en": "Sorry — your feedback could not be sent just now. Please try again in a moment.",
+      "where": "line 3678",
+      "bucket": "js",
+      "fr": "Désolé(e), votre commentaire n'a pas pu être envoyé pour le moment. Veuillez réessayer dans quelques instants.",
+      "pt": "Lamentamos, o seu feedback não pôde ser enviado agora. Por favor, tente novamente dentro de momentos."
+    },
+    "4974fbbb92c0fc5b": {
+      "en": "Pending since",
+      "where": "line 2045",
+      "bucket": "js",
+      "fr": "En attente depuis",
+      "pt": "Pendente desde"
+    },
+    "4b59d6f059966858": {
+      "en": "EMA approval (Eurartesim)",
+      "where": "products.products[3].stages[1].note",
+      "bucket": "data",
+      "fr": "Approbation de l'EMA (Eurartesim)",
+      "pt": "Aprovação da EMA (Eurartesim)"
+    },
+    "4b648daef47ae420": {
+      "en": "Asia submissions",
+      "where": "products.products[2].detail.milestones[4].next",
+      "bucket": "data",
+      "fr": "Soumissions asiatiques",
+      "pt": "Submissões da Ásia"
+    },
+    "4b8b07c9fd834d45": {
+      "en": "· small study",
+      "where": "line 3126",
+      "bucket": "js",
+      "fr": "· petite étude",
+      "pt": "· pequeno estudo"
+    },
+    "4bd15d5fc8e716f4": {
+      "en": "Efficacy against resistant parasites and transmission blocking",
+      "where": "products.products[0].detail.research.question",
+      "bucket": "data",
+      "fr": "Efficacité contre les parasites résistants et blocage de la transmission",
+      "pt": "Eficácia contra parasitas resistentes e bloqueio da transmissão"
+    },
+    "4c354ff4ef17f801": {
+      "en": "Select a country first",
+      "where": "line 3318",
+      "bucket": "js",
+      "fr": "Sélectionnez d'abord un pays",
+      "pt": "Selecione primeiro um país"
+    },
+    "4c537122f6ff043b": {
+      "en": "WHO Malaria Threat Maps",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Cartes de la menace du paludisme de l'OMS",
+      "pt": "Mapas de Ameaça da Malária da OMS"
+    },
+    "4cbd4c78df14b0e8": {
+      "en": "Registration footprint: 25+ countries and expanding",
+      "where": "products.products[2].detail.access[1]",
+      "bucket": "data",
+      "fr": "Présence enregistrée : plus de 25 pays et en expansion",
+      "pt": "Presença registada: mais de 25 países e em expansão."
+    },
+    "4dbfa5c5efd9a433": {
+      "en": "The national register of every medicine approved for sale in Nigeria.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Le registre national de tous les médicaments autorisés à la vente au Nigéria.",
+      "pt": "O registo nacional de todos os medicamentos aprovados para venda na Nigéria."
+    },
+    "4e2967c1258181c4": {
+      "en": "Each figure reflects its cited public source; manufacturer-specific details are shown only where release was confirmed in writing.",
+      "where": "line 1806",
+      "bucket": "js",
+      "fr": "Chaque chiffre reflète sa source publique citée ; les détails spécifiques au fabricant ne sont indiqués que lorsque la publication a été confirmée par écrit.",
+      "pt": "Cada figura reflete a fonte pública citada; os detalhes específicos do fabricante são mostrados apenas quando a divulgação foi confirmada por escrito."
+    },
+    "507fb04291826de9": {
+      "en": "WHO PQ held for tablets and paediatric granules",
+      "where": "products.products[2].detail.access[0]",
+      "bucket": "data",
+      "fr": "OMS PQ interdit pour les comprimés et les granulés pédiatriques",
+      "pt": "A OMS PQ manteve os comprimidos e grânulos pediátricos"
+    },
+    "508731a3c5d375cb": {
+      "en": "Peru",
+      "where": "resistance.dict.country[48]",
+      "bucket": "data",
+      "fr": "Pérou",
+      "pt": "Peru"
+    },
+    "50f0cbe12bbd0a33": {
+      "en": "${siteCount} ${siteCount === 1 ? \"site\" : \"sites\"}, ${lo === hi ? lo : lo + \"–\" + hi}",
+      "where": "line 3107",
+      "bucket": "js",
+      "fr": "${siteCount} ${siteCount === 1 ? \"site\" : \"sites\"}, ${lo === hi ? lo : lo + \"–\" + hi}",
+      "pt": "${siteCount} ${siteCount === 1 ? \"site\" : \"sites\"}, ${lo === hi ? lo : lo + \"–\" + hi}"
+    },
+    "5293e854ab993a1e": {
+      "en": "Drag to pan · Ctrl + scroll or double-click to zoom · arrow keys pan when the map has focus",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Faites glisser pour vous déplacer · Ctrl + molette ou double-clic pour zoomer · les flèches directionnelles permettent de se déplacer lorsque la carte est sélectionnée.",
+      "pt": "Arraste para mover o mapa · Ctrl + scroll ou clique duas vezes para ampliar · As teclas de seta movem o mapa quando este está focado"
+    },
+    "52ad54b7e997cf62": {
+      "en": "MFT strategy decisions",
+      "where": "products.products[3].detail.milestones[6].next",
+      "bucket": "data",
+      "fr": "MFT décisions stratégiques",
+      "pt": "MFT decisões de estratégia"
+    },
+    "53289e5eb860ce00": {
+      "en": "LAUNCH Transparency Dashboard — Illustrated journey",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "LAUNCH Tableau de bord de transparence — Parcours illustré",
+      "pt": "LAUNCH Painel de Transparência — Viagem Ilustrada"
+    },
+    "5367a08bba1e0ffd": {
+      "en": "New chemical class — pharmacovigilance planning required",
+      "where": "products.products[0].detail.adoption[0]",
+      "bucket": "data",
+      "fr": "Nouvelle classe chimique — planification de la pharmacovigilance requise",
+      "pt": "Nova classe química — planeamento de farmacovigilância necessário"
+    },
+    "5439a38ba2863df7": {
+      "en": "Everything we checked during the August review is now part of the main dataset. The separate preview version has been retired.",
+      "where": "products.changelog[3].plain",
+      "bucket": "data",
+      "fr": "Tous les éléments vérifiés lors de la revue d'août font désormais partie de l'ensemble de données principal. La version préliminaire distincte a été supprimée.",
+      "pt": "Tudo o que verificámos durante a revisão de agosto faz agora parte do conjunto de dados principal. A versão de pré-visualização separada foi desativada."
+    },
+    "546fb60fa0ae591b": {
+      "en": "No WHO results for ${curDim} vs ${curSpecies}.",
+      "where": "line 3188",
+      "bucket": "js",
+      "fr": "Aucun résultat de l'OMS pour ${curDim} vs ${curSpecies}.",
+      "pt": "Não existem resultados da OMS para ${curDim} vs ${curSpecies}."
+    },
+    "5483b8d1363b9fa5": {
+      "en": "Country access map",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Carte d'accès au pays",
+      "pt": "Mapa de acesso ao país"
+    },
+    "54a4ac86e9b865b1": {
+      "en": "Select medicine for map",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Sélectionnez le médicament pour la carte",
+      "pt": "Selecione o medicamento para o mapa"
+    },
+    "54f67e129a9d4f31": {
+      "en": "Prevention tools are on a separate list",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Les outils de prévention figurent sur une liste séparée",
+      "pt": "As ferramentas de prevenção estão numa lista separada."
+    },
+    "5603c15fb844c45d": {
+      "en": "Date achieved / submitted",
+      "where": "line 1789 (in markup)",
+      "bucket": "js",
+      "fr": "Date d'obtention / de soumission",
+      "pt": "Data de conclusão/entrega"
+    },
+    "56205e12c20fb568": {
+      "en": "Species",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Espèces",
+      "pt": "Espécies"
+    },
+    "56668392e3777fff": {
+      "en": "WHO recommendation",
+      "where": "products.stages[2]",
+      "bucket": "data",
+      "fr": "Recommandation de l'OMS",
+      "pt": "Recomendação da OMS"
+    },
+    "57a93d5d2737f0ab": {
+      "en": "We updated the name of the main trial and reworded how we describe the medicine, so both match what the published sources actually say.",
+      "where": "products.changelog[7].plain",
+      "bucket": "data",
+      "fr": "Nous avons mis à jour le nom de l'essai principal et reformulé la description du médicament, afin que les deux correspondent à ce que disent réellement les sources publiées.",
+      "pt": "Atualizámos o nome do estudo principal e reformulámos a descrição do medicamento para que ambos correspondam ao que as fontes publicadas realmente dizem."
+    },
+    "58028c13f98e3447": {
+      "en": "Safety, efficacy and adherence of co-formulated ALAQ at scale",
+      "where": "products.products[1].detail.research.question",
+      "bucket": "data",
+      "fr": "Sécurité, efficacité et adhésion de la formulation ALAQ co-administrée à grande échelle",
+      "pt": "Segurança, eficácia e adesão da formulação conjunta de ALAQ em larga escala."
+    },
+    "580685867d6fbc6d": {
+      "en": "Sources.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Sources.",
+      "pt": "Fontes."
+    },
+    "583201c1efbf30eb": {
+      "en": "Ghana",
+      "where": "resistance.dict.country[26]",
+      "bucket": "data",
+      "fr": "Ghana",
+      "pt": "Gana"
+    },
+    "58962071d2a360b5": {
+      "en": "Eastern Mediterranean",
+      "where": "line 2337",
+      "bucket": "js",
+      "fr": "Méditerranée orientale",
+      "pt": "Mediterrâneo Oriental"
+    },
+    "590b09dfbd9f5858": {
+      "en": "Resistance-associated genotype, % of samples genotyped",
+      "where": "markers.meta.metric",
+      "bucket": "data",
+      "fr": "Génotype associé à la résistance, % des échantillons génotypés",
+      "pt": "Genótipo associado à resistência, % de amostras genotipadas"
+    },
+    "5929613a6054931a": {
+      "en": "SRA approval (EMA, Eurartesim)",
+      "where": "products.products[3].detail.milestones[1].milestone",
+      "bucket": "data",
+      "fr": "SRA approbation (EMA, Eurartesim)",
+      "pt": "SRA aprovação (EMA, Eurartesim)"
+    },
+    "5a2e3032ca42d712": {
+      "en": "Manufacturer-confirmed in writing",
+      "where": "line 1721",
+      "bucket": "js",
+      "fr": "Confirmation écrite du fabricant",
+      "pt": "Confirmado por escrito pelo fabricante."
+    },
+    "5a5a50f3f79f453b": {
+      "en": "Turn on a study result to see sites",
+      "where": "line 3320",
+      "bucket": "js",
+      "fr": "Activez un résultat d'étude pour voir les sites",
+      "pt": "Ative os resultados do estudo para visualizar os locais."
+    },
+    "5aa339c0253cdbdc": {
+      "en": "Adoption requirements",
+      "where": "line 1768 (in markup)",
+      "bucket": "js",
+      "fr": "exigences d'adoption",
+      "pt": "Requisitos de adoção"
+    },
+    "5b0d203157e25a47": {
+      "en": "Co-developed with MMV under access-oriented partnership",
+      "where": "products.products[0].detail.access[0]",
+      "bucket": "data",
+      "fr": "Développé en collaboration avec MMV dans le cadre d'un partenariat axé sur l'accès",
+      "pt": "Desenvolvido em conjunto com a MMV no âmbito de uma parceria orientada para o acesso."
+    },
+    "5bbb421ecf0956df": {
+      "en": "you@organisation.org",
+      "where": "static @placeholder",
+      "bucket": "markup",
+      "fr": "vous@organisation.org",
+      "pt": "you@organization.org"
+    },
+    "5bf9d62646aabb57": {
+      "en": "What would you like to tell us?",
+      "where": "line 3672",
+      "bucket": "js",
+      "fr": "Que souhaitez-vous nous dire ?",
+      "pt": "O que nos gostaria de dizer?"
+    },
+    "5d1e35c079719713": {
+      "en": "National guideline inclusion lags WHO's 2022 strong recommendation — Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (its third, alongside AS-AQ and AL), but this remains the only confirmed national guideline adoption found; broader inclusion is the core adoption gap LAUNCH is tracking",
+      "where": "products.products[2].stages[5].note",
+      "bucket": "data",
+      "fr": "L’intégration des recommandations nationales est en retard par rapport à la recommandation forte de l’OMS de 2022 : le Ghana a introduit l’artésunate-pyronaridine comme traitement de première intention alternatif ACT en 2022 (son troisième, avec l’AS-AQ et l’AL), mais cela reste la seule adoption confirmée de recommandations nationales ; une intégration plus large constitue le principal écart d’adoption LAUNCH",
+      "pt": "A inclusão de orientações nacionais está atrasada em relação à forte recomendação da OMS de 2022 — o Gana introduziu o artesunato-pironaridina como alternativa de primeira linha ACT em 2022 (a sua terceira, juntamente com a AS-AQ e a AL), mas esta continua a ser a única adoção de orientações nacionais confirmada; uma inclusão mais ampla é a principal lacuna de adoção que a LAUNCH está a monitorizar."
+    },
+    "5dac660f6ce94aec": {
+      "en": "\" + esc(curDim) + \" · Click for every study here",
+      "where": "line 3156 (in markup)",
+      "bucket": "js",
+      "fr": "\" + esc(curDim) + \" · Cliquez ici pour consulter chaque étude",
+      "pt": "\" + esc(curDim) + \" · Clique aqui para ver todos os estudos"
+    },
+    "5dbddf911f9e5652": {
+      "en": "Afghanistan",
+      "where": "resistance.dict.country[0]",
+      "bucket": "data",
+      "fr": "Afghanistan",
+      "pt": "Afeganistão"
+    },
+    "5e95cab879f3837b": {
+      "en": "Mock only — Subscribe for updates isn't connected yet.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Version fictive uniquement — L'abonnement aux mises à jour n'est pas encore activé.",
+      "pt": "Apenas simulação — A opção \"Subscrever atualizações\" ainda não está ativada."
+    },
+    "5f02c5d6a33902a2": {
+      "en": "' + hist + peak + \"",
+      "where": "line 3142 (in markup)",
+      "bucket": "js",
+      "fr": "' + hist + pic + \"",
+      "pt": "' + hist + pico + \""
+    },
+    "600eefbe306f7d23": {
+      "en": "Select molecular marker for the resistance overlay",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Sélectionner le marqueur moléculaire pour la superposition de résistance",
+      "pt": "Selecione o marcador molecular para a sobreposição de resistência."
+    },
+    "6021619e059dd3b5": {
+      "en": "Forecast demand",
+      "where": "line 1776 (in markup)",
+      "bucket": "js",
+      "fr": "Prévision de la demande",
+      "pt": "Previsão da procura"
+    },
+    "611025cdde0afeea": {
+      "en": "Malawi",
+      "where": "resistance.dict.country[37]",
+      "bucket": "data",
+      "fr": "Malawi",
+      "pt": "Malawi"
+    },
+    "61d8e50a0670afed": {
+      "en": "The only study here",
+      "where": "line 3129",
+      "bucket": "js",
+      "fr": "La seule étude ici",
+      "pt": "O único estudo aqui"
+    },
+    "6279e338582956c5": {
+      "en": "' + r.year + \"",
+      "where": "line 3068 (in markup)",
+      "bucket": "js",
+      "fr": "' + r.année + \"",
+      "pt": "' + r.ano + \""
+    },
+    "6303e847182509df": {
+      "en": "Timor-Leste",
+      "where": "resistance.dict.country[60]",
+      "bucket": "data",
+      "fr": "Timor-Leste",
+      "pt": "Timor-Leste"
+    },
+    "6351bd33b51f0b77": {
+      "en": "${mapProduct} is not yet in clinical use — WHO has no resistance surveillance for it yet.",
+      "where": "line 3456",
+      "bucket": "js",
+      "fr": "${mapProduct} n’est pas encore utilisé en clinique — l’OMS ne dispose pas encore d’un système de surveillance de la résistance à son égard.",
+      "pt": "${mapProduct} ainda não está em uso clínico — a OMS ainda não dispõe de um sistema de vigilância de resistência para o mesmo."
+    },
+    "635572fb8fb39b66": {
+      "en": "Mock only — Send feedback isn't connected yet.",
+      "where": "line 3675",
+      "bucket": "js",
+      "fr": "Simulation uniquement — L'envoi de commentaires n'est pas encore activé.",
+      "pt": "Apenas simulação — o envio de feedback ainda não está ligado."
+    },
+    "63a5e0438e217a36": {
+      "en": "Recorded that Eurartesim passed its World Health Organization quality re-check in January 2025. Figures we cannot yet confirm are shown as TBC.",
+      "where": "products.changelog[19].plain",
+      "bucket": "data",
+      "fr": "Il a été enregistré que Eurartesim a réussi son nouveau contrôle de qualité de l'Organisation mondiale de la santé en janvier 2025. Les chiffres que nous ne pouvons pas encore confirmer sont indiqués comme TBC.",
+      "pt": "Registamos que o Eurartesim passou pela nova verificação de qualidade da Organização Mundial de Saúde em janeiro de 2025. Os números que ainda não podemos confirmar são apresentados como TBC (a confirmar)."
+    },
+    "646c8dc02bef9151": {
+      "en": "Piperaquine",
+      "where": "markers.meta.markerDrug[\"Pfplasmepsin 2-3 amplifications\"]",
+      "bucket": "data",
+      "fr": "Pipéraquine",
+      "pt": "Piperaquina"
+    },
+    "664bfb3d9c3c4211": {
+      "en": "Click for the full detail",
+      "where": "line 2205 (in markup)",
+      "bucket": "js",
+      "fr": "Cliquez pour plus de détails",
+      "pt": "Clique para ver todos os detalhes."
+    },
+    "67bad177a2082972": {
+      "en": "South-East Asia",
+      "where": "line 2338",
+      "bucket": "js",
+      "fr": "Asie du Sud-Est",
+      "pt": "Sudeste Asiático"
+    },
+    "682e5ef5df46aa96": {
+      "en": "Recent dashboard updates",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Dernières mises à jour du tableau de bord",
+      "pt": "Atualizações recentes do painel"
+    },
+    "69d0a7b84cd1d5d0": {
+      "en": "Benin",
+      "where": "resistance.dict.country[3]",
+      "bucket": "data",
+      "fr": "Bénin",
+      "pt": "Benim"
+    },
+    "6a0957b9a5f4421c": {
+      "en": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites.",
+      "where": "products.glossary.GMP",
+      "bucket": "data",
+      "fr": "Bonnes pratiques de fabrication — norme de qualité vérifiée par l'inspection des sites de production.",
+      "pt": "Boas Práticas de Fabrico — padrão de qualidade verificado através da inspeção das instalações de produção."
+    },
+    "6acf83c20675d9b3": {
+      "en": "WHO-Listed Authority — a regulator assessed by WHO as operating at an advanced level.",
+      "where": "products.glossary.WLA",
+      "bucket": "data",
+      "fr": "Autorité répertoriée par l'OMS — un organisme de réglementation évalué par l'OMS comme opérant à un niveau avancé.",
+      "pt": "Autoridade listada pela OMS — entidade reguladora avaliada pela OMS como operando a um nível avançado."
+    },
+    "6b479808395c861d": {
+      "en": "Added plain-language definitions, a download button, a print view, and the time taken between steps.",
+      "where": "products.changelog[16].plain",
+      "bucket": "data",
+      "fr": "Ajout de définitions en langage clair, d'un bouton de téléchargement, d'un aperçu avant impression et de l'indication du temps écoulé entre les étapes.",
+      "pt": "Foram adicionadas definições em linguagem simples, um botão de download, uma pré-visualização para impressão e o tempo decorrido entre os passos."
+    },
+    "6b615adb1300c116": {
+      "en": "Colombia",
+      "where": "resistance.dict.country[14]",
+      "bucket": "data",
+      "fr": "Colombie",
+      "pt": "Colômbia"
+    },
+    "6ca41f1b61085e8d": {
+      "en": "Viet Nam",
+      "where": "resistance.dict.country[66]",
+      "bucket": "data",
+      "fr": "Vietnam",
+      "pt": "Vietnã"
+    },
+    "6da03101cfa3a1c5": {
+      "en": "Draft — not yet verified. These figures come from public sources and are still being checked. Manufacturer-specific details appear only once that manufacturer confirms in writing that they may be shown.",
+      "where": "line 1805",
+      "bucket": "js",
+      "fr": "Version préliminaire – non vérifiée. Ces chiffres proviennent de sources publiques et sont en cours de vérification. Les informations spécifiques au fabricant ne sont publiées qu'après confirmation écrite de sa part.",
+      "pt": "Rascunho — ainda não verificado. Estes dados provêm de fontes públicas e ainda estão a ser verificados. Os detalhes específicos do fabricante só aparecem após a confirmação por escrito do mesmo."
+    },
+    "6da20ca1af666215": {
+      "en": "Status legend",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Légende d'état",
+      "pt": "Legenda de estado"
+    },
+    "6dab4eb5f2fd03a5": {
+      "en": "Country or area",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Pays ou région",
+      "pt": "País ou região"
+    },
+    "6e0112d84ca0b828": {
+      "en": "WHO PQ listing (Eurartesim)",
+      "where": "products.products[3].detail.milestones[2].milestone",
+      "bucket": "data",
+      "fr": "Liste OMS PQ (Eurartesim)",
+      "pt": "Lista da OMS PQ (Eurartesim)"
+    },
+    "6e49e65081b2bcb5": {
+      "en": "Thailand",
+      "where": "resistance.dict.country[59]",
+      "bucket": "data",
+      "fr": "Thaïlande",
+      "pt": "Tailândia"
+    },
+    "705b84d97cf2b31e": {
+      "en": "Routine delivery limited; concentrated in pilot and study settings",
+      "where": "products.products[2].stages[7].note",
+      "bucket": "data",
+      "fr": "Livraison de routine limitée ; concentrée dans les contextes pilotes et d'étude",
+      "pt": "A prestação de serviços de rotina é limitada; concentrada em contextos de projeto-piloto e de estudo."
+    },
+    "7084923218e9d421": {
+      "en": "Medicines for Malaria Venture — product development partnership behind several antimalarials.",
+      "where": "products.glossary.MMV",
+      "bucket": "data",
+      "fr": "Medicines for Malaria Venture — partenariat de développement de produits à l'origine de plusieurs antipaludiques.",
+      "pt": "Medicines for Malaria Venture — parceria para o desenvolvimento de vários produtos antimaláricos."
+    },
+    "70a0fa09cd972d47": {
+      "en": "The main trial finished on 25 November 2025 with 1,720 participants — now confirmed from the public trial registry.",
+      "where": "products.changelog[12].plain",
+      "bucket": "data",
+      "fr": "L'essai principal s'est terminé le 25 novembre 2025 avec 1 720 participants — chiffre désormais confirmé par le registre public des essais cliniques.",
+      "pt": "O ensaio clínico principal terminou a 25 de novembro de 2025 com 1.720 participantes — um número agora confirmado pelo registo público de ensaios clínicos."
+    },
+    "723177879f63ec31": {
+      "en": "9 presentations · 3 makers",
+      "where": "products.products[3].detail.milestones[4].label",
+      "bucket": "data",
+      "fr": "9 présentations · 3 créateurs",
+      "pt": "9 apresentações · 3 criadores"
+    },
+    "723244b4b9702abe": {
+      "en": "Additional PQ'd suppliers",
+      "where": "products.products[3].detail.milestones[4].milestone",
+      "bucket": "data",
+      "fr": "Fournisseurs supplémentaires PQ'd",
+      "pt": "Fornecedores adicionais PQ"
+    },
+    "739074856d2f2e0a": {
+      "en": "Phase III (KALUMA)",
+      "where": "products.products[0].detail.milestones[0].milestone",
+      "bucket": "data",
+      "fr": "Phase III (KALUMA)",
+      "pt": "Fase III (KALUMA)"
+    },
+    "7482e374b5bddc0a": {
+      "en": "Legend",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Légende",
+      "pt": "Legenda"
+    },
+    "74e1891dc615b22f": {
+      "en": "Kenya",
+      "where": "resistance.dict.country[33]",
+      "bucket": "data",
+      "fr": "Kenya",
+      "pt": "Quénia"
+    },
+    "74f848e3c06ff64f": {
+      "en": "Access and affordability provisions under discussion",
+      "where": "products.products[0].detail.access[1]",
+      "bucket": "data",
+      "fr": "Les dispositions relatives à l'accès et à l'abordabilité font l'objet de discussions.",
+      "pt": "Disposições sobre acesso e acessibilidade financeira em discussão."
+    },
+    "75e49a9a3f0599ca": {
+      "en": "Close study list",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Liste d'étude approfondie",
+      "pt": "Lista de estudo detalhada"
+    },
+    "75e8f462f9dae90e": {
+      "en": "Guinea-Bissau",
+      "where": "resistance.dict.country[28]",
+      "bucket": "data",
+      "fr": "Guinée-Bissau",
+      "pt": "Guiné-Bissau"
+    },
+    "76cd046712597f91": {
+      "en": "Data not yet available",
+      "where": "line 1716",
+      "bucket": "js",
+      "fr": "Données non disponibles pour le moment",
+      "pt": "Dados ainda não disponíveis"
+    },
+    "78408ab628836875": {
+      "en": "Regulatory submissions in preparation following Phase III success",
+      "where": "products.products[0].stages[1].note",
+      "bucket": "data",
+      "fr": "Préparation des dossiers réglementaires suite au succès de la phase III",
+      "pt": "Submissões regulamentares em preparação após o sucesso da Fase III."
+    },
+    "78beb096bbd119dd": {
+      "en": "In preparation",
+      "where": "products.products[0].detail.milestones[1].label",
+      "bucket": "data",
+      "fr": "En préparation",
+      "pt": "Em preparação"
+    },
+    "78c0cf158e642a90": {
+      "en": "SRA dossier submission",
+      "where": "products.products[0].detail.milestones[1].milestone",
+      "bucket": "data",
+      "fr": "SRA soumission de dossier",
+      "pt": "SRA submissão de dossier"
+    },
+    "78d4271f352506df": {
+      "en": "Filter map by WHO study site",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Filtrer la carte par site d'étude de l'OMS",
+      "pt": "Filtrar mapa por local de estudo da OMS"
+    },
+    "7907867ecb17d102": {
+      "en": "We checked the official medicine registers: Tanzania approved this medicine in 2022, and Nigeria approved a version for children in February 2024. Both are now confirmed on the map.",
+      "where": "products.changelog[5].plain",
+      "bucket": "data",
+      "fr": "Nous avons consulté les registres officiels des médicaments : la Tanzanie a approuvé ce médicament en 2022 et le Nigéria a approuvé une version pour enfants en février 2024. Ces deux autorisations sont désormais confirmées.",
+      "pt": "Consultámos os registos oficiais de medicamentos: a Tanzânia aprovou este medicamento em 2022 e a Nigéria aprovou uma versão para crianças em fevereiro de 2024. Ambos já estão confirmados no mapa."
+    },
+    "79446083e7bb6715": {
+      "en": "WHO PQ listing",
+      "where": "products.stages[3]",
+      "bucket": "data",
+      "fr": "Liste OMS PQ",
+      "pt": "Lista da OMS PQ"
+    },
+    "7b662112715afcad": {
+      "en": "Registered widely; adopted as first-line in several Southeast Asian countries. Register-verified so far: Tanzania — 10 presentations across four manufacturers (Guilin D-ARTEPP incl. paediatric dispersible, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), all Registered/Compliant; Nigeria — 47 presentations, but only 26 Active (22 lapsed — registrations not being maintained, itself an underuse signal)",
+      "where": "products.products[3].stages[4].note",
+      "bucket": "data",
+      "fr": "Largement enregistré ; adopté comme traitement de première intention dans plusieurs pays d’Asie du Sud-Est. Enregistrements vérifiés à ce jour : Tanzanie — 10 présentations de quatre fabricants (Guilin D-ARTEPP, y compris la forme pédiatrique dispersible, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), toutes enregistrées et conformes ; Nigéria — 47 présentations, dont seulement 26 actives (22 enregistrements expirés — non maintenus, signe de sous-utilisation).",
+      "pt": "Amplamente registado; adotado como primeira linha em vários países do Sudeste Asiático. Registos verificados até à data: Tanzânia — 10 apresentações de quatro fabricantes (Guilin D-ARTEPP, incluindo a versão pediátrica dispersível; KBN-Zhejiang Duo-Cotecxin; Ajanta Ridmal), todos registados/em conformidade; Nigéria — 47 apresentações, mas apenas 26 ativas (22 expiradas — registos não mantidos, o que por si só indica subutilização)."
+    },
+    "7d3e67eafcb0ffb3": {
+      "en": "Health-worker training (3-drug regimen)",
+      "where": "products.products[1].detail.adoption[1]",
+      "bucket": "data",
+      "fr": "Formation des agents de santé (traitement à 3 médicaments)",
+      "pt": "Formação de profissionais de saúde (regime de 3 medicamentos)"
+    },
+    "7d94977e033dee63": {
+      "en": "Ethiopia",
+      "where": "resistance.dict.country[23]",
+      "bucket": "data",
+      "fr": "Ethiopie",
+      "pt": "Etiópia"
+    },
+    "7d9eb7acb13e2462": {
+      "en": "Close",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Fermer",
+      "pt": "Perto"
+    },
+    "7e222a78e771f1b9": {
+      "en": "Gabon",
+      "where": "resistance.dict.country[24]",
+      "bucket": "data",
+      "fr": "Gabon",
+      "pt": "Gabão"
+    },
+    "7eb231802aa4837f": {
+      "en": "US President's Malaria Initiative",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Initiative du président américain contre le paludisme",
+      "pt": "Iniciativa Presidencial dos EUA contra a Malária"
+    },
+    "822041757fc756e5": {
+      "en": "Sao Tome and Principe",
+      "where": "resistance.dict.country[51]",
+      "bucket": "data",
+      "fr": "Sao Tomé-et-Principe",
+      "pt": "São Tomé e Príncipe"
+    },
+    "8235980b80addfc7": {
+      "en": "Send feedback",
+      "where": "line 3662",
+      "bucket": "js",
+      "fr": "Envoyer des commentaires",
+      "pt": "Enviar feedback"
+    },
+    "82f51d6a5a7a55c7": {
+      "en": "Select Plasmodium species for the resistance overlay",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Sélectionnez les espèces de Plasmodium pour la superposition de résistance",
+      "pt": "Selecione as espécies de Plasmodium para a sobreposição de resistência."
+    },
+    "83463ce7bc07ee10": {
+      "en": "WHO PQ requalification",
+      "where": "products.products[3].detail.milestones[3].milestone",
+      "bucket": "data",
+      "fr": "OMS PQ requalification",
+      "pt": "OMS PQ requalificação"
+    },
+    "834dc4010fce37ca": {
+      "en": "The medicines WHO has checked for quality, safety and effectiveness.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Les médicaments dont l'OMS a vérifié la qualité, l'innocuité et l'efficacité.",
+      "pt": "Os medicamentos que a OMS verificou quanto à qualidade, segurança e eficácia."
+    },
+    "838817d4b1639de5": {
+      "en": "Showing: ${full}.",
+      "where": "line 3198",
+      "bucket": "js",
+      "fr": "Affichage : ${full}.",
+      "pt": "A apresentar: ${full}."
+    },
+    "83a3c56d9b66bec6": {
+      "en": "Prototype — data presented here may not be accurate",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Prototype — les données présentées ici peuvent ne pas être exactes",
+      "pt": "Protótipo — os dados aqui apresentados podem não ser precisos."
+    },
+    "8495a26f2dcb3ea7": {
+      "en": "Send more feedback",
+      "where": "line 3683",
+      "bucket": "js",
+      "fr": "Envoyez plus de commentaires",
+      "pt": "Enviar mais comentários"
+    },
+    "850b457aa24ea8f6": {
+      "en": "25+ countries",
+      "where": "products.products[2].detail.milestones[4].label",
+      "bucket": "data",
+      "fr": "Plus de 25 pays",
+      "pt": "Mais de 25 países"
+    },
+    "854425db372ea3db": {
+      "en": "LAUNCH Transparency Dashboard dataset",
+      "where": "line 1373",
+      "bucket": "js",
+      "fr": "LAUNCH Ensemble de données du tableau de bord de transparence",
+      "pt": "LAUNCH Conjunto de dados do Painel de Transparência"
+    },
+    "86310da2ff153d57": {
+      "en": "· Draft — figures not yet verified",
+      "where": "line 1334",
+      "bucket": "js",
+      "fr": "Projet — chiffres non encore vérifiés",
+      "pt": "• Rascunho — números ainda não verificados"
+    },
+    "86bff94a2367c81a": {
+      "en": "European approval decisions, including its opinions on medicines meant for use outside Europe.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Les décisions d'approbation européennes, y compris ses avis sur les médicaments destinés à être utilisés en dehors de l'Europe.",
+      "pt": "Decisões de aprovação europeias, incluindo os seus pareceres sobre medicamentos destinados a serem utilizados fora da Europa."
+    },
+    "876aade328bafc00": {
+      "en": "No WHO sites here",
+      "where": "line 3323",
+      "bucket": "js",
+      "fr": "Aucun site de l'OMS ici",
+      "pt": "Não há aqui sites da OMS."
+    },
+    "8775bbb39cb0805e": {
+      "en": "Definitions",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Définitions",
+      "pt": "Definições"
+    },
+    "8794761935a27c03": {
+      "en": "Dose-optimization of co-formulation",
+      "where": "products.products[1].detail.milestones[0].milestone",
+      "bucket": "data",
+      "fr": "Optimisation de la dose de la co-formulation",
+      "pt": "Otimização da dose na coformulação"
+    },
+    "87f3eb7677bf2de9": {
+      "en": "Treatments procured",
+      "where": "line 1714 (in markup)",
+      "bucket": "js",
+      "fr": "Traitements obtenus",
+      "pt": "Tratamentos adquiridos"
+    },
+    "88078300df2ebea0": {
+      "en": "No country-level data yet for",
+      "where": "line 2615",
+      "bucket": "js",
+      "fr": "Aucune donnée au niveau national pour le moment.",
+      "pt": "Ainda não existem dados a nível nacional para"
+    },
+    "881f7fcc2e55695c": {
+      "en": "Cabo Verde",
+      "where": "markers.dict.country[8]",
+      "bucket": "data",
+      "fr": "Cabo Verde",
+      "pt": "Cabo Verde"
+    },
+    "88f6f64b9b169b63": {
+      "en": "1 ? \" · \" + s.thisYear + \" studies\" : \"\") + \"",
+      "where": "line 3140 (in markup)",
+      "bucket": "js",
+      "fr": "1 ? \" · \" + s.thisYear + \" études\" : \"\") + \"",
+      "pt": "1 ? \" · \" + s.esteAno + \" estudos\" : \"\") + \""
+    },
+    "893d538563bcd9ac": {
+      "en": "Uganda",
+      "where": "resistance.dict.country[62]",
+      "bucket": "data",
+      "fr": "Ouganda",
+      "pt": "Uganda"
+    },
+    "895c407f13abc82c": {
+      "en": "Filter map by WHO region",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Filtrer la carte par région de l'OMS",
+      "pt": "Filtrar mapa por região da OMS"
+    },
+    "8968425df01d3da6": {
+      "en": "All regions",
+      "where": "line 3293 (in markup)",
+      "bucket": "js",
+      "fr": "Toutes les régions",
+      "pt": "Todas as regiões"
+    },
+    "8994687843a38376": {
+      "en": "Equatorial Guinea",
+      "where": "resistance.dict.country[21]",
+      "bucket": "data",
+      "fr": "Guinée équatoriale",
+      "pt": "Guiné Equatorial"
+    },
+    "8a67a6e6d2041cec": {
+      "en": "Filter map by country",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Filtrer la carte par pays",
+      "pt": "Filtrar mapa por país"
+    },
+    "8b0ea2a4c0760112": {
+      "en": "Pipeline · triple ACT",
+      "where": "products.products[1].classLabel",
+      "bucket": "data",
+      "fr": "Pipeline · triple ACT",
+      "pt": "Pipeline · triplo ACT"
+    },
+    "8b5e041285f0cf9e": {
+      "en": "Multiple first-line therapies — deploying several first-line treatments in parallel to reduce drug pressure and slow resistance.",
+      "where": "products.glossary.MFT",
+      "bucket": "data",
+      "fr": "Traitements de première ligne multiples — déploiement parallèle de plusieurs traitements de première ligne pour réduire la pression médicamenteuse et ralentir l'apparition de résistances.",
+      "pt": "Terapias múltiplas de primeira linha — implementação de vários tratamentos de primeira linha em paralelo para reduzir a pressão medicamentosa e retardar a resistência."
+    },
+    "8d11f7f3b359a9a0": {
+      "en": "Submission",
+      "where": "products.products[0].detail.milestones[1].next",
+      "bucket": "data",
+      "fr": "Soumission",
+      "pt": "Submissão"
+    },
+    "8d54c5886387c82b": {
+      "en": "EOI listing, then dossier",
+      "where": "products.products[1].detail.milestones[3].next",
+      "bucket": "data",
+      "fr": "Liste des manifestations d'intérêt, puis dossier",
+      "pt": "Lista de EOI (Manifestação de Interesse), depois dossier."
+    },
+    "8dcf47c363eb2e27": {
+      "en": "Developed through MORU-led DeTACT partnership with Fosun Pharma",
+      "where": "products.products[1].detail.access[0]",
+      "bucket": "data",
+      "fr": "Développé dans le cadre du partenariat DeTACT mené par MORU avec Fosun Pharma",
+      "pt": "Desenvolvido através da parceria DeTACT, liderada pela MORU, com a Fosun Pharma."
+    },
+    "8e774d19eadd09a1": {
+      "en": "Transparency Dashboard",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Tableau de bord de transparence",
+      "pt": "Painel de Transparência"
+    },
+    "8f38724c3c013172": {
+      "en": "The dashboard moved from placeholder examples to real information gathered from public sources. Prices and volumes show as TBC until they are confirmed.",
+      "where": "products.changelog[20].plain",
+      "bucket": "data",
+      "fr": "Le tableau de bord affiche désormais des données réelles issues de sources publiques, au lieu d'exemples fictifs. Les prix et les volumes sont indiqués comme « à confirmer ».",
+      "pt": "O painel de controlo passou de exemplos provisórios para informações reais recolhidas de fontes públicas. Os preços e volumes aparecem como \"a confirmar\" até serem confirmados."
+    },
+    "8f925f1f1e7682ca": {
+      "en": "· expected",
+      "where": "line 1432",
+      "bucket": "js",
+      "fr": "· attendu",
+      "pt": "· esperado"
+    },
+    "8fe5a93113d728e6": {
+      "en": "South Sudan",
+      "where": "markers.dict.country[63]",
+      "bucket": "data",
+      "fr": "Soudan du Sud",
+      "pt": "Sudão do Sul"
+    },
+    "90473f3d2bfbdf5f": {
+      "en": "Design mockup.",
+      "where": "line 1324 (in markup)",
+      "bucket": "js",
+      "fr": "Maquette de conception.",
+      "pt": "Projeto de maqueta."
+    },
+    "929a28562d6a754a": {
+      "en": "World map, pan and zoom with the mouse or arrow keys",
+      "where": "line 2473",
+      "bucket": "js",
+      "fr": "Carte du monde, déplacement et zoom avec la souris ou les touches fléchées",
+      "pt": "Mapa-mundo, panorâmica e zoom com o rato ou as teclas de seta."
+    },
+    "9390483c2dbcf1bc": {
+      "en": "EMA procedure giving a scientific opinion on high-priority medicines intended for markets outside the EU.",
+      "where": "products.glossary.Article 58",
+      "bucket": "data",
+      "fr": "Procédure de l'EMA permettant d'émettre un avis scientifique sur les médicaments hautement prioritaires destinés aux marchés hors UE.",
+      "pt": "Procedimento da EMA para a emissão de um parecer científico sobre medicamentos de alta prioridade destinados a mercados fora da UE."
+    },
+    "93f7aee34fe9c146": {
+      "en": "Committee reviews in other endemic countries",
+      "where": "products.products[2].detail.milestones[5].next",
+      "bucket": "data",
+      "fr": "Examens par les comités dans d'autres pays endémiques",
+      "pt": "Revisões do comité noutros países endémicos"
+    },
+    "94e6bd574b6e3c55": {
+      "en": "Nicaragua",
+      "where": "markers.dict.country[48]",
+      "bucket": "data",
+      "fr": "Nicaragua",
+      "pt": "Nicarágua"
+    },
+    "9555664fcf433126": {
+      "en": "Tanzania",
+      "where": "resistance.dict.country[58]",
+      "bucket": "data",
+      "fr": "Tanzanie",
+      "pt": "Tanzânia"
+    },
+    "95786fed147fca57": {
+      "en": "Illustrated journey view — tracking new antimalarial medicines from research and development to market access — where each product stands, its access barriers, and opportunities to overcome them.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Vue d'ensemble illustrée du parcours — suivi des nouveaux médicaments antipaludiques, de la recherche et du développement à l'accès au marché — où se situe chaque produit, ses obstacles à l'accès et les opportunités de les surmonter.",
+      "pt": "Visão ilustrada da viagem — acompanhar os novos medicamentos antimaláricos desde a investigação e desenvolvimento até ao acesso ao mercado — onde se encontra cada produto, as suas barreiras de acesso e as oportunidades para as ultrapassar."
+    },
+    "95c0662cfd72bfae": {
+      "en": "Molecular markers of drug resistance",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Marqueurs moléculaires de la résistance aux médicaments",
+      "pt": "Marcadores moleculares de resistência a medicamentos"
+    },
+    "9612769f08f06e72": {
+      "en": "LAUNCH",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "LAUNCH",
+      "pt": "LAUNCH"
+    },
+    "96a0450508b3ccf7": {
+      "en": "WHO prequalification list",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Liste de préqualification de l'OMS",
+      "pt": "Lista de pré-qualificação da OMS"
+    },
+    "97edd6500b368d5f": {
+      "en": "node scripts/validate-data.js",
+      "where": "line 1265 (in markup)",
+      "bucket": "js",
+      "fr": "scripts node/validate-data.js",
+      "pt": "scripts node/validate-data.js"
+    },
+    "99573eb51e1429dc": {
+      "en": "A LAUNCH initiative of",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Une initiative LAUNCH de",
+      "pt": "Uma iniciativa LAUNCH de"
+    },
+    "9ba46dd6af5e2b79": {
+      "en": "Strong recommendation in revised WHO Guidelines for malaria",
+      "where": "products.products[2].stages[2].note",
+      "bucket": "data",
+      "fr": "Recommandation forte dans les directives révisées de l'OMS sur le paludisme",
+      "pt": "Forte recomendação nas orientações revistas da OMS para a malária."
+    },
+    "9bcd6deac9e73da3": {
+      "en": "WHO recommendation (strong)",
+      "where": "products.products[2].detail.milestones[2].milestone",
+      "bucket": "data",
+      "fr": "Recommandation de l'OMS (forte)",
+      "pt": "Recomendação da OMS (forte)"
+    },
+    "9c102a4c39520771": {
+      "en": "African Medicines Agency — continental body coordinating regulatory review across African Union member states.",
+      "where": "products.glossary.AMA",
+      "bucket": "data",
+      "fr": "Agence africaine des médicaments — organisme continental coordonnant l'examen réglementaire dans les États membres de l'Union africaine.",
+      "pt": "Agência Africana do Medicamento — organismo continental que coordena a revisão regulamentar em todos os estados membros da União Africana."
+    },
+    "9c1c1149cd35a42f": {
+      "en": "Next expected step",
+      "where": "line 1789 (in markup)",
+      "bucket": "js",
+      "fr": "Prochaine étape prévue",
+      "pt": "Próximo passo esperado"
+    },
+    "9d65ecbec8164f55": {
+      "en": "Study years",
+      "where": "line 3151",
+      "bucket": "js",
+      "fr": "années d'études",
+      "pt": "Anos de estudo"
+    },
+    "9ea21e1ef7a3f923": {
+      "en": "Delayed / access barrier",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Barrière d'accès retardée",
+      "pt": "Barreira de acesso/atraso"
+    },
+    "a045dcdc213ba391": {
+      "en": "Actual timeline",
+      "where": "line 1628 (in markup)",
+      "bucket": "js",
+      "fr": "Chronologie réelle",
+      "pt": "Cronograma real"
+    },
+    "a317b7572940e19a": {
+      "en": "Lao People's Democratic Republic",
+      "where": "resistance.dict.country[34]",
+      "bucket": "data",
+      "fr": "République démocratique populaire lao",
+      "pt": "República Democrática Popular do Laos"
+    },
+    "a339e15e3ee473fb": {
+      "en": "Not yet included in WHO PQ Expression of Interest list (24th malaria EOI, 27 Feb 2026, checked)",
+      "where": "products.products[1].stages[3].note",
+      "bucket": "data",
+      "fr": "Non encore inclus dans la liste des manifestations d'intérêt de l'OMS PQ (24e manifestation d'intérêt sur le paludisme, 27 février 2026, vérifiée)",
+      "pt": "Ainda não incluído na lista de Manifestações de Interesse da OMS PQ (24ª Manifestação de Interesse sobre a malária, 27 de fevereiro de 2026, verificada)"
+    },
+    "a4023b89022f326c": {
+      "en": "Download CSV",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Télécharger le fichier CSV",
+      "pt": "Baixar CSV"
+    },
+    "a4eafd170ae63892": {
+      "en": "No single-source dependency",
+      "where": "products.products[3].detail.access[1]",
+      "bucket": "data",
+      "fr": "Aucune dépendance à une source unique",
+      "pt": "Sem dependência de fonte única"
+    },
+    "a564371ac0f23840": {
+      "en": "Burkina Faso",
+      "where": "resistance.dict.country[7]",
+      "bucket": "data",
+      "fr": "Burkina Faso",
+      "pt": "Burkina Faso"
+    },
+    "a5b3a74811e60623": {
+      "en": "Notify me",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Prévenez-moi",
+      "pt": "Avise-me"
+    },
+    "a634dd4e2c774f23": {
+      "en": "Procurement scale-up",
+      "where": "products.products[2].detail.milestones[6].milestone",
+      "bucket": "data",
+      "fr": "augmentation de l'efficacité des achats",
+      "pt": "Alargamento do processo de aquisição"
+    },
+    "a7692387c3d3d29c": {
+      "en": "Not started (stage glyph dimmed, no badge)",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Non démarré (glyphe de scène grisé, pas de badge)",
+      "pt": "Não iniciado (ícone da fase esmaecido, sem emblema)"
+    },
+    "a7ddf210ae3cd179": {
+      "en": "Counts TBC",
+      "where": "products.products[3].detail.milestones[6].label",
+      "bucket": "data",
+      "fr": "Nombre de cas à confirmer",
+      "pt": "Contagem a confirmar"
+    },
+    "a96384cbb9c2c50f": {
+      "en": "Thank you — you are on the list.",
+      "where": "line 3613",
+      "bucket": "js",
+      "fr": "Merci — vous êtes sur la liste.",
+      "pt": "Obrigado — está na lista."
+    },
+    "a9d161f2a5134401": {
+      "en": "partners, to be hosted by the",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "partenaires, qui seront accueillis par les",
+      "pt": "parceiros, a acolher pelo"
+    },
+    "abd149214539d9f2": {
+      "en": "India",
+      "where": "resistance.dict.country[30]",
+      "bucket": "data",
+      "fr": "Inde",
+      "pt": "Índia"
+    },
+    "abeab43d641ba0dc": {
+      "en": "All sites",
+      "where": "line 3316",
+      "bucket": "js",
+      "fr": "Tous les sites",
+      "pt": "Todos os sites"
+    },
+    "ac748c19cc5ef5cc": {
+      "en": "We found a real example of a country acting on the World Health Organization's advice: Ghana added this medicine as a backup first-choice treatment in 2022. It's still the only country confirmed to have done so. We also recorded the years Global Fund purchasing began for both underused medicines (2018 and 2008).",
+      "where": "products.changelog[1].plain",
+      "bucket": "data",
+      "fr": "Nous avons trouvé un exemple concret de pays ayant suivi les recommandations de l'Organisation mondiale de la Santé : le Ghana a ajouté ce médicament à sa liste de traitements de première intention en 2022. Il reste à ce jour le seul pays à l'avoir fait. Nous avons également relevé les années de début des achats du Fonds mondial pour ces deux médicaments sous-utilisés (2018 et 2008).",
+      "pt": "Encontrámos um exemplo concreto de um país que agiu de acordo com a recomendação da Organização Mundial de Saúde: o Gana adicionou este medicamento como tratamento de primeira escolha em 2022. Até à data, é o único país que confirmou tê-lo feito. Registámos também os anos em que o Fundo Global começou a comprar ambos os medicamentos subutilizados (2018 e 2008)."
+    },
+    "aca65b62d6db2812": {
+      "en": "Please enter an email address we can reach you at.",
+      "where": "line 3604",
+      "bucket": "js",
+      "fr": "Veuillez saisir une adresse e-mail à laquelle nous pouvons vous contacter.",
+      "pt": "Por favor, introduza um endereço de e-mail para que possamos entrar em contacto consigo."
+    },
+    "ad7101d05ecc120b": {
+      "en": "Study year",
+      "where": "line 3065",
+      "bucket": "js",
+      "fr": "année d'études",
+      "pt": "Ano letivo"
+    },
+    "afa2581b14b2108c": {
+      "en": "First-line diversification / MFT component; paediatric granules available; label includes pregnant women (2025 update).",
+      "where": "products.products[2].detail.useCase",
+      "bucket": "data",
+      "fr": "Diversification de première ligne / composant MFT ; granulés pédiatriques disponibles ; l'étiquette inclut les femmes enceintes (mise à jour 2025).",
+      "pt": "Diversificação de primeira linha/componente MFT; grânulos pediátricos disponíveis; a bula inclui as grávidas (atualização de 2025)."
+    },
+    "b1cb8eac5b3197a6": {
+      "en": "Suriname",
+      "where": "resistance.dict.country[57]",
+      "bucket": "data",
+      "fr": "Suriname",
+      "pt": "Suriname"
+    },
+    "b2bd06b999d7b1e3": {
+      "en": "All countries",
+      "where": "line 3303 (in markup)",
+      "bucket": "js",
+      "fr": "Tous les pays",
+      "pt": "Todos os países"
+    },
+    "b2c2eabf2b751c53": {
+      "en": "WHO malaria guidelines",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "directives de l'OMS sur le paludisme",
+      "pt": "Orientações da OMS sobre malária"
+    },
+    "b374637e067e6a13": {
+      "en": "Recommended · underutilized",
+      "where": "products.products[2].classLabel",
+      "bucket": "data",
+      "fr": "Recommandé · sous-utilisé",
+      "pt": "Recomendado · subutilizado"
+    },
+    "b391c3e6ad5d794d": {
+      "en": "What was actually bought for countries — how many packs, at what price, in which year.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Qu’est-ce qui a réellement été acheté pour les pays ? Combien de paquets, à quel prix et en quelle année ?",
+      "pt": "O que foi efetivamente comprado para os países — quantas embalagens, a que preço e em que ano."
+    },
+    "b43967a70b2990f7": {
+      "en": "Registered in 25+ endemic countries since 2014; further submissions in Asia (Vietnam, Myanmar, Cambodia, Thailand). Register-verified so far: Tanzania — 2 registrations (TMDA, issued 8 Mar 2022, Registered/Compliant); Nigeria — 1 registration (Greenbook: granules B4-9425, approved 28 Feb 2024, Active)",
+      "where": "products.products[2].stages[4].note",
+      "bucket": "data",
+      "fr": "Enregistré dans plus de 25 pays endémiques depuis 2014 ; autres demandes d’enregistrement en cours en Asie (Vietnam, Myanmar, Cambodge, Thaïlande). Enregistrements vérifiés à ce jour : Tanzanie — 2 enregistrements (TMDA, délivré le 8 mars 2022, Enregistré/Conforme) ; Nigéria — 1 enregistrement (Livre vert : granules B4-9425, approuvé le 28 février 2024, Actif).",
+      "pt": "Registado em mais de 25 países endémicos desde 2014; novas submissões na Ásia (Vietname, Myanmar, Cambodja, Tailândia). Registos verificados até à data: Tanzânia — 2 registos (TMDA, emitido em 8 de março de 2022, Registado/Em Conformidade); Nigéria — 1 registo (Greenbook: grânulos B4-9425, aprovado em 28 de fevereiro de 2024, Ativo)."
+    },
+    "b5baf79774720e4a": {
+      "en": "Each dot is one WHO study site, coloured by its most recent study there — the same unit WHO's own threat map uses.",
+      "where": "line 2858",
+      "bucket": "js",
+      "fr": "Chaque point représente un site d'étude de l'OMS, coloré selon l'étude la plus récente menée sur ce site — la même unité que celle utilisée par la carte des menaces de l'OMS.",
+      "pt": "Cada ponto representa um local de estudo da OMS, colorido de acordo com o estudo mais recente aí realizado — a mesma unidade utilizada no mapa de ameaças da OMS."
+    },
+    "b5f9221ae041a8f8": {
+      "en": "Zambia",
+      "where": "resistance.dict.country[68]",
+      "bucket": "data",
+      "fr": "Zambie",
+      "pt": "Zâmbia"
+    },
+    "b62fbdffddd212fa": {
+      "en": "We reworded how we describe this medicine to match the manufacturer's own words: the first major change in malaria treatment in more than 25 years.",
+      "where": "products.changelog[8].plain",
+      "bucket": "data",
+      "fr": "Nous avons reformulé la description de ce médicament pour qu'elle corresponde aux propres termes du fabricant : le premier changement majeur dans le traitement du paludisme depuis plus de 25 ans.",
+      "pt": "Reformulámos a descrição deste medicamento para que corresponda às palavras do próprio fabricante: a primeira grande mudança no tratamento da malária em mais de 25 anos."
+    },
+    "b77884dead90f806": {
+      "en": "Each country is shaded by the furthest stage it has reached — a country counted in MFT plans is registered too. Counts are of the countries drawn on this map.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Chaque pays est coloré en fonction de son stade d'avancement ; un pays comptabilisé dans les plans MFT est également pris en compte. Les décomptes concernent les pays représentés sur cette carte.",
+      "pt": "Cada país é sombreado de acordo com o estádio mais avançado que atingiu — um país contabilizado nos planos MFT também está registado. As contagens referem-se aos países representados neste mapa."
+    },
+    "b7839a409e9f031d": {
+      "en": "⚠ Draft figures — not yet verified. Please do not quote them.",
+      "where": "line 1325 (in markup)",
+      "bucket": "js",
+      "fr": "⚠ Chiffres provisoires — non encore vérifiés. Veuillez ne pas les citer.",
+      "pt": "⚠ Números preliminares — ainda não verificados. Por favor, não os cite."
+    },
+    "b79b5f97bc67a30a": {
+      "en": "Honduras",
+      "where": "markers.dict.country[32]",
+      "bucket": "data",
+      "fr": "Honduras",
+      "pt": "Honduras"
+    },
+    "b8ed5279e897be5d": {
+      "en": "Sending…",
+      "where": "line 3677",
+      "bucket": "js",
+      "fr": "Envoi…",
+      "pt": "Enviando…"
+    },
+    "b9c877b97fdffadc": {
+      "en": "Côte d’Ivoire",
+      "where": "resistance.dict.country[17]",
+      "bucket": "data",
+      "fr": "Côte d’Ivoire",
+      "pt": "Costa do Marfim"
+    },
+    "ba2039a4cf69defd": {
+      "en": "Myanmar",
+      "where": "resistance.dict.country[42]",
+      "bucket": "data",
+      "fr": "Myanmar",
+      "pt": "Myanmar"
+    },
+    "ba35f0c47d862763": {
+      "en": "Not started",
+      "where": "products.products[0].detail.milestones[2].label",
+      "bucket": "data",
+      "fr": "Pas encore commencé",
+      "pt": "Não iniciado"
+    },
+    "ba383fddfa0231ae": {
+      "en": "WHO GDG engagement",
+      "where": "products.products[0].detail.milestones[2].milestone",
+      "bucket": "data",
+      "fr": "Engagement des DG de l'OMS",
+      "pt": "Envolvimento do GDG da OMS"
+    },
+    "bd05d324d8a3dfad": {
+      "en": "Somalia",
+      "where": "resistance.dict.country[55]",
+      "bucket": "data",
+      "fr": "Somalie",
+      "pt": "Somália"
+    },
+    "bd7e505d24a95f4b": {
+      "en": "Global Fund procurement 2018–2025: 940,111 packs / US$14.5m — modest overall, but US$11.6m of it landed in 2025 (led by Uganda and Burkina Faso), a sharp uptick consistent with early MFT rollouts",
+      "where": "products.products[2].stages[6].note",
+      "bucket": "data",
+      "fr": "Acquisitions du Fonds mondial 2018-2025 : 940 111 kits / 14,5 millions de dollars US — un montant modeste dans l’ensemble, mais dont 11,6 millions de dollars US ont été alloués en 2025 (principalement par l’Ouganda et le Burkina Faso), une forte hausse conforme aux premiers déploiements de MFT",
+      "pt": "Aquisições do Fundo Global 2018–2025: 940.111 pacotes / 14,5 milhões de dólares — um valor modesto no geral, mas 11,6 milhões de dólares deste montante foram entregues em 2025 (liderados pelo Uganda e Burkina Faso), um aumento acentuado consistente com as primeiras implementações do programa MFT."
+    },
+    "bfb0c8d36f4aaa84": {
+      "en": "Mauritania",
+      "where": "resistance.dict.country[40]",
+      "bucket": "data",
+      "fr": "Mauritanie",
+      "pt": "Mauritânia"
+    },
+    "c0002275769f1e0a": {
+      "en": "Everything on this page is traceable to one of the public sources below. Each name opens that source's own official site in a new tab, so you can check any figure yourself.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Toutes les informations de cette page proviennent des sources publiques ci-dessous. Chaque nom ouvre le site officiel de la source correspondante dans un nouvel onglet, vous permettant ainsi de vérifier chaque donnée par vous-même.",
+      "pt": "Tudo o que está nesta página pode ser rastreado até uma das fontes públicas abaixo. Cada nome abre o site oficial da respetiva fonte num novo separador, para que possa verificar qualquer dado por si mesmo."
+    },
+    "c194f546632e59cc": {
+      "en": "U.S. President's Malaria Initiative — a major bilateral funder and procurer of malaria commodities.",
+      "where": "products.glossary.PMI",
+      "bucket": "data",
+      "fr": "Initiative du président américain contre le paludisme — un important bailleur de fonds bilatéral et acheteur de produits antipaludiques.",
+      "pt": "Iniciativa Presidencial dos EUA contra a Malária — um importante financiador bilateral e adquirente de produtos para o combate à malária."
+    },
+    "c1f88e9d6c4145cf": {
+      "en": "In progress",
+      "where": "products.products[1].detail.milestones[1].label",
+      "bucket": "data",
+      "fr": "En cours",
+      "pt": "Em curso"
+    },
+    "c2168da48f82aef0": {
+      "en": "Company announcements, and figures a manufacturer has confirmed to us in writing. There is no public register for these.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Les annonces de l'entreprise et les chiffres que le fabricant nous a confirmés par écrit ne figurent pas dans un registre public.",
+      "pt": "Comunicados da empresa e números que um fabricante nos confirmou por escrito. Não existe um registo público para esta informação."
+    },
+    "c23bc96d219666ad": {
+      "en": "Unnamed site",
+      "where": "line 3122",
+      "bucket": "js",
+      "fr": "Site non identifié",
+      "pt": "Local sem nome"
+    },
+    "c25ec3f03b83e110": {
+      "en": "WHO prequalification — the quality, safety and efficacy assessment whose outcome, a listing on the WHO prequalified-products list, makes a product eligible for procurement by UN agencies and major donors.",
+      "where": "products.glossary.PQ",
+      "bucket": "data",
+      "fr": "Préqualification de l'OMS — l'évaluation de la qualité, de la sécurité et de l'efficacité dont le résultat, une inscription sur la liste des produits préqualifiés de l'OMS, rend un produit admissible à l'achat par les agences des Nations Unies et les principaux donateurs.",
+      "pt": "Pré-qualificação da OMS — a avaliação da qualidade, segurança e eficácia cujo resultado, a inclusão na lista de produtos pré-qualificados da OMS, torna um produto elegível para aquisição por agências da ONU e grandes doadores."
+    },
+    "c3782c86d8099f3f": {
+      "en": "Philippines",
+      "where": "resistance.dict.country[49]",
+      "bucket": "data",
+      "fr": "Philippines",
+      "pt": "Filipinas"
+    },
+    "c4aabcdcd63eeb1d": {
+      "en": "An idea for making this clearer or more useful",
+      "where": "line 3669",
+      "bucket": "js",
+      "fr": "Une idée pour rendre cela plus clair ou plus utile",
+      "pt": "Uma ideia para tornar isto mais claro ou mais útil."
+    },
+    "c5b2a6de9d5ae20a": {
+      "en": "Vanuatu",
+      "where": "resistance.dict.country[64]",
+      "bucket": "data",
+      "fr": "Vanuatu",
+      "pt": "Vanuatu"
+    },
+    "c65742ceb289d67f": {
+      "en": "Papua New Guinea",
+      "where": "resistance.dict.country[47]",
+      "bucket": "data",
+      "fr": "Papouasie-Nouvelle-Guinée",
+      "pt": "Papua Nova Guiné"
+    },
+    "c6e681b1968d02d9": {
+      "en": "Gambia",
+      "where": "resistance.dict.country[25]",
+      "bucket": "data",
+      "fr": "Gambie",
+      "pt": "Gâmbia"
+    },
+    "c707ee4ecc240442": {
+      "en": "Source:",
+      "where": "line 1720",
+      "bucket": "js",
+      "fr": "Source:",
+      "pt": "Fonte:"
+    },
+    "c72199a85b5423d2": {
+      "en": "Zimbabwe",
+      "where": "resistance.dict.country[69]",
+      "bucket": "data",
+      "fr": "Zimbabwe",
+      "pt": "Zimbábue"
+    },
+    "c7bb45d7a37e185b": {
+      "en": "Thanks — though this isn't sent anywhere yet.",
+      "where": "line 3679",
+      "bucket": "js",
+      "fr": "Merci — même si ce message n'a encore été envoyé nulle part.",
+      "pt": "Obrigado — embora isto ainda não tenha sido enviado para lado nenhum."
+    },
+    "c835bd1c4578817f": {
+      "en": "Burundi",
+      "where": "resistance.dict.country[8]",
+      "bucket": "data",
+      "fr": "Burundi",
+      "pt": "Burundi"
+    },
+    "c9054826f71c23b8": {
+      "en": "Mozambique",
+      "where": "resistance.dict.country[41]",
+      "bucket": "data",
+      "fr": "Mozambique",
+      "pt": "Moçambique"
+    },
+    "c9722a7a962a8435": {
+      "en": "Hide details",
+      "where": "line 1738 (in markup)",
+      "bucket": "js",
+      "fr": "Masquer les détails",
+      "pt": "Ocultar detalhes"
+    },
+    "c9845bf33c93be80": {
+      "en": "Stringent Regulatory Authority — an advanced regulator (e.g. EMA, US FDA) whose review anchors WHO prequalification and country registrations.",
+      "where": "products.glossary.SRA",
+      "bucket": "data",
+      "fr": "Autorité réglementaire rigoureuse — un organisme de réglementation de pointe (par exemple, l'EMA, la FDA américaine) dont l'examen sert de base à la préqualification de l'OMS et aux enregistrements nationaux.",
+      "pt": "Autoridade Reguladora Rigorosa — um organismo regulador avançado (por exemplo, EMA, FDA dos EUA) cuja análise serve de base para a pré-qualificação da OMS e os registos em cada país."
+    },
+    "c9d2604dd5187b6a": {
+      "en": "Liberia",
+      "where": "resistance.dict.country[35]",
+      "bucket": "data",
+      "fr": "Libéria",
+      "pt": "Libéria"
+    },
+    "ca7981b46ecf2c17": {
+      "en": "Off",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Désactivé",
+      "pt": "Desligado"
+    },
+    "cb52be0fb5b2a74d": {
+      "en": "In MFT plans",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Dans les plans MFT",
+      "pt": "Em planos MFT"
+    },
+    "cbd38bdb8ea24861": {
+      "en": "${esc(s)} — show every medicine at this gate${n ?",
+      "where": "line 1644",
+      "bucket": "js",
+      "fr": "${esc(s)} — montrez tous les médicaments à cette porte${n ?",
+      "pt": "${esc(s)} — mostrar todos os medicamentos neste portão${n ?"
+    },
+    "cbfa5f492ba86f77": {
+      "en": "Co-formulated fixed-dose triple ACT in pivotal Phase III (FD-TACT, successor to the DeTACT programme; first patient Sep 2025); dose-optimization published 2025; child-friendly dispersible formulation",
+      "where": "products.products[1].stages[0].note",
+      "bucket": "data",
+      "fr": "Triple ACT à dose fixe co-formulée en phase III pivotale (FD-TACT, successeur du programme DeTACT ; premier patient en septembre 2025) ; optimisation de la dose publiée en 2025 ; formulation dispersible adaptée aux enfants",
+      "pt": "Formulação conjunta de dose fixa tripla ACT num estudo pivotal de Fase III (FD-TACT, sucessor do programa DeTACT; primeiro doente em setembro de 2025); otimização da dose publicada em 2025; formulação dispersível adequada para crianças."
+    },
+    "cc72843144841a6f": {
+      "en": "Something else",
+      "where": "line 3670",
+      "bucket": "js",
+      "fr": "Autre chose",
+      "pt": "Outra coisa"
+    },
+    "ce926714b6e64ed7": {
+      "en": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
+      "where": "products.products[2].flag",
+      "bucket": "data",
+      "fr": "L'adoption constitue actuellement l'obstacle à l'accès : fortement recommandée par l'OMS depuis 2022 et enregistrée dans plus de 25 pays, son intégration dans les recommandations nationales reste toutefois limitée.",
+      "pt": "A adoção é a atual barreira de acesso — fortemente recomendada pela OMS desde 2022 e registada em mais de 25 países, mas a inclusão nas orientações nacionais continua limitada."
+    },
+    "cfa45dbb2efc0bfa": {
+      "en": "Patients still parasitaemic on day 3, % of those tested — WHO treats over 10% as a signal of suspected artemisinin partial resistance",
+      "where": "resistance.meta.metrics.delayedClearance.full",
+      "bucket": "data",
+      "fr": "Patients présentant encore une parasitémie au jour 3, % des patients testés — L’OMS considère un taux supérieur à 10 % comme un signe de suspicion de résistance partielle à l’artémisinine",
+      "pt": "Doentes ainda parasitémicos ao 3.º dia, % dos testados — a OMS considera mais de 10% como sinal de suspeita de resistência parcial à artemisinina."
+    },
+    "cfa8f5354c09f8cb": {
+      "en": "Not on the WHO PQ EOI list yet (24th malaria EOI, 27 Feb 2026, checked)",
+      "where": "products.products[0].stages[3].note",
+      "bucket": "data",
+      "fr": "Pas encore sur la liste des déclarations d'intérêt de l'OMS PQ (24e déclaration d'intérêt pour le paludisme, 27 février 2026, vérifiée)",
+      "pt": "Ainda não consta da lista de Manifestações de Interesse (EOI) da OMS PQ (24ª EOI sobre malária, 27 de fevereiro de 2026, verificada)"
+    },
+    "cff4c58de0baa100": {
+      "en": "Solomon Islands",
+      "where": "resistance.dict.country[54]",
+      "bucket": "data",
+      "fr": "Îles Salomon",
+      "pt": "Ilhas Salomão"
+    },
+    "d08b4a0f0dcdef11": {
+      "en": "Mayotte",
+      "where": "markers.dict.country[44]",
+      "bucket": "data",
+      "fr": "Mayotte",
+      "pt": "Mayotte"
+    },
+    "d090b87e4a3bbce3": {
+      "en": "Haiti",
+      "where": "markers.dict.country[31]",
+      "bucket": "data",
+      "fr": "Haïti",
+      "pt": "Haiti"
+    },
+    "d0a344319c01d661": {
+      "en": "Its public data portal closed in 2025, so US-funded purchases from that point on are a gap we cannot yet fill.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Son portail de données publiques a fermé en 2025, ce qui représente un manque que nous ne pouvons pas encore combler pour les achats financés par les États-Unis à partir de cette date.",
+      "pt": "O seu portal de dados públicos foi encerrado em 2025, pelo que as compras financiadas pelos EUA a partir desse ponto representam uma lacuna que ainda não podemos colmatar."
+    },
+    "d136295aeba24d8e": {
+      "en": "RBM Partnership to End Malaria",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "RBM Partenariat pour mettre fin au paludisme",
+      "pt": "RBM Parceria para Acabar com a Malária"
+    },
+    "d1bf045bb524dae5": {
+      "en": "View details",
+      "where": "line 1737 (in markup)",
+      "bucket": "js",
+      "fr": "Voir les détails",
+      "pt": "Ver detalhes"
+    },
+    "d2f24d4cc453047e": {
+      "en": "SRA approval (EMA Art. 58)",
+      "where": "products.products[2].detail.milestones[0].milestone",
+      "bucket": "data",
+      "fr": "SRA approbation (EMA Art. 58)",
+      "pt": "SRA aprovação (EMA Art.º 58.º)"
+    },
+    "d3a008ef1335692d": {
+      "en": "Region",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Région",
+      "pt": "Região"
+    },
+    "d4549923709b3ebf": {
+      "en": "Renamed from Pyramax to ASPY. The brand name still appears underneath.",
+      "where": "products.changelog[15].plain",
+      "bucket": "data",
+      "fr": "Renommé Pyramax en ASPY. Le nom de la marque apparaît toujours en dessous.",
+      "pt": "O nome foi alterado de Pyramax para ASPY. A marca ainda aparece abaixo."
+    },
+    "d56a72deeaec87a4": {
+      "en": "Phase III (KALUMA, NCT05842954) met primary endpoint: 97.4% PCR-corrected cure rate; registry records 1,720 participants and trial completion 25 Nov 2025 (34 sites, 12 African countries)",
+      "where": "products.products[0].stages[0].note",
+      "bucket": "data",
+      "fr": "La phase III (KALUMA, NCT05842954) a atteint son critère d'évaluation principal : taux de guérison corrigé de 97,4 % PCR ; le registre enregistre 1 720 participants et l'essai devrait se terminer le 25 novembre 2025 (34 sites, 12 pays africains).",
+      "pt": "A Fase III (KALUMA, NCT05842954) atingiu o objetivo primário: taxa de cura corrigida para PCR de 97,4%; o registo inclui 1.720 participantes e a conclusão do estudo está prevista para 25 de novembro de 2025 (34 centros, 12 países africanos)."
+    },
+    "d59194c990e6398c": {
+      "en": "Added a country map, a chart of how long each step takes, a shareable widget, an updates feed and automatic snapshots of the data.",
+      "where": "products.changelog[14].plain",
+      "bucket": "data",
+      "fr": "Ajout d'une carte du pays, d'un graphique indiquant la durée de chaque étape, d'un widget partageable, d'un flux de mises à jour et de captures d'écran automatiques des données.",
+      "pt": "Adicionámos um mapa do país, um gráfico que mostra a duração de cada etapa, um widget partilhável, um feed de atualizações e capturas automáticas dos dados."
+    },
+    "d6804464c5f44de8": {
+      "en": "Madagascar",
+      "where": "resistance.dict.country[36]",
+      "bucket": "data",
+      "fr": "Madagascar",
+      "pt": "Madagáscar"
+    },
+    "d72288a5c04f5270": {
+      "en": "Treatment failure",
+      "where": "resistance.meta.metrics.treatmentFailure.short",
+      "bucket": "data",
+      "fr": "Échec du traitement",
+      "pt": "Falha no tratamento"
+    },
+    "d7278686a1058e8d": {
+      "en": "Illustrative data for design review. Live version: each figure links to its public source and the date the manufacturer confirmed release.",
+      "where": "line 1803",
+      "bucket": "js",
+      "fr": "Données illustratives pour la revue de conception. Version en direct : chaque figure renvoie à sa source publique et à la date de publication confirmée par le fabricant.",
+      "pt": "Dados ilustrativos para revisão de projeto. Versão online: cada figura contém um link para a sua fonte pública e a data de lançamento confirmada pelo fabricante."
+    },
+    "d78ad816cecba2ad": {
+      "en": "Updated treatment guidelines and job aids",
+      "where": "products.products[1].detail.adoption[0]",
+      "bucket": "data",
+      "fr": "Directives de traitement et outils d'aide à l'emploi mis à jour",
+      "pt": "Orientações de tratamento e materiais de apoio atualizados."
+    },
+    "d7ddd542f6269ed4": {
+      "en": "Otherwise standard ACT case-management training",
+      "where": "products.products[3].detail.adoption[1]",
+      "bucket": "data",
+      "fr": "Sinon, formation standard en gestion de cas ACT",
+      "pt": "Caso contrário, formação padrão em gestão de casos ACT"
+    },
+    "d889e2172a211a1d": {
+      "en": "Bhutan",
+      "where": "resistance.dict.country[4]",
+      "bucket": "data",
+      "fr": "Bhoutan",
+      "pt": "Butão"
+    },
+    "d8d25752df253a3f": {
+      "en": "Nine PQ'd presentations across three manufacturers — Alfasigma (2015, requal. Jan 2025), Guilin (2019–2020, incl. dispersible paediatric), Beijing Holley (2023) — real supply security",
+      "where": "products.products[3].stages[3].note",
+      "bucket": "data",
+      "fr": "Neuf présentations préqualifiées (PQ) auprès de trois fabricants — Alfasigma (2015, requalification janv. 2025), Guilin (2019–2020, dont une forme pédiatrique dispersible), Beijing Holley (2023) — une réelle sécurité d’approvisionnement",
+      "pt": "Nove apresentações pré-qualificadas (PQ) de três fabricantes — Alfasigma (2015, requalificação jan. 2025), Guilin (2019–2020, incl. formulação pediátrica dispersível), Beijing Holley (2023) — verdadeira segurança do abastecimento"
+    },
+    "d9fa09d8aa92cc82": {
+      "en": "Molecular markers",
+      "where": "markers.meta.metrics.molecularMarkers.short",
+      "bucket": "data",
+      "fr": "Marqueurs moléculaires",
+      "pt": "Marcadores moleculares"
+    },
+    "daba8f936f4af80b": {
+      "en": "Procurement is the current access barrier — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
+      "where": "products.products[3].flag",
+      "bucket": "data",
+      "fr": "L’approvisionnement constitue actuellement l’obstacle à l’accès — 0,9 à 4,5 % des dépenses du Fonds mondial pour les antipaludiques entre 2022 et 2024, malgré une recommandation de l’OMS datant de 2010, bien que les commandes de 2025 aient fortement augmenté (PQR, rapport encore incomplet).",
+      "pt": "A aquisição é a atual barreira de acesso — representando 0,9–4,5% das despesas do Fundo Global com antimaláricos entre 2022 e 2024, apesar de uma recomendação da OMS datada de 2010, embora os pedidos para 2025 tenham aumentado consideravelmente (PQR, relatório ainda incompleto)."
+    },
+    "db64cb18e9f20411": {
+      "en": "This form has no inbox behind it yet, so nothing was actually sent — your note stayed in",
+      "where": "line 3680",
+      "bucket": "js",
+      "fr": "Ce formulaire n'est pas encore associé à une boîte de réception, donc rien n'a été envoyé ; votre message est resté en attente.",
+      "pt": "Este formulário ainda não tem caixa de entrada, pelo que nada foi enviado — a sua mensagem permaneceu em"
+    },
+    "dbc74a36d8e7439c": {
+      "en": "Indonesia",
+      "where": "resistance.dict.country[31]",
+      "bucket": "data",
+      "fr": "Indonésie",
+      "pt": "Indonésia"
+    },
+    "dc44911609a3ed66": {
+      "en": "\" + where + \"",
+      "where": "line 3066 (in markup)",
+      "bucket": "js",
+      "fr": "\" + où + \"",
+      "pt": "\" + onde + \""
+    },
+    "dc5678ab2606df65": {
+      "en": "this browser tab. Once it is connected, the LAUNCH team will read every message, and where",
+      "where": "line 3681",
+      "bucket": "js",
+      "fr": "cet onglet du navigateur. Une fois la connexion établie, l'équipe LAUNCH lira chaque message, et où",
+      "pt": "esta aba do navegador. Assim que estiver ligado, a equipa LAUNCH lerá todas as mensagens e onde"
+    },
+    "dc99951b591ff4d0": {
+      "en": "Trial records: how many people took part, when a trial finished, and what it found.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Comptes rendus d'essais : nombre de participants, date de fin de l'essai et conclusions de celui-ci.",
+      "pt": "Registos dos ensaios clínicos: quantas pessoas participaram, quando terminou o ensaio e quais as suas conclusões."
+    },
+    "dd1f6cd25c58fd49": {
+      "en": "We now call a blocked step an \"access barrier\" instead of a \"bottleneck\". Only the wording changed — no figures or dates were altered.",
+      "where": "products.changelog[0].plain",
+      "bucket": "data",
+      "fr": "On parle désormais de « barrière d'accès » au lieu de « goulot d'étranglement ». Seul le vocabulaire a changé ; ni les chiffres ni les dates n'ont été modifiés.",
+      "pt": "Agora chamamos a um degrau bloqueado \"barreira de acesso\" em vez de \"gargalo\". Apenas a terminologia foi alterada — nenhum número ou data foi alterado."
+    },
+    "dd591d77ea53db0b": {
+      "en": "Guinea",
+      "where": "resistance.dict.country[27]",
+      "bucket": "data",
+      "fr": "Guinée",
+      "pt": "Guiné"
+    },
+    "df0d329db25ca84c": {
+      "en": "The LAUNCH dashboard displays publicly available information only. Product-specific details (including pricing) appear solely where the manufacturer has confirmed in writing that they may be shared. Hover any stage for status detail; select a medicine to open its full profile.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Le tableau de bord LAUNCH affiche uniquement les informations publiques. Les détails spécifiques à un produit (y compris les prix) apparaissent uniquement lorsque le fabricant a confirmé par écrit qu'ils pouvaient être partagés. Survolez une étape pour obtenir des détails sur son statut ; sélectionnez un médicament pour ouvrir son profil complet.",
+      "pt": "O painel LAUNCH apenas apresenta informações publicamente disponíveis. Os detalhes específicos do produto (incluindo preços) aparecem apenas quando o fabricante confirma por escrito que podem ser partilhados. Passe o cursor sobre qualquer passo para ver os detalhes do estado; selecione um medicamento para abrir o seu perfil completo."
+    },
+    "df5ab0a977e067d6": {
+      "en": "Where malaria is becoming harder to treat — the study results behind the resistance layers on the map above.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Là où le paludisme devient plus difficile à traiter — les résultats de l'étude qui expliquent les différentes couches de résistance sur la carte ci-dessus.",
+      "pt": "Onde a malária está a tornar-se mais difícil de tratar — os resultados do estudo por detrás das camadas de resistência no mapa acima."
+    },
+    "df5e2944e3c662ae": {
+      "en": "Mefloquine, lumefantrine",
+      "where": "markers.meta.markerDrug[\"Pfmdr1 amplifications\"]",
+      "bucket": "data",
+      "fr": "Méfloquine, luméfantrine",
+      "pt": "Mefloquina, lumefantrina"
+    },
+    "e04d53f14ea293a2": {
+      "en": "Venezuela (Bolivarian Republic of)",
+      "where": "resistance.dict.country[65]",
+      "bucket": "data",
+      "fr": "Venezuela (République bolivarienne de)",
+      "pt": "Venezuela (República Bolivariana da)"
+    },
+    "e06cfb7ec8186fc7": {
+      "en": "Get an email when the data on this page is updated — new milestones, corrected figures and newly verified country registrations.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Recevez un courriel lorsque les données de cette page sont mises à jour : nouvelles étapes importantes, chiffres corrigés et nouvelles inscriptions de pays vérifiées.",
+      "pt": "Receba um e-mail quando os dados desta página forem atualizados — novos marcos, números corrigidos e registos de países recentemente verificados."
+    },
+    "e07bc9f2a0ce43ff": {
+      "en": "Pipeline · new chemical class",
+      "where": "products.products[0].classLabel",
+      "bucket": "data",
+      "fr": "Pipeline · nouvelle classe chimique",
+      "pt": "Gasoduto · nova classe química"
+    },
+    "e15a18aadcac09e6": {
+      "en": "Nepal",
+      "where": "resistance.dict.country[43]",
+      "bucket": "data",
+      "fr": "Népal",
+      "pt": "Nepal"
+    },
+    "e17906430396d8f3": {
+      "en": "Corrected a European approval date to 2012, and added the July 2025 update to the medicine's label for use in pregnancy.",
+      "where": "products.changelog[18].plain",
+      "bucket": "data",
+      "fr": "La date d'approbation européenne a été corrigée et ramenée à 2012. La mise à jour de juillet 2025 concernant l'utilisation du médicament pendant la grossesse a également été ajoutée à l'étiquetage.",
+      "pt": "Corrigimos a data de aprovação europeia para 2012 e adicionámos a atualização de julho de 2025 à bula do medicamento para utilização durante a gravidez."
+    },
+    "e19f4a31cc7d3731": {
+      "en": "${panelTitle} — ${n} ${n === 1 ? \"study\" : \"studies\"} at",
+      "where": "line 3106",
+      "bucket": "js",
+      "fr": "${panelTitle} — ${n} ${n === 1 ? \"study\" : \"studies\"} à",
+      "pt": "${panelTitle} — ${n} ${n === 1 ? \"study\" : \"studies\"} em"
+    },
+    "e20430bc4f85f4cd": {
+      "en": "Guidelines Development Group — the WHO expert group that reviews evidence and formulates treatment recommendations.",
+      "where": "products.glossary.GDG",
+      "bucket": "data",
+      "fr": "Groupe d’élaboration des lignes directrices — le groupe d’experts de l’OMS qui examine les données probantes et formule des recommandations de traitement.",
+      "pt": "Grupo de Desenvolvimento de Guidelines — o grupo de peritos da OMS que analisa a evidência e formula recomendações de tratamento."
+    },
+    "e23bb910957487a4": {
+      "en": "Nigeria: NAFDAC Green Book",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Nigéria : NAFDAC Livre vert",
+      "pt": "Nigéria: NAFDAC Livro Verde"
+    },
+    "e2567312ec53232b": {
+      "en": "Pakistan",
+      "where": "resistance.dict.country[46]",
+      "bucket": "data",
+      "fr": "Pakistan",
+      "pt": "Paquistão"
+    },
+    "e27d089d50c2e45e": {
+      "en": "Verify surge in next PQR extract",
+      "where": "products.products[2].detail.milestones[6].next",
+      "bucket": "data",
+      "fr": "Vérifier la hausse dans le prochain extrait PQR",
+      "pt": "Verificar aumento na próxima extração de PQR"
+    },
+    "e325dae397f141e6": {
+      "en": "Data failed to load.",
+      "where": "line 1265 (in markup)",
+      "bucket": "js",
+      "fr": "Les données n'ont pas pu être chargées.",
+      "pt": "Os dados não puderam ser carregados."
+    },
+    "e32d690fc4f1033f": {
+      "en": "\" + esc(cn + \" — \" + mk.members.length + \" sites\") + \"",
+      "where": "line 3149 (in markup)",
+      "bucket": "js",
+      "fr": "\" + esc(cn + \" — \" + mk.members.length + \" sites\") + \"",
+      "pt": "\" + esc(cn + \" — \" + mk.members.length + \" sites\") + \""
+    },
+    "e33d155fe1cd396f": {
+      "en": "First batch of updates drawn from public databases — Global Fund purchasing records, World Health Organization approval lists, European medicines records and clinical trial registries.",
+      "where": "products.changelog[9].plain",
+      "bucket": "data",
+      "fr": "Première série de mises à jour issues de bases de données publiques : registres d’achats du Fonds mondial, listes d’approbation de l’Organisation mondiale de la santé, registres européens des médicaments et registres d’essais cliniques.",
+      "pt": "Primeiro lote de atualizações extraídas de bases de dados públicas — registos de compras do Fundo Global, listas de aprovação da Organização Mundial de Saúde, registos europeus de medicamentos e registos de ensaios clínicos."
+    },
+    "e3743b2d468f4a0f": {
+      "en": "What is your feedback about?",
+      "where": "line 3665",
+      "bucket": "js",
+      "fr": "Quels sont vos commentaires ?",
+      "pt": "Qual é o seu feedback?"
+    },
+    "e3872dc33ae6bb0b": {
+      "en": "Manufacturer communications",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Communications des fabricants",
+      "pt": "Comunicações do fabricante"
+    },
+    "e4e239c437499d24": {
+      "en": "Tanzania: TMDA register",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Tanzanie : TMDA inscription",
+      "pt": "Tanzânia: TMDA registar"
+    },
+    "e509cda4c4469cb8": {
+      "en": "Central African Republic",
+      "where": "resistance.dict.country[11]",
+      "bucket": "data",
+      "fr": "République centrafricaine",
+      "pt": "República Centro-Africana"
+    },
+    "e53228c78ba613ea": {
+      "en": "About the data.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "À propos des données.",
+      "pt": "Sobre os dados."
+    },
+    "e7103661f32b14ea": {
+      "en": "Indicative price per treatment",
+      "where": "line 1754 (in markup)",
+      "bucket": "js",
+      "fr": "Prix indicatif par traitement",
+      "pt": "Preço indicativo por tratamento"
+    },
+    "e7b552847955ba77": {
+      "en": "Drug",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Médicament",
+      "pt": "Medicamento"
+    },
+    "e814fdb45fd481e7": {
+      "en": "Comoros",
+      "where": "resistance.dict.country[15]",
+      "bucket": "data",
+      "fr": "Comores",
+      "pt": "Comores"
+    },
+    "e96d77688f4f2b69": {
+      "en": "Samples carrying a resistance-associated genotype, % of those genotyped — for Pfkelch13 this counts WHO-validated markers of artemisinin partial resistance only, not every mutation found",
+      "where": "markers.meta.metrics.molecularMarkers.full",
+      "bucket": "data",
+      "fr": "Échantillons porteurs d'un génotype associé à la résistance, % des échantillons génotypés — pour Pfkelch13, ce chiffre ne prend en compte que les marqueurs de résistance partielle à l'artémisinine validés par l'OMS, et non toutes les mutations détectées.",
+      "pt": "Amostras portadoras de genótipo associado à resistência, % das amostras genotipadas — para Pfkelch13, esta contagem inclui apenas marcadores de resistência parcial à artemisinina validados pela OMS, e não todas as mutações encontradas."
+    },
+    "ea3bfc26fa5ca39f": {
+      "en": "Guyana",
+      "where": "resistance.dict.country[29]",
+      "bucket": "data",
+      "fr": "Guyane",
+      "pt": "Guiana"
+    },
+    "ea74ba472102d43f": {
+      "en": "Unitaid",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Unitaid",
+      "pt": "Unitaid"
+    },
+    "eb6213d7c037b126": {
+      "en": "Source: WHO Malaria Threat Maps, updated ${prettyDate(m.whoLastDataUpdate)}. Values are WHO's; site-merging is ours.",
+      "where": "line 3199",
+      "bucket": "js",
+      "fr": "Source : Cartes de la menace du paludisme de l’OMS, mises à jour le ${prettyDate(m.whoLastDataUpdate)}. Les valeurs sont celles de l’OMS ; la fusion des sites est de notre fait.",
+      "pt": "Fonte: Mapas de Ameaças da Malária da OMS, atualizados em ${prettyDate(m.whoLastDataUpdate)}. Os valores são da OMS; a fusão dos sites é nossa."
+    },
+    "eb6914fdeeace2e2": {
+      "en": "Sites too close to draw apart at this zoom merge into one numbered dot, pooled across them by patient count. Zoom in to separate them; click any dot for the studies behind it.",
+      "where": "line 2859",
+      "bucket": "js",
+      "fr": "À ce niveau de zoom, les sites trop proches pour être distingués s'affichent en un seul point numéroté, regroupés par nombre de patients. Zoomez pour les séparer ; cliquez sur un point pour afficher les études correspondantes.",
+      "pt": "Os locais demasiado próximos para serem separados neste nível de zoom fundem-se num único ponto numerado, agrupados por número de doentes. Aumente o zoom para os separar; clique em qualquer ponto para ver os estudos correspondentes."
+    },
+    "ed0ec9671ca85aed": {
+      "en": "Which medicines the World Health Organization recommends, and from when.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Quels médicaments l'Organisation mondiale de la santé recommande-t-elle, et à partir de quand ?",
+      "pt": "Que medicamentos recomenda a Organização Mundial de Saúde e a partir de quando."
+    },
+    "ed1dc3abce5a8f2b": {
+      "en": "Designed for affordability in endemic-country public sectors",
+      "where": "products.products[1].detail.access[1]",
+      "bucket": "data",
+      "fr": "Conçu pour être abordable dans les secteurs publics des pays endémiques",
+      "pt": "Concebido para ser acessível nos setores públicos dos países endémicos."
+    },
+    "ed68d4def1af578d": {
+      "en": "Sudan",
+      "where": "resistance.dict.country[56]",
+      "bucket": "data",
+      "fr": "Soudan",
+      "pt": "Sudão"
+    },
+    "ed7aff1ae9fa57c2": {
+      "en": "is pre-launch — no country access yet.",
+      "where": "line 2614",
+      "bucket": "js",
+      "fr": "En phase de pré-lancement — aucun accès national pour le moment.",
+      "pt": "Está em fase de pré-lançamento — ainda não há acesso a alguns países."
+    },
+    "ed9ad13611d71648": {
+      "en": "Saudi Arabia",
+      "where": "markers.dict.country[57]",
+      "bucket": "data",
+      "fr": "Arabie Saoudite",
+      "pt": "Arábia Saudita"
+    },
+    "ee5721a5a60b7625": {
+      "en": "Mali",
+      "where": "resistance.dict.country[39]",
+      "bucket": "data",
+      "fr": "Mali",
+      "pt": "Mali"
+    },
+    "f0ea22a14fb2608c": {
+      "en": "${esc(STAGES[b])} was reached ${yrs} yr${yrs === 1 ? \"\" : \"s\"} before ${esc(STAGES[a])} — these gates were not cleared in pathway order.",
+      "where": "line 1579",
+      "bucket": "js",
+      "fr": "${esc(STAGES[b])} a été atteint ${yrs} an${yrs === 1 ? \"\" : \"s\"} avant ${esc(STAGES[a])} — ces portes n'ont pas été dégagées dans l'ordre du chemin.",
+      "pt": "${esc(STAGES[b])} foi atingido ${yrs} ano${yrs === 1 ? \"\" : \"s\"} antes de ${esc(STAGES[a])} — estes portões não foram libertados pela ordem do caminho."
+    },
+    "f1568857ac4bfa32": {
+      "en": "Each dot is the most recent survey year for that country, marker and species, averaged across every site surveyed that year and weighted by the number of samples genotyped — so a large survey counts for more than a small one. The value is the share of samples carrying a resistance-associated genotype, not the share carrying any mutation at all. No survey is excluded; click a dot to see all of them.",
+      "where": "markers.meta.rule",
+      "bucket": "data",
+      "fr": "Chaque point représente l'année d'étude la plus récente pour ce pays, ce marqueur et cette espèce, la moyenne étant calculée sur l'ensemble des sites étudiés cette année-là et pondérée par le nombre d'échantillons génotypés ; ainsi, une étude de grande envergure a plus d'impact qu'une étude de petite envergure. La valeur indiquée correspond à la proportion d'échantillons porteurs d'un génotype associé à la résistance, et non à la proportion d'échantillons porteurs d'une mutation quelconque. Aucune étude n'est exclue ; cliquez sur un point pour les afficher toutes.",
+      "pt": "Cada ponto representa o ano de levantamento mais recente para esse país, marcador e espécie, com a média calculada para todos os locais pesquisados nesse ano e ponderada pelo número de amostras genotipadas — pelo que um levantamento alargado tem mais peso do que um pequeno. O valor representa a proporção de amostras que apresentam um genótipo associado à resistência, e não a proporção de amostras que apresentam qualquer mutação. Nenhum levantamento é excluído; clique num ponto para ver todos eles."
+    },
+    "f1896329f8eabb57": {
+      "en": "\" + esc(curDim) + \" · Click for this site's studies",
+      "where": "line 3143 (in markup)",
+      "bucket": "js",
+      "fr": "\" + esc(curDim) + \" · Cliquez pour accéder aux études de ce site",
+      "pt": "\" + esc(curDim) + \" · Clique para aceder aos estudos deste site"
+    },
+    "f19ec27ee96e7143": {
+      "en": "WHO PQ list carries tablets and granules as EMA-Art.-58 alternative listings (refs H-W-2319-2/-3)",
+      "where": "products.products[2].stages[3].note",
+      "bucket": "data",
+      "fr": "La liste OMS PQ inclut les comprimés et les granulés comme alternatives à l'EMA-Art.-58 (réf. H-W-2319-2/-3)",
+      "pt": "A lista da OMS PQ inclui comprimidos e grânulos como listagens alternativas do EMA-Art. -58 (refs H-W-2319-2/-3)"
+    },
+    "f1a7804624c4143f": {
+      "en": "Price & Quality Reporting — the Global Fund database of procurement transactions (volumes and prices).",
+      "where": "products.glossary.PQR",
+      "bucket": "data",
+      "fr": "Rapports sur les prix et la qualité — la base de données du Fonds mondial sur les transactions d’approvisionnement (volumes et prix).",
+      "pt": "Relatórios de Preços e Qualidade — a base de dados do Fundo Global sobre as transações de aquisição (volumes e preços)."
+    },
+    "f1f0975fa9386eee": {
+      "en": "% in",
+      "where": "line 3136",
+      "bucket": "js",
+      "fr": "% dans",
+      "pt": "% em"
+    },
+    "f200b4f8e33dbcfe": {
+      "en": "Non-artemisinin combination — the first major innovation in malaria treatment since ACTs were introduced over 25 years ago (Novartis) — candidate for artemisinin partial-resistance settings and MFT strategies; kills resistant parasites and blocks transmission.",
+      "where": "products.products[0].detail.useCase",
+      "bucket": "data",
+      "fr": "Combinaison non-artémisinine — la première innovation majeure dans le traitement du paludisme depuis l'introduction des ACTs il y a plus de 25 ans (Novartis) — candidate pour les contextes de résistance partielle à l'artémisinine et les stratégies MFT ; tue les parasites résistants et bloque la transmission.",
+      "pt": "A combinação não artemisinina — a primeira grande inovação no tratamento da malária desde que ACTs foram introduzidas há mais de 25 anos (Novartis) — candidata para ambientes de resistência parcial à artemisinina e estratégias MFT; mata os parasitas resistentes e bloqueia a transmissão."
+    },
+    "f3563c3da7991407": {
+      "en": "Open in row",
+      "where": "line 2134 (in markup)",
+      "bucket": "js",
+      "fr": "Ouvrir en rangée",
+      "pt": "Abrir em linha"
+    },
+    "f405b98d5ffcfb05": {
+      "en": "Sierra Leone",
+      "where": "resistance.dict.country[53]",
+      "bucket": "data",
+      "fr": "Sierra Leone",
+      "pt": "Serra Leoa"
+    },
+    "f5ffe0e8f73d7857": {
+      "en": "European Medicines Agency",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Agence européenne des médicaments",
+      "pt": "Agência Europeia do Medicamento"
+    },
+    "f6482da9923e82b8": {
+      "en": "The eight-stage access pathway — choose a gate to see every medicine at it",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Le parcours d'accès en huit étapes — choisissez une porte pour voir tous les médicaments disponibles",
+      "pt": "O sistema de acesso em oito passos — escolha um portão para ver todos os medicamentos disponíveis."
+    },
+    "f709d5d4159eabb5": {
+      "en": "We checked Nigeria's and Tanzania's official medicine registers. Tanzania lists 10 approved versions of this medicine, all up to date. Nigeria lists 47, but only 26 are still active — 22 have expired and would need renewing.",
+      "where": "products.changelog[4].plain",
+      "bucket": "data",
+      "fr": "Nous avons consulté les registres officiels des médicaments du Nigéria et de la Tanzanie. La Tanzanie recense 10 versions approuvées de ce médicament, toutes à jour. Le Nigéria en recense 47, mais seules 26 sont encore valides ; 22 sont périmées et nécessitent un renouvellement.",
+      "pt": "Consultámos os registos oficiais de medicamentos da Nigéria e da Tanzânia. A Tanzânia lista 10 versões aprovadas deste medicamento, todas atualizadas. A Nigéria lista 47, mas apenas 26 ainda estão ativas — 22 expiraram e precisariam de ser renovadas."
+    },
+    "f737d10c0ed67e05": {
+      "en": "Triple ACT to protect artemisinin partner drugs — MFT component and first-line option where artemisinin partial resistance is confirmed.",
+      "where": "products.products[1].detail.useCase",
+      "bucket": "data",
+      "fr": "Triple ACT pour protéger les médicaments partenaires de l'artémisinine — composant MFT et option de première ligne lorsque la résistance partielle à l'artémisinine est confirmée.",
+      "pt": "Tripla ACT para proteger os medicamentos parceiros da artemisinina — componente MFT e opção de primeira linha onde se confirma a resistência parcial à artemisinina."
+    },
+    "f872759ca5fe18a7": {
+      "en": "Established API supply chains",
+      "where": "products.products[3].detail.access[2]",
+      "bucket": "data",
+      "fr": "Chaînes d'approvisionnement en API établies",
+      "pt": "Cadeias de fornecimento de API estabelecidas"
+    },
+    "f99eeb59eb9596ad": {
+      "en": "MFT rotation sequencing and resistance impact",
+      "where": "products.products[3].detail.research.question",
+      "bucket": "data",
+      "fr": "MFT séquence de rotation et impact de résistance",
+      "pt": "MFT Sequenciação da rotação e impacto da resistência"
+    },
+    "fa7955814e32aed3": {
+      "en": "Site",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Site",
+      "pt": "Local"
+    },
+    "fb293d4b4d34a477": {
+      "en": "R&D & clinical",
+      "where": "products.stages[0]",
+      "bucket": "data",
+      "fr": "Recherche et développement et clinique",
+      "pt": "I&D e clínica"
+    },
+    "fb5f27d5457c4641": {
+      "en": "Detail",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Détail",
+      "pt": "Detalhe"
+    },
+    "fd8228bb92fa16cb": {
+      "en": "WHO-recommended ACT for uncomplicated malaria — added as the fifth recommended ACT in the 2010 second-edition treatment guidelines; reaffirmed 2015",
+      "where": "products.products[3].stages[2].note",
+      "bucket": "data",
+      "fr": "Recommandé par l'OMS ACT pour le paludisme non compliqué — ajouté comme cinquième recommandation ACT dans la deuxième édition des directives de traitement de 2010 ; réaffirmé en 2015",
+      "pt": "A recomendação da OMS para a malária não complicada (ACT) foi acrescentada como quinta recomendação (ACT) nas orientações de tratamento da segunda edição de 2010; reafirmada em 2015."
+    },
+    "fdc5d2e9410c2d88": {
+      "en": "Powered by",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Alimenté par",
+      "pt": "Distribuído por"
+    },
+    "ff78656420d8f76f": {
+      "en": "Child-friendly dispersible formulation",
+      "where": "products.products[1].detail.access[2]",
+      "bucket": "data",
+      "fr": "Formule dispersible adaptée aux enfants",
+      "pt": "Fórmula dispersível adequada para crianças"
+    },
+    "ffd08b32396a2766": {
+      "en": "US$41.5m since 2008",
+      "where": "products.products[3].detail.milestones[7].label",
+      "bucket": "data",
+      "fr": "41,5 millions de dollars américains depuis 2008",
+      "pt": "41,5 milhões de dólares desde 2008"
+    }
+  }
+}

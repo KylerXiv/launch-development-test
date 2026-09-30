@@ -3,7 +3,7 @@
 // and removes it from the queue in data/proposals.js.
 //
 //   ISSUE_NUMBER=… STATE=approved|rejected DECIDER=… [REASON=…] [PR=…] [COMMIT=…] \
-//     node scripts/record-decision.js
+//     [CONTENT_HASH=…] [REVIEWED_CONTENT_HASH=…] node scripts/record-decision.js
 //
 // Inputs arrive through the environment, never as arguments spliced into a
 // shell command: the rejection reason is a label name, and anyone who can
@@ -14,6 +14,12 @@
 // back (scripts/propose-regulatory.js skips it; intake warns the reviewer).
 // Called by both jobs of .github/workflows/proposal-decision.yml. Writes the
 // two files and stops; committing is the workflow's job.
+//
+// An approval also records the contentHash it approved (CP-4): the English
+// content that was merged and translated, from scripts/proposal-translate.sh.
+// When main's page or other data files had moved since the pull request was
+// opened, the pull request's own contentHash differs, and is recorded beside
+// it as reviewedContentHash.
 
 "use strict";
 
@@ -22,7 +28,7 @@ const path = require("path");
 const rules = require("./data-rules.js");
 
 const ROOT = path.join(__dirname, "..");
-const { ISSUE_NUMBER, STATE, DECIDER, REASON, PR, COMMIT } = process.env;
+const { ISSUE_NUMBER, STATE, DECIDER, REASON, PR, COMMIT, CONTENT_HASH, REVIEWED_CONTENT_HASH } = process.env;
 const n = Number(ISSUE_NUMBER);
 if (!Number.isInteger(n) || n <= 0) { console.error("record-decision: ISSUE_NUMBER must be an issue number"); process.exit(2); }
 if (!["approved", "rejected"].includes(STATE)) { console.error("record-decision: STATE must be approved or rejected"); process.exit(2); }
@@ -56,6 +62,8 @@ log.data.decisions.push({
   fingerprint: p ? p.fingerprint : null,
   ...(PR ? { pr: Number(PR) } : {}),
   ...(COMMIT ? { commit: COMMIT } : {}),
+  ...(CONTENT_HASH ? { contentHash: CONTENT_HASH } : {}),
+  ...(REVIEWED_CONTENT_HASH && REVIEWED_CONTENT_HASH !== CONTENT_HASH ? { reviewedContentHash: REVIEWED_CONTENT_HASH } : {}),
 });
 write(log, "LAUNCH_DECISIONS", { meta: { updated: today }, decisions: log.data.decisions });
 write(queue, "LAUNCH_PROPOSALS", { meta: { updated: today }, proposals: queue.data.proposals.filter((x) => x.issue !== n) });
