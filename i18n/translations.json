@@ -162,6 +162,13 @@
       "fr": "Tous les statuts, dates, prix et volumes ci-dessous sont des exemples pour la révision de la mise en page — et non des données réelles du programme.\", brouillon : '",
       "pt": "Todos os estados, datas, preços e volumes abaixo são meramente ilustrativos para revisão do layout — não são dados reais do programa.\", rascunho: '"
     },
+    "0ed410b8e08cfeff": {
+      "en": "WHO Essential Medicines List",
+      "where": "sources.sources[11].label",
+      "bucket": "data",
+      "fr": "Liste des médicaments essentiels de l'OMS",
+      "pt": "Lista de Medicamentos Essenciais da OMS"
+    },
     "100e29c10b651ced": {
       "en": "Purchasing figures added: the Global Fund has bought 11.5 million packs (US$41.5m) since 2008, with a sharp rise in 2025. Nine versions of the medicine have passed World Health Organization quality checks.",
       "where": "products.changelog[10].plain",
@@ -393,6 +400,13 @@
       "fr": "inclusion dans les directives nationales",
       "pt": "Inclusão de orientações nacionais"
     },
+    "25464f74dbb99fe6": {
+      "en": "An independent overview of which malaria medicines exist and who makes them.",
+      "where": "sources.sources[16].plain",
+      "bucket": "data",
+      "fr": "Un aperçu indépendant des médicaments antipaludiques existants et de leurs fabricants.",
+      "pt": "Uma análise independente dos medicamentos antimaláricos existentes e dos seus fabricantes."
+    },
     "255cd279e75752c1": {
       "en": "Added a poster view showing where each medicine sits in development.",
       "where": "products.changelog[13].plain",
@@ -582,6 +596,13 @@
       "fr": "' + pat + \"",
       "pt": "' + pat + \""
     },
+    "37b13d1a89378471": {
+      "en": "Uganda: National Drug Register",
+      "where": "sources.sources[7].label",
+      "bucket": "data",
+      "fr": "Ouganda : Registre national des médicaments",
+      "pt": "Uganda: Registo Nacional de Medicamentos"
+    },
     "382ac5f308f76c24": {
       "en": "Last updated",
       "where": "line 1319",
@@ -630,6 +651,13 @@
       "bucket": "data",
       "fr": "Phase pivotale III (FD-TACT)",
       "pt": "Fase III Pivotal (FD-TACT)"
+    },
+    "3aaf267d59a2612c": {
+      "en": "Where each medicine still in development has got to, from the non-profit that co-develops many of them.",
+      "where": "sources.sources[15].plain",
+      "bucket": "data",
+      "fr": "Où en sont arrivés tous les médicaments encore en développement, selon l'organisation à but non lucratif qui participe à leur développement.",
+      "pt": "O estado atual de cada medicamento ainda em desenvolvimento, segundo a organização sem fins lucrativos que participa no desenvolvimento de muitos deles."
     },
     "3af18984450120e6": {
       "en": "Countries on this map, list form",
@@ -715,6 +743,13 @@
       "fr": "Des chiffres d'achat ont été ajoutés : le Fonds mondial a acquis 940 000 packs (pour un montant de 14,5 millions de dollars américains) depuis 2018, principalement en 2025 pour l'Ouganda et le Burkina Faso. La date de décision de la Commission européenne sur les médicaments est désormais enregistrée.",
       "pt": "Dados de compras adicionados: o Fundo Global adquiriu 940.000 embalagens (14,5 milhões de dólares) desde 2018, a maior parte destinada ao Uganda e ao Burkina Faso em 2025. A data da decisão europeia sobre medicamentos já foi registada."
     },
+    "4106845b3e4c1b7a": {
+      "en": "WHO's rules for how a medicine gets prequalified.",
+      "where": "sources.sources[13].plain",
+      "bucket": "data",
+      "fr": "Règles de l'OMS concernant la préqualification des médicaments.",
+      "pt": "Regras da OMS para a pré-qualificação de um medicamento."
+    },
     "410de87dcb0d5470": {
       "en": "Routine use concentrated in Southeast Asia and chemoprevention niches",
       "where": "products.products[3].stages[7].note",
@@ -742,6 +777,13 @@
       "bucket": "js",
       "fr": "À partir de",
       "pt": "Até"
+    },
+    "44af7bb76b861b2a": {
+      "en": "Novartis: GanLum Phase III results",
+      "where": "sources.sources[17].label",
+      "bucket": "data",
+      "fr": "Novartis: GanLum Résultats de la phase III",
+      "pt": "Novartis: GanLum Resultados da Fase III"
     },
     "45a15a2470e1d182": {
       "en": "Guatemala",
@@ -784,6 +826,13 @@
       "bucket": "data",
       "fr": "Formation du personnel de santé au nouveau protocole",
       "pt": "Formação dos profissionais de saúde sobre o novo regime"
+    },
+    "485adf8da873e275": {
+      "en": "PLOS Medicine: ASPY in routine use",
+      "where": "sources.sources[18].label",
+      "bucket": "data",
+      "fr": "PLOS Medicine : L'ASPY en utilisation courante",
+      "pt": "PLOS Medicine: ASPY em uso de rotina"
     },
     "487bc4d395b98be0": {
       "en": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); label updated 2025 to include treatment of pregnant women (EMA outcome 5 Jun 2025; announced 31 Jul 2025)",
@@ -868,6 +917,13 @@
       "bucket": "data",
       "fr": "Présence enregistrée : plus de 25 pays et en expansion",
       "pt": "Presença registada: mais de 25 países e em expansão."
+    },
+    "4d570d07253c81f7": {
+      "en": "Pooled results from many separate studies of how well antimalarials still work.",
+      "where": "sources.sources[10].plain",
+      "bucket": "data",
+      "fr": "Résultats combinés de nombreuses études distinctes sur l'efficacité actuelle des antipaludiques.",
+      "pt": "Resultados agrupados de vários estudos independentes sobre a eficácia contínua dos antimaláricos."
     },
     "4dbfa5c5efd9a433": {
       "en": "The national register of every medicine approved for sale in Nigeria.",
@@ -1191,6 +1247,13 @@
       "fr": "Cliquez pour plus de détails",
       "pt": "Clique para ver todos os detalhes."
     },
+    "66cd0aef45cd1946": {
+      "en": "Individual studies, assessments and announcements behind specific medicines.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Études individuelles, évaluations et annonces concernant des médicaments spécifiques.",
+      "pt": "Estudos individuais, avaliações e comunicados sobre medicamentos específicos."
+    },
     "67bad177a2082972": {
       "en": "South-East Asia",
       "where": "line 2338",
@@ -1408,6 +1471,13 @@
       "fr": "Liste OMS PQ",
       "pt": "Lista da OMS PQ"
     },
+    "7a5c00e2e131c008": {
+      "en": "MMV pipeline: ganaplacide–lumefantrine",
+      "where": "sources.sources[15].label",
+      "bucket": "data",
+      "fr": "MMV pipeline : ganaplacide–luméfantrine",
+      "pt": "MMV pipeline: ganaplacida–lumefantrina"
+    },
     "7b662112715afcad": {
       "en": "Registered widely; adopted as first-line in several Southeast Asian countries. Register-verified so far: Tanzania — 10 presentations across four manufacturers (Guilin D-ARTEPP incl. paediatric dispersible, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), all Registered/Compliant; Nigeria — 47 presentations, but only 26 Active (22 lapsed — registrations not being maintained, itself an underuse signal)",
       "where": "products.products[3].stages[4].note",
@@ -1492,6 +1562,13 @@
       "fr": "Affichage : ${full}.",
       "pt": "A apresentar: ${full}."
     },
+    "838badbc3f2828da": {
+      "en": "Key documents.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Documents clés.",
+      "pt": "Documentos essenciais."
+    },
     "83a3c56d9b66bec6": {
       "en": "Prototype — data presented here may not be accurate",
       "where": "static text",
@@ -1533,6 +1610,20 @@
       "bucket": "markup",
       "fr": "Les décisions d'approbation européennes, y compris ses avis sur les médicaments destinés à être utilisés en dehors de l'Europe.",
       "pt": "Decisões de aprovação europeias, incluindo os seus pareceres sobre medicamentos destinados a serem utilizados fora da Europa."
+    },
+    "8704adf8e4da49a0": {
+      "en": "MESA malaria medicines landscape",
+      "where": "sources.sources[16].label",
+      "bucket": "data",
+      "fr": "Paysage des médicaments contre le paludisme de MESA",
+      "pt": "panorama dos medicamentos contra a malária no MESA"
+    },
+    "872c210f1ca784eb": {
+      "en": "WHO's list of the medicines every health system should be able to supply.",
+      "where": "sources.sources[11].plain",
+      "bucket": "data",
+      "fr": "Liste de l'OMS des médicaments que tout système de santé devrait être en mesure de fournir.",
+      "pt": "Lista da OMS dos medicamentos que todo o sistema de saúde deveria ser capaz de fornecer."
     },
     "876aade328bafc00": {
       "en": "No WHO sites here",
@@ -1646,6 +1737,13 @@
       "fr": "Liste des manifestations d'intérêt, puis dossier",
       "pt": "Lista de EOI (Manifestação de Interesse), depois dossier."
     },
+    "8dadc15f7f10f626": {
+      "en": "Rwanda: Rwanda FDA register",
+      "where": "sources.sources[6].label",
+      "bucket": "data",
+      "fr": "Rwanda : Registre de la FDA rwandaise",
+      "pt": "Ruanda: Registo da FDA do Ruanda"
+    },
     "8dcf47c363eb2e27": {
       "en": "Developed through MORU-led DeTACT partnership with Fosun Pharma",
       "where": "products.products[1].detail.access[0]",
@@ -1659,6 +1757,13 @@
       "bucket": "markup",
       "fr": "Tableau de bord de transparence",
       "pt": "Painel de Transparência"
+    },
+    "8ed8d5d14c7b9116": {
+      "en": "The current electronic list",
+      "where": "sources.sources[11].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "La liste électronique actuelle",
+      "pt": "A lista eletrónica atual"
     },
     "8f38724c3c013172": {
       "en": "The dashboard moved from placeholder examples to real information gathered from public sources. Prices and volumes show as TBC until they are confirmed.",
@@ -1688,6 +1793,13 @@
       "fr": "Maquette de conception.",
       "pt": "Projeto de maqueta."
     },
+    "914a31fed6ce7b6a": {
+      "en": "The national register of every medicine approved for sale in Uganda.",
+      "where": "sources.sources[7].plain",
+      "bucket": "data",
+      "fr": "Le registre national de tous les médicaments autorisés à la vente en Ouganda.",
+      "pt": "O registo nacional de todos os medicamentos aprovados para venda no Uganda."
+    },
     "929a28562d6a754a": {
       "en": "World map, pan and zoom with the mouse or arrow keys",
       "where": "line 2473",
@@ -1701,6 +1813,13 @@
       "bucket": "data",
       "fr": "Procédure de l'EMA permettant d'émettre un avis scientifique sur les médicaments hautement prioritaires destinés aux marchés hors UE.",
       "pt": "Procedimento da EMA para a emissão de um parecer científico sobre medicamentos de alta prioridade destinados a mercados fora da UE."
+    },
+    "93f3f73b396c42da": {
+      "en": "The national register of every medicine approved for sale in Rwanda.",
+      "where": "sources.sources[6].plain",
+      "bucket": "data",
+      "fr": "Le registre national de tous les médicaments autorisés à la vente au Rwanda.",
+      "pt": "O registo nacional de todos os medicamentos aprovados para venda no Ruanda."
     },
     "93f7aee34fe9c146": {
       "en": "Committee reviews in other endemic countries",
@@ -1807,6 +1926,13 @@
       "fr": "Barrière d'accès retardée",
       "pt": "Barreira de acesso/atraso"
     },
+    "9f108d772d431385": {
+      "en": "WHO PQ comparator products",
+      "where": "sources.sources[12].label",
+      "bucket": "data",
+      "fr": "OMS PQ produits comparateurs",
+      "pt": "OMS PQ produtos comparadores"
+    },
     "a045dcdc213ba391": {
       "en": "Actual timeline",
       "where": "line 1628 (in markup)",
@@ -1828,6 +1954,13 @@
       "fr": "Non encore inclus dans la liste des manifestations d'intérêt de l'OMS PQ (24e manifestation d'intérêt sur le paludisme, 27 février 2026, vérifiée)",
       "pt": "Ainda não incluído na lista de Manifestações de Interesse da OMS PQ (24ª Manifestação de Interesse sobre a malária, 27 de fevereiro de 2026, verificada)"
     },
+    "a3b772e4eaf6082d": {
+      "en": "The reference products a generic must be tested against before WHO will list it.",
+      "where": "sources.sources[12].plain",
+      "bucket": "data",
+      "fr": "Il faut tester un médicament générique par rapport à des produits de référence avant que l'OMS ne l'inscrive sur sa liste.",
+      "pt": "Os produtos de referência com os quais um medicamento genérico deve ser testado antes de a OMS o incluir na sua lista de produtos de referência."
+    },
     "a4023b89022f326c": {
       "en": "Download CSV",
       "where": "static text",
@@ -1841,6 +1974,13 @@
       "bucket": "data",
       "fr": "Aucune dépendance à une source unique",
       "pt": "Sem dependência de fonte única"
+    },
+    "a52078f37cfff62b": {
+      "en": "The same study results as a searchable database",
+      "where": "sources.sources[2].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Les mêmes résultats d'étude sous forme de base de données consultable",
+      "pt": "Os mesmos resultados do estudo numa base de dados pesquisável"
     },
     "a564371ac0f23840": {
       "en": "Burkina Faso",
@@ -1862,6 +2002,13 @@
       "bucket": "data",
       "fr": "augmentation de l'efficacité des achats",
       "pt": "Alargamento do processo de aquisição"
+    },
+    "a6a7436941658443": {
+      "en": "A 2023 study in Ghana of how well two of these medicines still cure malaria there.",
+      "where": "sources.sources[19].plain",
+      "bucket": "data",
+      "fr": "Une étude menée au Ghana en 2023 sur l'efficacité de deux de ces médicaments pour soigner le paludisme dans ce pays.",
+      "pt": "Um estudo realizado em 2023 no Gana avaliou a eficácia de dois destes medicamentos no tratamento da malária naquele país."
     },
     "a7692387c3d3d29c": {
       "en": "Not started (stage glyph dimmed, no badge)",
@@ -1933,6 +2080,13 @@
       "fr": "Diversification de première ligne / composant MFT ; granulés pédiatriques disponibles ; l'étiquette inclut les femmes enceintes (mise à jour 2025).",
       "pt": "Diversificação de primeira linha/componente MFT; grânulos pediátricos disponíveis; a bula inclui as grávidas (atualização de 2025)."
     },
+    "b1a3fa311a6436e7": {
+      "en": "The manufacturer's announcement of GanLum's Phase III results.",
+      "where": "sources.sources[17].plain",
+      "bucket": "data",
+      "fr": "Annonce par le fabricant des résultats de la phase III de GanLum.",
+      "pt": "Anúncio do fabricante sobre os resultados da Fase III do GanLum."
+    },
     "b1cb8eac5b3197a6": {
       "en": "Suriname",
       "where": "resistance.dict.country[57]",
@@ -1967,6 +2121,13 @@
       "bucket": "markup",
       "fr": "Qu’est-ce qui a réellement été acheté pour les pays ? Combien de paquets, à quel prix et en quelle année ?",
       "pt": "O que foi efetivamente comprado para os países — quantas embalagens, a que preço e em que ano."
+    },
+    "b438bbef0d7a3b70": {
+      "en": "WHO assessment report: DHA–PPQ (Guilin)",
+      "where": "sources.sources[14].label",
+      "bucket": "data",
+      "fr": "Rapport d'évaluation de l'OMS : DHA–PPQ (Guilin)",
+      "pt": "Relatório de avaliação da OMS: DHA – PPQ (Guilin)"
     },
     "b43967a70b2990f7": {
       "en": "Registered in 25+ endemic countries since 2014; further submissions in Asia (Vietnam, Myanmar, Cambodia, Thailand). Register-verified so far: Tanzania — 2 registrations (TMDA, issued 8 Mar 2022, Registered/Compliant); Nigeria — 1 registration (Greenbook: granules B4-9425, approved 28 Feb 2024, Active)",
@@ -2128,6 +2289,13 @@
       "bucket": "js",
       "fr": "Une idée pour rendre cela plus clair ou plus utile",
       "pt": "Uma ideia para tornar isto mais claro ou mais útil."
+    },
+    "c50bb2e5e7a4d0ae": {
+      "en": "Source list unavailable — data/sources.js did not load.",
+      "where": "line 3621 (in markup)",
+      "bucket": "js",
+      "fr": "Liste des sources indisponible — le fichier data/sources.js n'a pas pu être chargé.",
+      "pt": "Lista de fontes indisponível — o ficheiro data/sources.js não foi carregado."
     },
     "c5b2a6de9d5ae20a": {
       "en": "Vanuatu",
@@ -2395,6 +2563,13 @@
       "fr": "Marqueurs moléculaires",
       "pt": "Marcadores moleculares"
     },
+    "da99806f945cefea": {
+      "en": "WWARN / IDDO malaria data",
+      "where": "sources.sources[10].label",
+      "bucket": "data",
+      "fr": "Données sur le paludisme WWARN / IDDO",
+      "pt": "Dados sobre a malária da WWARN/IDDO"
+    },
     "daba8f936f4af80b": {
       "en": "Procurement is the current access barrier — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
       "where": "products.products[3].flag",
@@ -2437,6 +2612,13 @@
       "fr": "Comptes rendus d'essais : nombre de participants, date de fin de l'essai et conclusions de celui-ci.",
       "pt": "Registos dos ensaios clínicos: quantas pessoas participaram, quando terminou o ensaio e quais as suas conclusões."
     },
+    "dcced801f4ce3e82": {
+      "en": "A study of how pyronaridine-artesunate performed in ordinary clinical use across five African countries.",
+      "where": "sources.sources[18].plain",
+      "bucket": "data",
+      "fr": "Une étude sur les performances de la pyronaridine-artésunate en usage clinique courant dans cinq pays africains.",
+      "pt": "Um estudo sobre o desempenho da pironaridina-artesunato no uso clínico comum em cinco países africanos."
+    },
     "dd1f6cd25c58fd49": {
       "en": "We now call a blocked step an \"access barrier\" instead of a \"bottleneck\". Only the wording changed — no figures or dates were altered.",
       "where": "products.changelog[0].plain",
@@ -2457,6 +2639,13 @@
       "bucket": "markup",
       "fr": "Le tableau de bord LAUNCH affiche uniquement les informations publiques. Les détails spécifiques à un produit (y compris les prix) apparaissent uniquement lorsque le fabricant a confirmé par écrit qu'ils pouvaient être partagés. Survolez une étape pour obtenir des détails sur son statut ; sélectionnez un médicament pour ouvrir son profil complet.",
       "pt": "O painel LAUNCH apenas apresenta informações publicamente disponíveis. Os detalhes específicos do produto (incluindo preços) aparecem apenas quando o fabricante confirma por escrito que podem ser partilhados. Passe o cursor sobre qualquer passo para ver os detalhes do estado; selecione um medicamento para abrir o seu perfil completo."
+    },
+    "df2e63f7dba9e1a2": {
+      "en": "Frontiers: Ghana efficacy study, 2023",
+      "where": "sources.sources[19].label",
+      "bucket": "data",
+      "fr": "Frontiers : Étude d'efficacité au Ghana, 2023",
+      "pt": "Fronteiras: Estudo de eficácia no Gana, 2023"
     },
     "df5ab0a977e067d6": {
       "en": "Where malaria is becoming harder to treat — the study results behind the resistance layers on the map above.",
@@ -2682,6 +2871,13 @@
       "fr": "En phase de pré-lancement — aucun accès national pour le moment.",
       "pt": "Está em fase de pré-lançamento — ainda não há acesso a alguns países."
     },
+    "ed7b1ed74573e8c1": {
+      "en": "WHO's published assessment of one prequalified dihydroartemisinin-piperaquine product.",
+      "where": "sources.sources[14].plain",
+      "bucket": "data",
+      "fr": "Évaluation publiée par l'OMS d'un produit préqualifié à base de dihydroartémisinine-pipéraquine.",
+      "pt": "Avaliação publicada pela OMS de um produto pré-qualificado de di-hidroartemisinina-piperaquina."
+    },
     "ed9ad13611d71648": {
       "en": "Saudi Arabia",
       "where": "markers.dict.country[57]",
@@ -2695,6 +2891,13 @@
       "bucket": "data",
       "fr": "Mali",
       "pt": "Mali"
+    },
+    "efb074d55ce99c55": {
+      "en": "WHO's publication record for it",
+      "where": "sources.sources[0].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Le bilan de publication de l'OMS à ce sujet",
+      "pt": "O histórico das publicações da OMS sobre o tema."
     },
     "f0ea22a14fb2608c": {
       "en": "${esc(STAGES[b])} was reached ${yrs} yr${yrs === 1 ? \"\" : \"s\"} before ${esc(STAGES[a])} — these gates were not cleared in pathway order.",
@@ -2835,6 +3038,13 @@
       "bucket": "markup",
       "fr": "Alimenté par",
       "pt": "Distribuído por"
+    },
+    "fe8547e13b12ad91": {
+      "en": "WHO prequalification guidance",
+      "where": "sources.sources[13].label",
+      "bucket": "data",
+      "fr": "Orientations de l'OMS en matière de préqualification",
+      "pt": "Orientações de pré-qualificação da OMS"
     },
     "ff78656420d8f76f": {
       "en": "Child-friendly dispersible formulation",
