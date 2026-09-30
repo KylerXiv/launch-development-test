@@ -18,8 +18,10 @@
     --line: #DCE3E7;
     --accent: #0F5A72;
     --accent-soft: #E6F1F4;
-    --nav-pad: 24px;
-    --nav-max: 1132px;
+    /* Full-width page, like the illustrated journey: one side padding, shared by
+       the menu bar and the content so their edges line up at every width. */
+    --pad: clamp(24px, 4vw, 64px);
+    --nav-pad: var(--pad);
     --cat-newclass: #0F5A72;
     --cat-tact: #3E5C8A;
     --cat-market: #1E8A5A;
@@ -36,7 +38,7 @@
     font: 15px/1.5 -apple-system, "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 56px; }
+  .wrap { margin: 0; padding: 16px var(--pad) 56px; }
 
   header { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 24px; margin-bottom: 6px; }
   .brand h1 { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.01em; }
@@ -50,7 +52,8 @@
   @media (max-width: 760px) {
     .proto-badge { white-space: normal; margin-left: 0; margin-top: 6px; display: block; width: fit-content; }
     .meta { text-align: left; margin-left: 0; }
-    .wrap { padding: 20px 14px 48px; }
+    :root { --pad: 14px; }
+    .wrap { padding: 20px var(--pad) 48px; }
     .poster-box { padding: 12px; }
   }
   .brand p { margin: 4px 0 0; color: var(--ink-2); font-size: 15px; max-width: 62ch; }

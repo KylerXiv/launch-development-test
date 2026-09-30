@@ -1000,6 +1000,17 @@ link rows to be replaced so the pages are consistent.
 - **Story's closing buttons** now link only to the Illustrated journey and Pipeline
   (they pointed at Journey board and Comparison matrix, which are no longer in the
   menu).
+- **Full width, like this page (Keith, same day):** Pipeline and Story dropped their
+  fixed 1180px column (and Story's 780/732px hero, banner and closing panel) and now
+  fill the screen with this page's side padding. Each defines `--pad:
+  clamp(24px, 4vw, 64px)` (14px on a phone) and uses it for the header, content and
+  footer; the menu bar reads the same value through `--nav-pad`, so the bar's left
+  edge lines up with the content at every width. The old `--nav-max` cap is no longer
+  set by any page. Story's hero is now left-aligned at the page edge instead of
+  centred in a 780px column (the heading and intro keep their 58ch line length), and
+  the closing panel's text is capped at 70ch so it stays readable. Checked at 1900px
+  and 390px; the scroll section's sticky stage and cards still lay out. Not checked:
+  the interactive map steps in Story, or widths between 860px and 1400px.
 - **Left alone, worth a decision:** clicking a product card on Pipeline still goes
   to `index.html#id` (the Journey board), and Pipeline's footer says "open the full
   profile on the journey board". Both point outside the three-view menu. The
