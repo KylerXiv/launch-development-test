@@ -96,6 +96,25 @@ tablets and paediatric granules" reads in French as "OMS PQ **interdit** pour
 les comprimés…" ("forbidden"), and masking pushes a protected term to the front
 of its sentence ("MFT Modèles de déploiement avec…").
 
+**3. The approval gate is wired (CP-4), and there is a stub engine.**
+`approvalGate()` in `translate-strings.js` exits 1 unless
+`APPROVED_CONTENT_HASH` is exactly the `contentHash` of the content it is about
+to translate; a dry run needs no approval. The approval job passes the hash of
+the proposal it is merging, the translate bot the hash now on `main`. A person
+can still run it by hand, but only by setting the variable on purpose.
+Rejected: the gate reading `data/decisions.js` itself — the approval job
+translates before it merges and records, so the record would not exist yet.
+
+`TRANSLATE_ENGINE=stub` returns `[stub-fr] <the English>` for every string, so
+the route runs end to end with no key and nothing sent anywhere. A real engine
+treats a stub value as an empty slot and overwrites it — the one exception to
+"empty locale only", because a stub value is test output, not a translation.
+`build-locale-pages.js` counts stub values it substitutes and says so. Checked:
+no approval, a wrong hash, no key, and an unknown engine each exit 1 and leave
+the memory untouched; the stub fills 30 per locale, a second run has nothing to
+do, a Google dry run then sees those 30 slots as empty again, and the pages
+build at 98% (12 left in English) with the stubs flagged.
+
 ## What `feat/translation` brought, and what we changed on it
 
 | Where | Change |
@@ -176,8 +195,8 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
   but its path filter is `data/products.js` alone, and `content.en.json` also
   depends on `illustrated-journey-dashboard.html`, `resistance.js` and
   `molecular-markers.js`.
-- **CP-4 is still open.** `approvalGate()` in `translate-strings.js` only prints
-  the hash.
+- **Resolved in item 3 above.** **CP-4 was still open.** `approvalGate()` in
+  `translate-strings.js` only printed the hash.
 - **The locale pages are not deployed.** `scripts/build-public-site.sh` copies a
   fixed list of files, and `dist/locale/` is not on it.
 - **Two of the three `publish.yml` runs dispatched after an approval failed** on

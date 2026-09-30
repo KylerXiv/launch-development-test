@@ -62,6 +62,10 @@ node scripts/translate-strings.js --locale=pt
 node scripts/build-locale-pages.js             # writes dist/locale/{fr,pt} and self-checks
 ```
 
+Since 30 Sep `translate-strings.js` also needs `APPROVED_CONTENT_HASH` set to the
+approved `contentHash` (CP-4, §6); normally the approval job and the translate bot
+run it, not a person — see [docs/translation-notes.md](../translation-notes.md).
+
 `assemble-content.js` is silent when it succeeds. `translate-strings.js` and
 `build-locale-pages.js` both **refuse to run** if `content.en.json` is out of date,
 so a forgotten step 1 cannot produce a translation or a page from old content.
@@ -230,6 +234,10 @@ something really changed.
   PR). `translate-strings.js` has a marked `approvalGate()` stub that currently only
   prints the hash; once the location is agreed it must exit unless `contentHash` is
   approved. `build-dataset.js` (DEV-32) will ask the same question.
+  **Resolved 30 Sep** (`translation-workflow`): the approval is the `approved`
+  label on a proposal, recorded with its `contentHash` in `data/decisions.js`;
+  `approvalGate()` now exits unless `APPROVED_CONTENT_HASH` equals the content's
+  `contentHash`. See [docs/translation-notes.md](../translation-notes.md).
 - **Portuguese locale code.** We emit `pt-PT`. If RBM's site expects `pt-BR`, their page
   reads a key that is not there. To be confirmed with RBM.
 

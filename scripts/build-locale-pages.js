@@ -114,6 +114,7 @@ function tr(locale, text) {
   const e = entryOf(t);
   const v = e && e[locale];
   const s = (stat[locale] ||= { hit: 0, miss: 0, missed: new Set() });
+  if (v && /^\[stub-[a-z]+\] /.test(v)) s.stub = (s.stub || 0) + 1;
   if (v) { s.hit++; return v; }
   s.miss++; if (s.missed.size < 40) s.missed.add(t.slice(0, 70));
   return t;                                   // untranslated stays English
@@ -419,6 +420,7 @@ function main() {
     const s = stat[loc];
     const pct = s.hit + s.miss ? Math.round((s.hit / (s.hit + s.miss)) * 100) : 0;
     console.log(`  ${loc}:  ${s.hit} translated · ${s.miss} left in English · ${pct}% coverage`);
+    if (s.stub) console.log(`       ${s.stub} of them are stub values from a test run (TRANSLATE_ENGINE=stub), not translations`);
 
     if (!check) {
       fs.mkdirSync(dataDir, { recursive: true });

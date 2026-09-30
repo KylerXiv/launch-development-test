@@ -29,6 +29,17 @@
  *
  * GOOGLE_API_KEY comes from the environment. It is never committed, never read
  * from a file, and never reaches the browser.
+ *
+ * APPROVED_CONTENT_HASH must name the content being translated — see
+ * approvalGate() below. The approval job and the translate bot set it; by hand:
+ *
+ *   APPROVED_CONTENT_HASH=<contentHash of i18n/content.en.json> \
+ *     node scripts/translate-strings.js --locale=fr
+ *
+ * TRANSLATE_ENGINE=stub replaces Google with a stand-in that returns
+ * "[stub-fr] <the English>", so the whole route can be exercised with no key and
+ * nothing sent anywhere. A later real run overwrites stub values — the one
+ * exception to rule 1, since a stub value is test output, not a translation.
  */
 "use strict";
 const fs = require("fs");
@@ -69,12 +80,29 @@ function inventory(content) {
   return content.text.map((e) => ({ key: e.key, text: e.en, where: e.where, bucket: e.bucket }));
 }
 
-// CP-4 — the approval gate. NOT WIRED YET: where the approval record lives (a
-// file in the repo, a git tag or a merged PR) is still to be settled. Once it
-// is, this must exit unless content.contentHash is approved, because nothing
-// may reach a translation engine before approval. Until then it only reports.
-function approvalGate(content) {
-  return `${content.contentHash.slice(0, 12)}…  (approval check not wired yet, CP-4)`;
+// CP-4 — the approval gate. Nothing may reach a translation engine before the
+// English is approved, so this exits unless APPROVED_CONTENT_HASH is exactly
+// the contentHash of the content about to be translated. Where the approval
+// comes from (docs/translation-notes.md):
+//
+//   proposal-decision.yml  the contentHash of the proposal a reviewer labelled
+//                          `approved`, rebuilt on main as it is now; recorded
+//                          in data/decisions.js
+//   translate.yml          the contentHash now on main — a push to main is
+//                          already live in English, and the push is its approval
+//
+// A dry run sends nothing and needs no approval.
+function approvalGate(content, dryRun) {
+  const short = `${content.contentHash.slice(0, 12)}…`;
+  if (dryRun) return `${short}  (dry run — sends nothing, no approval needed)`;
+  const approved = process.env.APPROVED_CONTENT_HASH || "";
+  if (approved !== content.contentHash) {
+    console.error(`\n  Not approved: contentHash ${short} is ${approved ? `not the approved ${approved.slice(0, 12)}…` : "not approved (APPROVED_CONTENT_HASH is not set)"}.`);
+    console.error("  Nothing is sent to a translation engine before the English is approved.");
+    console.error("  The approval job and the translate bot set APPROVED_CONTENT_HASH; see the header.\n");
+    process.exit(1);
+  }
+  return `${short}  approved`;
 }
 
 function loadMemory() {
@@ -155,8 +183,21 @@ function restore(masked, holes) {
 }
 
 // ---------------------------------------------------------------------------
-// Google Cloud Translation v2
+// Engines
 // ---------------------------------------------------------------------------
+const ENGINE = process.env.TRANSLATE_ENGINE || "google";
+const isStub = (v) => typeof v === "string" && /^\[stub-[a-z]+\] /.test(v);
+// A locale slot is empty if it holds nothing — or, for a real engine, only a
+// stub value left behind by a test run.
+const isEmpty = (v) => !v || (ENGINE !== "stub" && isStub(v));
+
+async function engineTranslate(texts, locale) {
+  if (ENGINE === "stub") return texts.map((t) => `[stub-${locale}] ${t}`);
+  if (ENGINE === "google") return googleTranslate(texts, locale);
+  throw new Error(`TRANSLATE_ENGINE must be "google" or "stub", not "${ENGINE}"`);
+}
+
+// Google Cloud Translation v2
 async function googleTranslate(texts, locale) {
   const key = process.env.GOOGLE_API_KEY;
   if (!key) throw new Error("GOOGLE_API_KEY is not set");
@@ -194,13 +235,14 @@ async function main() {
   for (const loc of locales) {
     const todo = kept.filter((s) => {
       const e = mem.entries[s.key];
-      return !e || !e[loc];
+      return !e || isEmpty(e[loc]);
     });
     report[loc] = todo;
   }
 
   console.log("");
-  console.log(`  contentHash      ${approvalGate(content)}`);
+  console.log(`  contentHash      ${approvalGate(content, dryRun)}`);
+  console.log(`  engine           ${ENGINE}`);
   console.log(`  content.en.json  ${all.length} strings`);
   console.log(`  deny-listed      ${skipped} skipped (species, gene markers, selectors)`);
   console.log(`  translatable     ${kept.length}`);
@@ -224,16 +266,16 @@ async function main() {
   for (let i = 0; i < todo.length; i += BATCH) {
     const slice = todo.slice(i, i + BATCH);
     const masked = slice.map((s) => protect(s.text));
-    const outs = await googleTranslate(masked.map((m) => m.masked), locale);
+    const outs = await engineTranslate(masked.map((m) => m.masked), locale);
     slice.forEach((s, j) => {
       const back = restore(outs[j], masked[j].holes);
       if (back === null) { rejected.push(s.text); return; }   // keep English
       const k = s.key;
       const e = (mem.entries[k] ||= { en: s.text, where: s.where, bucket: s.bucket });
-      if (!e[locale]) e[locale] = back;          // empty-locale-only, enforced here too
+      if (isEmpty(e[locale])) e[locale] = back;  // empty-locale-only, enforced here too
     });
     done += slice.length;
-    process.stdout.write(`\r  google → ${locale} … ${done}/${todo.length}`);
+    process.stdout.write(`\r  ${ENGINE} → ${locale} … ${done}/${todo.length}`);
   }
   console.log("");
   saveMemory(mem);
