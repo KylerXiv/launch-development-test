@@ -240,7 +240,7 @@
   }
   .exp:hover { color: var(--accent); border-color: var(--accent); }
   .exp[aria-expanded="true"] { transform: rotate(180deg); color: var(--accent); border-color: var(--accent); }
-  .exp:focus-visible, .swv:focus-visible, .more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .exp:focus-visible, .swg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .nm { min-width: 0; }
   .nm b { display: block; font-size: 15.5px; font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
   .nm small { display: block; font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -290,22 +290,33 @@
   .l1id { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--ink-3); min-width: 0; }
   .l1ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
   .l1t { font-size: 12.5px; font-weight: 650; color: var(--ink-2); }
-  .swv {
-    background: none; border: 0; padding: 4px 2px; font: inherit; font-size: 12.5px; font-weight: 600;
-    color: var(--ink-3); cursor: pointer; text-decoration: underline;
-    text-decoration-color: var(--line); text-underline-offset: 3px;
+  /* The view switch: two buttons, equal weight, timeline first (30 Sep 2026).
+     It was a quiet text link; Keith asked for a button group. */
+  .swg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .swg button {
+    border: 0; background: var(--surface); color: var(--ink-2); font: inherit; font-size: 12.5px; font-weight: 600;
+    padding: 5px 12px; min-height: 30px; cursor: pointer;
   }
-  .swv:hover { color: var(--accent); text-decoration-color: var(--accent); }
+  .swg button + button { border-left: 1px solid var(--line); }
+  .swg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .swg button:not([aria-pressed="true"]):hover { background: var(--accent-soft); color: var(--accent); }
+  .swg button:focus-visible { outline-offset: -2px; }
   .view { transition: opacity .28s ease, transform .28s ease; }
   .view[hidden] { display: none; }
   .view.fade-in { opacity: 0; transform: translateY(6px); }
   .cscroll { overflow-x: auto; overflow-y: hidden; }
-  .l1f { display: flex; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  /* "More detail" is a full-width bar across the foot of the panel (30 Sep 2026),
+     a bigger target than the outlined button it replaced. The panel loses its
+     bottom padding so the bar sits on the edge, and overflow:hidden keeps the bar
+     inside the panel's rounded corners. The detail opens below the bar. */
+  .l1in { overflow: hidden; padding-bottom: 0; }
   .more {
-    display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--accent);
-    color: var(--accent); border-radius: 8px; padding: 6px 13px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% + 32px);
+    margin: 10px -16px 0; padding: 9px 12px; background: var(--surface-2); border: 0; border-top: 1px solid var(--line);
+    color: var(--accent); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
   }
   .more:hover { background: var(--accent-soft); }
+  .more:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .more .ch { transition: transform .15s ease; }
   .more[aria-expanded="true"] .ch { transform: rotate(180deg); }
   @media (max-width: 1040px) {
@@ -656,7 +667,7 @@
   }
 
   /* ---------- detail panel ---------- */
-  .detail { display: none; margin-top: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); padding: 16px; }
+  .detail { display: none; margin: 12px 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); padding: 16px; }
   .product.open .detail { display: block; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
   .card {
@@ -1160,7 +1171,7 @@
     .product .l1 { display: block !important; }
     .view[data-v="path"] { display: none !important; }
     .view[data-v="time"] { display: block !important; }
-    .exp, .swv, .l1f { display: none !important; }
+    .exp, .swg, .more { display: none !important; }
     .product { break-inside: avoid; box-shadow: none; }
     .hdr-actions, #tip, .gp-close { display: none !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
@@ -1866,7 +1877,10 @@
             <div class="l1h">
               <div class="l1id"><span>${esc(p.manufacturer)}</span><span class="chip ${p.class === "pipeline" ? "pipeline" : ""}">${esc(p.classLabel)}</span></div>
               <div class="l1ctl"><span class="l1t">On pathway: ${onPathwayLong(p)}</span>
-                <button class="swv" type="button">Switch to pathway order</button></div>
+                <div class="swg" role="group" aria-label="Journey view">
+                  <button type="button" data-v="time" aria-pressed="true">Actual timeline</button>
+                  <button type="button" data-v="path" aria-pressed="false">Pathway order</button>
+                </div></div>
             </div>
             <div class="views">
               <div class="view" data-v="time">${journeyTime(p)}</div>
@@ -1874,7 +1888,7 @@
             </div>
             <div class="gatepanel" id="${esc(p.id)}-gate" hidden></div>
             ${p.flag ? `<div class="flagnote"><span>${esc(p.flag)}</span></div>` : ""}
-            <div class="l1f"><button class="more" type="button" aria-expanded="false" aria-controls="${esc(p.id)}-detail"><span class="more-t">More detail</span><span class="ch" aria-hidden="true">▾</span></button></div>
+            <button class="more" type="button" aria-expanded="false" aria-controls="${esc(p.id)}-detail"><span class="more-t">More detail</span><span class="ch" aria-hidden="true">▾</span></button>
         <div class="detail" id="${esc(p.id)}-detail">
           <div class="cards">
             <div class="card">
@@ -2116,13 +2130,24 @@
     prod.querySelector(".exp").setAttribute("aria-expanded", open ? "true" : "false");
     if (open) layoutJourney();
   }
-  function showView(prod, which) {
+  // One view for every row (30 Sep 2026): pick Pathway order on one medicine and
+  // every row shows it, including rows opened later. Closed rows are updated too;
+  // their rails have no size yet, so setL1() re-runs layoutJourney() on opening.
+  let journeyView = "time";
+  function showView(which) {
     closeCell();
-    prod.querySelectorAll(".view").forEach(v => { v.hidden = v.dataset.v !== which; });
-    prod.dataset.view = which;
-    prod.querySelector(".swv").textContent = which === "time" ? "Switch to pathway order" : "Back to timeline";
-    const active = prod.querySelector('.view[data-v="' + which + '"]');
-    if (!reduceMotion) { active.classList.add("fade-in"); void active.offsetHeight; active.classList.remove("fade-in"); }
+    journeyView = which;
+    board.querySelectorAll(".product").forEach(prod => {
+      const views = prod.querySelectorAll(".view");
+      if (!views.length) return;
+      views.forEach(v => { v.hidden = v.dataset.v !== which; });
+      prod.dataset.view = which;
+      prod.querySelectorAll(".swg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === which ? "true" : "false"));
+      if (!reduceMotion && prod.classList.contains("l1-open")) {
+        const active = prod.querySelector('.view[data-v="' + which + '"]');
+        active.classList.add("fade-in"); void active.offsetHeight; active.classList.remove("fade-in");
+      }
+    });
     if (which === "path") layoutJourney();
   }
   document.querySelectorAll(".exp").forEach(btn => {
@@ -2131,11 +2156,8 @@
       setL1(prod, !prod.classList.contains("l1-open"));
     });
   });
-  document.querySelectorAll(".swv").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const prod = btn.closest(".product");
-      showView(prod, prod.dataset.view === "path" ? "time" : "path");
-    });
+  document.querySelectorAll(".swg button").forEach(btn => {
+    btn.addEventListener("click", () => { if (btn.dataset.v !== journeyView) showView(btn.dataset.v); });
   });
   document.querySelectorAll(".more").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2378,7 +2400,7 @@
           // Glossary terms become focusable spans. Inside the product toggle that
           // would nest interactive content in a button — the exact thing the row
           // split removes. The same terms are still glossed in the detail panel.
-          if (parent.closest(".exp, .swv, .more, .smark")) return NodeFilter.FILTER_REJECT;
+          if (parent.closest(".exp, .swg, .more, .smark")) return NodeFilter.FILTER_REJECT;
           return NodeFilter.FILTER_ACCEPT;
         }
       });
