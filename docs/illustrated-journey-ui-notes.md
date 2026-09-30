@@ -666,7 +666,9 @@ Structure, per medicine:
 - **Level 2 ("More detail"):** the cards and milestone table that "View details"
   showed, now inside level 1. The gate drill-down still opens under the marker
   row, from either view.
-- First row (ALAQ, A-Z) starts open; the rest are closed.
+- All rows start closed. (The first row, ALAQ, started open until later the same
+  day, when Keith asked for it closed: the table is then about 300px and nothing
+  is chosen for the reader. `setL1()` is still the single place that opens a row.)
 
 Decisions and what was rejected:
 - **"Main barrier" is a new optional `barrier` field** in `data/products.js`
