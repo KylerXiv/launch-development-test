@@ -4,55 +4,41 @@
 <title>The Waiting Years</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+  /* Colours match the illustrated journey dashboard (30 Sep 2026), so the views
+     read as one product. That page is light-only by design, so this one no longer
+     switches to a dark theme with the OS setting. The map ramp is the dashboard's
+     too (registered teal, guidelines blue, MFT purple). */
   :root {
-    --ground: #F5F7F8; --surface: #FFFFFF; --surface-2: #EDF1F3;
-    --ink: #16303F; --ink-2: #4E6371; --ink-3: #7C8E99; --line: #D8E0E4;
-    --accent: #14657E; --accent-soft: #E3EEF2;
+    color-scheme: light;
+    --ground: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F7F8;
+    --ink: #16303F; --ink-2: #3F5564; --ink-3: #566A77; --line: #DCE3E7;
+    --accent: #0F5A72; --accent-soft: #E6F1F4;
     --good: #1E8A5A; --good-soft: #E2F2EA;
     --warn: #B87500; --warn-soft: #FBF0DA;
     --crit: #C0392B; --crit-soft: #FAE7E4;
     --idle: #9AA8B1; --idle-soft: #EEF1F3;
-    --map1: #5490A6; --map2: #055D76; --map3: #002A38;
-    --map-nodata: #FFFFFF; --map-border: #A8B5BD; --map-texture: rgba(255,255,255,.55);
+    --map1: #00929F; --map2: #3A559C; --map3: #5C245F;
+    --map-nodata: #FFFFFF; --map-border: #8299A2; --map-texture: rgba(255,255,255,.55);
     /* map roles — components use these; --mapN are the ramp primitives */
     --map-registered: var(--map1); --map-guidelines: var(--map2); --map-mft: var(--map3);
-    --shadow: 0 1px 2px rgba(22,48,63,.06), 0 4px 16px rgba(22,48,63,.07);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --ground: #101B22; --surface: #17252E; --surface-2: #1E3039;
-      --ink: #E7EEF2; --ink-2: #A9BBC5; --ink-3: #7C919D; --line: #2B404C;
-      --accent: #4FA8C3; --accent-soft: #1C3947;
-      --good: #47B983; --good-soft: #16352A;
-      --warn: #E0A63C; --warn-soft: #3A2E14;
-      --crit: #E06A5C; --crit-soft: #40201C;
-      --idle: #647883; --idle-soft: #22333C;
-      --map1: #3A8298; --map2: #5EB7D2; --map3: #C6F0FF;
-      --map-nodata: #17252E; --map-border: #395964; --map-texture: rgba(16,27,34,.55);
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
-    }
-  }
-  :root[data-theme="dark"] {
-    --ground: #101B22; --surface: #17252E; --surface-2: #1E3039;
-    --ink: #E7EEF2; --ink-2: #A9BBC5; --ink-3: #7C919D; --line: #2B404C;
-    --accent: #4FA8C3; --accent-soft: #1C3947;
-    --good: #47B983; --good-soft: #16352A;
-    --warn: #E0A63C; --warn-soft: #3A2E14;
-    --crit: #E06A5C; --crit-soft: #40201C;
-    --idle: #647883; --idle-soft: #22333C;
-    --map1: #3A8298; --map2: #5EB7D2; --map3: #C6F0FF;
-      --map-nodata: #17252E; --map-border: #395964; --map-texture: rgba(16,27,34,.55);
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.3);
+    --shadow: 0 1px 3px rgba(22,48,63,.07), 0 8px 24px rgba(22,48,63,.08);
+    --nav-pad: 24px; --nav-max: 1132px;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--ground); color: var(--ink);
     font: 16px/1.6 -apple-system, "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased; }
 
-  .top { max-width: 1180px; margin: 0 auto; padding: 22px 24px 0; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; }
-  .top .mark { font-weight: 750; color: var(--accent); letter-spacing: -.01em; }
-  .top a { color: var(--accent); font-size: 13px; }
+  .top { max-width: 1180px; margin: 0 auto; padding: 16px 24px 0; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
   .top .spacer { margin-left: auto; }
+  /* "Powered by" + the Unitaid logo, as on the illustrated journey: no plate,
+     border, shadow or hover, sitting directly on the page. */
+  .attrib { display: flex; justify-content: flex-end; }
+  .attrib a { display: flex; align-items: center; gap: 8px; padding: 2px 0; border-radius: 4px; text-decoration: none; }
+  .attrib a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .attrib .ptxt { font-size: 12.5px; line-height: 1.3; color: var(--ink-3); }
+  .attrib img { display: block; width: 112px; height: auto; }
+
   .proto { font-size: 11px; font-weight: 650; padding: 2px 9px; border-radius: 999px;
     background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
 
@@ -187,13 +173,13 @@
   }
 </style>
 
+<body>
+<script src="assets/site-nav.js" data-current="story"></script>
+
 <div class="top">
-  <span class="mark">LAUNCH</span>
   <span class="proto">Prototype — data presented here may not be accurate</span>
   <span class="spacer"></span>
-  <a href="index.html">Journey board (A)</a> <a href="option-b.html">Comparison matrix (B)</a>
-  <a href="illustrated-journey-dashboard.html">Illustrated journey</a>
-  <a href="pipeline.html">Pipeline poster</a>
+  <div class="attrib"><a href="https://unitaid.org" target="_blank" rel="noopener noreferrer"><span class="ptxt">Powered by</span><img src="assets/unitaid-logo.svg" alt="Unitaid" width="1200" height="418"></a></div>
 </div>
 
 <div class="hero">
@@ -217,8 +203,7 @@
        wherever one is stuck — so donors, ministries, manufacturers and WHO can act on
        delays instead of discovering them years later.</p>
     <div class="links">
-      <a href="index.html">Open the journey board (A)</a>
-      <a class="ghost" href="option-b.html">Comparison matrix (B)</a>
+      <a href="illustrated-journey-dashboard.html">Open the illustrated journey</a>
       <a class="ghost" href="pipeline.html">Pipeline poster</a>
     </div>
   </div>
