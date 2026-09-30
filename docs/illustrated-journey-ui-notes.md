@@ -774,6 +774,10 @@ suggested option was accepted.
 
 ### 3.20 The step panel: explanation band + a card per medicine (30 Sep 2026)
 
+> **Superseded the same day by 3.21:** the per-medicine cards and "Read more" were
+> removed. What survives from this section is the explanation band, the status
+> count pills and the removal of "Open in row".
+
 Keith asked to drop "Open in row" and redesign the panel. Reviewed as a published
 mock-up (two layouts, three options for the button); the suggested options were
 built.
@@ -802,6 +806,34 @@ built.
   click branch.
 - Not checked: tablet width, real devices. Verified in headless Chrome at desktop
   width: step 5 opens, ASPY's card expands, no script errors.
+
+### 3.21 The step panel explains; the summary table shows where (30 Sep 2026)
+
+Keith spotted that the per-medicine cards repeated the summary table's content.
+Checked: for a medicine's current stage they said the same thing, and the
+per-stage detail is already one click away (expand the row, click the marker).
+The panel was also about 500px tall, most of the scrolling this work set out to
+cut. Reviewed as a mock-up first; built as suggested.
+
+- **Panel:** explanation only (what happens, who decides, why it can stall,
+  source) plus the status-count pills. About 200px.
+- **Highlight:** opening a step lights that step's column in every summary row
+  (`highlightStep()`): a ring on the dot and a tinted band. Each journey column is
+  now a `.jcell` that stretches to the row height (negative block margin cancels
+  the row padding), so the lit cells read as one continuous column. Step 3 lights
+  both WHO dots, which share a column. The header's Journey cell shows the step
+  numbers 1-7 above the dots in the same cells, so the number on the strip lines
+  up with its column. Closing the panel clears it.
+- **What was lost, knowingly:** reading all four medicines' notes for one step side
+  by side. To compare, open the rows and click the stage marker. The status-count
+  pills are the only cross-section left. A middle option (list only the delayed or
+  in-progress medicines, one line each) was offered and not chosen.
+- **Removed:** `.gw-cards`, `.gw-card`, `.gw-more`, `.gw-tg` and the Read more click
+  branch. The old `.mp` WHO-pair bracket in the dots is kept inside each cell.
+- Checked in headless Chrome: step 5 and step 3 light 5 cells each (header plus
+  four rows), switching moves the highlight, no script errors. Not checked: tablet
+  width, real devices. On phones the journey sits on its own line and the
+  highlight is a short band per row, not a continuous column.
 
 ## 4. Newly discovered, deferred, or left alone
 
