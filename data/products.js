@@ -23,6 +23,12 @@
   // Flattened in order, stageColumns must equal every index in "stages"
   // exactly once, ascending — scripts/validate-data.js enforces this.
   //
+  // stageInfo: one plain-language explainer per stage, same order as "stages".
+  // Shown in the panel that opens when a step on the pathway strip is clicked
+  // (what happens there, who decides, why it can stall, where to check it).
+  // Written from docs/domain-primer.md section 2; draft wording, needs LAUNCH
+  // sign-off. Optional: without it the panel shows only where each medicine is.
+  //
 window.LAUNCH_DATA =
 {
   "meta": {
@@ -48,6 +54,16 @@ window.LAUNCH_DATA =
     { "stages": [5] },
     { "stages": [6] },
     { "stages": [7] }
+  ],
+  "stageInfo": [
+    {"what": "Lab discovery, then three rounds of human trials: first for safety, then for the right dose, then large efficacy trials across several countries. The trials alone usually take 3 to 6 years.", "who": "The manufacturer, often with a product development partnership such as MMV.", "stall": "Recruiting enough patients, and running trial sites in several countries.", "source": "Trial registries and manufacturer announcements"},
+    {"what": "A stringent regulator reviews the full evidence on quality, safety and effectiveness. For malaria medicines this is usually the European Medicines Agency (EMA) Article 58 procedure, which covers medicines meant for use outside Europe. Every later step builds on this opinion.", "who": "EMA, or another stringent regulator such as the US FDA.", "stall": "Preparing the full dossier, then waiting out the review.", "source": "EMA registers"},
+    {"what": "A WHO expert group weighs the clinical evidence and decides whether the medicine goes into the WHO Guidelines for malaria. Most countries follow these guidelines when writing their own.", "who": "WHO Global Malaria Programme and its Guidelines Development Group.", "stall": "The group meets on its own calendar, so the timing is hard to predict.", "source": "WHO Guidelines for malaria"},
+    {"what": "A separate WHO check of quality and manufacturing, including factory inspections. A place on the prequalified list is what lets UN agencies and the Global Fund buy the medicine. The product must first be invited through WHO's Expression of Interest (EOI) list.", "who": "WHO Prequalification Team.", "stall": "Waiting for an invitation round, then for inspections.", "source": "WHO prequalification list and EOI"},
+    {"what": "Each country's own regulator licenses the medicine before it can be sold or used there, usually one country at a time. Regional routes, such as the African Medicines Agency and WHO's collaborative registration (about 90 working days), are meant to speed this up.", "who": "National medicines regulators.", "stall": "Going country by country, each with its own queue.", "source": "National medicines registers"},
+    {"what": "The health ministry writes the medicine into the national treatment guidelines. These decide what health workers prescribe and what the public sector buys. A WHO recommendation does not automatically become national policy.", "who": "Ministries of health and national malaria programmes.", "stall": "National guideline committees meet rarely and follow their own schedules.", "source": "National treatment guidelines"},
+    {"what": "Someone has to pay. Funders and governments run tenders, agree reference prices and forecast demand. A medicine can be recommended, registered and in the guidelines and still be barely bought.", "who": "The Global Fund, the US President's Malaria Initiative, UNICEF and national governments.", "stall": "Financing cycles. Global Fund grants, for example, run for three years.", "source": "Global Fund price and quality reporting, PMI"},
+    {"what": "Getting the medicine from the port to the health facility, training health workers, and watching for side effects once it is in use.", "who": "Governments and implementing partners.", "stall": "Supply chain readiness and health-worker training.", "source": "Manufacturer and programme communications"}
   ],
   "glossary": {
     "ACT": "Artemisinin-based combination therapy — the standard class of malaria treatments pairing an artemisinin derivative with a longer-acting partner drug.",

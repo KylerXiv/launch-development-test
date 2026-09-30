@@ -166,6 +166,25 @@ sentence. Add any acronym you introduce in a note.
 | `stages` | array[8] | See below. |
 | `detail` | object | See below. |
 
+### Stage explainers (`stageInfo`)
+
+A top-level list, one entry per stage in the same order as `stages`, read by the
+panel that opens when someone clicks a step on the pathway strip. Each entry has
+four plain strings:
+
+| Field | What to write |
+| --- | --- |
+| `what` | Two or three sentences on what happens at this step, in words a non-specialist follows. |
+| `who` | Who runs or decides it. |
+| `stall` | The usual reason it takes longer than expected. |
+| `source` | Where a reader can check it (a register or publication name, not a URL). |
+
+It describes the step in general, not any one medicine; per-medicine status and
+notes come from each product's `stages` entry. Optional, but if present it must
+have exactly one entry per stage with all four strings (the validator checks
+this). The current wording is a first draft from `docs/domain-primer.md` and needs
+sign-off from LAUNCH before it is treated as final.
+
 ### Stage entry
 
 `{ status, note, date, next, nextDate, source?, asOf? }` — `note` is the
