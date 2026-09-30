@@ -37,7 +37,7 @@ existed. Do not treat it as precedent.
 | `illustrated-journey-dashboard.html` | the page; all UI below lives here |
 | `assets/journey-icons/icons-solid.js` | filled stage-marker glyphs, **this page only** |
 | `assets/who-emblem.svg` | WHO emblem, mark only, permission-gated — see §3.1 |
-| `assets/unitaid-mark.svg` | Unitaid bird, extracted from the official lockup |
+| `assets/unitaid-logo.svg` | full Unitaid logo (bird + wordmark), copy of `unitaid/assets/unitaid-logo.svg`; replaced the bird-only `unitaid-mark.svg` (sheet row 11) |
 | `assets/report-issue.js` | shared by nine pages; gained a `COPY` override seam |
 | `data/products.js` | changelog entries gained an optional `plain` field |
 | `docs/data-analyst-guide.md` | documents that `plain` field |
@@ -59,7 +59,7 @@ how much they change what a reader sees:
    detail.
 5. Stage markers redrawn as a filled set, with the WHO emblem on the
    guidelines gate.
-6. "Powered by" + the Unitaid mark, top right.
+6. "Powered by" + the full Unitaid logo, top right.
 7. Sources footer became a list of named links to each official register.
 8. "Subscribe for more information" button — front end only.
 9. The summary strip became an explicit **portfolio** summary and dropped

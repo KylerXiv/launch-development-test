@@ -62,8 +62,8 @@
      reads as part of that right-aligned column rather than floating loose
      in the corner — one card, one link, rather than plain text beside a
      plated logo, so the shadow reads as belonging to the whole attribution,
-     not just the mark. The name is not written out — the mark carries it,
-     so the mark's alt text is what says "Unitaid". */
+     not just the mark. The full lockup (bird + wordmark) is used, so the
+     name is carried by the logo itself. */
   .attrib { display: flex; justify-content: flex-end; margin-bottom: 10px; }
   .attrib a {
     display: flex; align-items: center; gap: 8px;
@@ -76,7 +76,7 @@
   .attrib a:hover { box-shadow: 0 2px 4px rgba(22,48,63,.14), 0 8px 22px rgba(22,48,63,.12); transform: translateY(-1px); }
   .attrib a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .attrib .ptxt { font-size: 12.5px; line-height: 1.3; color: var(--ink-3); }
-  .attrib img { display: block; width: 40px; height: auto; }
+  .attrib img { display: block; width: 112px; height: auto; }
   .brand h1 { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.01em; }
   .brand h1 span { color: var(--accent); }
   .brand h1 span.proto-badge {
@@ -1053,7 +1053,7 @@
       <div class="attrib">
         <a href="https://unitaid.org" target="_blank" rel="noopener noreferrer">
           <span class="ptxt">Powered by</span>
-          <img src="assets/unitaid-mark.svg" alt="Unitaid" width="388" height="251">
+          <img src="assets/unitaid-logo.svg" alt="Unitaid" width="1200" height="418">
         </a>
       </div>
       <span id="updated"></span><span id="meta-note"></span>
