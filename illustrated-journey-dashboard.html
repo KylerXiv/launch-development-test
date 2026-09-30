@@ -490,7 +490,6 @@
     transition: box-shadow .12s ease, transform .12s ease;
   }
   .stage .smark:hover { transform: translateY(-1px); }
-  .stage .smark[aria-expanded="true"] { box-shadow: 0 0 0 3px var(--accent); }
   .stage .smark:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .stage .sicon { width: 26px; height: 26px; display: block; }
   /* Reached gates all share the icon row's blue (matching the WHO emblem,
@@ -501,10 +500,18 @@
      amber/red pastels read as a clash next to a blue icon, so in-progress and
      delayed go neutral instead — the corner badge alone still carries amber
      or red clearly. */
-  .stage.s-done .smark { background: var(--good-soft); color: var(--journey-icon); }
+  /* Every marker carries a ring in its own status colour (30 Sep 2026): complete
+     green, in progress amber, delayed red, not started grey. --ring is that
+     colour and --ring-soft its tint; the selected ring and the current-stage
+     glow below both read them, so neither introduces a second colour. */
+  .stage.s-done { --ring: var(--good); --ring-soft: var(--good-soft); }
+  .stage.s-prog { --ring: var(--warn); --ring-soft: var(--warn-soft); }
+  .stage.s-late { --ring: var(--crit); --ring-soft: var(--crit-soft); }
+  .stage.s-idle { --ring: var(--idle); --ring-soft: var(--idle-soft); }
+  .stage.s-done .smark { background: var(--good-soft); color: var(--journey-icon); border: 2px solid var(--good); }
   .stage.s-prog .smark { background: var(--surface-2); color: var(--journey-icon); border: 2px solid var(--warn); }
   .stage.s-late .smark { background: var(--surface-2); color: var(--journey-icon); border: 2px solid var(--crit); }
-  .stage.s-idle .smark { background: none; border: 1px dashed var(--line); opacity: .55; }
+  .stage.s-idle .smark { background: none; border: 1.5px dashed var(--idle); opacity: .65; }
   /* The WHO emblem can't take the idle grey tint the other glyphs get from
      `color` — it's an image with WHO's own fixed blue (assets/who-emblem.svg),
      not a currentColor stroke. Left alone it reads as active/blue against
@@ -514,7 +521,10 @@
   .stage.s-idle .whoemb { filter: grayscale(1) opacity(.8); }
   .stage .smark .dot { position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; font-size: 9.5px; box-shadow: 0 0 0 2px var(--surface); cursor: help; }
   .stage.s-idle .smark .dot { display: none; }
-  .stage.cur .smark { box-shadow: 0 0 0 4px var(--accent-soft); }
+  .stage.cur .smark { box-shadow: 0 0 0 4px var(--ring-soft); }
+  /* selected: a 3px ring in the status colour with a 2px gap, so it cannot clash
+     with the marker's own border (it used to be teal whatever the status) */
+  .stage .smark[aria-expanded="true"], .stage.cur .smark[aria-expanded="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 5px var(--ring); }
   /* always-on badge marking every stage marker as clickable, not just on hover —
      top-right so it doesn't collide with the status .dot at bottom-right */
   .stage .smark::after {
