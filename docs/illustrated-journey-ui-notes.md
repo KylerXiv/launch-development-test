@@ -522,6 +522,18 @@ Measured rather than eyeballed: `--ink-3` (#7C8E99) was **3.15:1** on the panel'
   picks up the darker colours but not larger sizes. Vertical spacing is sheet
   rows 18 + 20, a separate change.
 
+### 3.15 The Unitaid badge is flat: no plate, shadow, border or hover (row 11 follow-up, 30 Sep 2026)
+
+Requested by Keith after the full logo landed: the badge should blend into the
+page. Removed the white plate, the two-layer shadow, the hover lift and the
+transition. The earlier comment said the white plate was deliberate, to give the
+logo's dark navy a fixed backdrop "independent of this page's theme tokens" -
+that reasoning only matters if the page background can change. It is light-only
+(`--ground` #FFFFFF, `color-scheme: light`), so the logo's navy already has the
+backdrop it needs. **If a dark theme is ever added, this badge needs a plate
+again.** Kept deliberately: the `:focus-visible` outline, since removing it would
+make the link invisible to keyboard users; that is focus, not hover.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
