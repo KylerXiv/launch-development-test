@@ -61,7 +61,8 @@ how much they change what a reader sees:
    guidelines gate.
 6. "Powered by" + the full Unitaid logo, top right.
 7. Sources footer became a list of named links to each official register.
-8. "Subscribe for more information" button — front end only.
+8. "Subscribe for more information" button — front end only until 1 Oct
+   2026, now connected (§3.10).
 9. The summary strip became an explicit **portfolio** summary and dropped
    "bottleneck" for "access barrier" (client feedback, 10 Sep 2026 — §3.12).
 
@@ -272,6 +273,18 @@ browser."* A standing note says the same before anyone types.
 The one thing this page cannot do is claim "you are subscribed" with no list to
 join. One seam, `subscribeEmail()`, mirrors the pattern `report-issue.js`
 already uses; addresses are held in `window.LAUNCH_SUBSCRIBERS` in memory only.
+
+**Superseded 1 Oct 2026: Subscribe is connected.** `subscribeEmail()` now
+posts to `api/subscribe.js`, which saves the address as a Resend contact and
+tells the team inbox. The principle above held, and decided the wording:
+*"Thank you — you are on the list."* shows only after the server confirms the
+contact was saved. Any failure, including an unconfigured server, shows
+*"Sorry — we could not add you just now…"* and leaves the address in the field
+for a retry. The button shows *Sending…* while in flight. Its 10 Sep click
+block is removed, and the red "Mock only" `.sub-note` is now a muted privacy
+line. `LAUNCH_SUBSCRIBERS` is gone. Send feedback is unchanged: still a mock,
+Send still blocked, red flag still in its dialog. Why a Resend contact and not
+a notify-us email: [email-backend-notes.md](email-backend-notes.md) §2.
 
 ### 3.11 The draft warning is amber, and leads with the caveat
 
@@ -1212,7 +1225,7 @@ Nothing in the data model needs to change for either.
 | changelog `plain` fields | §3.7 and `docs/data-analyst-guide.md` |
 | the hover peek or the click panel | §3.8 |
 | the sources footer or any source URL | §3.9 |
-| wiring a subscribe backend | §3.10 — replace the seam, note the provider |
+| the subscribe backend (`api/`) | §3.10 here for what the visitor sees; decisions in [email-backend-notes.md](email-backend-notes.md) |
 | the draft/dataStatus banner | §3.11 |
 | the summary strip's KPIs, or "access barrier" wording | §3.12 |
 | the parallel-gate fork, or the legend strip's pair alignment | §3.13, plus §4 if the row-band grid or the strip's bracket moves |
