@@ -534,6 +534,36 @@ backdrop it needs. **If a dark theme is ever added, this badge needs a plate
 again.** Kept deliberately: the `:focus-visible` outline, since removing it would
 make the link invisible to keyboard users; that is focus, not hover.
 
+### 3.16 The header is three rows: identity, description, status + actions (30 Sep 2026)
+
+Requested by Keith as part of the compact-layout work (sheet rows 18 + 20). The
+old header was a brand column on the left and a `.meta` column on the right that
+stacked the logo, the date and both buttons, leaving the middle empty.
+
+- Row 1: title + Prototype pill (left), "Powered by" Unitaid logo (right).
+- Row 2: description, full width.
+- Row 3: "Last updated ... Draft" (left), Download CSV + Subscribe (right).
+- Header is about 150px tall against about 210px before; the draft banner under
+  it was slimmed (padding 12/16 -> 7/14, lead text 14 -> 13.5px, margins
+  18/20 -> 14/18) and keeps its amber colour and "do not quote" wording.
+- Description cap is `160ch`, chosen after 120ch looked short on a 1400px
+  screen (two lines with a quarter of the row empty). The text is about 190
+  characters, so it is one line from roughly 1330px and two lines below that. The
+  cap exists so a 1900px+ screen does not get one 200-character line.
+- Phone keeps the same order: title wraps at 20px with the logo (72px) top-right,
+  pill drops under the title, "Powered by" text is hidden (too small to help),
+  date on its own line, then the two buttons share a row at equal width.
+  Rejected: stacking everything into one column, which was the first suggestion;
+  Keith preferred the same structure on phones.
+- Removed: the `.brand` and `.meta` wrappers and the 1180px rule that
+  left-aligned them. The Subscribe dropdown used to flip to the left edge at 1180;
+  the actions now stay right-aligned at every width above the phone breakpoint, so
+  that flip went too. On phones the dropdown spans the button row as before.
+- The ids (`#updated`, `#meta-note`, `#dl-csv`, `#sub-open`, `#subwrap`) are
+  unchanged, so no script edits were needed.
+- Checked in headless Chrome at 1400, 820 and 390px; not checked with the
+  Subscribe dropdown open, and not on a real phone.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
