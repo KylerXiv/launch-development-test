@@ -1048,7 +1048,7 @@
     </div>
     <p class="hd-desc">Illustrated journey view — tracking new antimalarial medicines from research and development to market access — where each product stands, its access barriers, and opportunities to overcome them.</p>
     <div class="hd-bar">
-      <div class="hd-status"><span id="updated"></span><span id="meta-note"></span></div>
+      <div class="hd-status"><span id="updated"></span></div>
       <div class="hdr-actions">
         <button class="dl-btn" id="dl-csv" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v7.5M4.75 6.75 8 10l3.25-3.25M2.5 13h11"/></svg> Download CSV</button>
         <button class="sub-btn" id="sub-open" type="button" aria-expanded="false" aria-controls="subwrap"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.75" y="3.25" width="12.5" height="9.5" rx="1.5"/><path d="m2.25 4.6 5.05 3.85a1.15 1.15 0 0 0 1.4 0L13.75 4.6"/></svg> Subscribe for updates</button>
@@ -1321,10 +1321,9 @@
     banner.innerHTML = BANNERS[status];
     banner.classList.add(status);
   }
-  document.getElementById("meta-note").textContent =
-    status === "live" ? " · Data confirmed by manufacturers for public release"
-    : status === "draft" ? " · Draft — figures not yet verified"
-    : " · " + status + " data";
+  // The status suffix that used to follow the date ("Draft — figures not yet
+  // verified" etc.) was removed by request, 30 Sep 2026: the row shows the date
+  // only. The draft caveat still lives in the banner and the Prototype pill.
 
   // changelog
   const updates = DATA.changelog || [];
