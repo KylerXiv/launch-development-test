@@ -114,6 +114,23 @@ if (data.stageColumns !== undefined) {
   }
 }
 
+// ---- stageInfo ---------------------------------------------------------------
+// Optional plain-language explainer per stage, same order as stages[]. Shown in
+// the panel a click on a pathway step opens. Every entry needs its four strings
+// so the panel never renders a half-empty block.
+if (data.stageInfo !== undefined) {
+  if (!Array.isArray(data.stageInfo) || data.stageInfo.length !== nStages) {
+    err(`stageInfo: must be an array with one entry per stage (${nStages}), got ${Array.isArray(data.stageInfo) ? data.stageInfo.length : typeof data.stageInfo}`);
+  } else {
+    data.stageInfo.forEach((si, i) => {
+      ["what", "who", "stall", "source"].forEach((k) => {
+        if (!si || typeof si[k] !== "string" || !si[k].trim())
+          err(`stageInfo[${i}] (${data.stages[i]}): "${k}" must be a non-empty string`);
+      });
+    });
+  }
+}
+
 // ---- products ----------------------------------------------------------------
 if (!Array.isArray(data.products) || data.products.length === 0) {
   err("products: must be a non-empty array");
