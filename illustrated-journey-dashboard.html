@@ -211,10 +211,11 @@
     margin-bottom: calc(-1 * var(--pg-lift, 0px));
   }
   .pathgroup .pathnode { flex: none; min-width: 0; width: 100%; }
-  .pathgroup-note {
-    display: block; font-size: 9.5px; font-style: italic; letter-spacing: .01em;
-    color: var(--ink-3); line-height: 1.15; margin: 1px 0 2px; padding: 0 2px;
-  }
+  /* Empty spacer between the two parallel gates. It used to read "no fixed
+     order" (removed 30 Sep 2026: the heading line and the bracket say it); the
+     element stays so the pair keeps a gap and alignPathGroup() still measures
+     the same structure. */
+  .pathgroup-note { display: block; min-height: 8px; margin: 1px 0 2px; padding: 0 2px; }
 
   /* ---------- journey table (sheet rows 18/20, 30 Sep 2026) ----------
      One summary row per medicine, A-Z. Level 1 (the chevron) opens that
@@ -1778,7 +1779,7 @@
     if (col.stages.length === 1) return pathNodeHtml(col.stages[0], false);
     const names = col.stages.map(i => STAGES[i]).join(" and ");
     return `<span class="pathgroup" role="group" aria-label="${esc(names)} — independent approvals with no defined order between them">` +
-      col.stages.map(i => pathNodeHtml(i, true)).join(`<span class="pathgroup-note" aria-hidden="true">no fixed order</span>`) +
+      col.stages.map(i => pathNodeHtml(i, true)).join(`<span class="pathgroup-note" aria-hidden="true"></span>`) +
       `</span>`;
   }).join(`<span class="patharrow" aria-hidden="true">→</span>`);
 
@@ -1825,7 +1826,7 @@
       return `<div class="${cls}" role="group" aria-label="${esc(names)} — independent approvals, no defined order between them">` +
         `<svg class="forkline" preserveAspectRatio="none" aria-hidden="true" focusable="false"></svg>` +
         col.stages.map((i, n) => stageUnitHtml(i, n === 0 ? "sg-top" : "sg-bottom"))
-          .join(`<div class="stagegroup-note" aria-hidden="true">no fixed order</div>`) +
+          .join(`<div class="stagegroup-note" aria-hidden="true"></div>`) +
         `</div>`;
     }).join("");
 
