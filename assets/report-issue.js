@@ -19,9 +19,13 @@
  *  that is how a per-row "report an issue with this product" link would hook
  *  in later, with no change to this file.
  *
- *  A page may retitle the whole widget by setting window.LAUNCH_FEEDBACK_COPY
- *  to an object of overrides BEFORE this script tag — see the COPY block below
- *  for the keys. The illustrated journey page runs it as "Send feedback".
+ *  Every page runs it as "Send feedback". A page gives it wording that fits
+ *  what it shows by setting window.LAUNCH_FEEDBACK_COPY to an object of
+ *  overrides BEFORE this script tag; only the keys given change, see the COPY
+ *  block below. Two further keys are not wording: `view` (a short id such as
+ *  "pipeline", sent as page.view so a report says which view it came from) and
+ *  `connected` (true once the seam below posts to a real endpoint; until then
+ *  the Send button is disabled and the dialog says so in red).
  *
  *  ── WIRING A REAL BACKEND ───────────────────────────────────────────────
  *  There is exactly one seam: submitIssueReport() immediately below. Replace
@@ -32,7 +36,7 @@
  *
  *  Payload it receives:
  *    { type, productId, productName, message, name, email, organisation,
- *      page: { url, path, title },
+ *      page: { url, path, title, view },
  *      data: { lastUpdated, dataStatus },
  *      submittedAt, userAgent }
  */
@@ -121,6 +125,7 @@
     '.ri-field.is-bad .ri-err{display:block}',
     '.ri-field.is-bad .ri-input,.ri-field.is-bad .ri-textarea{border-color:var(--crit)}',
     '.ri-note{margin:0 0 14px;font-size:11.5px;color:var(--ink-3);line-height:1.5}',
+    '.ri-note.ri-mock{color:var(--crit,#C0392B);font-weight:700}',
     '.ri-alert{display:none;margin:0 0 14px;padding:10px 12px;border-radius:8px;',
     'border:1px solid var(--crit);background:var(--crit-soft);color:var(--crit);',
     'font-size:12.5px;font-weight:600}',
@@ -157,9 +162,9 @@
   ].join("");
 
   var TYPES = [
-    ["correction", "A data point looks wrong"],
-    ["source",     "A source is missing, broken or out of date"],
-    ["suggestion", "Suggestion or feature request"],
+    ["correction", "Something on the page looks wrong"],
+    ["source",     "A source is missing or out of date"],
+    ["suggestion", "An idea for making this clearer or more useful"],
     ["other",      "Something else"]
   ];
   // Same four values, relabelled per page via COPY.types below — the value is
@@ -173,26 +178,22 @@
    *  widget as "Send feedback".
    */
   var COPY = {
-    pill:        "Report an issue",
-    title:       "Report an issue",
-    intro:       "Spotted a figure that looks wrong, a source we have missed, or something " +
-                 "that could work better? Tell the LAUNCH team.",
-    typeLabel:   "What kind of issue is it?",
-    messageLabel:"What is wrong, and what should it say?",
+    pill:        "Send feedback",
+    title:       "Send feedback",
+    intro:       "Something look wrong, out of date, or hard to follow? Tell the LAUNCH team what you're seeing.",
+    typeLabel:   "What is your feedback about?",
+    messageLabel:"What would you like to tell us?",
     messagePlaceholder:
-                 "e.g. Country registration for ALAQ shows Tanzania as pending, but TMDA " +
-                 "listed it on 12 June 2026 — register entry TZ/…",
-    note:        "An email address is only used to come back to you about this report. We also " +
-                 "record which page you are on and the version of the data you are looking at, " +
-                 "so the team can trace what you saw.",
-    submit:      "Send report",
-    sending:     "Sending…",
-    failed:      "Sorry — that report could not be sent just now. Please try again in a moment.",
-    doneTitle:   "Thank you — your report has been received.",
-    doneMessage: "The LAUNCH data team reviews reports alongside the regular source scan. " +
-                 "Corrections that check out against a public source are applied in the next " +
-                 "data update, and appear in <em>Recent updates</em>.",
-    again:       "Report something else"
+                 "e.g. A date on this page looks out of date: the source I checked gives a newer one.",
+    note:        "Mock only \u2014 Send feedback isn't connected yet.",
+    submit:      "Send feedback",
+    sending:     "Sending\u2026",
+    failed:      "Sorry \u2014 your feedback could not be sent just now. Please try again in a moment.",
+    doneTitle:   "Thanks \u2014 though this isn't sent anywhere yet.",
+    doneMessage: "This form has no inbox behind it yet, so nothing was actually sent \u2014 your note stayed in " +
+                 "this browser tab. Once it is connected, the LAUNCH team will read every message, and where " +
+                 "you have pointed us to a public source that checks out, we correct the data at the next update.",
+    again:       "Send more feedback"
   };
   (function (over) {
     if (!over) return;
@@ -205,6 +206,9 @@
       });
     }
   })(window.LAUNCH_FEEDBACK_COPY);
+  var FB = window.LAUNCH_FEEDBACK_COPY || {};
+  var CONNECTED = FB.connected === true;        // no endpoint yet, so false everywhere today
+  var VIEW = typeof FB.view === "string" && FB.view ? FB.view : null;
 
   /* ── helpers ───────────────────────────────────────────────────────── */
 
@@ -424,6 +428,15 @@
     open(t);
   });
 
+  // Until an endpoint exists the Send button is inert, exactly as it was on the
+  // illustrated journey: the click is blocked (not the submit handler) so the
+  // button keeps its normal look and the red note is the one explanation.
+  if (!CONNECTED) {
+    btnSend.setAttribute("aria-disabled", "true");
+    btnSend.addEventListener("click", function (e) { e.preventDefault(); });
+    dlg.querySelector(".ri-note").classList.add("ri-mock");
+  }
+
   /* ── submit ────────────────────────────────────────────────────────── */
 
   form.addEventListener("submit", function (e) {
@@ -440,7 +453,7 @@
       name: inName.value.trim() || null,
       email: inMail.value.trim() || null,
       organisation: inOrg.value.trim() || null,
-      page: { url: location.href, path: location.pathname, title: document.title },
+      page: { url: location.href, path: location.pathname, title: document.title, view: VIEW },
       data: { lastUpdated: meta.lastUpdated || null, dataStatus: meta.dataStatus || null },
       submittedAt: new Date().toISOString(),
       userAgent: navigator.userAgent

@@ -27,7 +27,7 @@ upgrade, or break.
 | `story.html` | Scroll-driven data story. Steps (left) drive a sticky layered visual (right) via IntersectionObserver (guarded — no IO means step 0 stays active). Every figure is derived from the data at render time — the hero product is `pyramax` falling back to the first `market` product, the headline gap is computed from its `journey`, so the narrative self-updates. Count-up respects `prefers-reduced-motion`. |
 | `widget.html` | Embeddable one-row product tracker for partner sites (`?product=<id or name>`). Dependency-free; reads the same data file. |
 | `data/products.js` | The data contract: `window.LAUNCH_DATA = { …strict JSON… }`. The only file analysts touch; **feeds all three pages**. |
-| `assets/report-issue.js` | The **Report an issue / contact** front end (DEV-04): floating pill, footer link and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. No backend yet; see §9c. |
+| `assets/report-issue.js` | The **Send feedback** front end (DEV-04; called "Report an issue" until 30 Sep 2026): floating pill and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. No backend yet; see §9c. |
 | `data/world-map.js` | Generated geometry: `window.LAUNCH_MAP = { w, h, countries: { ISO3: { n, d } } }`. Natural Earth 110m, public domain. Committed output — regenerate with `scripts/build-map.js`, never hand-edit. |
 | `history/` | Dated snapshots of the data file, bot-committed by `publish.yml` on every data change. Append-only; the raw material for future trend charts and playback. |
 | `feed.xml` | RSS 2.0 feed of changelog entries, bot-rebuilt by `publish.yml`. |
@@ -289,10 +289,10 @@ Widget indices are position-based — keep the sidebar's control order stable
 toggle) or update the tests. `launch_data.py` has no Streamlit imports, so its
 loaders/builders are testable with plain `python -c`.
 
-## 9c. The "Report an issue" form (DEV-04)
+## 9c. The "Send feedback" form (DEV-04)
 
 `assets/report-issue.js` is the whole feature: one dependency-free file that
-injects its own styles, the floating **Report an issue** pill and the modal
+injects its own styles, the floating **Send feedback** pill and the modal
 dialog. Every dashboard page includes it with a single line before end of file
 (`<script src="assets/report-issue.js" defer></script>`) and carries a matching
 footer link. Nothing else in the pages knows about it, so it can be dropped or
@@ -305,6 +305,18 @@ A trigger may carry `data-product="<id>"` to preselect the medicine — that is
 the hook for a per-row "report an issue with this product" link, with no change
 to the component. The product dropdown is built from `LAUNCH_DATA.products` at
 open time, so it never drifts from the board.
+
+**Wording and page context.** Every page shows the same widget, called "Send
+feedback" (the default wording used to be "Report an issue"). A page fits it to
+what it shows by setting `window.LAUNCH_FEEDBACK_COPY` *before* the script tag;
+only the keys given change (see the `COPY` block for the strings, and `types` for
+the four dropdown labels, whose *values* are fixed because a backend keys on
+them). Two keys are not wording: `view`, a short id such as `"pipeline"` that is
+sent as `page.view` so a report says which view it came from, and `connected`.
+Until `connected: true` is set (when `submitIssueReport()` posts to a real
+endpoint) the Send button is disabled and the dialog says "Mock only" in red.
+The illustrated journey, Pipeline and Story each set `view`, an intro and an
+example message in their own terms.
 
 **There is no backend.** The static-site architecture (§1) has nowhere to POST
 to, so the form validates, then reports success from the browser: the report is
