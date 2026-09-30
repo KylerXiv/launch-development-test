@@ -568,6 +568,17 @@ stacked the logo, the date and both buttons, leaving the middle empty.
   note the suffix was the only place the page said `live` data was "confirmed by
   manufacturers for public release"; if the dataset ever goes `live`, that line
   is gone and nothing replaces it. The other pages keep `#meta-note`.
+- Follow-up, same day: at about 1800px the 160ch cap left "them." alone on a
+  second line. Fixed with `text-wrap: balance` and a 120ch cap, and the
+  "Illustrated journey view -" lead-in was dropped at Keith's request, so the copy
+  now starts "Tracking new antimalarial medicines ...". Rejected: a bold
+  accent-coloured lead-in (Keith chose to remove it), a tinted callout strip
+  (about 20px taller and competes with the amber banner), and rewording the copy
+  to fit one line (an editorial change, not asked for). `text-wrap: balance`
+  is ignored by browsers older than Chrome 114 / Safari 17.5 / Firefox 121, which
+  fall back to ordinary wrapping, so the orphan can still appear there.
+  Balancing alone put the em dash at the start of line 2, so it is bound to the
+  preceding word with a non-breaking space.
 - Checked in headless Chrome at 1400, 820 and 390px; not checked with the
   Subscribe dropdown open, and not on a real phone.
 
