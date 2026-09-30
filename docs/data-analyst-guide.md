@@ -162,6 +162,7 @@ sentence. Add any acronym you introduce in a note.
 | `classLabel` | string | The chip text under the name. |
 | `currentStage` | integer 0–7 | Index of the highlighted stage. |
 | `flag` | string or `null` | The red sentence under the row. Required if any stage is `late`; keep it to one factual sentence with dates. |
+| `barrier` | string (optional) | A short phrase (about 8 words) for the "Main barrier" column of the illustrated journey table. Write it to stand alone without the row's other columns. Omit it when the product has no `flag`; if it is missing but a `flag` exists, the table shows the full flag sentence clipped. |
 | `stages` | array[8] | See below. |
 | `detail` | object | See below. |
 

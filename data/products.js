@@ -186,6 +186,7 @@ window.LAUNCH_DATA =
       "phase": "access",
       "currentStage": 5,
       "flag": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
+      "barrier": "National guideline inclusion is limited",
       "stages": [
         { "status": "done", "note": "Development complete (Shin Poong / MMV co-development)", "date": "", "next": "", "nextDate": "", "source": "MMV", "asOf": "2026-08-14" },
         { "status": "done", "note": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); label updated 2025 to include treatment of pregnant women (EMA outcome 5 Jun 2025; announced 31 Jul 2025)", "date": "2012 (label update 2025)", "next": "", "nextDate": "", "source": "EMA EU-M4all opinions table; MMV, 31 Jul 2025", "asOf": "2026-08-22" },
@@ -268,6 +269,7 @@ window.LAUNCH_DATA =
       "phase": "access",
       "currentStage": 6,
       "flag": "Procurement is the current access barrier — 0.9–4.5% of Global Fund antimalarial spend 2022–24 despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
+      "barrier": "Only 0.9–4.5% of Global Fund spend, 2022–24",
       "stages": [
         { "status": "done", "note": "Development complete", "date": "", "next": "", "nextDate": "", "source": "MMV", "asOf": "2026-08-14" },
         { "status": "done", "note": "EMA approval (Eurartesim)", "date": "2011", "next": "", "nextDate": "", "source": "EMA register", "asOf": "2026-08-14" },
