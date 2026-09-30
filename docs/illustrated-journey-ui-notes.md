@@ -496,6 +496,32 @@ bar to butt against, only an arrow that stops short of it.
 
 ---
 
+### 3.14 Contrast and type size in the detail and gate panels (sheet rows 15 + 17, 30 Sep 2026)
+
+Reviewer: the Detail section's light-grey background and grey text were hard to
+read, and the medication sections' type was small and pale.
+
+Measured rather than eyeballed: `--ink-3` (#7C8E99) was **3.15:1** on the panel's
+`--surface-2` (#F4F7F8) and 3.39:1 on white; AA body text needs 4.5:1. Changed:
+
+- `--ink-3` -> #566A77 (5.24:1 on surface-2) and `--ink-2` -> #3F5564 (7.24:1).
+  Both moved, not just ink-3, because #4E6371 and a darkened ink-3 would have
+  been near-identical and the three-step hierarchy would have collapsed. This is
+  page-wide (41 uses of ink-3), which was the intent: the same pale grey was the
+  problem everywhere, and fixing it only inside `.detail` left it low-contrast
+  in the changelog, footer and timeline labels.
+- Rejected: only recolouring `.detail`'s background to white. Cards inside it are
+  already white, so the panel would lose its visible edge, and the text colour
+  was the larger half of the problem.
+- `.gatepanel` (the drill-down the sheet calls the Detail section) is now white
+  with a `--ink-3` border instead of `--surface-2`/`--line`; body text moved from
+  ink-2 to ink.
+- Sizes: card body/list/kv 13.5 -> 15px, card sub 12.5 -> 14, table 13 -> 14.5,
+  headings/labels and provenance 10.5-11.5 -> 12-12.5, gate note 13.5 -> 15.
+- Not changed: timeline SVG text (9.5-11px, set in user units inside the SVG)
+  picks up the darker colours but not larger sizes. Vertical spacing is sheet
+  rows 18 + 20, a separate change.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
