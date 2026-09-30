@@ -57,6 +57,13 @@
       "fr": "État d’avancement des voies d’accès aux nouveaux médicaments antipaludiques — étapes, jalons, accès par pays et approvisionnement — avec provenance de sources publiques pour chaque figure.",
       "pt": "Situação das vias de acesso a novos medicamentos antimaláricos — etapas, marcos, acesso por país e aquisição — com informação de fontes públicas sobre cada dado."
     },
+    "067f9f108ad6bf6f": {
+      "en": "Nine PQ'd presentations across three manufacturers (Alfasigma, Guilin, Beijing Holley) — supply security via diversity",
+      "where": "products.products[3].detail.access[0]",
+      "bucket": "data",
+      "fr": "Neuf présentations préqualifiées (PQ) auprès de trois fabricants (Alfasigma, Guilin, Beijing Holley) — sécurité d’approvisionnement par la diversité",
+      "pt": "Nove apresentações pré-qualificadas (PQ) de três fabricantes (Alfasigma, Guilin, Beijing Holley) — segurança do abastecimento pela diversidade"
+    },
     "07e9ffda646ae720": {
       "en": "Pre-submission dialogue",
       "where": "products.products[0].detail.milestones[2].next",
@@ -539,6 +546,13 @@
       "bucket": "data",
       "fr": "Sénégal",
       "pt": "Senegal"
+    },
+    "368e55377d8c2ac7": {
+      "en": "First-line in several SE Asian countries; consideration in African MFT strategies growing; verified country counts pending",
+      "where": "products.products[3].stages[5].note",
+      "bucket": "data",
+      "fr": "Traitement de première intention dans plusieurs pays d’Asie du Sud-Est ; prise en compte croissante dans les stratégies MFT africaines ; décompte vérifié des pays en attente",
+      "pt": "Primeira linha em vários países do Sudeste Asiático; consideração crescente nas estratégias MFT africanas; contagem verificada de países pendente"
     },
     "37009d07e34663ef": {
       "en": "National policy adoption",
@@ -2366,6 +2380,13 @@
       "bucket": "data",
       "fr": "Bhoutan",
       "pt": "Butão"
+    },
+    "d8d25752df253a3f": {
+      "en": "Nine PQ'd presentations across three manufacturers — Alfasigma (2015, requal. Jan 2025), Guilin (2019–2020, incl. dispersible paediatric), Beijing Holley (2023) — real supply security",
+      "where": "products.products[3].stages[3].note",
+      "bucket": "data",
+      "fr": "Neuf présentations préqualifiées (PQ) auprès de trois fabricants — Alfasigma (2015, requalification janv. 2025), Guilin (2019–2020, dont une forme pédiatrique dispersible), Beijing Holley (2023) — une réelle sécurité d’approvisionnement",
+      "pt": "Nove apresentações pré-qualificadas (PQ) de três fabricantes — Alfasigma (2015, requalificação jan. 2025), Guilin (2019–2020, incl. formulação pediátrica dispersível), Beijing Holley (2023) — verdadeira segurança do abastecimento"
     },
     "d9fa09d8aa92cc82": {
       "en": "Molecular markers",

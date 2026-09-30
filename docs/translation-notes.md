@@ -79,6 +79,23 @@ out of date the builder assembles the content from the source in memory
 instead of refusing, writes nothing back, and leaves what is new in English.
 Without the flag it refuses, as before.
 
+**2. The three strings the engine always rejects are written by hand.** DEV-31
+§4 lists three (`PQ'd` twice, `MFT` once, all DHA–PPQ) whose placeholders do
+not survive the round trip. A rejected string is never saved, so every run
+queued it again: `translate-strings.js` never reached "nothing to do", and a
+run with nothing new still called Google and needed the key. Their French and
+Portuguese are now in `translations.json` (keys `067f9f108ad6bf6f`,
+`d8d25752df253a3f`, `368e55377d8c2ac7`), following the memory's own usage —
+"première intention", "d’Asie du Sud-Est", European Portuguese "primeira
+linha", PQ and MFT kept. **Drafted, not reviewed by a French or Portuguese
+speaker — Jackson or a bilingual reviewer should check them.** The dry run now
+queues 30 per locale, 1,559 characters, all of it new text; coverage 93%.
+
+Found while writing them, left alone for the same reviewer: "WHO PQ held for
+tablets and paediatric granules" reads in French as "OMS PQ **interdit** pour
+les comprimés…" ("forbidden"), and masking pushes a protected term to the front
+of its sentence ("MFT Modèles de déploiement avec…").
+
 ## What `feat/translation` brought, and what we changed on it
 
 | Where | Change |
