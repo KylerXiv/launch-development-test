@@ -254,12 +254,7 @@
   .mini .ln { align-self: center; }
   .jcell.on { background: var(--accent-soft); box-shadow: inset 1px 0 0 #B7D6DF, inset -1px 0 0 #B7D6DF; }
   .jcell.on .md { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
-  .srow.hd .c-mini { margin-block: 0; align-self: end; display: block; }
-  .srow.hd .nums { align-items: center; margin-top: 2px; }
-  .nums .jcell { min-height: 0; }
-  .nums .n { width: 14px; text-align: center; font-size: 10.5px; font-weight: 700; letter-spacing: 0; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-  .nums .jcell.on { box-shadow: none; }
-  .nums .jcell.on .n { color: var(--accent); }
+  .srow.hd .c-mini { margin-block: 0; align-self: center; display: block; }
   .md { width: 14px; height: 14px; border-radius: 50%; flex: none; box-sizing: border-box; }
   .md.done { background: var(--good); }
   .md.prog { background: var(--warn-soft); border: 2px solid var(--warn); }
@@ -1650,12 +1645,6 @@
         (col.stages.length === 1 ? dot(col.stages[0]) : `<span class="mp">${col.stages.map(dot).join("")}</span>`) +
         `</span>`).join('<i class="ln"></i>') + `</div>`;
   }
-  // The header's Journey cell carries the step numbers 1-7 above the dots, in the
-  // same cells, so the number on the pathway strip lines up with its column.
-  function miniNumbers() {
-    return `<div>Journey</div><div class="mini nums" aria-hidden="true">` +
-      STAGE_COLUMNS.map((col, c) => `<span class="jcell" data-c="${c}"><span class="n">${c + 1}</span></span>`).join('<i class="ln"></i>') + `</div>`;
-  }
   // Light the selected step's column in every row, or clear it (null).
   function highlightStep(i) {
     const c = i == null ? -1 : STAGE_COLUMNS.findIndex(col => col.stages.includes(i));
@@ -1777,7 +1766,7 @@
   }).join(`<span class="patharrow" aria-hidden="true">→</span>`);
 
   board.insertAdjacentHTML("afterbegin",
-    `<div class="srow hd" role="presentation"><span></span><span>Medicine</span><span class="c-mini">${miniNumbers()}</span>` +
+    `<div class="srow hd" role="presentation"><span></span><span>Medicine</span><span class="c-mini">Journey</span>` +
     `<span class="c-stage">Current stage</span><span>Status</span><span class="c-path">On pathway</span><span class="c-bar">Main barrier</span></div>`);
 
   tracked.forEach(p => {

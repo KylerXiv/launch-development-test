@@ -824,6 +824,10 @@ cut. Reviewed as a mock-up first; built as suggested.
   both WHO dots, which share a column. The header's Journey cell shows the step
   numbers 1-7 above the dots in the same cells, so the number on the strip lines
   up with its column. Closing the panel clears it.
+- **Header step numbers removed** (Keith, after seeing them live): the small 1-7
+  above the dots are gone and the header cell is just "Journey" again. The lit
+  column and ring still tie the table to the strip; the numbers on the strip itself
+  stay. `miniNumbers()` and the `.nums` rules went with them.
 - **What was lost, knowingly:** reading all four medicines' notes for one step side
   by side. To compare, open the rows and click the stage marker. The status-count
   pills are the only cross-section left. A middle option (list only the delayed or
