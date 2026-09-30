@@ -559,8 +559,15 @@ stacked the logo, the date and both buttons, leaving the middle empty.
   left-aligned them. The Subscribe dropdown used to flip to the left edge at 1180;
   the actions now stay right-aligned at every width above the phone breakpoint, so
   that flip went too. On phones the dropdown spans the button row as before.
-- The ids (`#updated`, `#meta-note`, `#dl-csv`, `#sub-open`, `#subwrap`) are
+- The ids (`#updated`, `#dl-csv`, `#sub-open`, `#subwrap`) are
   unchanged, so no script edits were needed.
+- Follow-up, same day: the row now shows **only** "Last updated <date>". The
+  ` · Draft - figures not yet verified` suffix (and the `live` / other-status
+  variants of it) and its `#meta-note` span were removed at Keith's request. The
+  caveat is not lost - it stays in the amber banner and the Prototype pill - but
+  note the suffix was the only place the page said `live` data was "confirmed by
+  manufacturers for public release"; if the dataset ever goes `live`, that line
+  is gone and nothing replaces it. The other pages keep `#meta-note`.
 - Checked in headless Chrome at 1400, 820 and 390px; not checked with the
   Subscribe dropdown open, and not on a real phone.
 
