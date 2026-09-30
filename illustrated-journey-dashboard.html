@@ -62,8 +62,7 @@
   /* ---------- header ---------- */
   /* Three rows (sheet rows 18/20 follow-up, 30 Sep 2026):
        1. title + Prototype pill on the left, "Powered by" Unitaid logo on the right
-       2. the description, full width (capped at 160ch so it stays readable on
-          very wide screens rather than running the whole row)
+       2. the description (capped at 120ch, balanced wrapping)
        3. "Last updated" on the left, Download CSV + Subscribe on the right
      Replaces the old brand/meta two-column header, which left the middle empty
      and stacked the logo, date and buttons in one right-hand column. */
@@ -71,7 +70,10 @@
   .hd-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 24px; }
   .hd-title { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.01em; }
   .hd-title span { color: var(--accent); }
-  .hd-desc { margin: 6px 0 0; color: var(--ink-2); font-size: 15px; max-width: 160ch; }
+  /* text-wrap: balance splits a two-line description into two even lines, so
+     the last word never sits alone on a second line (it did at ~1800px with the
+     plain 160ch cap). */
+  .hd-desc { margin: 6px 0 0; color: var(--ink-2); font-size: 15px; max-width: 120ch; text-wrap: balance; }
   .hd-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; margin-top: 12px; }
   .hd-status { font-size: 13px; color: var(--ink-3); line-height: 1.5; }
   /* "Powered by" + the Unitaid logo. No plate, border, shadow or hover
@@ -1046,7 +1048,7 @@
         </a>
       </div>
     </div>
-    <p class="hd-desc">Illustrated journey view — tracking new antimalarial medicines from research and development to market access — where each product stands, its access barriers, and opportunities to overcome them.</p>
+    <p class="hd-desc">Tracking new antimalarial medicines from research and development to market access&nbsp;— where each product stands, its access barriers, and opportunities to overcome them.</p>
     <div class="hd-bar">
       <div class="hd-status"><span id="updated"></span></div>
       <div class="hdr-actions">
