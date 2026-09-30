@@ -886,6 +886,11 @@ choice; these are the choices made.
   (`overflow:hidden` keeps it inside the rounded corners); the detail cards open
   **below** the bar. The mock-up had opened them above it, which reads oddly; the
   dashboard does not.
+- **Reversed the same day: the view is per row again** (Keith chose "Per row" in
+  the mock-up's option 7; the first build shared it across rows by mistake, from a
+  screenshot that showed the other option selected). Each row keeps its own view
+  and opening a row never changes another. The next bullet describes the shared
+  version that was built and then removed.
 - **One view for every row:** choosing Pathway order on one medicine switches all
   rows, including closed ones, so a row opened later is already on it. The rails of
   closed rows have no size, so `setL1()` re-runs `layoutJourney()` on opening (it

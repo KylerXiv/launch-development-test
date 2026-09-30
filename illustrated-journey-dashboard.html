@@ -2130,24 +2130,15 @@
     prod.querySelector(".exp").setAttribute("aria-expanded", open ? "true" : "false");
     if (open) layoutJourney();
   }
-  // One view for every row (30 Sep 2026): pick Pathway order on one medicine and
-  // every row shows it, including rows opened later. Closed rows are updated too;
-  // their rails have no size yet, so setL1() re-runs layoutJourney() on opening.
-  let journeyView = "time";
-  function showView(which) {
+  // Each row remembers its own view. The pathway-order rail is measured to line
+  // its forks up, so switching to it re-runs layoutJourney().
+  function showView(prod, which) {
     closeCell();
-    journeyView = which;
-    board.querySelectorAll(".product").forEach(prod => {
-      const views = prod.querySelectorAll(".view");
-      if (!views.length) return;
-      views.forEach(v => { v.hidden = v.dataset.v !== which; });
-      prod.dataset.view = which;
-      prod.querySelectorAll(".swg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === which ? "true" : "false"));
-      if (!reduceMotion && prod.classList.contains("l1-open")) {
-        const active = prod.querySelector('.view[data-v="' + which + '"]');
-        active.classList.add("fade-in"); void active.offsetHeight; active.classList.remove("fade-in");
-      }
-    });
+    prod.querySelectorAll(".view").forEach(v => { v.hidden = v.dataset.v !== which; });
+    prod.dataset.view = which;
+    prod.querySelectorAll(".swg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === which ? "true" : "false"));
+    const active = prod.querySelector('.view[data-v="' + which + '"]');
+    if (!reduceMotion) { active.classList.add("fade-in"); void active.offsetHeight; active.classList.remove("fade-in"); }
     if (which === "path") layoutJourney();
   }
   document.querySelectorAll(".exp").forEach(btn => {
@@ -2157,7 +2148,10 @@
     });
   });
   document.querySelectorAll(".swg button").forEach(btn => {
-    btn.addEventListener("click", () => { if (btn.dataset.v !== journeyView) showView(btn.dataset.v); });
+    btn.addEventListener("click", () => {
+      const prod = btn.closest(".product");
+      if (btn.dataset.v !== (prod.dataset.view || "time")) showView(prod, btn.dataset.v);
+    });
   });
   document.querySelectorAll(".more").forEach(btn => {
     btn.addEventListener("click", () => {
