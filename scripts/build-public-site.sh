@@ -30,4 +30,4 @@ cp data/products.js data/products.synthetic.js data/world-map.js \
 
 # Shared assets
 cp assets/journey-icons/icons.js assets/journey-icons/icons-solid.js "$OUT/assets/journey-icons/"
-cp assets/who-emblem.svg assets/unitaid-mark.svg assets/report-issue.js "$OUT/assets/"
+cp assets/who-emblem.svg assets/unitaid-logo.svg assets/report-issue.js "$OUT/assets/"
