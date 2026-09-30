@@ -144,11 +144,6 @@
     padding: 8px 18px; margin-bottom: 10px; overflow-x: auto;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
-  .pathhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 18px; margin-top: 10px; }
-  .pathhead h2 { margin: 0; font-size: 15px; font-weight: 700; }
-  .pathhead p { margin: 0; font-size: 13px; color: var(--ink-2); }
-  .pathhint { margin: -2px 4px 10px; font-size: 12.5px; color: var(--ink-3); }
-  .pathhint[hidden] { display: none; }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
   /* step number: the pathway is a sequence, so the order is stated, not implied.
      The two WHO gates share one number because they are parallel. */
@@ -1242,13 +1237,7 @@
 
   <div class="demo-banner" id="banner" hidden></div>
 
-  <div class="pathhead">
-    <h2>How a medicine reaches patients</h2>
-    <p>Every medicine moves left to right. Step 3 is two separate WHO approvals, in either order.</p>
-  </div>
-
   <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway. Choose a step to see what happens there and where each medicine is" hidden></div>
-  <p class="pathhint" id="pathhint">Select a step to see what happens there and where each medicine is.</p>
 
   <div class="gatewrap" id="gatewrap" hidden></div>
 
@@ -2262,7 +2251,6 @@
     if (!openGate) return;
     const wrap = document.getElementById("gatewrap");
     wrap.hidden = true; wrap.innerHTML = "";
-    document.getElementById("pathhint").hidden = false;
     openGate.setAttribute("aria-expanded", "false");
     openGate = null;
   }
@@ -2310,7 +2298,6 @@
       </div>
       <div class="gw-grid${info ? "" : " one"}">${explain}${meds}</div>`;
     wrap.hidden = false;
-    document.getElementById("pathhint").hidden = true;
     btn.setAttribute("aria-expanded", "true");
     openGate = btn;
   }
