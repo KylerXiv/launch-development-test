@@ -592,38 +592,40 @@
     font: inherit; font-size: 13px; color: var(--ink-2); border-radius: 6px;
   }
   .gw-head .gp-close:hover { background: var(--surface-2); color: var(--ink); }
-  .gw-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; align-items: start; }
-  .gw-grid.one { grid-template-columns: minmax(0, 1fr); }
-  @media (max-width: 860px) { .gw-grid { grid-template-columns: minmax(0, 1fr); } }
-  .gw-sec { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 15px 14px; }
-  .gw-sec h4 { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-  .gw-sec > p { margin: 0; font-size: 15px; color: var(--ink); max-width: 70ch; }
-  .gw-facts { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 6px 12px; margin: 12px 0 0; font-size: 14px; }
-  .gw-facts dt { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); padding-top: 2px; }
-  .gw-facts dd { margin: 0; color: var(--ink); }
-  .gw-src { margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 12px; color: var(--ink-3); }
-  .gw-sec .gw-sum { margin: 0 0 10px; font-size: 13px; color: var(--ink-2); }
-  .gw-sum b { color: var(--crit); font-variant-numeric: tabular-nums; }
-  .gw-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
-  .gw-list li {
-    display: grid; grid-template-columns: 84px 104px minmax(0, 1fr) auto; gap: 10px; align-items: start;
-    padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px;
+  /* The step panel: an explanation band across the top, then one card per
+     medicine side by side (30 Sep 2026). Replaces a two-column split whose text
+     column stopped at 70ch and left an empty strip, and whose clipped notes could
+     only be read by jumping to the row. A card's extra facts expand in place. */
+  .gw-sum { display: flex; flex-wrap: wrap; gap: 6px; margin-left: 10px; }
+  .gw-band { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 16px; margin-bottom: 14px; }
+  .gw-band h4 { margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .gw-band > p { margin: 0; font-size: 15.5px; color: var(--ink); max-width: 110ch; }
+  .gw-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 22px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+  .gw-facts h5 { margin: 0 0 2px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
+  .gw-facts p { margin: 0; font-size: 14px; color: var(--ink); }
+  .gw-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; align-items: start; }
+  .gw-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .gw-card.is-late { background: var(--crit-soft); border-color: #EBC3BD; }
+  .gw-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .gw-name { font-size: 15.5px; font-weight: 700; }
+  .gw-when { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .gw-note { margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.45; }
+  .gw-note.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .gw-tg {
+    align-self: flex-start; background: none; border: 0; padding: 2px 0; font: inherit; font-size: 12.5px; font-weight: 650;
+    color: var(--accent); cursor: pointer; display: inline-flex; gap: 5px; align-items: center;
   }
-  .gw-list li:first-child { padding-top: 0; }
-  .gw-list li:last-child { border-bottom: 0; padding-bottom: 0; }
-  .gw-list li.is-late .gw-name { color: var(--crit); }
-  .gw-list .gw-name { font-weight: 700; font-size: 14.5px; }
-  .gw-list .gw-note { color: var(--ink-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .gw-jump {
-    background: none; border: 1px solid var(--line); border-radius: 999px;
-    padding: 3px 11px; font: inherit; font-size: 11.5px; color: var(--accent);
-    cursor: pointer; white-space: nowrap;
-  }
-  .gw-jump:hover { border-color: var(--accent); background: var(--accent-soft); }
-  @media (max-width: 560px) {
-    .gw-list li { grid-template-columns: 1fr auto; }
-    .gw-list .gw-note { grid-column: 1 / -1; }
-  }
+  .gw-tg:hover { text-decoration: underline; }
+  .gw-tg .ch { transition: transform .15s ease; font-size: 13px; }
+  .gw-tg[aria-expanded="true"] .ch { transform: rotate(180deg); }
+  .gw-tg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .gw-more { margin: 2px 0 0; padding-top: 8px; border-top: 1px dashed var(--line); display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 5px 10px; font-size: 13px; }
+  .gw-more[hidden] { display: none; }
+  .gw-more dt { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); padding-top: 2px; }
+  .gw-more dd { margin: 0; color: var(--ink); }
+  .gw-more .pend { color: var(--crit); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .gw-more .prov { grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-3); }
+  @media (prefers-reduced-motion: reduce) { .gw-tg .ch { transition: none; } }
 
   /* the panel carries the flag for the current gate; don't say it twice */
   .product.gate-flag .flagnote { display: none; }
@@ -1163,7 +1165,9 @@
     .view[data-v="time"] { display: block !important; }
     .exp, .swv, .l1f { display: none !important; }
     .product { break-inside: avoid; box-shadow: none; }
-    .hdr-actions, #tip, .gp-close, .gw-jump { display: none !important; }
+    .hdr-actions, #tip, .gp-close, .gw-tg { display: none !important; }
+    .gw-more[hidden] { display: grid !important; }
+    .gw-note.clamp { display: block !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
     .gatepanel[hidden], .gatewrap[hidden] { display: none !important; }
     .gatepanel, .gatewrap { break-inside: avoid; box-shadow: none; }
@@ -2254,49 +2258,65 @@
     openGate.setAttribute("aria-expanded", "false");
     openGate = null;
   }
-  // One panel per step: what happens there (from DATA.stageInfo, general to the
-  // step) and where each medicine is (from each product's own stage entry).
-  // Without stageInfo, for example on an edition that does not carry it, the
-  // panel falls back to the medicines half alone.
+  // One panel per step: an explanation band (DATA.stageInfo, general to the
+  // step) and a card per medicine (each product's own stage entry). A card's
+  // note is clipped to three lines; "Read more" expands it in place with the
+  // dates, next step and source, so nobody has to jump to the row to read it.
+  // Without stageInfo the band is simply left out.
+  const STATUS_NOUN = { done: "complete", prog: "in progress", late: "delayed", idle: "not started" };
+  function gwMore(p, i) {
+    const st = p.stages[i], el2 = stalledSince(p, i), rows = [];
+    if (st.date) rows.push(["Recorded", esc(st.date)]);
+    if (st.next) rows.push(["Next step", esc(st.next)]);
+    if (st.nextDate) rows.push(["Expected", esc(st.nextDate)]);
+    if (el2) rows.push(["Pending since", `<span class="pend">${el2.yrs} yr${el2.yrs === 1 ? "" : "s"}</span> · ${esc(el2.label)} (${el2.year})`]);
+    const prov = [st.source ? "Source: " + esc(st.source) : "", st.asOf ? "verified " + esc(st.asOf) : ""].filter(Boolean).join(" · ");
+    return { rows, prov };
+  }
   function openGatePanel(btn) {
     const i = +btn.dataset.gate;
     closeGate();
     const info = (DATA.stageInfo || [])[i];
-    const rows = tracked.map(p => {
+    const counts = { late: 0, prog: 0, done: 0, idle: 0 };
+    tracked.forEach(p => counts[p.stages[i].status]++);
+    const chips = ["late", "prog", "done", "idle"].filter(k => counts[k])
+      .map(k => `<span class="gp-pill ${k}">${counts[k]} ${STATUS_NOUN[k]}</span>`).join("");
+    const band = info ? `
+      <div class="gw-band">
+        <h4>What happens here</h4>
+        <p>${esc(info.what)}</p>
+        <div class="gw-facts">
+          <div><h5>Who decides</h5><p>${esc(info.who)}</p></div>
+          <div><h5>Why it can stall</h5><p>${esc(info.stall)}</p></div>
+          <div><h5>Source</h5><p>${esc(info.source)}</p></div>
+        </div>
+      </div>` : "";
+    const cards = tracked.map(p => {
       const st = p.stages[i];
-      return `<li class="${st.status === "late" ? "is-late" : ""}">
-        <span class="gw-name">${esc(p.name)}</span>
-        <span><span class="gp-pill ${st.status}">${LABEL[st.status]}</span></span>
-        <span class="gw-note">${esc(st.note || "—")}</span>
-        <span><button class="gw-jump" type="button" data-jump="${esc(p.id)}" data-jumpi="${i}">Open in row</button></span>
-      </li>`;
+      const when = firstClause(st.date);
+      const more = gwMore(p, i);
+      const hasMore = (st.note || "").length > 120 || more.rows.length > 0 || !!more.prov;
+      const body = more.rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("") +
+        (more.prov ? `<div class="prov">${more.prov}</div>` : "");
+      return `<article class="gw-card${st.status === "late" ? " is-late" : ""}">
+        <div class="gw-top"><span class="gw-name">${esc(p.name)}</span><span class="gp-pill ${st.status}">${LABEL[st.status]}</span></div>
+        ${when ? `<div class="gw-when">${esc(when)}</div>` : ""}
+        <p class="gw-note${hasMore ? " clamp" : ""}">${esc(st.note || "—")}</p>
+        ${hasMore ? `<button class="gw-tg" type="button" aria-expanded="false"><span class="gw-tgt">Read more</span> <span class="ch" aria-hidden="true">▾</span></button>
+        <dl class="gw-more" hidden>${body}</dl>` : ""}
+      </article>`;
     }).join("");
-    const n = tracked.filter(p => p.stages[i].status === "late").length;
-    const explain = info ? `
-        <div class="gw-sec">
-          <h4>What happens here</h4>
-          <p>${esc(info.what)}</p>
-          <dl class="gw-facts">
-            <dt>Who decides</dt><dd>${esc(info.who)}</dd>
-            <dt>Why it can stall</dt><dd>${esc(info.stall)}</dd>
-          </dl>
-          <div class="gw-src">Source: ${esc(info.source)}</div>
-        </div>` : "";
-    const meds = `
-        <div class="gw-sec">
-          <h4>Where each medicine is</h4>
-          <p class="gw-sum">${n ? `<b>${n}</b> of ${tracked.length} medicines delayed at this step.` : `No medicine is delayed at this step.`}</p>
-          <ul class="gw-list">${rows}</ul>
-        </div>`;
     const wrap = document.getElementById("gatewrap");
     wrap.setAttribute("aria-label", "Step " + stepNo(i) + ": " + STAGES[i]);
     wrap.innerHTML = `
       <div class="gw-head">
         <span class="gw-ico">${stageIconImg(i, "")}</span>
         <div><div class="gw-step">Step ${stepNo(i)} of ${STAGE_COLUMNS.length}</div><h3>${esc(STAGES[i])}</h3></div>
+        <span class="gw-sum" aria-label="Status of the ${tracked.length} medicines at this step">${chips}</span>
         <button class="gp-close" type="button" data-close="gate">Close</button>
       </div>
-      <div class="gw-grid${info ? "" : " one"}">${explain}${meds}</div>`;
+      ${band}
+      <div class="gw-cards">${cards}</div>`;
     wrap.hidden = false;
     btn.setAttribute("aria-expanded", "true");
     openGate = btn;
@@ -2309,20 +2329,18 @@
     });
   });
 
-  // close buttons + "open in row" jump, delegated so re-rendered markup keeps working
+  // close buttons and the per-card "Read more", delegated so re-rendered markup keeps working
   document.addEventListener("click", e => {
     const c = e.target.closest("[data-close]");
     if (c) { c.dataset.close === "gate" ? closeGate() : closeCell(); return; }
-    const j = e.target.closest("[data-jump]");
-    if (j) {
-      // The row may be collapsed, and the time view only draws gates that have a
-      // year or are current; fall back to the pathway rail, which draws all eight.
-      const prod = document.getElementById(j.dataset.jump);
-      const pick = () => prod.querySelector(`.view:not([hidden]) .smark[data-stagei="${j.dataset.jumpi}"]`);
-      setL1(prod, true);
-      let mark = pick();
-      if (!mark) { showView(prod, "path"); mark = pick(); }
-      if (mark) { openCellPanel(mark); mark.scrollIntoView({ block: "center", behavior: "smooth" }); mark.focus(); }
+    const t = e.target.closest(".gw-tg");
+    if (t) {
+      const card = t.closest(".gw-card");
+      const open = t.getAttribute("aria-expanded") !== "true";
+      t.setAttribute("aria-expanded", open ? "true" : "false");
+      t.querySelector(".gw-tgt").textContent = open ? "Show less" : "Read more";
+      card.querySelector(".gw-note").classList.toggle("clamp", !open);
+      card.querySelector(".gw-more").hidden = !open;
     }
   });
 
