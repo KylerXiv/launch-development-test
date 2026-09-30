@@ -61,22 +61,16 @@
 
   /* ---------- header ---------- */
   header { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px 24px; margin-bottom: 6px; }
-  /* "Powered by" + the Unitaid mark, stacked above the meta block so it
-     reads as part of that right-aligned column rather than floating loose
-     in the corner — one card, one link, rather than plain text beside a
-     plated logo, so the shadow reads as belonging to the whole attribution,
-     not just the mark. The full lockup (bird + wordmark) is used, so the
-     name is carried by the logo itself. */
+  /* "Powered by" + the Unitaid logo, stacked above the meta block so it reads
+     as part of that right-aligned column. No plate, border, shadow or hover
+     effect (sheet row 11 follow-up): the logo sits directly on the page
+     background and blends in. The page background is white, so the logo's own
+     navy needs no plate. Keyboard focus keeps its outline. */
   .attrib { display: flex; justify-content: flex-end; margin-bottom: 10px; }
   .attrib a {
     display: flex; align-items: center; gap: 8px;
-    padding: 7px 12px 7px 10px; border-radius: 10px;
-    text-decoration: none; transition: box-shadow .15s ease, transform .15s ease;
-    /* Fixed white, never recoloured — a deliberate plate for the mark's own
-       dark navy, independent of this page's (light-only) theme tokens. */
-    background: #FFFFFF; box-shadow: 0 1px 2px rgba(22,48,63,.10), 0 4px 14px rgba(22,48,63,.08);
+    padding: 2px 0; border-radius: 4px; text-decoration: none;
   }
-  .attrib a:hover { box-shadow: 0 2px 4px rgba(22,48,63,.14), 0 8px 22px rgba(22,48,63,.12); transform: translateY(-1px); }
   .attrib a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .attrib .ptxt { font-size: 12.5px; line-height: 1.3; color: var(--ink-3); }
   .attrib img { display: block; width: 112px; height: auto; }
