@@ -52,6 +52,33 @@ they forget. Four reasons:
   for an unapproved claim) do not apply to a push to `main`, which is already
   live in English.
 
+## Built on this branch
+
+**1. The Sources footer is translated again, and the build checks for missing
+files.** `main`'s `9c6be45` moved the footer from the page into
+`data/sources.js`. `assemble-content.js` now collects what `renderSources()`
+shows for each public entry — the name (`label`, or `title` where there is no
+label), the `plain` line, and the `alsoSee` link labels — and puts the file in
+`values`. The internal `findings` and `relevance` fields are never collected,
+so they cannot reach an engine. `build-locale-pages.js` writes a localised
+`sources.js`, and now copies every other data file the page's own `<script
+src>` tags load instead of a fixed list — the fixed list is how the file went
+missing. Its self-check gained "every data/ and assets/ file the page loads is
+there"; with `pt/data/sources.js` removed it fails the build.
+
+*Correction to "should need nothing new sent to Google", below.* Of the 48
+strings the footer shows, 21 are in `translations.json` from when they were
+markup; the other 27 belong to sources added to the registry after 23 Sep. With
+this change `content.en.json` has 453 strings (276 data, 61 markup, 116 js) and
+the dry run queues 33 per locale, 1,982 characters: those 27, the 3 new page
+strings, and the 3 known rejects. Until they are translated, coverage reads 92%
+(fr 524 translated, 44 left in English; pt 529 / 44).
+
+`--allow-stale`, for the public build only (item 4): when `content.en.json` is
+out of date the builder assembles the content from the source in memory
+instead of refusing, writes nothing back, and leaves what is new in English.
+Without the flag it refuses, as before.
+
 ## What `feat/translation` brought, and what we changed on it
 
 | Where | Change |
@@ -114,7 +141,7 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
   (228 data, 61 markup, 116 js), against 423 on the branch. The dry run then
   sends 6 per locale, 568 characters — the 3 new strings and the 3 known
   `PQ'd`/`MFT` rejects.
-- **The sources footer breaks on the French and Portuguese pages.** `main`'s
+- **Fixed in item 1 above.** **The sources footer breaks on the French and Portuguese pages.** `main`'s
   `9c6be45` moved the footer's source list out of the page into
   `data/sources.js`, rendered at runtime; those are the 21 removed strings.
   `assemble-content.js` reads only `products.js`, `resistance.js` and

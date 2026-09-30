@@ -14,8 +14,9 @@
  * by contentHash, is approved". It has three parts:
  *
  *   text         every translatable string, with its translation key
- *   values       products.js, resistance.js and molecular-markers.js, parsed,
- *                each with its own sha256. Never sent to a translation engine.
+ *   values       products.js, resistance.js, molecular-markers.js and
+ *                sources.js, parsed, each with its own sha256. Never sent to a
+ *                translation engine.
  *   contentHash  one digest over text + values
  *
  * Three buckets of text, because they are found and substituted differently:
@@ -51,6 +52,7 @@ const GLOBALS = {
   "data/products.js": "window.LAUNCH_DATA",
   "data/resistance.js": "window.LAUNCH_RESISTANCE",
   "data/molecular-markers.js": "window.LAUNCH_MOLECULAR_MARKERS",
+  "data/sources.js": "window.LAUNCH_SOURCES",
 };
 
 function readDataFile(rel) {
@@ -141,6 +143,21 @@ function collect() {
       (((D.dict || {})[col]) || []).forEach((v, i) => add("data", v, `${tag}.dict.${col}[${i}]`));
     }
   }
+
+  // sources.js: the Sources footer, rendered from the registry since 9c6be45.
+  // Exactly what renderSources() puts on the page, for public entries only —
+  // the name (label, or title where there is no label), the plain line, and
+  // the labels of the alsoSee links. "findings" and "relevance" are internal
+  // and are never collected; urls, ids and dates are provenance.
+  const S = readDataFile("data/sources.js");
+  (S.sources || []).forEach((src, i) => {
+    if (!src.public) return;
+    const b = `sources.sources[${i}]`;
+    if (src.label) add("data", src.label, `${b}.label`);
+    else add("data", src.title, `${b}.title`);
+    add("data", src.plain, `${b}.plain`);
+    (src.alsoSee || []).forEach((a, j) => add("data", a.label, `${b}.alsoSee[${j}].label`));
+  });
 
   // ---------------------------------------------------------------------------
   // 2 & 3. the page itself

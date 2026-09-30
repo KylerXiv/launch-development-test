@@ -9,11 +9,13 @@
  *
  *   node scripts/build-locale-pages.js --check     # report, write nothing
  *   node scripts/build-locale-pages.js
+ *   node scripts/build-locale-pages.js --allow-stale   # the public build only
  *
  * Output, ready for build-public-site.sh to copy:
  *
  *   dist/locale/fr/illustrated-journey-dashboard.html
- *   dist/locale/fr/data/{products,resistance,molecular-markers}.js
+ *   dist/locale/fr/data/{products,resistance,molecular-markers,sources}.js
+ *   dist/locale/fr/data/  every other data file the page loads, unchanged
  *   dist/locale/pt/...
  *
  * Why per-locale copies of the data files: the page loads data/*.js with
@@ -25,6 +27,13 @@
  * replaced only if it is in the approved text section AND has a translation in
  * i18n/translations.json. Keys are read from content.en.json, not recomputed.
  * The build exits first if content.en.json is stale (assemble-content.js).
+ *
+ * --allow-stale is for scripts/build-public-site.sh alone. A hand-made change
+ * reaches main before the translate bot has rebuilt content.en.json, and
+ * English does not wait for French (docs/translation-notes.md): so instead of
+ * refusing, the build assembles the content from the source in memory — the
+ * current English, never an old file — and whatever is new stays in English
+ * until the bot has translated it. Nothing is written back.
  *
  * Substitution is exact-match only, and each kind is handled separately:
  *
@@ -40,7 +49,7 @@ const fs = require("fs");
 const path = require("path");
 const { identifiers } = require("./i18n-identifiers");
 const { normalise } = require("./i18n-hash");
-const { requireFresh } = require("./assemble-content");
+const { requireFresh, problems, assemble } = require("./assemble-content");
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "dist", "locale");
@@ -53,8 +62,8 @@ const GLOBALS = {
   "data/products.js": "window.LAUNCH_DATA",
   "data/resistance.js": "window.LAUNCH_RESISTANCE",
   "data/molecular-markers.js": "window.LAUNCH_MOLECULAR_MARKERS",
+  "data/sources.js": "window.LAUNCH_SOURCES",
 };
-
 
 // Drug, marker and species names are LOOKUP KEYS. The build never translates an
 // object key, so translating the same string anywhere else — a dict column, a
@@ -68,6 +77,7 @@ const isCodeChars = (t) => /[!=&|{}\\]/.test(t) || /=>/.test(t) ||
 
 const check = process.argv.includes("--check");
 const verifyOnly = process.argv.includes("--verify");   // re-run the self-check on existing output
+const allowStale = process.argv.includes("--allow-stale");
 if (!fs.existsSync(MEM)) {
   console.error(`\n  ${path.relative(ROOT, MEM)} not found — run scripts/translate-strings.js first.\n`);
   process.exit(1);
@@ -80,7 +90,17 @@ const MEMORY = JSON.parse(fs.readFileSync(MEM, "utf8")).entries;
 // does not need the content file.
 const KEY_OF = new Map();
 if (!verifyOnly) {
-  for (const e of requireFresh().text) KEY_OF.set(normalise(e.en), e.key);
+  let text;
+  const stale = allowStale ? problems() : [];
+  if (stale.length) {
+    console.log("\n  i18n/content.en.json is not current — building from the source instead (--allow-stale):");
+    stale.forEach((x) => console.log(`    ${x}`));
+    console.log("  Anything new stays in English until the translate bot has run.");
+    text = assemble().text;
+  } else {
+    text = requireFresh().text;
+  }
+  for (const e of text) KEY_OF.set(normalise(e.en), e.key);
 }
 const entryOf = (text) => {
   const k = KEY_OF.get(normalise(text));
@@ -153,6 +173,39 @@ function localiseSurveillance(D, loc) {
     if (Array.isArray((D.dict || {})[col])) D.dict[col] = D.dict[col].map(T);
   }
   return D;
+}
+
+// The Sources footer — the same fields assemble-content.js collects, and only
+// the one renderSources() shows: label, or title where there is no label.
+function localiseSources(D, loc) {
+  const T = (v) => (typeof v === "string" && v.trim() ? tr(loc, v) : v);
+  (D.sources || []).forEach((src) => {
+    if (!src.public) return;
+    if (src.label) src.label = T(src.label);
+    else src.title = T(src.title);
+    src.plain = T(src.plain);
+    (src.alsoSee || []).forEach((a) => { a.label = T(a.label); });
+  });
+  return D;
+}
+const LOCALISE = {
+  "data/products.js": localiseProducts,
+  "data/resistance.js": localiseSurveillance,
+  "data/molecular-markers.js": localiseSurveillance,
+  "data/sources.js": localiseSources,
+};
+
+// Every data file the page loads, from its own <script src> tags. A fixed list
+// here is how the locale pages lost data/sources.js when the Sources footer
+// moved into it: the page loaded a file the build never copied.
+const dataFilesOf = (html) => [...new Set([...html.matchAll(/<script src="(data\/[^"]+\.js)"/g)].map((m) => m[1]))];
+
+// Local files a page references that are missing from its directory. Paths
+// built at runtime (with ${...}) cannot be checked here and are skipped.
+function missingFiles(dir) {
+  const html = fs.readFileSync(path.join(dir, PAGE), "utf8");
+  const refs = [...html.matchAll(/\bsrc="((?:data|assets)\/[^"?#]+)"/g)].map((m) => m[1]).filter((r) => !r.includes("${"));
+  return [...new Set(refs)].filter((r) => !fs.existsSync(path.join(dir, r)));
 }
 
 // ---------------------------------------------------------------------------
@@ -316,6 +369,11 @@ function verify() {
     const lc = profile(path.join(OUT, loc));
     console.log(`\n    ${loc}`);
 
+    const missing = missingFiles(path.join(OUT, loc));
+    say(!missing.length, missing.length
+      ? `the page loads files that are not there: ${missing.join(", ")}`
+      : "every data/ and assets/ file the page loads is there");
+
     say(lc.keys.species === en.keys.species && lc.speciesOk,
         `FALLBACK_SPECIES "${lc.keys.species}" resolves in dict.species`);
 
@@ -335,9 +393,10 @@ function verify() {
 
   if (failures) {
     console.error(`\n  BUILD FAILED \u2014 ${failures} check(s) did not pass.`);
-    console.error("  A lookup key has been translated. The page would render fine and the");
-    console.error("  threat map would be EMPTY. See docs/jackson/DEV-31.md (rule 1b)");
-    console.error("  and scripts/i18n-identifiers.js.\n");
+    console.error("  Either a lookup key has been translated — the page would render fine and");
+    console.error("  the threat map would be EMPTY; see docs/jackson/DEV-31.md (rule 1b) and");
+    console.error("  scripts/i18n-identifiers.js — or the page loads a file the build did not");
+    console.error("  write, and part of it would say its data did not load.\n");
     process.exit(1);
   }
   console.log("\n  All checks passed.\n");
@@ -354,9 +413,8 @@ function main() {
     const dataDir = path.join(dir, "data");
 
     const page = localisePage(html, loc);
-    const products = localiseProducts(readData("data/products.js"), loc);
-    const resistance = localiseSurveillance(readData("data/resistance.js"), loc);
-    const markers = localiseSurveillance(readData("data/molecular-markers.js"), loc);
+    const localised = {};
+    for (const [rel, fn] of Object.entries(LOCALISE)) localised[rel] = fn(readData(rel), loc);
 
     const s = stat[loc];
     const pct = s.hit + s.miss ? Math.round((s.hit / (s.hit + s.miss)) * 100) : 0;
@@ -365,14 +423,12 @@ function main() {
     if (!check) {
       fs.mkdirSync(dataDir, { recursive: true });
       fs.writeFileSync(path.join(dir, PAGE), page, "utf8");
-      const write = (name, global, obj) =>
-        fs.writeFileSync(path.join(dataDir, name), `${global} = ${JSON.stringify(obj)};\n`, "utf8");
-      write("products.js", GLOBALS["data/products.js"], products);
-      write("resistance.js", GLOBALS["data/resistance.js"], resistance);
-      write("molecular-markers.js", GLOBALS["data/molecular-markers.js"], markers);
-      // the page also loads these, unchanged
-      for (const f of ["world-map.js", "world-map-geo.js"]) {
-        fs.copyFileSync(path.join(ROOT, "data", f), path.join(dataDir, f));
+      for (const [rel, obj] of Object.entries(localised)) {
+        fs.writeFileSync(path.join(dir, rel), `${GLOBALS[rel]} = ${JSON.stringify(obj)};\n`, "utf8");
+      }
+      // whatever else the page loads (the map geometry today), unchanged
+      for (const rel of dataFilesOf(html)) {
+        if (!LOCALISE[rel]) fs.copyFileSync(path.join(ROOT, rel), path.join(dir, rel));
       }
       // the page also loads assets/ with relative paths (icons, the Unitaid mark,
       // the WHO emblem, report-issue.js). Without these the locale page renders
