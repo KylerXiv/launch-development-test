@@ -245,6 +245,21 @@
   .nm b { display: block; font-size: 15.5px; font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
   .nm small { display: block; font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mini { display: flex; align-items: center; gap: 3px; }
+  /* Each journey column is a cell so the step selected on the pathway strip can
+     light it up in every row (30 Sep 2026). The cell stretches to the full row
+     height, so the lit cells read as one continuous column down the table. */
+  .srow > .c-mini { align-self: stretch; margin-block: -10px; display: flex; align-items: stretch; }
+  .srow > .c-mini .mini { align-items: stretch; }
+  .jcell { flex: none; display: flex; align-items: center; justify-content: center; padding: 0 4px; margin: 0 -4px; }
+  .mini .ln { align-self: center; }
+  .jcell.on { background: var(--accent-soft); box-shadow: inset 1px 0 0 #B7D6DF, inset -1px 0 0 #B7D6DF; }
+  .jcell.on .md { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
+  .srow.hd .c-mini { margin-block: 0; align-self: end; display: block; }
+  .srow.hd .nums { align-items: center; margin-top: 2px; }
+  .nums .jcell { min-height: 0; }
+  .nums .n { width: 14px; text-align: center; font-size: 10.5px; font-weight: 700; letter-spacing: 0; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .nums .jcell.on { box-shadow: none; }
+  .nums .jcell.on .n { color: var(--accent); }
   .md { width: 14px; height: 14px; border-radius: 50%; flex: none; box-sizing: border-box; }
   .md.done { background: var(--good); }
   .md.prog { background: var(--warn-soft); border: 2px solid var(--warn); }
@@ -304,7 +319,7 @@
   @media (max-width: 640px) {
     .srow { grid-template-columns: 34px 1fr auto; row-gap: 6px; }
     .srow.hd { display: none; }
-    .srow .c-mini { grid-column: 2 / -1; grid-row: 2; }
+    .srow .c-mini { grid-column: 2 / -1; grid-row: 2; margin-block: 0; }
     .srow .c-bar { grid-column: 2 / -1; grid-row: 3; }
     .l1 { padding-inline: 10px; }
   }
@@ -592,40 +607,16 @@
     font: inherit; font-size: 13px; color: var(--ink-2); border-radius: 6px;
   }
   .gw-head .gp-close:hover { background: var(--surface-2); color: var(--ink); }
-  /* The step panel: an explanation band across the top, then one card per
-     medicine side by side (30 Sep 2026). Replaces a two-column split whose text
-     column stopped at 70ch and left an empty strip, and whose clipped notes could
-     only be read by jumping to the row. A card's extra facts expand in place. */
+  /* The step panel: an explanation band and a status-count summary (30 Sep 2026).
+     It used to repeat where each medicine is, which the summary table already
+     says; the table now lights up the selected step instead. */
   .gw-sum { display: flex; flex-wrap: wrap; gap: 6px; margin-left: 10px; }
-  .gw-band { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 16px; margin-bottom: 14px; }
+  .gw-band { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 16px; }
   .gw-band h4 { margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
   .gw-band > p { margin: 0; font-size: 15.5px; color: var(--ink); max-width: 110ch; }
   .gw-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 22px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
   .gw-facts h5 { margin: 0 0 2px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
   .gw-facts p { margin: 0; font-size: 14px; color: var(--ink); }
-  .gw-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; align-items: start; }
-  .gw-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-  .gw-card.is-late { background: var(--crit-soft); border-color: #EBC3BD; }
-  .gw-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .gw-name { font-size: 15.5px; font-weight: 700; }
-  .gw-when { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-  .gw-note { margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.45; }
-  .gw-note.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .gw-tg {
-    align-self: flex-start; background: none; border: 0; padding: 2px 0; font: inherit; font-size: 12.5px; font-weight: 650;
-    color: var(--accent); cursor: pointer; display: inline-flex; gap: 5px; align-items: center;
-  }
-  .gw-tg:hover { text-decoration: underline; }
-  .gw-tg .ch { transition: transform .15s ease; font-size: 13px; }
-  .gw-tg[aria-expanded="true"] .ch { transform: rotate(180deg); }
-  .gw-tg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .gw-more { margin: 2px 0 0; padding-top: 8px; border-top: 1px dashed var(--line); display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 5px 10px; font-size: 13px; }
-  .gw-more[hidden] { display: none; }
-  .gw-more dt { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); padding-top: 2px; }
-  .gw-more dd { margin: 0; color: var(--ink); }
-  .gw-more .pend { color: var(--crit); font-weight: 700; font-variant-numeric: tabular-nums; }
-  .gw-more .prov { grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-3); }
-  @media (prefers-reduced-motion: reduce) { .gw-tg .ch { transition: none; } }
 
   /* the panel carries the flag for the current gate; don't say it twice */
   .product.gate-flag .flagnote { display: none; }
@@ -1165,9 +1156,7 @@
     .view[data-v="time"] { display: block !important; }
     .exp, .swv, .l1f { display: none !important; }
     .product { break-inside: avoid; box-shadow: none; }
-    .hdr-actions, #tip, .gp-close, .gw-tg { display: none !important; }
-    .gw-more[hidden] { display: grid !important; }
-    .gw-note.clamp { display: block !important; }
+    .hdr-actions, #tip, .gp-close { display: none !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
     .gatepanel[hidden], .gatewrap[hidden] { display: none !important; }
     .gatepanel, .gatewrap { break-inside: avoid; box-shadow: none; }
@@ -1655,11 +1644,22 @@
   }
   function miniJourney(p) {
     const done = p.stages.filter(st => st.status === "done").length;
+    const dot = i => `<i class="md ${p.stages[i].status}" title="${esc(STAGES[i])}: ${LABEL[p.stages[i].status]}"></i>`;
     return `<div class="mini" role="img" aria-label="${done} of ${p.stages.length} stages complete">` +
-      STAGE_COLUMNS.map(col => col.stages.length === 1
-        ? `<i class="md ${p.stages[col.stages[0]].status}" title="${esc(STAGES[col.stages[0]])}: ${LABEL[p.stages[col.stages[0]].status]}"></i>`
-        : `<span class="mp">${col.stages.map(i => `<i class="md ${p.stages[i].status}" title="${esc(STAGES[i])}: ${LABEL[p.stages[i].status]}"></i>`).join("")}</span>`
-      ).join('<i class="ln"></i>') + `</div>`;
+      STAGE_COLUMNS.map((col, c) => `<span class="jcell" data-c="${c}">` +
+        (col.stages.length === 1 ? dot(col.stages[0]) : `<span class="mp">${col.stages.map(dot).join("")}</span>`) +
+        `</span>`).join('<i class="ln"></i>') + `</div>`;
+  }
+  // The header's Journey cell carries the step numbers 1-7 above the dots, in the
+  // same cells, so the number on the pathway strip lines up with its column.
+  function miniNumbers() {
+    return `<div>Journey</div><div class="mini nums" aria-hidden="true">` +
+      STAGE_COLUMNS.map((col, c) => `<span class="jcell" data-c="${c}"><span class="n">${c + 1}</span></span>`).join('<i class="ln"></i>') + `</div>`;
+  }
+  // Light the selected step's column in every row, or clear it (null).
+  function highlightStep(i) {
+    const c = i == null ? -1 : STAGE_COLUMNS.findIndex(col => col.stages.includes(i));
+    board.querySelectorAll(".jcell").forEach(cell => cell.classList.toggle("on", +cell.dataset.c === c));
   }
   function stageMarkHtml(p, i) {
     const st = p.stages[i];
@@ -1777,7 +1777,7 @@
   }).join(`<span class="patharrow" aria-hidden="true">→</span>`);
 
   board.insertAdjacentHTML("afterbegin",
-    `<div class="srow hd" role="presentation"><span></span><span>Medicine</span><span class="c-mini">Journey</span>` +
+    `<div class="srow hd" role="presentation"><span></span><span>Medicine</span><span class="c-mini">${miniNumbers()}</span>` +
     `<span class="c-stage">Current stage</span><span>Status</span><span class="c-path">On pathway</span><span class="c-bar">Main barrier</span></div>`);
 
   tracked.forEach(p => {
@@ -2257,22 +2257,14 @@
     wrap.hidden = true; wrap.innerHTML = "";
     openGate.setAttribute("aria-expanded", "false");
     openGate = null;
+    highlightStep(null);
   }
-  // One panel per step: an explanation band (DATA.stageInfo, general to the
-  // step) and a card per medicine (each product's own stage entry). A card's
-  // note is clipped to three lines; "Read more" expands it in place with the
-  // dates, next step and source, so nobody has to jump to the row to read it.
+  // One panel per step: the explanation (DATA.stageInfo, general to the step)
+  // and a count of how many medicines are at each status. Where each medicine is
+  // belongs to the summary table, which lights up the selected step's column
+  // (highlightStep); per-medicine detail is one click on that stage's marker.
   // Without stageInfo the band is simply left out.
   const STATUS_NOUN = { done: "complete", prog: "in progress", late: "delayed", idle: "not started" };
-  function gwMore(p, i) {
-    const st = p.stages[i], el2 = stalledSince(p, i), rows = [];
-    if (st.date) rows.push(["Recorded", esc(st.date)]);
-    if (st.next) rows.push(["Next step", esc(st.next)]);
-    if (st.nextDate) rows.push(["Expected", esc(st.nextDate)]);
-    if (el2) rows.push(["Pending since", `<span class="pend">${el2.yrs} yr${el2.yrs === 1 ? "" : "s"}</span> · ${esc(el2.label)} (${el2.year})`]);
-    const prov = [st.source ? "Source: " + esc(st.source) : "", st.asOf ? "verified " + esc(st.asOf) : ""].filter(Boolean).join(" · ");
-    return { rows, prov };
-  }
   function openGatePanel(btn) {
     const i = +btn.dataset.gate;
     closeGate();
@@ -2291,21 +2283,6 @@
           <div><h5>Source</h5><p>${esc(info.source)}</p></div>
         </div>
       </div>` : "";
-    const cards = tracked.map(p => {
-      const st = p.stages[i];
-      const when = firstClause(st.date);
-      const more = gwMore(p, i);
-      const hasMore = (st.note || "").length > 120 || more.rows.length > 0 || !!more.prov;
-      const body = more.rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("") +
-        (more.prov ? `<div class="prov">${more.prov}</div>` : "");
-      return `<article class="gw-card${st.status === "late" ? " is-late" : ""}">
-        <div class="gw-top"><span class="gw-name">${esc(p.name)}</span><span class="gp-pill ${st.status}">${LABEL[st.status]}</span></div>
-        ${when ? `<div class="gw-when">${esc(when)}</div>` : ""}
-        <p class="gw-note${hasMore ? " clamp" : ""}">${esc(st.note || "—")}</p>
-        ${hasMore ? `<button class="gw-tg" type="button" aria-expanded="false"><span class="gw-tgt">Read more</span> <span class="ch" aria-hidden="true">▾</span></button>
-        <dl class="gw-more" hidden>${body}</dl>` : ""}
-      </article>`;
-    }).join("");
     const wrap = document.getElementById("gatewrap");
     wrap.setAttribute("aria-label", "Step " + stepNo(i) + ": " + STAGES[i]);
     wrap.innerHTML = `
@@ -2315,11 +2292,11 @@
         <span class="gw-sum" aria-label="Status of the ${tracked.length} medicines at this step">${chips}</span>
         <button class="gp-close" type="button" data-close="gate">Close</button>
       </div>
-      ${band}
-      <div class="gw-cards">${cards}</div>`;
+      ${band}`;
     wrap.hidden = false;
     btn.setAttribute("aria-expanded", "true");
     openGate = btn;
+    highlightStep(i);
   }
 
   document.querySelectorAll(".pathnode[data-gate]").forEach(btn => {
@@ -2329,19 +2306,10 @@
     });
   });
 
-  // close buttons and the per-card "Read more", delegated so re-rendered markup keeps working
+  // close buttons, delegated so re-rendered markup keeps working
   document.addEventListener("click", e => {
     const c = e.target.closest("[data-close]");
     if (c) { c.dataset.close === "gate" ? closeGate() : closeCell(); return; }
-    const t = e.target.closest(".gw-tg");
-    if (t) {
-      const card = t.closest(".gw-card");
-      const open = t.getAttribute("aria-expanded") !== "true";
-      t.setAttribute("aria-expanded", open ? "true" : "false");
-      t.querySelector(".gw-tgt").textContent = open ? "Show less" : "Read more";
-      card.querySelector(".gw-note").classList.toggle("clamp", !open);
-      card.querySelector(".gw-more").hidden = !open;
-    }
   });
 
   document.addEventListener("keydown", e => {
