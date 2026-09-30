@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Builds the public deploy output: every public-facing HTML page (root,
-# unitaid/, synthetic/) plus the data/ and assets/ files they load.
+# unitaid/, synthetic/, and the fr/ and pt/ editions of the illustrated
+# journey dashboard) plus the data/ and assets/ files they load.
 #
 # Deliberately excluded, and never copied here: briefs/, sourcing/, ontology/,
 # docs/, history/, powerbi/, streamlit-app/, scripts/ itself, and repo files
@@ -35,3 +36,14 @@ cp data/products.js data/products.synthetic.js data/world-map.js \
 # Shared assets
 cp assets/journey-icons/icons.js assets/journey-icons/icons-solid.js "$OUT/assets/journey-icons/"
 cp assets/who-emblem.svg assets/unitaid-mark.svg assets/report-issue.js "$OUT/assets/"
+
+# French and Portuguese editions of the illustrated journey dashboard, from
+# the translation memory (docs/translation-notes.md). --allow-stale because a
+# hand-made change reaches main before the translate bot has run, and English
+# does not wait for French: new text shows in English until it is translated.
+# A locale page that fails its self-check still fails the build.
+node scripts/build-locale-pages.js --allow-stale
+for loc in fr pt; do
+  mkdir -p "$OUT/$loc"
+  cp -R "dist/locale/$loc/." "$OUT/$loc/"
+done

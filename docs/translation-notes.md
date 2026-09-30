@@ -115,6 +115,17 @@ the memory untouched; the stub fills 30 per locale, a second run has nothing to
 do, a Google dry run then sees those 30 slots as empty again, and the pages
 build at 98% (12 left in English) with the stubs flagged.
 
+**4. The French and Portuguese pages are published, and CI builds them.**
+`build-public-site.sh` runs `build-locale-pages.js --allow-stale` and copies
+the output to `/fr/` and `/pt/` (about 2.5 MB each: the page, its six data
+files and `assets/`). The illustrated page links to no other local page, so the
+copies are self-contained. A self-check failure fails the build; out-of-date
+content does not — that is English not waiting for French. `pr-preview.yml`'s
+comment links both, and `validate.yml` runs the same build on every push and
+pull request, so a broken locale page is caught before a preview or production.
+Rejected: failing the public build when `content.en.json` is out of date — every
+hand-made push would then hold up English until the bot had run.
+
 ## What `feat/translation` brought, and what we changed on it
 
 | Where | Change |
@@ -197,8 +208,16 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
   `molecular-markers.js`.
 - **Resolved in item 3 above.** **CP-4 was still open.** `approvalGate()` in
   `translate-strings.js` only printed the hash.
-- **The locale pages are not deployed.** `scripts/build-public-site.sh` copies a
-  fixed list of files, and `dist/locale/` is not on it.
+- **Resolved in item 4 above.** **The locale pages were not deployed.**
+  `scripts/build-public-site.sh` copied a fixed list of files, and
+  `dist/locale/` was not on it.
+- **Pre-existing, left alone: `data/sources.js` is public with its internal
+  fields.** Its header says `findings` and `relevance` are internal and
+  "NOT published", and the page never renders them — but
+  `build-public-site.sh` copies the file whole, so both are downloadable from
+  the public site. The `/fr/` and `/pt/` copies carry them the same way. Not
+  changed here: stripping them belongs in the public build for every copy,
+  and is the owner's call.
 - **Two of the three `publish.yml` runs dispatched after an approval failed** on
   29 Sep: `59c116f` (#10) and `ec49635` (#15), the latter at "Commit snapshot,
   feed and linked-data export". The failed-step log came back empty, so the

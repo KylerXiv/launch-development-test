@@ -18,6 +18,11 @@ jobs:
         run: node scripts/validate-data.js data/products.synthetic.js
       - name: Build single-file preview (smoke test)
         run: node scripts/make-preview.js
+      # The same build the public site runs: new text stays English, but a
+      # translated lookup key or a file the page loads and the build did not
+      # write fails here, before it reaches a preview or production.
+      - name: French and Portuguese pages build and pass their self-check
+        run: node scripts/build-locale-pages.js --allow-stale
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

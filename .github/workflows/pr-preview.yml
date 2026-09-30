@@ -125,10 +125,12 @@ jobs:
         run: |
           MARK='<!-- proposal-preview -->'
           if [ "$STATUS" = "success" ] && [ -n "$URL" ]; then
+            PAGE=illustrated-journey-dashboard.html
             BODY=$(printf '%s\n' "$MARK" \
               "### Public dashboard preview" "" \
               "This preview shows what the public dashboard will look like if this pull request is merged." "" \
               "**Preview:** $URL" "" \
+              "**In French and Portuguese:** [$URL/fr/$PAGE]($URL/fr/$PAGE) · [$URL/pt/$PAGE]($URL/pt/$PAGE) — new text shows in English there until it is approved and translated." "" \
               "Built from \`${SHA:0:7}\`, the commit on this pull request now. Production is unchanged until it merges.")
           else
             BODY=$(printf '%s\n' "$MARK" \
