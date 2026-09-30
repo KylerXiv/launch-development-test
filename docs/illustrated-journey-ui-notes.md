@@ -1000,6 +1000,22 @@ link rows to be replaced so the pages are consistent.
 - **Story's closing buttons** now link only to the Illustrated journey and Pipeline
   (they pointed at Journey board and Comparison matrix, which are no longer in the
   menu).
+- **No links to pages outside the three (Keith, same day):** the Journey board is
+  "replaced and overstepped" by this page, so Pipeline no longer sends people there.
+  Clicking a Pipeline card now opens `illustrated-journey-dashboard.html#<product
+  id>`, and this page opens that medicine's row and scrolls to it on load and on
+  `hashchange` (`openFromHash()`); a hash that is not a product id, such as
+  `#report-issue`, is ignored. Pipeline's legend now says "see the illustrated
+  journey", and its footer copy was reworded: "Spotted an error?" is gone (the
+  floating Report an issue button covers it), "open the full profile on the journey
+  board" became "open that medicine in the illustrated journey", and the Format line
+  was shortened. No other link to `index.html`, `option-b.html` or `explainer.html`
+  remains in this page, Pipeline, Story or `site-nav.js`. **Not done, needs a
+  decision:** `index.html`, `option-b.html` and the rest are still deployed and
+  reachable by URL (and `/` still serves the Journey board); making `/` land on this
+  page would be a redirect in `vercel.json`, which changes what the public URL serves.
+  The comment in `assets/report-issue.js` still cites `index.html#report-issue` as an
+  example share link; it works on any page that loads the script.
 - **Full width, like this page (Keith, same day):** Pipeline and Story dropped their
   fixed 1180px column (and Story's 780/732px hero, banner and closing panel) and now
   fill the screen with this page's side padding. Each defines `--pad:

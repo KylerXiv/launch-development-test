@@ -2159,6 +2159,19 @@
     });
   });
 
+  // A link such as illustrated-journey-dashboard.html#pyramax (the Pipeline cards
+  // use these) opens that medicine's row and scrolls to it. Hashes that are not a
+  // product id, such as #report-issue, are ignored.
+  function openFromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const prod = id ? document.getElementById(id) : null;
+    if (!prod || !prod.classList.contains("product") || !prod.querySelector(".exp")) return;
+    setL1(prod, true);
+    prod.scrollIntoView({ block: "start" });
+  }
+  openFromHash();
+  window.addEventListener("hashchange", openFromHash);
+
   // ---------------------------------------------------------------------------
   // Gate drill-down. gatePanelHTML is a pure renderer: (product, stageIndex) in,
   // markup out, no knowledge of where it is mounted — so the cell tier, the gate
