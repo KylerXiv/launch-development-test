@@ -644,107 +644,107 @@ pathway strip's stacked WHO pair is still the tallest thing in that strip.
 Checked at 1400px and 390px; not at tablet width, and the map could not be
 rendered headless here so its spacing is unchecked.
 
-### 3.18 The medicine cards became a journey table (30 Sep 2026)
-
-Reviewer complaint was scrolling. Keith reviewed a published mock-up
-(summary table + time-scaled journey + original rail) before any of this was
-built, and chose the options recorded here.
-
-Structure, per medicine:
-- **Summary row** (A-Z): chevron, name + INN, a mini journey (one dot per gate,
-  the WHO pair stacked), current stage, status, years on the pathway, and a
-  "Main barrier" phrase. With all rows closed the table is about 300px, against
-  about 1,600px for four full cards.
-- **Level 1 (chevron):** the **time-scaled journey** by default. Dated gates
-  hang from their real year on one axis that starts at the first milestone (no
-  empty years), the current gate sits at today with a bar back to the year it
-  has been waiting since, and gates with no year are listed on the right
-  (reached but undated / ongoing / not started) instead of being given an
-  invented date. A quiet text link, "Switch to pathway order", swaps in the
-  **original rail**, unchanged (forks, bars, year labels), as Keith asked. The
-  swap fades (the mock-up's "Fade" option); reduced-motion users get none.
-- **Level 2 ("More detail"):** the cards and milestone table that "View details"
-  showed, now inside level 1. The gate drill-down still opens under the marker
-  row, from either view.
+### 3.18 The medicine cards became a journey table (30 Sep 2026)
+
+Reviewer complaint was scrolling. Keith reviewed a published mock-up
+(summary table + time-scaled journey + original rail) before any of this was
+built, and chose the options recorded here.
+
+Structure, per medicine:
+- **Summary row** (A-Z): chevron, name + INN, a mini journey (one dot per gate,
+  the WHO pair stacked), current stage, status, years on the pathway, and a
+  "Main barrier" phrase. With all rows closed the table is about 300px, against
+  about 1,600px for four full cards.
+- **Level 1 (chevron):** the **time-scaled journey** by default. Dated gates
+  hang from their real year on one axis that starts at the first milestone (no
+  empty years), the current gate sits at today with a bar back to the year it
+  has been waiting since, and gates with no year are listed on the right
+  (reached but undated / ongoing / not started) instead of being given an
+  invented date. A quiet text link, "Switch to pathway order", swaps in the
+  **original rail**, unchanged (forks, bars, year labels), as Keith asked. The
+  swap fades (the mock-up's "Fade" option); reduced-motion users get none.
+- **Level 2 ("More detail"):** the cards and milestone table that "View details"
+  showed, now inside level 1. The gate drill-down still opens under the marker
+  row, from either view.
 - All rows start closed. (The first row, ALAQ, started open until later the same
   day, when Keith asked for it closed: the table is then about 300px and nothing
-  is chosen for the reader. `setL1()` is still the single place that opens a row.)
-
-Decisions and what was rejected:
-- **"Main barrier" is a new optional `barrier` field** in `data/products.js`
-  (short phrase; documented in the data analyst guide), not a trimmed `flag`.
-  Rejected: first clause of `flag` - "Adoption is the current access barrier"
-  repeats the column title and says nothing. I drafted the two phrases
-  (ASPY "National guideline inclusion is limited", DHA-PPQ "Only 0.9-4.5% of
-  Global Fund spend, 2022-24"); **they are the data owner's to rewrite**. With no
-  `barrier` but a `flag`, the row shows the flag clipped; with neither, "No
-  barrier recorded". No changelog entry was added: it is a display field, not a
-  change to a fact.
-- **Pending-since year** comes from `detail.journey`, the same milestones the
-  gate panel's "Pending since" line reads, so the two always agree (ASPY 2022,
-  DHA-PPQ 2015). The mock-up had used 2008 for DHA-PPQ from the stage's "Since
-  2008" text; the gate panel says 11 years from 2015, so 2015 is what ships. A
-  product with no journey falls back to the latest year in the column before the
-  current gate (GanLum: 2025); ALAQ has none and shows no bar.
-- **Not-started gates are a row of dimmed icons**, not labelled chips: a product
-  early on has up to seven, which made the right-hand panel the tallest thing in
-  the row. Names are in each icon's title/aria-label and the strip above names
-  every gate.
-- **Kept:** the full pathway strip above the table (Keith chose it over a slim
-  key). The legend lost "reached out of order": positions are now real years, so
-  that state no longer exists in the default view (the rail still shows
-  out-of-order gates by year label).
-- **Removed:** the always-visible "Actual timeline" SVG and `fitTimelines()`,
-  `stageTimeline()` and their helpers, and the `.prow`/`.pbtn`/`.peek` rules. The
-  time view is plain percent-positioned HTML, so it needs no width measurement or
-  re-render on resize.
-- The pathway-order rail is measured to line its forks up, and a hidden rail has
-  no size. `layoutJourney()` therefore re-runs whenever a row opens, when the
-  view switches to the rail and on resize. Anything new that reveals a rail must
-  call it.
+  is chosen for the reader. `setL1()` is still the single place that opens a row.)
+
+Decisions and what was rejected:
+- **"Main barrier" is a new optional `barrier` field** in `data/products.js`
+  (short phrase; documented in the data analyst guide), not a trimmed `flag`.
+  Rejected: first clause of `flag` - "Adoption is the current access barrier"
+  repeats the column title and says nothing. I drafted the two phrases
+  (ASPY "National guideline inclusion is limited", DHA-PPQ "Only 0.9-4.5% of
+  Global Fund spend, 2022-24"); **they are the data owner's to rewrite**. With no
+  `barrier` but a `flag`, the row shows the flag clipped; with neither, "No
+  barrier recorded". No changelog entry was added: it is a display field, not a
+  change to a fact.
+- **Pending-since year** comes from `detail.journey`, the same milestones the
+  gate panel's "Pending since" line reads, so the two always agree (ASPY 2022,
+  DHA-PPQ 2015). The mock-up had used 2008 for DHA-PPQ from the stage's "Since
+  2008" text; the gate panel says 11 years from 2015, so 2015 is what ships. A
+  product with no journey falls back to the latest year in the column before the
+  current gate (GanLum: 2025); ALAQ has none and shows no bar.
+- **Not-started gates are a row of dimmed icons**, not labelled chips: a product
+  early on has up to seven, which made the right-hand panel the tallest thing in
+  the row. Names are in each icon's title/aria-label and the strip above names
+  every gate.
+- **Kept:** the full pathway strip above the table (Keith chose it over a slim
+  key). The legend lost "reached out of order": positions are now real years, so
+  that state no longer exists in the default view (the rail still shows
+  out-of-order gates by year label).
+- **Removed:** the always-visible "Actual timeline" SVG and `fitTimelines()`,
+  `stageTimeline()` and their helpers, and the `.prow`/`.pbtn`/`.peek` rules. The
+  time view is plain percent-positioned HTML, so it needs no width measurement or
+  re-render on resize.
+- The pathway-order rail is measured to line its forks up, and a hidden rail has
+  no size. `layoutJourney()` therefore re-runs whenever a row opens, when the
+  view switches to the rail and on resize. Anything new that reveals a rail must
+  call it.
 - ~~"Open in row" from the gate list~~ was removed on 30 Sep 2026 (see 3.20); the
   `setL1`/`showView` fallback it needed is still used by the chevron and the Switch
   link.
-- Print: every row prints open in its time view, with the detail cards.
-
-Not done / left alone: tablet width was not checked; the map is unchanged; the
-stage markers in the time view keep hover tooltips and the drill-down but the
-"Switch" link is the only route to gates that have no year, apart from "Open in
-row". Real sliding of markers between the two views (mock-up option F's
-animation) was not built; it is a fade.
-
-### 3.19 The pathway strip explains itself (30 Sep 2026)
-
-Keith wanted the strip to make the order obvious, to explain what happens at each
-stage, and to drop the legend. Reviewed as a published mock-up first; every
-suggested option was accepted.
-
-- **Order:** steps are numbered 1 to 7 (`stepNo()`, the position of the stage's
-  column), and the two parallel WHO gates share **3**, inside their bracket. A
-  heading line says "Every medicine moves left to right. Step 3 is two separate
-  WHO approvals, in either order." Numbering is justified because the steps are a
-  real sequence; the shared 3 is what stops it implying an order between the WHO
-  pair. The stage label size went from 11 to 12px.
-- **Panel:** clicking a step opens one section under the strip (the old "every
-  medicine at this gate" panel, extended) with two halves: *what happens here*
-  (what, who decides, why it can stall, source) and *where each medicine is*
-  (status, the note clamped to three lines, "Open in row"). With no `stageInfo` it
-  falls back to the medicines half alone. Nothing is open on load; a hint line
-  invites a click.
-- **Wording lives in data, not HTML:** a top-level `stageInfo` array in
-  `data/products.js`, one entry per stage, validated by `validate-data.js` (length
-  must equal `stages`, all four strings non-empty) and documented in the data
-  analyst guide. Drafted from `docs/domain-primer.md` section 2. **It is unreviewed
-  wording and needs LAUNCH sign-off** - nothing on the page marks it as draft
-  beyond the page-wide prototype banner. The "typical 3 to 6 years" for trials and
-  the "about 90 working days" for collaborative registration are the primer's
-  figures, not new claims.
-- **Legend removed**, with the dated-milestone key. Status is written in words in
-  the table, the panel and the row journey, and the dots differ in shape as well as
-  colour. Safeguard added: each mini-journey dot has a `title` ("Regulatory
-  approval (SRA): Complete"). The dots sit inside an element with `role="img"`, so
-  the hover text helps sighted users; screen readers get the row's summary label,
-  not per-dot names. `.strip`, `.legend` and `.tgap-key` CSS went with it.
+- Print: every row prints open in its time view, with the detail cards.
+
+Not done / left alone: tablet width was not checked; the map is unchanged; the
+stage markers in the time view keep hover tooltips and the drill-down but the
+"Switch" link is the only route to gates that have no year, apart from "Open in
+row". Real sliding of markers between the two views (mock-up option F's
+animation) was not built; it is a fade.
+
+### 3.19 The pathway strip explains itself (30 Sep 2026)
+
+Keith wanted the strip to make the order obvious, to explain what happens at each
+stage, and to drop the legend. Reviewed as a published mock-up first; every
+suggested option was accepted.
+
+- **Order:** steps are numbered 1 to 7 (`stepNo()`, the position of the stage's
+  column), and the two parallel WHO gates share **3**, inside their bracket. A
+  heading line says "Every medicine moves left to right. Step 3 is two separate
+  WHO approvals, in either order." Numbering is justified because the steps are a
+  real sequence; the shared 3 is what stops it implying an order between the WHO
+  pair. The stage label size went from 11 to 12px.
+- **Panel:** clicking a step opens one section under the strip (the old "every
+  medicine at this gate" panel, extended) with two halves: *what happens here*
+  (what, who decides, why it can stall, source) and *where each medicine is*
+  (status, the note clamped to three lines, "Open in row"). With no `stageInfo` it
+  falls back to the medicines half alone. Nothing is open on load; a hint line
+  invites a click.
+- **Wording lives in data, not HTML:** a top-level `stageInfo` array in
+  `data/products.js`, one entry per stage, validated by `validate-data.js` (length
+  must equal `stages`, all four strings non-empty) and documented in the data
+  analyst guide. Drafted from `docs/domain-primer.md` section 2. **It is unreviewed
+  wording and needs LAUNCH sign-off** - nothing on the page marks it as draft
+  beyond the page-wide prototype banner. The "typical 3 to 6 years" for trials and
+  the "about 90 working days" for collaborative registration are the primer's
+  figures, not new claims.
+- **Legend removed**, with the dated-milestone key. Status is written in words in
+  the table, the panel and the row journey, and the dots differ in shape as well as
+  colour. Safeguard added: each mini-journey dot has a `title` ("Regulatory
+  approval (SRA): Complete"). The dots sit inside an element with `role="img"`, so
+  the hover text helps sighted users; screen readers get the row's summary label,
+  not per-dot names. `.strip`, `.legend` and `.tgap-key` CSS went with it.
 - **"no fixed order" text removed** from both the top strip and each medicine's
   pathway rail (Keith, same day), since the heading line and the bracket already
   say it. The two note elements were emptied, not deleted: the rail's fork
@@ -763,15 +763,15 @@ suggested option was accepted.
   strip's `aria-label` still carry it, but a first-time reader gets no sentence
   telling them to click. If readers do not open the steps, restore the hint line
   first; it was the cheapest of the three.
-- Rejected: a separate explainer page or tooltip per step (the click panel already
-  exists and is where the per-medicine answer lives), and putting the wording in
-  `index.html`-style hard-coded prose (nothing would keep it in step with the data).
-- Validator now reports 6 warnings, not the 5 in CLAUDE.md. The extra is
-  `treatment policy: 1 country value(s) ... fall outside the drawn basemap (GUF)`,
-  from PR #21 (MFT policy map), already on `development` before this change;
-  confirmed by validating without these edits.
-- Not checked: tablet width, real devices, print with a step panel open.
-
+- Rejected: a separate explainer page or tooltip per step (the click panel already
+  exists and is where the per-medicine answer lives), and putting the wording in
+  `index.html`-style hard-coded prose (nothing would keep it in step with the data).
+- Validator now reports 6 warnings, not the 5 in CLAUDE.md. The extra is
+  `treatment policy: 1 country value(s) ... fall outside the drawn basemap (GUF)`,
+  from PR #21 (MFT policy map), already on `development` before this change;
+  confirmed by validating without these edits.
+- Not checked: tablet width, real devices, print with a step panel open.
+
 ### 3.20 The step panel: explanation band + a card per medicine (30 Sep 2026)
 
 > **Superseded the same day by 3.21:** the per-medicine cards and "Read more" were
@@ -842,6 +842,32 @@ cut. Reviewed as a mock-up first; built as suggested.
   four rows), switching moves the highlight, no script errors. Not checked: tablet
   width, real devices. On phones the journey sits on its own line and the
   highlight is a short band per row, not a continuous column.
+
+### 3.22 Marker rings take their status colour (30 Sep 2026)
+
+Keith saw that a selected marker got a teal ring whatever its status (an amber
+"in progress" marker ended up with a teal ring outside its own amber border), and
+that complete markers had no ring at all. Suggested first, then built.
+
+- **One colour per status, set once:** `.stage.s-done/-prog/-late/-idle` define
+  `--ring` (green / amber / red / grey) and `--ring-soft` (its tint). The border,
+  the selected ring and the current-stage glow all read them, so no second colour
+  can appear on a marker.
+- **Selected:** a 3px ring in `--ring` with a 2px white gap, so it cannot clash with
+  the marker's own border. Declared for `.stage.cur` too, because the current-stage
+  glow (same specificity, later in the file) used to override it.
+- **Every marker has a ring:** complete markers gained a solid 2px green border
+  (prog and late already had theirs); not-started markers keep a dashed ring, now
+  1.5px in `--idle` (was 1px in `--line`) at 65% opacity (was 55%), since dashed
+  reads as "not yet" and a solid ring would say otherwise.
+- **Current-stage glow** is the status tint, not teal.
+- Applies to the pathway-order rail and the time view, which share the markers. The
+  top pathway strip has no status, so it is unchanged.
+- Trade-off: complete markers are heavier, so a fully complete row reads busier;
+  the green check badge was already there.
+- Checked in headless Chrome: selecting an in-progress and a delayed marker gives
+  amber and red rings. Not checked: tablet width, real devices, keyboard-focus
+  outline against the new rings.
 
 ## 4. Newly discovered, deferred, or left alone
 
