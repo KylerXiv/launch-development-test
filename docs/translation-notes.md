@@ -126,6 +126,92 @@ pull request, so a broken locale page is caught before a preview or production.
 Rejected: failing the public build when `content.en.json` is out of date — every
 hand-made push would then hold up English until the bot had run.
 
+**5. The approval job translates before it merges; a bot covers the rest.**
+
+- `proposal-pr.sh` puts `i18n/content.en.json`, rebuilt from the proposal, on
+  the pull request beside `data/products.js`, so its diff shows the English
+  strings being approved. Nothing is translated at intake.
+- `proposal-decision.yml` accepts a pull request whose files are
+  `data/products.js` and, optionally, `i18n/content.en.json` — one opened before
+  this change carries only the first and still passes. `products.js` must still
+  be byte-for-byte the snapshot on today's `main`; that check is unchanged.
+- A new step runs `scripts/proposal-translate.sh`. On `main` as it is now, with
+  the snapshot applied, it rebuilds `content.en.json`, translates the strings
+  that have no translation yet (with `APPROVED_CONTENT_HASH` set to that
+  content's hash), builds and self-checks the French and Portuguese pages, and
+  replaces `proposal/<n>` with that one commit — only over the commit the
+  reviewer's preview was built from (`--force-with-lease`). The squash merge then
+  carries `products.js`, `content.en.json` and `translations.json` together.
+- **Rebuilt on today's `main`, not taken from the pull request.** Rejected:
+  requiring the pull request's `content.en.json` to equal a rebuild. The
+  translate bot refreshes that file on `main` after every hand-made change (53
+  page commits in the month to 30 Sep), so each would conflict with every open
+  proposal's copy and send it back for approval, over a change that was already
+  live and not part of the proposal. When the two hashes differ, both are
+  recorded: `contentHash` (merged) and `reviewedContentHash` (the pull request's).
+- An engine failure does not stop the merge; a failed self-check does. The
+  approval comment says either that French and Portuguese are in the same
+  commit, or how many strings still show in English and whether the engine
+  failed.
+- The merge is tried up to five times, six seconds apart: the branch has just
+  been replaced, and GitHub may not yet have worked out that it is mergeable.
+  A guard, not an observed failure. Between tries it asks whether the pull
+  request is already merged, so a try that merged but still exited non-zero
+  (failing to delete the branch, say) is not reported as "Not merged".
+- `record-decision.js` writes `contentHash`, and `reviewedContentHash` when it
+  differs.
+- **`translate.yml`, the translate bot.** On a push to `main` that changes the
+  page, `products.js`, `resistance.js`, `molecular-markers.js`, `sources.js`,
+  `assemble-content.js` or `i18n-identifiers.js`, and by hand: rebuilds the
+  content file, translates what is new, self-checks, commits the two `i18n/`
+  files and starts the deploy. It commits what is ready even when the engine
+  fails, then fails the run, so a gap is visible.
+- **`publish.yml` starts the bot after an approval, not the approval job.**
+  The diagram said the approval job would. The `bot-push-main` group holds one
+  running and one pending run: dispatched there alongside `publish.yml`, the bot
+  would be a second pending run and cancel it, and the history snapshot would be
+  lost. Rejected: giving the bot its own group — it would then push to `main`
+  beside `publish.yml`, which does not retry a rejected push.
+- Engine and key: `vars.TRANSLATE_ENGINE` (a repository variable, default
+  `google`) and `secrets.GOOGLE_API_KEY`. **Neither is set on any repository
+  yet.** Until they are, a proposal with new text merges with that text in
+  English on `/fr` and `/pt`, and a bot run with new text fails, saying so. The
+  30 strings already pending (item 1) make the bot's first run on `main` one of
+  those. Setting `TRANSLATE_ENGINE=stub` on the test repository runs the whole
+  route with stub values instead.
+
+**Checked.** `actionlint` 1.7.12 with `shellcheck` 0.11.0: clean on the five
+changed workflows and on `proposal-translate.sh`, `proposal-pr.sh` and
+`build-public-site.sh` (`main`'s own copies are clean too). **Local simulation,
+50/50** — the workflows' own `run:` blocks, with their `env:` and `if:`, against
+a bare remote and a stub `gh` that squash-merges for real (the harness lives
+outside the repository):
+
+- A. a text proposal with the stub engine: the PR carries the two files and no
+  translations; the merge commit carries exactly the three files; `main`'s
+  content is current, the sentence has French, both pages build, the decision
+  records `main`'s `contentHash`; publish then starts the bot, which has
+  nothing to do;
+- B. `main`'s page changes after the PR is opened and the bot runs first: the
+  approval still merges without a conflict and records both hashes;
+- C. no key at approval: English merges, the comment says what is still in
+  English and that the engine failed; the bot fails visibly while the engine is
+  down and fills the gap once it is back;
+- D. another change to `products.js` lands first: rebuilt and asked again,
+  nothing translated;
+- E. the PR branch gains another file: refused;
+- F. a push to the PR branch between the check and the merge: the lease
+  refuses, and the racing commit stays;
+- G. a hand-made change with no new text and no key: the bot succeeds,
+  commits only the content file, and a second run commits nothing.
+- H. the merge lands but `gh` still exits non-zero: counted as merged, the
+  approval recorded, no "Not merged" comment, one merge.
+
+Not exercised, and only the test repository can: GitHub's own event delivery
+(the `labeled` event, dispatches made with `GITHUB_TOKEN`, queueing in
+`bot-push-main`), mergeability timing, Vercel's build image running Node for
+`build-public-site.sh`, and a real engine.
+
 ## What `feat/translation` brought, and what we changed on it
 
 | Where | Change |
@@ -199,7 +285,8 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
   branch's 525 / 14; the self-check passes because it checks the resistance rows
   only. The translations are still in `translations.json`, keyed by unchanged
   English, so reading `sources.js` should need nothing new sent to Google.
-- **The approval check does not allow `content.en.json` in a proposal PR.**
+- **Resolved in item 5 above.** **The approval check does not allow
+  `content.en.json` in a proposal PR.**
   `proposal-decision.yml` merges only a PR whose one changed file is
   `data/products.js`. Rebuilding the content file after the merge, in
   `publish.yml`, fits that workflow's pattern (a generated file, one bot commit),
@@ -223,16 +310,35 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
   feed and linked-data export". The failed-step log came back empty, so the
   cause is not known; `59c116f`'s step was not checked.
 
+## Deferred, and left alone
+
+- **A string the engine rejects is queued again on every run**, as the three in
+  item 2 were, until someone writes it by hand; each run then calls the engine.
+- **There are no numbers-only proposals.** `proposal-lib.js apply` writes a
+  changelog entry, and its `plain` line is translatable, so every approval has
+  new text and needs the engine — or leaves that line in English. The changelog
+  panel is hidden on the page for now.
+- **Every hand-made change to the page or the data adds a bot commit** to
+  `main` (`content.en.json`, and `translations.json` when there is new text).
+- **`content.en.json` carries `sources.js` whole**, `findings` and `relevance`
+  included, in `values`. The repository is private; DEV-32's `build-dataset.js`
+  must drop them before anything is published from `values`.
+- **Portuguese locale code**, `pt-PT` or `pt-BR`: still open (DEV-31 §6).
+- **No language switcher** links `/`, `/fr/` and `/pt/`; the pages exist but
+  nothing on the English page points to them.
+- The two translation-memory faults in item 2, and the `publish.yml` failures
+  and `sources.js` exposure above.
+
 ## Status
 
-- `feat/translation` on `KylerXiv/launch-development-test`: Keith's `ee1181e`
-  plus this commit, pushed. It now differs from Keith's branch by this commit, so
-  a later pull from Keith is a merge, not a fast-forward.
-- `main`: `b8c8d05` pushed 30 Sep; validate, Vercel deploy and publish all
-  succeeded.
-- CI on `ee1181e`: "Validate dashboard data" succeeded.
+- Branch `translation-workflow` on `KylerXiv/launch-development-test`, cut from
+  `main` at `b8c8d05`: the merge of `feat/translation` and five commits. Pushed
+  with this commit, as a draft pull request against `main`. **Not merged.**
+- `feat/translation` there is Keith's `ee1181e` plus `f69ecf6`; `main` is
+  `b8c8d05` (validate, Vercel deploy and publish succeeded on it, 30 Sep).
 - Verify block on this commit, 30 Sep: both normalizers byte-identical;
   `validate-data.js` 0 errors / 5 warnings (3 resistance + 2 molecular markers);
-  synthetic 0 / 0; `make-preview.js` 154 KB. `assemble-content.js --check` up
-  to date; `build-locale-pages.js` all checks passed, fr 525 / pt 530
-  translated, 14 left in English each. No NUL bytes in any changed file.
+  synthetic 0 / 0; `make-preview.js` 154 KB; `assemble-content.js --check` up
+  to date; `build-locale-pages.js` all checks passed (fr 527 / pt 532
+  translated, 41 left in English each, 93%); `build-public-site.sh` exits 0.
+  No NUL bytes in any changed file.

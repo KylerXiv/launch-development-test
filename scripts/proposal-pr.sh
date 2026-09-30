@@ -3,6 +3,11 @@
 # open pull request carries it — so the reviewer sees the real diff and, once
 # pr-preview.yml has run, the real public dashboard, before anyone decides.
 #
+# The branch carries two files: data/products.js with the proposal applied,
+# and i18n/content.en.json rebuilt from it — the English the reviewer is
+# approving, identified by its contentHash (docs/translation-notes.md). Nothing
+# is translated here; that happens only after approval.
+#
 #   bash scripts/proposal-pr.sh <issue-number> <proposal.json>
 #
 # Run from a checkout of main. The branch, proposal/<n>, is rebuilt from that
@@ -35,8 +40,10 @@ git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
 git checkout --quiet -B "$BRANCH"
 node scripts/proposal-lib.js apply "$PROPOSAL"
-# By name, never -A: the data file is the only thing a proposal may change.
-git add data/products.js
+node scripts/assemble-content.js
+# By name, never -A: the data file is the only thing a proposal may change,
+# and the content file is generated from it.
+git add data/products.js i18n/content.en.json
 git commit --quiet -m "Proposal #$N: $TITLE" -m "Applied from the snapshot recorded when issue #$N was filed."
 git push --quiet --force origin "$BRANCH"
 SHA=$(git rev-parse HEAD)

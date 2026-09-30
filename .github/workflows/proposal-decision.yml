@@ -9,6 +9,10 @@ name: Proposal decision
 #                    has moved or the branch was edited, it rebuilds the PR
 #                    and its preview instead and asks for the approval again:
 #                    what merges is always what the reviewer was shown.
+#                    Before merging it translates the proposal's new English
+#                    (scripts/proposal-translate.sh), so English, French and
+#                    Portuguese land as one commit; if the engine fails, the
+#                    English merges anyway and the translate bot fills the gap.
 #   rejected:...  -> records the reason and the fingerprint in
 #                    data/decisions.js, closes the issue and its PR.
 #
@@ -103,8 +107,10 @@ jobs:
 
       # The reviewer saw the diff and the preview of $SHA. Merge it only if
       # its data file is byte-for-byte the snapshot applied to main as main is
-      # NOW, and it touches nothing else. Rebuilt with the date intake stamped,
-      # so an approval on a later day still matches.
+      # NOW, and it touches nothing else — except i18n/content.en.json, which
+      # proposal-pr.sh generates from it and the next step rebuilds anyway, so
+      # nothing in the pull request's copy is trusted. Rebuilt with the date
+      # intake stamped, so an approval on a later day still matches.
       - name: Check it is still exactly the proposal, on main as it is now
         id: verify
         env:
@@ -129,7 +135,11 @@ jobs:
           ')
           FILES=$(gh pr diff "$PR" --name-only)
           node scripts/proposal-lib.js apply /tmp/proposal.json ${ON:+"$ON"}
-          if [ "$FILES" = "data/products.js" ] && git diff --quiet "$SHA" -- data/products.js; then
+          ONLY=true
+          for f in $FILES; do
+            case "$f" in data/products.js|i18n/content.en.json) ;; *) ONLY=false ;; esac
+          done
+          if [ "$ONLY" = true ] && grep -qx data/products.js <<< "$FILES" && git diff --quiet "$SHA" -- data/products.js; then
             echo "current=true" >> "$GITHUB_OUTPUT"
           else
             echo "Changed files: $FILES"
@@ -141,9 +151,27 @@ jobs:
         if: steps.verify.outputs.current == 'true'
         run: node scripts/validate-data.js
 
+      # The approval is what lets the English reach a translation engine. On
+      # this checkout — main with the snapshot applied — rebuild the content
+      # file, translate only its new strings, check the French and Portuguese
+      # pages, and replace the branch with that one commit. Only over $SHA:
+      # a push since the reviewer's preview makes this fail, and nothing merges.
+      # An engine failure does not stop it (English does not wait for French);
+      # a locale page that fails its self-check does.
+      - name: Translate it, and build the commit that merges
+        id: build
+        if: steps.verify.outputs.current == 'true'
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          SHA: ${{ steps.pr.outputs.sha }}
+          TRANSLATE_ENGINE: ${{ vars.TRANSLATE_ENGINE || 'google' }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: bash scripts/proposal-translate.sh "$ISSUE_NUMBER" "$SHA"
+
       # A merge made with GITHUB_TOKEN fires no push workflows, so this starts
       # the two that a push to main would have started. A person merging the
-      # pull request by hand starts them the ordinary way.
+      # pull request by hand starts them the ordinary way. publish.yml then
+      # starts the translate bot, which normally has nothing left to do.
       - name: Merge it, and rebuild production
         id: merge
         if: steps.verify.outputs.current == 'true'
@@ -151,16 +179,33 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           PR: ${{ steps.pr.outputs.pr }}
-          SHA: ${{ steps.pr.outputs.sha }}
+          SHA: ${{ steps.build.outputs.sha }}
           APPROVER: ${{ github.event.sender.login }}
+          LEFT_FR: ${{ steps.build.outputs.left_fr }}
+          LEFT_PT: ${{ steps.build.outputs.left_pt }}
+          FAILED: ${{ steps.build.outputs.failed }}
         run: |
-          gh pr merge "$PR" --squash --match-head-commit "$SHA" --delete-branch \
-            --subject "Apply proposal #$ISSUE_NUMBER, approved by @$APPROVER" \
-            --body "Closes #$ISSUE_NUMBER"
+          # GitHub may still be working out whether the branch it was just
+          # given is mergeable; give it a few tries before calling it a failure.
+          # A try that merged but still failed (deleting the branch, say) must
+          # count as merged, or the run would report an unmerged change.
+          for try in 1 2 3 4 5; do
+            if gh pr merge "$PR" --squash --match-head-commit "$SHA" --delete-branch \
+                 --subject "Apply proposal #$ISSUE_NUMBER, approved by @$APPROVER" \
+                 --body "Closes #$ISSUE_NUMBER"; then break; fi
+            [ "$(gh pr view "$PR" --json state --jq .state)" = MERGED ] && break
+            [ "$try" = 5 ] && exit 1
+            sleep 6
+          done
           gh workflow run vercel-deploy.yml --ref main
           gh workflow run publish.yml --ref main
+          if [ "$LEFT_FR" = 0 ] && [ "$LEFT_PT" = 0 ]; then
+            LANGS="Its French and Portuguese are in the same commit."
+          else
+            LANGS="French and Portuguese: ${LEFT_FR:-?} and ${LEFT_PT:-?} string(s) are still in English on \`/fr\` and \`/pt\` until the translate bot fills them${FAILED:+ — the translation engine failed for: $FAILED, see the run}."
+          fi
           gh issue comment "$ISSUE_NUMBER" --body \
-            "**Approved by @$APPROVER.** #$PR is merged and the production dashboard is being rebuilt from it."
+            "**Approved by @$APPROVER.** #$PR is merged and the production dashboard is being rebuilt from it. $LANGS"
           # By hand: GitHub does not act on "Closes #n" when GITHUB_TOKEN both
           # opened and merged the pull request (seen on #4, 29 Sep).
           gh issue close "$ISSUE_NUMBER" --reason completed
@@ -177,6 +222,8 @@ jobs:
           STATE: approved
           DECIDER: ${{ github.event.sender.login }}
           PR: ${{ steps.pr.outputs.pr }}
+          CONTENT_HASH: ${{ steps.build.outputs.content_hash }}
+          REVIEWED_CONTENT_HASH: ${{ steps.build.outputs.reviewed_hash }}
         run: |
           COMMIT=$(gh pr view "$PR" --json mergeCommit --jq '.mergeCommit.oid // ""')
           export COMMIT

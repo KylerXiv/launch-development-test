@@ -40,6 +40,8 @@ upgrade, or break.
 | `scripts/build-map.js` | One-off map-geometry generator (dev-only deps documented in its header). |
 | `.github/workflows/validate.yml` | CI: validator + preview build on every push/PR. |
 | `.github/workflows/publish.yml` | On `data/products.js` changes: validates, snapshots to `history/`, rebuilds `feed.xml`, `ontology/launch-data.jsonld` and `ontology/launch-history.jsonld`, bot-commits. Path-filtered so its own commit cannot retrigger it. |
+| `.github/workflows/translate.yml` | The translate bot. After a hand-made change to the illustrated page, `data/products.js`, `resistance.js`, `molecular-markers.js` or `sources.js` reaches `main`: rebuilds `i18n/content.en.json`, translates only new strings into French and Portuguese, checks both pages, bot-commits `i18n/` and redeploys. Also started by `publish.yml` after an approval, as a safety net. Approved proposals are translated before they merge, by `scripts/proposal-translate.sh` in `proposal-decision.yml`. See [translation-notes.md](translation-notes.md). |
+| `i18n/` | The translation layer (DEV-31): `content.en.json`, the English content and its `contentHash` — **generated** by `scripts/assemble-content.js`, never hand-edited — and `translations.json`, the translation memory, where `fr`/`pt` hand corrections live. `scripts/build-locale-pages.js` builds the `/fr/` and `/pt/` pages from them at deploy time. See [jackson/DEV-31.md](jackson/DEV-31.md). |
 | `.github/workflows/reminder.yml` | Monthly cron: opens the milestone-scan checklist issue. Also runnable manually (workflow_dispatch). |
 | `.github/workflows/sourcing.yml` | Scheduled source fetch: weekly trial watch (Mon), monthly Global Fund + regulatory pulls (3rd); bot-commits outputs under `sourcing/` only and opens watch issues on changes. Manually runnable with a fetcher picker. |
 | `sourcing/` | Public-source data collection area: append-only raw snapshots, regenerated staging CSVs, generated watch reports. Upstream of analyst edits — **never feeds the pages directly**. Self-documented in its own README; design in [docs/data-sourcing-plan.md](data-sourcing-plan.md). |
@@ -173,7 +175,8 @@ No test framework by design; two layers instead:
   CI gates data quality but does not gate the Pages deploy (branch-based Pages
   deploys regardless) — treat a red CI run as a revert-now signal.
 - **Bot commits**: `publish.yml` pushes snapshot/feed commits to `main` after
-  data changes — always `git pull` before pushing local work, or a
+  data changes, and `translate.yml` pushes `i18n/` commits after changes to the
+  page or the data — always `git pull` before pushing local work, or a
   fast-forward rejection will greet you.
 - **RBM options**: (a) copy the static set — `index.html`, `pipeline.html`,
   `story.html`, `widget.html`, `data/`, `feed.xml`, `.nojekyll` (plus

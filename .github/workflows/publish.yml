@@ -7,7 +7,8 @@ name: Snapshot history and rebuild feed
 #
 # workflow_dispatch: proposal-decision.yml merges approved proposals with
 # GITHUB_TOKEN, which fires no push workflows, so it starts this one by hand
-# on main. Re-running it on an unchanged file commits nothing.
+# on main. Re-running it on an unchanged file commits nothing. After such a
+# run it starts the translate bot (translate.yml) — see the last step.
 on:
   push:
     branches: [main]
@@ -16,6 +17,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # to start translate.yml after an approval
 
 # One bot push at a time — a queued run rebases on the previous one's commit
 # instead of failing non-fast-forward.
@@ -75,3 +77,15 @@ jobs:
             git commit -m "chore: history snapshot + feed + linked-data rebuild [bot]"
             git push
           fi
+
+      # After an approval, the translate bot as a safety net: the approval job
+      # translated already, unless the engine failed there. Started from here,
+      # not by the approval job: the group holds one running and one pending
+      # run, so dispatched from there alongside this one, it would have been a
+      # second pending run and cancelled this one.
+      # A push to main starts the bot by itself, so only dispatched runs do this.
+      - name: Start the translate bot
+        if: always() && github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run translate.yml --ref main
