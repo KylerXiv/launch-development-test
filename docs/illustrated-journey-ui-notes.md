@@ -901,6 +901,14 @@ choice; these are the choices made.
   alternatives (a strip under the chart; a summary in place of the axis) were
   offered and not chosen; ALAQ is the case to revisit if the panel still feels
   empty.
+- **Provenance line under the milestone table removed** (Keith, after seeing the
+  draft wording live): the "Draft - not yet verified. These figures come from
+  public sources..." note. The same `.src` element also carried the wording for
+  `illustrative` and `live` data ("Each figure reflects its cited public source;
+  manufacturer-specific details are shown only where release was confirmed in
+  writing"), so those went too. The draft banner at the top of the page and the
+  "About the data" footer still say the same things; if the dataset goes `live`,
+  that per-figure sentence is no longer shown next to the figures.
 - Removed: the `.swv` link and the `.l1f` footer row. Print hides the switch and the
   bar.
 - Checked in headless Chrome: the group switches every row, the bar opens the
