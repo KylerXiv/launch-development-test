@@ -57,7 +57,7 @@
     font: 15px/1.5 -apple-system, "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { margin: 0; padding: 28px clamp(24px, 4vw, 64px) 56px; position: relative; }
+  .wrap { margin: 0; padding: 16px clamp(24px, 4vw, 64px) 32px; position: relative; }
 
   /* ---------- header ---------- */
   /* Two rows (sheet rows 18/20 follow-up, 30 Sep 2026):
@@ -100,7 +100,7 @@
     white-space: nowrap;
   }
   .demo-banner {
-    margin: 14px 0 18px; padding: 9px 14px; border-radius: 8px;
+    margin: 10px 0 12px; padding: 9px 14px; border-radius: 8px;
     background: var(--accent-soft); color: var(--ink-2); font-size: 13px;
     border: 1px solid var(--line);
   }
@@ -130,7 +130,7 @@
      `tracked`, which the rest of the page still needs) went with them. */
   .strip {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px;
-    padding: 12px 18px; margin-top: 22px; margin-bottom: 22px;
+    padding: 8px 18px; margin-top: 10px; margin-bottom: 10px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-left: auto; font-size: 12.5px; color: var(--ink-2); }
@@ -155,7 +155,7 @@
        below it shifts with that same lift. Setting equal padding here and
        measuring the true rendered gap afterwards is what keeps the two
        matching instead of just assuming a formula stays right forever. */
-    padding: 14px 18px; margin-bottom: 22px; overflow-x: auto;
+    padding: 8px 18px; margin-bottom: 10px; overflow-x: auto;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
@@ -206,6 +206,11 @@
     border-left: 3px solid var(--line); border-right: 3px solid var(--line);
     border-radius: 14px;
     transform: translateY(calc(-1 * var(--pg-lift, 0px)));
+    /* The transform moves paint, not layout, so without this the row stays
+       --pg-lift taller than the bracket's painted bottom edge and the card
+       keeps that much empty space under it. Pulling the layout box up by the
+       same amount makes the card's bottom padding the real gap. */
+    margin-bottom: calc(-1 * var(--pg-lift, 0px));
   }
   .pathgroup .pathnode { flex: none; min-width: 0; width: 100%; }
   .pathgroup-note {
@@ -214,7 +219,7 @@
   }
 
   /* ---------- product rows ---------- */
-  .board { display: flex; flex-direction: column; gap: 14px; }
+  .board { display: flex; flex-direction: column; gap: 10px; }
   .product {
     background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
     box-shadow: var(--shadow); overflow: hidden;
@@ -223,7 +228,7 @@
   /* The row is a plain grid, not a button: the eight stage markers are real
      buttons now, and HTML forbids interactive content inside a button. The
      product toggle is the identity block on the left; the track is its sibling. */
-  .prow { display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; padding: 26px 20px; }
+  .prow { display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; padding: 8px 20px; }
   .pbtn {
     display: block; width: 100%; padding: 0; cursor: pointer;
     background: none; border: 0; text-align: left; color: inherit; font: inherit;
@@ -242,7 +247,7 @@
   .chip.pipeline { background: var(--accent-soft); color: var(--accent); }
   .chip.soon { background: var(--idle-soft); color: var(--ink-3); }
   .peek {
-    display: inline-flex; align-items: center; gap: 4px; margin-top: 9px;
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
     font-size: 12px; font-weight: 650; color: var(--accent);
   }
   .peek .pchev { font-size: 15px; transition: transform .15s ease; display: inline-block; }
@@ -259,7 +264,10 @@
      4px box-shadow) sits exactly on that invisible clip line and gets sheared
      flat instead of curving. padding-top gives it (and the hover lift, and
      the focus/aria-expanded rings) room to draw before the clip. */
-  .trackbox { overflow-x: auto; padding-top: 8px; }
+  /* overflow-y hidden: the rail overflows its box by a few px (fork labels) and
+     overflow-x:auto alone gave every card its own vertical scrollbar arrows. The
+     4px bottom padding keeps the last label's descenders from being clipped. */
+  .trackbox { overflow-x: auto; overflow-y: hidden; padding-top: 8px; padding-bottom: 4px; }
   .track { display: flex; align-items: flex-start; min-width: 700px; padding-top: var(--sg-lift, 0px); }
   .stage { flex: 1; min-width: 80px; position: relative; text-align: center; }
   .stage .row { display: flex; align-items: center; }
@@ -368,7 +376,7 @@
      standalone real-year timeline (.tlbox) — min-width:0 keeps the nested
      horizontal-scroll regions from blowing out the .prow grid track. */
   .trackwrap { min-width: 0; }
-  .tlbox { overflow-x: auto; margin-top: 16px; padding-top: 13px; border-top: 1px dashed var(--line); }
+  .tlbox { overflow-x: auto; margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--line); }
   .tlbox svg { display: block; width: 100%; height: auto; }
   .tl-caption { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px; }
   .tl-caption .tl-total { font-size: 11.5px; letter-spacing: normal; text-transform: none; color: var(--ink-2); font-variant-numeric: tabular-nums; }
@@ -380,7 +388,7 @@
     font-variant-numeric: tabular-nums; background: var(--good-soft); color: var(--good);
   }
   .tgap-key.g-back { background: var(--surface-2); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
-  .tl-key { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 8px; font-size: 10.5px; color: var(--ink-3); }
+  .tl-key { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 2px; font-size: 10.5px; color: var(--ink-3); }
 
   /* illustrated stage marker: journey icon + status badge overlay */
   .stage .smark {
@@ -526,7 +534,7 @@
   /* the panel carries the flag for the current gate; don't say it twice */
   .product.gate-flag .flagnote { display: none; }
   .flagnote {
-    margin: 10px 20px 0 290px; font-size: 12.5px; color: var(--crit);
+    margin: 0 20px 0 290px; font-size: 12.5px; color: var(--crit);
     display: flex; gap: 7px; align-items: baseline;
   }
   .flagnote::before { content: "▲"; font-size: 9px; }
@@ -597,8 +605,8 @@
 
   /* recent updates */
   .updates {
-    margin-top: 22px; background: var(--surface); border: 1px solid var(--line);
-    border-radius: 12px; box-shadow: var(--shadow); padding: 12px 18px;
+    margin-top: 14px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; box-shadow: var(--shadow); padding: 10px 18px;
   }
   .updates summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-2); letter-spacing: .04em; text-transform: uppercase; }
   .updates ul { margin: 10px 0 4px; padding-left: 0; list-style: none; }
@@ -616,7 +624,7 @@
   .updates.changes .um .up-name { color: var(--ink-2); font-weight: 650; letter-spacing: 0; }
   .updates.changes .ut { font-size: 14px; line-height: 1.55; color: var(--ink); }
 
-  footer { margin-top: 30px; font-size: 12.5px; color: var(--ink-3); line-height: 1.7; border-top: 1px solid var(--line); padding-top: 16px; }
+  footer { margin-top: 18px; font-size: 12.5px; color: var(--ink-3); line-height: 1.7; border-top: 1px solid var(--line); padding-top: 16px; }
   footer b { color: var(--ink-2); }
   /* Sources: one named source per line, each opening its own official site.
      Two columns on a wide screen so the list stays a footnote rather than
@@ -642,8 +650,8 @@
 
   /* ---------- visualization sections (map, timing) ---------- */
   .viz {
-    margin-top: 22px; background: var(--surface); border: 1px solid var(--line);
-    border-radius: 14px; box-shadow: var(--shadow); padding: 18px 20px;
+    margin-top: 14px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; box-shadow: var(--shadow); padding: 14px 18px;
   }
   .viz h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.005em; }
   .viz .viznote { margin: 3px 0 12px; font-size: 12.5px; color: var(--ink-3); }
@@ -1090,6 +1098,8 @@
       <span class="key"><span class="dot prog" aria-hidden="true">›</span> In progress</span>
       <span class="key"><span class="dot late" aria-hidden="true">!</span> Delayed / access barrier</span>
       <span class="key"><span class="dot idle" aria-hidden="true"></span> Not started (stage glyph dimmed, no badge)</span>
+      <span class="key"><span class="tgap-key" aria-hidden="true">●</span> Actual milestone (timeline)</span>
+      <span class="key"><span class="tgap-key g-back" aria-hidden="true">↩</span> Reached out of order (line dips back)</span>
     </div>
   </div>
 
@@ -1356,7 +1366,11 @@
 
   // Every render below filters to real, non-placeholder products — this is
   // that filter, used throughout the rest of the script.
-  const tracked = PRODUCTS.filter(p => !p.placeholder);
+  // Alphabetical by display name (30 Sep 2026) rather than the order in
+  // data/products.js; every list built from `tracked` (board, gate panels, map
+  // tabs, CSV) follows it.
+  const tracked = PRODUCTS.filter(p => !p.placeholder)
+    .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
 
   // schema.org structured data for search engines and knowledge-graph crawlers.
   // Derived from the data at render time, never stored; @id ties each product to
@@ -1542,8 +1556,11 @@
     items.sort((a, b) => a.x - b.x);
     const tierCount = packTiers(items);
 
-    const tierHeight = 40, labelTop0 = 76;
-    const H = labelTop0 + tierCount * tierHeight + 8;
+    const tierHeight = 38, labelTop0 = 66;
+    // Sized to the labels actually drawn (name lines at 13px, the year line, a
+    // few px for descenders) rather than a flat tierHeight per tier, which left
+    // a blank band under every timeline whose labels were short.
+    const H = Math.max(...items.map(it => labelTop0 + it.tier * tierHeight + it.nameLines.length * 13 + 5));
     const parts = [];
 
     parts.push(`<line x1="${marginX}" y1="${dotY}" x2="${W - marginX}" y2="${dotY}" stroke="var(--line)" stroke-width="1"/>`);
@@ -1627,7 +1644,6 @@
 
     return `<div class="tlbox"><div class="tl-caption"><span>Actual timeline</span>${totalLabel ? `<span class="tl-total">${esc(totalLabel)}</span>` : ""}</div>
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Real timing of gates reached for ${esc(p.name)}">${parts.join("")}</svg>
-      <div class="tl-key"><span class="tgap-key" aria-hidden="true">●</span> actual milestone <span class="tgap-key g-back" aria-hidden="true">↩</span> reached out of order (line dips back)</div>
     </div>`;
   }
 
@@ -1960,9 +1976,9 @@
   // padding-bottom = G — has no such floor, because it never asks the
   // bottom to shrink past where it naturally sits.
   function centerPathwayCard() {
-    const G = 14;    // the base gap either side would get if there were no lift at all
+    const G = 8;    // the base gap either side would get if there were no lift at all
     const lift = parseFloat(getComputedStyle(pathway).getPropertyValue("--pg-lift")) || 0;
-    pathway.style.paddingTop = (G + 2 * lift).toFixed(2) + "px";
+    pathway.style.paddingTop = (G + lift).toFixed(2) + "px";
     pathway.style.paddingBottom = G.toFixed(2) + "px";
   }
 

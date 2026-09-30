@@ -595,6 +595,55 @@ stacked the logo, the date and both buttons, leaving the middle empty.
 - Checked in headless Chrome at 1400, 820 and 390px; not checked with the
   Subscribe dropdown open, and not on a real phone.
 
+### 3.17 Compact page, alphabetical medicines (sheet rows 18 + 20, 30 Sep 2026)
+
+Complaint: too much scrolling, too much empty space. Measured in a 1400px
+headless screenshot, the distance from the top of the page to the start of the
+map section went from about **2,600px to about 1,980px** (roughly 600px, 24%).
+
+What moved, and why each number:
+
+- **Pathway strip** was about 290px tall, now about 190px. The cause was a
+  centring script (`centerPathwayCard`) that set the top padding to
+  `G + 2*lift`, where `lift` is how far the stacked WHO pair is raised to line
+  its icons up with the other gates. A `transform` moves paint, not layout, so the
+  bracket ended up with a gap of `G + lift` (about 50px) above *and* below it.
+  Now padding-top is `G + lift` and the bracket gets `margin-bottom: -lift`, so
+  both gaps are really `G`, which was also lowered from 14 to 8px. Rejected:
+  drawing the WHO pair side by side to flatten the strip - that is the
+  parallel-gates editorial question, deferred in the reviewer notes.
+- **Medicine cards:** row padding 26 -> 8px, board gap 14 -> 10, timeline margin
+  16 -> 6 and padding 13 -> 8, "View details" margin 9 -> 6, barrier-note top
+  margin 10 -> 0. Legend strip and pathway margins 22 -> 10. Page padding
+  28/56 -> 16/32, draft banner margins 14/18 -> 10/12, viz/updates/footer
+  margins 22/30 -> 14/18.
+- **Timeline SVG** height is now computed from the labels actually drawn
+  (`nameLines * 13 + 5` below the tier's top) instead of a flat 40px per tier plus
+  8, and `labelTop0` 76 -> 66. Checked that the three-line ASPY and DHA-PPQ labels
+  still clear each other.
+- **The timeline key** ("actual milestone" / "reached out of order") was repeated
+  under all four timelines (about 30px each). It is now two more entries in the
+  legend strip at the top, shown once.
+- **Vertical scrollbars on every stage rail** (the small up/down arrows at the
+  right of each card) came from `overflow-x:auto` forcing `overflow-y:auto`
+  while the fork's labels overflow the box by a few px. `.trackbox` is now
+  `overflow-y:hidden` with 4px of bottom padding so descenders are not clipped. A
+  scrollbar inside each card was itself a source of the "too much scrolling"
+  complaint.
+- **Order:** `tracked` is sorted alphabetically by display name, case-insensitive
+  (ALAQ, ASPY, DHA-PPQ, GanLum). Everything built from it follows: the board, the
+  gate drill-down rows, the map's drug tabs and the CSV. Rejected: reordering
+  `data/products.js` itself - other pages read it in file order, and only this
+  page was asked to change. Side effect: the map's default product is the first
+  alphabetical one that has a country survey, which may differ from before.
+
+Left alone: the **map** keeps its 960:480 aspect ratio - that is the fitted
+lon/lat window, and a shorter box would crop the world, so it is the largest
+block still on the page. The two side rails beside it are capped at 480px. The
+pathway strip's stacked WHO pair is still the tallest thing in that strip.
+Checked at 1400px and 390px; not at tablet width, and the map could not be
+rendered headless here so its spacing is unchecked.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
