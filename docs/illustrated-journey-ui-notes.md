@@ -915,6 +915,50 @@ choice; these are the choices made.
   detail below it, no script errors. Not checked: tablet width, real devices,
   keyboard focus on the bar (outline drawn inside because the panel clips).
 
+### 3.24 A site menu and a guide to the views (sheet rows 26 + 27, 30 Sep 2026)
+
+Row 26 asked for a global menu linking the dashboard's views so nobody has to edit
+a URL to move between them; row 27 for on-page guidance on the available views.
+Reviewed as a published mock-up (six choices, each selectable); these are Keith's
+picks.
+
+- **What was actually missing:** the other pages (`index`, `option-b`, `pipeline`,
+  `story`) already carry a small row of in-text links to each other and to this
+  page. This page had none going out, so it was the dead end the row describes.
+  Building the menu here closes that without touching the other four.
+- **Menu:** a top bar above everything, "LAUNCH" then six links, the current one
+  underlined and marked `aria-current="page"`: Illustrated journey, Journey board
+  (`index.html`), Comparison (`option-b.html`), Pipeline, Story, About the data
+  (`explainer.html`). Short names. It **scrolls away** with the page (the
+  mock-up's "stays in view" was not chosen; it would cost about 44px of screen all
+  the time). `widget.html` is left out: it is an embeddable tracker for other sites,
+  not a view to browse.
+- **Guidance (row 27):** a one-line blurb on this view plus a "What are these
+  views?" button that opens a panel describing all six, each a link, with "You are
+  here" on the current one. Closed on load.
+- **Phone (640px and below):** the links collapse into a "Views: Illustrated
+  journey" button that opens a list with a one-line description each; Escape closes
+  it. The blurb and guide stay.
+- **Wording is my draft** (from `docs/project-explainer.md` section on the views)
+  and needs LAUNCH sign-off, like the step explainers in 3.19. The blurb and panel
+  text is English only: the translation pipeline leaves untranslated text as English,
+  so locale builds will show it untranslated until strings are added.
+- **Cost:** about 44px for the bar plus about 40px for the blurb row above the
+  header, against the compact-layout work in 3.17. The guide panel is closed on
+  load, so it adds nothing further unless opened.
+- **Not done, on purpose:** the same menu on `index`, `option-b`, `pipeline`,
+  `story` and `explainer` (Keith scoped this work to the illustrated dashboard).
+  They keep their in-text link rows, which name the views differently ("Comparison
+  matrix (B)", "Data story"); worth aligning if the menu is rolled out. The menu
+  is inline on this page; if other pages adopt it, move it to a shared file so the
+  page list lives in one place. Not added to the `unitaid/` or `synthetic/`
+  editions, which do not build this page.
+- Public build needs nothing new: every link target is already copied by
+  `build-public-site.sh`.
+- Checked in headless Chrome: desktop bar and open guide, and the phone Views menu
+  inside a 390px frame, no script errors. Not checked: tablet width, real devices,
+  keyboard order through the bar.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
