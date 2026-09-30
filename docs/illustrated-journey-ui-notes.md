@@ -711,6 +711,47 @@ stage markers in the time view keep hover tooltips and the drill-down but the
 row". Real sliding of markers between the two views (mock-up option F's
 animation) was not built; it is a fade.
 
+### 3.19 The pathway strip explains itself (30 Sep 2026)
+
+Keith wanted the strip to make the order obvious, to explain what happens at each
+stage, and to drop the legend. Reviewed as a published mock-up first; every
+suggested option was accepted.
+
+- **Order:** steps are numbered 1 to 7 (`stepNo()`, the position of the stage's
+  column), and the two parallel WHO gates share **3**, inside their bracket. A
+  heading line says "Every medicine moves left to right. Step 3 is two separate
+  WHO approvals, in either order." Numbering is justified because the steps are a
+  real sequence; the shared 3 is what stops it implying an order between the WHO
+  pair. The stage label size went from 11 to 12px.
+- **Panel:** clicking a step opens one section under the strip (the old "every
+  medicine at this gate" panel, extended) with two halves: *what happens here*
+  (what, who decides, why it can stall, source) and *where each medicine is*
+  (status, the note clamped to three lines, "Open in row"). With no `stageInfo` it
+  falls back to the medicines half alone. Nothing is open on load; a hint line
+  invites a click.
+- **Wording lives in data, not HTML:** a top-level `stageInfo` array in
+  `data/products.js`, one entry per stage, validated by `validate-data.js` (length
+  must equal `stages`, all four strings non-empty) and documented in the data
+  analyst guide. Drafted from `docs/domain-primer.md` section 2. **It is unreviewed
+  wording and needs LAUNCH sign-off** - nothing on the page marks it as draft
+  beyond the page-wide prototype banner. The "typical 3 to 6 years" for trials and
+  the "about 90 working days" for collaborative registration are the primer's
+  figures, not new claims.
+- **Legend removed**, with the dated-milestone key. Status is written in words in
+  the table, the panel and the row journey, and the dots differ in shape as well as
+  colour. Safeguard added: each mini-journey dot has a `title` ("Regulatory
+  approval (SRA): Complete"). The dots sit inside an element with `role="img"`, so
+  the hover text helps sighted users; screen readers get the row's summary label,
+  not per-dot names. `.strip`, `.legend` and `.tgap-key` CSS went with it.
+- Rejected: a separate explainer page or tooltip per step (the click panel already
+  exists and is where the per-medicine answer lives), and putting the wording in
+  `index.html`-style hard-coded prose (nothing would keep it in step with the data).
+- Validator now reports 6 warnings, not the 5 in CLAUDE.md. The extra is
+  `treatment policy: 1 country value(s) ... fall outside the drawn basemap (GUF)`,
+  from PR #21 (MFT policy map), already on `development` before this change;
+  confirmed by validating without these edits.
+- Not checked: tablet width, real devices, print with a step panel open.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)

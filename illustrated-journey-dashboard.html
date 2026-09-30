@@ -122,20 +122,6 @@
     font-weight: 700; color: var(--warn);
   }
 
-  /* ---------- legend strip ----------
-     Used to be a summary strip too: three portfolio-wide numbers (medicines
-     tracked, gates cleared, current access barriers) ahead of the legend
-     below. Removed by request, 10 Sep 2026 — see .strip .legend just below
-     for what that leaves of the layout. The JS that computed them (reading
-     `tracked`, which the rest of the page still needs) went with them. */
-  .strip {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px;
-    padding: 8px 18px; margin-top: 10px; margin-bottom: 10px;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
-  }
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-left: auto; font-size: 12.5px; color: var(--ink-2); }
-  .legend .key { display: inline-flex; align-items: center; gap: 6px; }
-
   /* status dots (shape + color, never color alone) */
   .dot { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex: none; font-size: 11px; font-weight: 800; }
   .dot.done { background: var(--good); color: #fff; }
@@ -158,7 +144,19 @@
     padding: 8px 18px; margin-bottom: 10px; overflow-x: auto;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
   }
+  .pathhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 18px; margin-top: 10px; }
+  .pathhead h2 { margin: 0; font-size: 15px; font-weight: 700; }
+  .pathhead p { margin: 0; font-size: 13px; color: var(--ink-2); }
+  .pathhint { margin: -2px 4px 10px; font-size: 12.5px; color: var(--ink-3); }
+  .pathhint[hidden] { display: none; }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
+  /* step number: the pathway is a sequence, so the order is stated, not implied.
+     The two WHO gates share one number because they are parallel. */
+  .pathnode .nb {
+    position: absolute; left: -7px; top: -5px; min-width: 20px; height: 20px; padding: 0 5px;
+    border-radius: 10px; background: var(--ink); color: #fff;
+    font-size: 11px; font-weight: 750; line-height: 20px; font-variant-numeric: tabular-nums;
+  }
   .pathnode svg { width: 30px; height: 30px; display: block; margin: 0 auto; color: var(--journey-icon); }
   /* The WHO emblem sits in the same box as a glyph but keeps its own colour and
      its own 1.13:1 ratio, so it is contained rather than stretched. */
@@ -172,7 +170,7 @@
     width: 44px; height: 44px; border-radius: 50%;
     background: var(--accent-soft); border: 1px solid var(--line);
   }
-  .pathnode span { display: block; font-size: 11px; line-height: 1.25; color: var(--ink-2); margin-top: 5px; padding: 0 3px; }
+  .pathnode .plabel { display: block; font-size: 12px; line-height: 1.25; color: var(--ink-2); margin-top: 5px; padding: 0 3px; }
   /* always-on badge marking every gate icon as clickable, not just on hover */
   .pathnode .pill::after {
     content: "\25be"; position: absolute; top: -6px; right: -6px;
@@ -474,11 +472,6 @@
   /* same small pill the status legend uses for the timeline's two facts —
      a reached gate's real year (good), and one reached out of pathway order
      (neutral grey: a fact about sequence, not a delay) */
-  .tgap-key {
-    padding: 2px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 700;
-    font-variant-numeric: tabular-nums; background: var(--good-soft); color: var(--good);
-  }
-  .tgap-key.g-back { background: var(--surface-2); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
 
   /* illustrated stage marker: journey icon + status badge overlay */
   .stage .smark {
@@ -587,37 +580,53 @@
   .pathnode[aria-expanded="true"] .plabel { color: var(--accent); font-weight: 700; }
 
   .gatewrap {
-    margin: -12px 0 22px; padding: 16px 18px;
+    margin: 0 0 10px; padding: 16px 18px 18px;
     background: var(--surface); border: 1px solid var(--line);
     border-left: 3px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow);
   }
   .gatewrap[hidden] { display: none; }
-  .gw-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
-  .gw-head h3 { margin: 0; font-size: 16px; font-weight: 700; }
-  .gw-head .gw-sum { font-size: 13px; color: var(--ink-2); }
-  .gw-head .gw-sum b { color: var(--crit); font-variant-numeric: tabular-nums; }
+  .gw-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .gw-ico { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-soft); display: grid; place-items: center; flex: none; color: var(--journey-icon); }
+  .gw-ico svg { width: 24px; height: 24px; }
+  .gw-ico .whoemb { width: 26px; height: 26px; }
+  .gw-step { font-size: 12px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+  .gw-head h3 { margin: 0; font-size: 17px; font-weight: 750; letter-spacing: -.005em; }
   .gw-head .gp-close {
-    margin-left: auto; background: none; border: 0; padding: 3px 8px; cursor: pointer;
-    font: inherit; font-size: 12px; color: var(--ink-2); border-radius: 6px;
+    margin-left: auto; background: none; border: 0; padding: 4px 8px; cursor: pointer;
+    font: inherit; font-size: 13px; color: var(--ink-2); border-radius: 6px;
   }
   .gw-head .gp-close:hover { background: var(--surface-2); color: var(--ink); }
-  .gw-list { margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1px; }
+  .gw-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px; align-items: start; }
+  .gw-grid.one { grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 860px) { .gw-grid { grid-template-columns: minmax(0, 1fr); } }
+  .gw-sec { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 15px 14px; }
+  .gw-sec h4 { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .gw-sec > p { margin: 0; font-size: 15px; color: var(--ink); max-width: 70ch; }
+  .gw-facts { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 6px 12px; margin: 12px 0 0; font-size: 14px; }
+  .gw-facts dt { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); padding-top: 2px; }
+  .gw-facts dd { margin: 0; color: var(--ink); }
+  .gw-src { margin-top: 12px; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 12px; color: var(--ink-3); }
+  .gw-sec .gw-sum { margin: 0 0 10px; font-size: 13px; color: var(--ink-2); }
+  .gw-sum b { color: var(--crit); font-variant-numeric: tabular-nums; }
+  .gw-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
   .gw-list li {
-    display: grid; grid-template-columns: 150px 118px 1fr auto; gap: 12px; align-items: baseline;
-    padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px;
+    display: grid; grid-template-columns: 84px 104px minmax(0, 1fr) auto; gap: 10px; align-items: start;
+    padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px;
   }
-  .gw-list li > span:nth-child(2) { white-space: nowrap; }
-  .gw-list li.is-late { background: var(--crit-soft); border-radius: 6px; padding-left: 8px; padding-right: 8px; }
-  .gw-list .gw-name { font-weight: 700; }
-  .gw-list .gw-note { color: var(--ink-2); line-height: 1.45; }
+  .gw-list li:first-child { padding-top: 0; }
+  .gw-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .gw-list li.is-late .gw-name { color: var(--crit); }
+  .gw-list .gw-name { font-weight: 700; font-size: 14.5px; }
+  .gw-list .gw-note { color: var(--ink-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .gw-jump {
     background: none; border: 1px solid var(--line); border-radius: 999px;
     padding: 3px 11px; font: inherit; font-size: 11.5px; color: var(--accent);
     cursor: pointer; white-space: nowrap;
   }
   .gw-jump:hover { border-color: var(--accent); background: var(--accent-soft); }
-  @media (max-width: 760px) {
-    .gw-list li { grid-template-columns: 1fr; gap: 3px; }
+  @media (max-width: 560px) {
+    .gw-list li { grid-template-columns: 1fr auto; }
+    .gw-list .gw-note { grid-column: 1 / -1; }
   }
 
   /* the panel carries the flag for the current gate; don't say it twice */
@@ -1051,15 +1060,13 @@
   .res-dot.is-selected:focus-visible { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent), 0 0 0 3px var(--accent); }
 
   /* header actions — Download CSV + Subscribe -------------------------------
-     These used to be the last two flex items of .strip, alongside the three
-     stats and the six legend keys. That could not hold: the strip wraps, the
+     These used to be the last two flex items of a legend strip, alongside three
+     stats and six legend keys. That could not hold: the strip wraps, the
      legend is wide enough to fill its row at most widths, so Download CSV was
      pushed onto a line of its own while `margin-left:auto` kept Subscribe up
      with the legend — the two actions read as unrelated things. Here they are
-     one flex group in the header rail, so they wrap as a unit or not at all,
-     and the strip is left doing one job: the status legend. (It carried three
-     portfolio-summary numbers alongside the legend until 10 Sep 2026, when
-     they were removed by request — see .strip below.)
+     one flex group in the header rail, so they wrap as a unit or not at all.
+     (The status-legend strip these once sat in was removed on 30 Sep 2026.)
 
      Emphasis is the reverse of what it was. Subscribe is the only conversion
      point on the page and now takes the solid accent block; Download CSV is a
@@ -1089,10 +1096,6 @@
   }
   .sub-btn:hover { background: #0C4A5E; border-color: #0C4A5E; }
   .sub-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  /* .legend's own `margin-left:auto` is for the map legend, where it is one
-     item among several and needs pushing to the far edge; here it is the
-     strip's only content, so it sits at the strip's own start instead. */
-  .strip .legend { margin-left: 0; }
 
   /* The panel it opens. Front end only for now — see the seam in the script.
      Anchored to .hdr-actions rather than sitting inline in the document: an
@@ -1191,7 +1194,6 @@
     .hd-bar .hdr-actions { flex-wrap: nowrap; margin-left: 0; }
     .hd-bar .hdr-actions button { flex: 1 1 0; justify-content: center; padding: 10px 6px; gap: 5px; white-space: nowrap; }
     .updates li { flex-wrap: wrap; gap: 4px 12px; }
-    .strip { padding: 10px 14px; }
     .hdr-actions button { padding: 10px 15px; }
     .pathway { padding: 12px 12px; }
     .pathnode { min-width: 72px; }
@@ -1239,19 +1241,13 @@
 
   <div class="demo-banner" id="banner" hidden></div>
 
-  <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway — choose a gate to see every medicine at it" hidden></div>
-
-  <!-- Moved below the pathway strip, 10 Sep 2026 (was above it) — reads as
-       the key to the stages just drawn, rather than as a summary ahead of them. -->
-  <div class="strip" role="group" aria-label="Status legend">
-    <div class="legend" aria-label="Status legend">
-      <span class="key"><span class="dot done" aria-hidden="true">✓</span> Complete</span>
-      <span class="key"><span class="dot prog" aria-hidden="true">›</span> In progress</span>
-      <span class="key"><span class="dot late" aria-hidden="true">!</span> Delayed / access barrier</span>
-      <span class="key"><span class="dot idle" aria-hidden="true"></span> Not started (stage glyph dimmed, no badge)</span>
-      <span class="key"><span class="tgap-key" aria-hidden="true">●</span> Dated milestone (timeline)</span>
-    </div>
+  <div class="pathhead">
+    <h2>How a medicine reaches patients</h2>
+    <p>Every medicine moves left to right. Step 3 is two separate WHO approvals, in either order.</p>
   </div>
+
+  <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway. Choose a step to see what happens there and where each medicine is" hidden></div>
+  <p class="pathhint" id="pathhint">Select a step to see what happens there and where each medicine is.</p>
 
   <div class="gatewrap" id="gatewrap" hidden></div>
 
@@ -1667,8 +1663,8 @@
     const done = p.stages.filter(st => st.status === "done").length;
     return `<div class="mini" role="img" aria-label="${done} of ${p.stages.length} stages complete">` +
       STAGE_COLUMNS.map(col => col.stages.length === 1
-        ? `<i class="md ${p.stages[col.stages[0]].status}"></i>`
-        : `<span class="mp">${col.stages.map(i => `<i class="md ${p.stages[i].status}"></i>`).join("")}</span>`
+        ? `<i class="md ${p.stages[col.stages[0]].status}" title="${esc(STAGES[col.stages[0]])}: ${LABEL[p.stages[col.stages[0]].status]}"></i>`
+        : `<span class="mp">${col.stages.map(i => `<i class="md ${p.stages[i].status}" title="${esc(STAGES[i])}: ${LABEL[p.stages[i].status]}"></i>`).join("")}</span>`
       ).join('<i class="ln"></i>') + `</div>`;
   }
   function stageMarkHtml(p, i) {
@@ -1762,6 +1758,9 @@
   }
 
   const lateAt = i => tracked.filter(p => p.stages[i].status === "late").length;
+  // Step number = position of the stage's column, so the two parallel WHO gates
+  // both read "3".
+  const stepNo = i => STAGE_COLUMNS.findIndex(col => col.stages.includes(i)) + 1;
 
   function pathNodeHtml(i, stacked) {
     const s = STAGES[i];
@@ -1771,8 +1770,8 @@
     // for screen readers, and still shown per-medicine in the gate panel this
     // button opens — just not as a second always-visible line in the strip.
     return `<button class="pathnode${stacked ? " pathnode-sm" : ""}" type="button" aria-expanded="false" aria-controls="gatewrap"
-      data-gate="${i}" aria-label="${esc(s)} — show every medicine at this gate${n ? ", " + n + " delayed" : ""}">` +
-      `<span class="pill">${stageIconImg(i, "")}</span><span class="plabel">${esc(s)}</span></button>`;
+      data-gate="${i}" aria-label="Step ${stepNo(i)}, ${esc(s)}. Shows what happens here and where each medicine is${n ? ", " + n + " delayed" : ""}.">` +
+      `<span class="pill">${stageIconImg(i, "")}<span class="nb" aria-hidden="true">${stepNo(i)}</span></span><span class="plabel">${esc(s)}</span></button>`;
   }
 
   pathway.innerHTML = STAGE_COLUMNS.map(col => {
@@ -2263,12 +2262,18 @@
     if (!openGate) return;
     const wrap = document.getElementById("gatewrap");
     wrap.hidden = true; wrap.innerHTML = "";
+    document.getElementById("pathhint").hidden = false;
     openGate.setAttribute("aria-expanded", "false");
     openGate = null;
   }
+  // One panel per step: what happens there (from DATA.stageInfo, general to the
+  // step) and where each medicine is (from each product's own stage entry).
+  // Without stageInfo, for example on an edition that does not carry it, the
+  // panel falls back to the medicines half alone.
   function openGatePanel(btn) {
     const i = +btn.dataset.gate;
     closeGate();
+    const info = (DATA.stageInfo || [])[i];
     const rows = tracked.map(p => {
       const st = p.stages[i];
       return `<li class="${st.status === "late" ? "is-late" : ""}">
@@ -2279,15 +2284,33 @@
       </li>`;
     }).join("");
     const n = tracked.filter(p => p.stages[i].status === "late").length;
+    const explain = info ? `
+        <div class="gw-sec">
+          <h4>What happens here</h4>
+          <p>${esc(info.what)}</p>
+          <dl class="gw-facts">
+            <dt>Who decides</dt><dd>${esc(info.who)}</dd>
+            <dt>Why it can stall</dt><dd>${esc(info.stall)}</dd>
+          </dl>
+          <div class="gw-src">Source: ${esc(info.source)}</div>
+        </div>` : "";
+    const meds = `
+        <div class="gw-sec">
+          <h4>Where each medicine is</h4>
+          <p class="gw-sum">${n ? `<b>${n}</b> of ${tracked.length} medicines delayed at this step.` : `No medicine is delayed at this step.`}</p>
+          <ul class="gw-list">${rows}</ul>
+        </div>`;
     const wrap = document.getElementById("gatewrap");
+    wrap.setAttribute("aria-label", "Step " + stepNo(i) + ": " + STAGES[i]);
     wrap.innerHTML = `
       <div class="gw-head">
-        <h3>${esc(STAGES[i])}</h3>
-        <span class="gw-sum">${n ? `<b>${n}</b> of ${tracked.length} medicines delayed at this gate` : `no medicine is delayed at this gate`}</span>
+        <span class="gw-ico">${stageIconImg(i, "")}</span>
+        <div><div class="gw-step">Step ${stepNo(i)} of ${STAGE_COLUMNS.length}</div><h3>${esc(STAGES[i])}</h3></div>
         <button class="gp-close" type="button" data-close="gate">Close</button>
       </div>
-      <ul class="gw-list">${rows}</ul>`;
+      <div class="gw-grid${info ? "" : " one"}">${explain}${meds}</div>`;
     wrap.hidden = false;
+    document.getElementById("pathhint").hidden = true;
     btn.setAttribute("aria-expanded", "true");
     openGate = btn;
   }
