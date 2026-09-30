@@ -59,72 +59,6 @@
   }
   .wrap { margin: 0; padding: 16px clamp(24px, 4vw, 64px) 32px; position: relative; }
 
-  /* ---------- site menu and view guide (rows 26 + 27, 30 Sep 2026) ----------
-     A top bar linking the dashboard's views, so this page is no longer a dead end
-     (the other pages already link here). It scrolls away with the page. On a phone
-     the links collapse into a "Views" button. Below it, a one-line blurb on this
-     view and a "What are these views?" panel that describes all of them. */
-  .sitenav {
-    position: relative; display: flex; align-items: stretch; background: var(--surface);
-    border-bottom: 1px solid var(--line); padding-inline: clamp(24px, 4vw, 64px);
-  }
-  .sn-brand {
-    display: flex; align-items: center; margin-right: 6px; padding: 10px 14px 10px 0;
-    border-right: 1px solid var(--line); font-size: 14px; font-weight: 800; letter-spacing: .02em; color: var(--accent);
-  }
-  .sitenav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; min-width: 0; overflow-x: auto; }
-  .sitenav li a {
-    display: flex; align-items: center; height: 100%; padding: 10px 14px; text-decoration: none; white-space: nowrap;
-    font-size: 13.5px; font-weight: 600; color: var(--ink-2);
-  }
-  .sitenav li a:hover { color: var(--accent); }
-  .sitenav li a[aria-current="page"] { color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
-  .sitenav a:focus-visible, .sn-views:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  .sn-views {
-    display: none; margin-left: auto; align-self: center; align-items: center; gap: 6px; background: var(--surface);
-    border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 650;
-    color: var(--accent); cursor: pointer;
-  }
-  .sn-views[aria-expanded="true"] { background: var(--accent-soft); border-color: var(--accent); }
-  .sn-pop {
-    display: none; position: absolute; left: 0; right: 0; top: 100%; z-index: 30; background: var(--surface);
-    border-bottom: 1px solid var(--line); box-shadow: var(--shadow); padding: 4px 14px 10px;
-  }
-  .sn-pop.open { display: block; }
-  .sn-pop a { display: block; padding: 9px 4px; border-bottom: 1px solid var(--line); text-decoration: none; font-size: 14px; font-weight: 650; color: var(--ink); }
-  .sn-pop a:last-child { border-bottom: 0; }
-  .sn-pop a small { display: block; font-weight: 400; font-size: 12px; color: var(--ink-3); }
-  .sn-pop a[aria-current="page"] { color: var(--accent); }
-  @media (max-width: 640px) {
-    .sitenav { padding-inline: 14px; }
-    .sitenav ul { display: none; }
-    .sn-views { display: inline-flex; }
-  }
-  .vguide { margin: 0 0 10px; }
-  .vblurb { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: 13.5px; color: var(--ink-2); }
-  .vblurb b { color: var(--ink); }
-  .vbtn {
-    display: inline-flex; align-items: center; gap: 5px; background: none; border: 0; padding: 2px 0; font: inherit;
-    font-size: 13px; font-weight: 650; color: var(--accent); cursor: pointer;
-  }
-  .vbtn:hover { text-decoration: underline; }
-  .vbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .vbtn .ch { transition: transform .15s ease; }
-  .vbtn[aria-expanded="true"] .ch { transform: rotate(180deg); }
-  .vpanel {
-    margin-top: 10px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px 20px;
-  }
-  .vpanel[hidden] { display: none; }
-  .vpanel h3 { grid-column: 1 / -1; margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-  .vpanel a { display: block; text-decoration: none; color: inherit; }
-  .vpanel a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-  .vpanel .vn { font-size: 14px; font-weight: 700; color: var(--accent); }
-  .vpanel a:hover .vn { text-decoration: underline; }
-  .vpanel p { margin: 1px 0 0; font-size: 13px; color: var(--ink-2); }
-  .vhere { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-  @media (prefers-reduced-motion: reduce) { .vbtn .ch { transition: none; } }
-
   /* ---------- header ---------- */
   /* Two rows (sheet rows 18/20 follow-up, 30 Sep 2026):
        1. title + Prototype pill on the left, "Powered by" Unitaid logo on the right
@@ -1238,7 +1172,7 @@
     .product .l1 { display: block !important; }
     .view[data-v="path"] { display: none !important; }
     .view[data-v="time"] { display: block !important; }
-    .exp, .swg, .more, .sitenav, .vguide { display: none !important; }
+    .exp, .swg, .more { display: none !important; }
     .product { break-inside: avoid; box-shadow: none; }
     .hdr-actions, #tip, .gp-close { display: none !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
@@ -1276,19 +1210,9 @@
   }
 </style>
 
-<nav class="sitenav" aria-label="LAUNCH views">
-  <span class="sn-brand">LAUNCH</span>
-  <ul><li><a href="illustrated-journey-dashboard.html" aria-current="page">Illustrated journey</a></li><li><a href="index.html">Journey board</a></li><li><a href="option-b.html">Comparison</a></li><li><a href="pipeline.html">Pipeline</a></li><li><a href="story.html">Story</a></li><li><a href="explainer.html">About the data</a></li></ul>
-  <button class="sn-views" id="sn-btn" type="button" aria-expanded="false" aria-controls="sn-pop">Views: Illustrated journey <span aria-hidden="true">▾</span></button>
-  <div class="sn-pop" id="sn-pop"><a href="illustrated-journey-dashboard.html" aria-current="page">Illustrated journey<small>Follow each medicine through the seven steps to patients.</small></a><a href="index.html">Journey board<small>Every medicine, stage by stage.</small></a><a href="option-b.html">Comparison<small>Medicines side by side at each step.</small></a><a href="pipeline.html">Pipeline<small>Where each product is, trial to launch.</small></a><a href="story.html">Story<small>How long each medicine waited.</small></a><a href="explainer.html">About the data<small>How the dashboard works.</small></a></div>
-</nav>
+<body>
+<script src="assets/site-nav.js" data-current="illustrated"></script>
 <div class="wrap">
-  <div class="vguide">
-    <p class="vblurb"><span><b>Illustrated journey.</b> Follow each medicine through the seven steps from trial to patients, with a timeline and what is holding it up.</span>
-      <button class="vbtn" id="vg-btn" type="button" aria-expanded="false" aria-controls="vg-panel">What are these views? <span class="ch" aria-hidden="true">▾</span></button></p>
-    <div class="vpanel" id="vg-panel" hidden><h3>Views of the LAUNCH data</h3><a href="illustrated-journey-dashboard.html" aria-current="page"><span class="vn">Illustrated journey<span class="vhere">You are here</span></span><p>Follow each medicine through the seven steps from trial to patients, with a timeline and what is holding it up.</p></a><a href="index.html"><span class="vn">Journey board</span><p>Every medicine and every stage of its journey on one board, with prices, volumes and country access.</p></a><a href="option-b.html"><span class="vn">Comparison</span><p>A matrix with the steps as rows and the medicines as columns, so you can compare them at each step.</p></a><a href="pipeline.html"><span class="vn">Pipeline</span><p>The whole portfolio laid out by development phase, from early trials to launch.</p></a><a href="story.html"><span class="vn">Story</span><p>The waiting years: how long each medicine has waited at each step, as a scrolling story.</p></a><a href="explainer.html"><span class="vn">About the data</span><p>How the dashboard works and where every figure comes from.</p></a></div>
-  </div>
-
   <header>
     <div class="hd-top">
       <h1 class="hd-title"><span>LAUNCH</span> Transparency Dashboard <span class="proto-badge">Prototype — data presented here may not be accurate</span></h1>
@@ -1323,28 +1247,6 @@
       </div>
     </div>
   </header>
-
-<script>
-  // site menu ("Views" on a phone) and the view guide
-  (function () {
-    var vb = document.getElementById("sn-btn"), pop = document.getElementById("sn-pop");
-    var gb = document.getElementById("vg-btn"), gp = document.getElementById("vg-panel");
-    vb.addEventListener("click", function () {
-      var open = vb.getAttribute("aria-expanded") !== "true";
-      vb.setAttribute("aria-expanded", open ? "true" : "false");
-      pop.classList.toggle("open", open);
-    });
-    gb.addEventListener("click", function () {
-      var open = gb.getAttribute("aria-expanded") !== "true";
-      gb.setAttribute("aria-expanded", open ? "true" : "false");
-      gp.hidden = !open;
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key !== "Escape") return;
-      if (pop.classList.contains("open")) { pop.classList.remove("open"); vb.setAttribute("aria-expanded", "false"); vb.focus(); }
-    });
-  })();
-</script>
 
   <div class="demo-banner" id="banner" hidden></div>
 
