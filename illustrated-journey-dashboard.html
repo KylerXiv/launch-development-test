@@ -60,10 +60,11 @@
   .wrap { margin: 0; padding: 28px clamp(24px, 4vw, 64px) 56px; position: relative; }
 
   /* ---------- header ---------- */
-  /* Three rows (sheet rows 18/20 follow-up, 30 Sep 2026):
+  /* Two rows (sheet rows 18/20 follow-up, 30 Sep 2026):
        1. title + Prototype pill on the left, "Powered by" Unitaid logo on the right
-       2. the description (capped at 120ch, balanced wrapping)
-       3. "Last updated" on the left, Download CSV + Subscribe on the right
+       2. the description with "Last updated" under it on the left, Download
+          CSV + Subscribe on the right, bottom-aligned with the date
+          (capped at 120ch, balanced wrapping)
      Replaces the old brand/meta two-column header, which left the middle empty
      and stacked the logo, date and buttons in one right-hand column. */
   header { margin-bottom: 6px; }
@@ -73,9 +74,12 @@
   /* text-wrap: balance splits a two-line description into two even lines, so
      the last word never sits alone on a second line (it did at ~1800px with the
      plain 160ch cap). */
-  .hd-desc { margin: 6px 0 0; color: var(--ink-2); font-size: 15px; max-width: 120ch; text-wrap: balance; }
-  .hd-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; margin-top: 12px; }
-  .hd-status { font-size: 13px; color: var(--ink-3); line-height: 1.5; }
+  .hd-desc { margin: 0; color: var(--ink-2); font-size: 15px; max-width: 120ch; text-wrap: balance; }
+  .hd-bar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; margin-top: 6px; }
+  /* 500px minimum: below roughly 860px of content the buttons would squeeze the
+     description into four short lines, so they wrap under it instead. */
+  .hd-text { flex: 1 1 500px; min-width: 0; }
+  .hd-status { margin-top: 6px; font-size: 13px; color: var(--ink-3); line-height: 1.5; }
   /* "Powered by" + the Unitaid logo. No plate, border, shadow or hover
      effect (sheet row 11 follow-up): the logo sits directly on the page
      background and blends in. The page background is white, so the logo's own
@@ -905,7 +909,7 @@
      utility and is outlined beside it. */
   .hdr-actions { position: relative; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
   .hdr-actions button { display: inline-flex; align-items: center; gap: 7px; }
-  .hd-bar .hdr-actions { margin-top: 0; }
+  .hd-bar .hdr-actions { margin-top: 0; margin-left: auto; }
   /* Both buttons' mock flags used to float here in the header (Subscribe)
      and beside the feedback pill (Send feedback), always visible whether or
      not either panel was open. Both moved inside their own panel instead,
@@ -1022,7 +1026,8 @@
     .attrib img { width: 72px; }
     .attrib .ptxt { display: none; }
     .hd-bar { flex-direction: column; align-items: stretch; gap: 8px; }
-    .hd-bar .hdr-actions { flex-wrap: nowrap; }
+    .hd-text { flex: none; }
+    .hd-bar .hdr-actions { flex-wrap: nowrap; margin-left: 0; }
     .hd-bar .hdr-actions button { flex: 1 1 0; justify-content: center; padding: 10px 6px; gap: 5px; white-space: nowrap; }
     .prow { grid-template-columns: 1fr; padding: 14px 14px; }
     .flagnote { margin-left: 14px; margin-right: 14px; }
@@ -1048,9 +1053,11 @@
         </a>
       </div>
     </div>
-    <p class="hd-desc">Tracking new antimalarial medicines from research and development to market access&nbsp;— where each product stands, its access barriers, and opportunities to overcome them.</p>
     <div class="hd-bar">
-      <div class="hd-status"><span id="updated"></span></div>
+      <div class="hd-text">
+        <p class="hd-desc">Tracking new antimalarial medicines from research and development to market access&nbsp;— where each product stands, its access barriers, and opportunities to overcome them.</p>
+        <div class="hd-status"><span id="updated"></span></div>
+      </div>
       <div class="hdr-actions">
         <button class="dl-btn" id="dl-csv" type="button"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v7.5M4.75 6.75 8 10l3.25-3.25M2.5 13h11"/></svg> Download CSV</button>
         <button class="sub-btn" id="sub-open" type="button" aria-expanded="false" aria-controls="subwrap"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1.75" y="3.25" width="12.5" height="9.5" rx="1.5"/><path d="m2.25 4.6 5.05 3.85a1.15 1.15 0 0 0 1.4 0L13.75 4.6"/></svg> Subscribe for updates</button>
