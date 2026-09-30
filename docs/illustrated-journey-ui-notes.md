@@ -579,6 +579,19 @@ stacked the logo, the date and both buttons, leaving the middle empty.
   fall back to ordinary wrapping, so the orphan can still appear there.
   Balancing alone put the em dash at the start of line 2, so it is bound to the
   preceding word with a non-breaking space.
+- Follow-up, same day: the buttons moved from their own third row to the right
+  of the description, bottom-aligned with the "Last updated" line that now sits
+  under the description. The header is two rows, not three (about 20-30px
+  shorter again). Reason: the balanced description is only about 650px wide, so
+  the right of that row was empty while the buttons cost a whole row. Rejected:
+  buttons under the logo (brings back the tall right column), beside the logo
+  (crowded), and moving Download CSV next to the data it exports (sensible, but
+  relocates a control people already know; left as a possible later step).
+  `.hd-text` has a 500px flex-basis: below about 860px of content width the
+  buttons wrap under the text and right-align, instead of squeezing the
+  description into four short lines. On phones the buttons sit under the date at
+  equal width, as before; `margin-left:auto` is reset there because it cancels
+  the stretch.
 - Checked in headless Chrome at 1400, 820 and 390px; not checked with the
   Subscribe dropdown open, and not on a real phone.
 
