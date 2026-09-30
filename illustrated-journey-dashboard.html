@@ -697,6 +697,66 @@
   .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+  /* ---------- MFT policy switch (WHO World Malaria Report, Annex 4B) ----------
+     Off by default: until the switch is on, nothing below is visible and the
+     map is exactly the access-stage map. Borders, not fills, so the stage
+     colours and the study dots underneath stay readable. Border colours are
+     per product; the page never names a drug outside the four it tracks. */
+  :root { --mft-ganlum: #D4557A; --mft-alaq: #8C6A3F; --mft-pyramax: #E08A1E; --mft-dhappq: #2E9B5F; }
+  .mft-switch {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+    font: inherit; font-size: 12.5px; font-weight: 650; color: var(--ink); cursor: pointer; text-align: left;
+  }
+  .mft-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .mft-track { width: 34px; height: 20px; border-radius: 999px; background: #C9D3D8; position: relative; flex: none; transition: background .15s; }
+  .mft-track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+                      background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s; }
+  .mft-switch[aria-checked="true"] .mft-track { background: var(--accent); }
+  .mft-switch[aria-checked="true"] .mft-track::after { transform: translateX(14px); }
+  @media (prefers-reduced-motion: reduce) { .mft-track, .mft-track::after { transition: none; } }
+  .mft-hint { font-size: 11.5px; line-height: 1.45; color: var(--ink-3); margin: 6px 0 0; }
+  .mft-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 10px; font-size: 12.5px; color: var(--ink-2); }
+  .mft-legend[hidden] { display: none; }
+  .mft-legend .res-t { font-weight: 700; color: var(--ink); margin-right: 4px; }
+  .mft-chip { font: inherit; font-size: 12.5px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px;
+              background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 7px; cursor: pointer; }
+  .mft-chip[aria-pressed="false"] { opacity: .45; text-decoration: line-through; }
+  .mft-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .mft-chip .ct { font-variant-numeric: tabular-nums; font-weight: 650; color: var(--ink); }
+  .mft-line { width: 16px; height: 12px; flex: none; display: inline-block; }
+  .mft-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
+  .mft-panel { flex: 0 1 auto; min-height: 0; overflow-y: auto; margin-bottom: 10px; }
+  .mft-panel[hidden] { display: none; }
+  .mft-panel.with-studies { max-height: 50%; }
+  .mft-panel .mft-h { margin: 0 0 10px; font-size: 12px; font-weight: 750; text-transform: uppercase; letter-spacing: .05em;
+                      color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
+  .mft-panel .mft-h .mft-dot { width: 12px; height: 12px; }
+  .mft-donut { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px; align-items: center; margin: 2px 0 14px; }
+  .mft-donut svg { display: block; }
+  .mft-donut .ct-n { font-size: 26px; font-weight: 750; fill: var(--ink); font-variant-numeric: tabular-nums; }
+  .mft-donut .ct-l { font-size: 10.5px; fill: var(--ink-3); }
+  .mft-donut .rows { display: grid; gap: 7px; font-size: 13px; color: var(--ink-2); }
+  .mft-donut .rows div { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+  .mft-donut .rows b { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 750; }
+  .mft-sq { width: 14px; height: 14px; border-radius: 3px; display: inline-block; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+  .mft-grp { font-size: 11.5px; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); margin: 14px 0 4px; }
+  .mft-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; width: 100%; padding: 4px 4px 4px 0;
+             border: 0; border-radius: 5px; background: none; font: inherit; font-size: 13.5px; color: var(--ink); text-align: left; cursor: pointer; }
+  .mft-row:hover, .mft-row:focus-visible { background: var(--surface); }
+  .mft-row .nm { min-width: 0; line-height: 1.4; }   /* long WHO names wrap rather than truncate */
+  .mft-row .stg { color: var(--ink-3); }
+  .mft-row .mft-dot { width: 12px; height: 12px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.28); margin-right: 2px; }
+  .mft-back { font: inherit; font-size: 12px; font-weight: 650; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; margin-bottom: 8px; }
+  .mft-name { margin: 0; font-size: 16px; font-weight: 700; color: var(--ink); }
+  .mft-sub { font-size: 12.5px; color: var(--ink-3); margin: 0 0 10px; }
+  .mft-kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 7px 14px; align-items: center; font-size: 13px; }
+  .mft-kv dt { color: var(--ink-3); }
+  .mft-kv dd { margin: 0; display: flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 650; }
+  .mft-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .mft-pchip { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; background: #EDF1F3; color: var(--ink-3); }
+  .mft-pchip.yes { background: #E2F2EA; color: #1E8A5A; font-weight: 650; }
+  .mft-note { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 12px 0 0; }
   .mapwrap { position: relative; }
   /* MapLibre's canvas has no viewBox/height:auto equivalent — an explicit
      aspect-ratio keeps the same responsive width-drives-height behaviour the
@@ -1102,6 +1162,11 @@
           <h3>Drug</h3>
           <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
         </div>
+        <div class="dock-section" id="mft-controls" hidden>
+          <h3>MFT policy</h3>
+          <button type="button" class="mft-switch" id="mft-switch" role="switch" aria-checked="false"><span>Show MFT policy</span><span class="mft-track" aria-hidden="true"></span></button>
+          <p class="mft-hint" id="mft-hint">Off: the map shows access stages only.</p>
+        </div>
         <div id="res-controls" hidden>
           <div class="dock-section">
             <h3>Study result</h3>
@@ -1150,6 +1215,8 @@
               <span class="key"><span class="resdot b4"></span>&gt; 20%</span>
             </div>
             <p class="res-rule" id="res-rule" hidden></p>
+            <div class="mft-legend" id="mft-legend" hidden></div>
+            <p class="res-rule" id="mft-rule" hidden></p>
           </div>
         </div>
       </div>
@@ -1157,6 +1224,7 @@
       <aside class="map-dock-rail map-dock-right">
         <div class="dock-section dock-detail">
           <h3>Detail</h3>
+          <div class="mft-panel" id="mft-panel" hidden></div>
           <p class="res-note" id="res-note" hidden></p>
           <div class="res-panel" id="res-panel" hidden>
             <div class="res-panel-head">
@@ -1246,6 +1314,7 @@
 <script src="data/world-map-geo.js"></script>
 <script src="data/resistance.js"></script>
 <script src="data/molecular-markers.js"></script>
+<script src="data/treatment-policy.js"></script>
 <script src="assets/journey-icons/icons.js"></script>
 <script src="assets/journey-icons/icons-solid.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.24.0/maplibre-gl.min.js"
@@ -2432,6 +2501,11 @@
       };
     }
     readMapColors();
+    // MFT policy switch state (the switch itself is further down, next to the
+    // study-result code it sits beside in the Detail panel). Off by default.
+    const TP = window.LAUNCH_TREATMENT_POLICY;
+    let mftOn = false, mftSel = null, mftPanelIso = null, mftProductId = null, mftByIso = {};
+    const mftHide = new Set();
 
     const map = new maplibregl.Map({
       container: "mapwrap-gl",
@@ -2442,6 +2516,11 @@
           { id: "bg", type: "background", paint: { "background-color": mapColors.surface2 } },
           { id: "country-fill", type: "fill", source: "world", paint: { "fill-color": mapColors.nodata } },
           { id: "country-line", type: "line", source: "world", paint: { "line-color": mapColors.border, "line-width": .75 } },
+          // MFT policy borders — hidden until the switch is on; filters are
+          // set per product by mftPaint(). Halo first so the line reads on any fill.
+          { id: "mft-halo", type: "line", source: "world", layout: { visibility: "none" }, filter: ["in", ["get", "iso3"], ["literal", []]], paint: { "line-color": "#FFFFFF", "line-width": 4.2, "line-opacity": .9 } },
+          { id: "mft-solid", type: "line", source: "world", layout: { visibility: "none" }, filter: ["in", ["get", "iso3"], ["literal", []]], paint: { "line-color": "#2E9B5F", "line-width": 2.6 } },
+          { id: "mft-dash", type: "line", source: "world", layout: { visibility: "none" }, filter: ["in", ["get", "iso3"], ["literal", []]], paint: { "line-color": "#2E9B5F", "line-width": 2.4, "line-dasharray": [2, 1.4] } },
         ],
       },
       center: [(LON0 + LON1) / 2, (LAT0 + LAT1) / 2], zoom: 0,
@@ -2539,7 +2618,7 @@
             return `<div class="tlvl${on ? "" : " off"}"><span class="tmark">${on ? "✓" : "·"}</span>` +
               `<span class="mapsw ${k}"></span>${LEVEL_LABEL[k]}</div>`;
           }).join("");
-      return `<b>${esc(el.dataset.name)}</b>${rows}${foot}`;
+      return `<b>${esc(el.dataset.name)}</b>${rows}${mftTipLine(el.dataset.iso3)}${foot}`;
     };
     const countryListEl = document.getElementById("map-country-list");
     countryListEl.innerHTML = GEO.features.map((f) =>
@@ -2613,7 +2692,9 @@
       } else {
         empty.hidden = true;
       }
+      mftProductId = id; mftByIso = byIso;   // before bindDrug: its closePanel() re-renders MFT
       bindDrug(id);
+      mftRender();
     }
 
     // ---- resistance overlay (WHO Malaria Threat Maps) ----------------------
@@ -2996,6 +3077,7 @@
       if (p) { p.hidden = true; panelRows = []; }
       selKeys = null;
       if (typeof applySelection === "function") applySelection();
+      mftFollowPanel(null);
     }
 
     // ---- chart above the study table (D25) ---------------------------------
@@ -3175,6 +3257,7 @@
       selKeys = new Set(mk.members.map((x) => x.key));
       applySelection();
       renderPanel();
+      mftFollowPanel(mk.iso3);
     }
 
     function writeNote() {
@@ -3380,6 +3463,8 @@
       } else {
         map.fitBounds([[LON0, LAT0], [LON1, LAT1]], { padding: 0 });
       }
+      if (mftSel && !mftScope().includes(mftSel)) mftSel = null;
+      mftRender();
     }
 
     fillRegionList();
@@ -3516,6 +3601,271 @@
       if (Math.abs(z - drawnZoom) < 0.001) return;
       drawMarks();
     });
+
+    // ---- MFT policy switch (WHO World Malaria Report, Annex 4B) -------------
+    // Which of the four tracked medicines each country's NATIONAL TREATMENT
+    // POLICY lists, and for which patients. This is policy, not use: a listed
+    // medicine can still be out of stock, and a country can use one that its
+    // policy does not list. It is a separate question from the access stage
+    // the fill shows, so it rides a separate channel (a border) and stays off
+    // until the reader turns it on — with the switch off, nothing below
+    // touches the map, the legend or the Detail panel.
+    //
+    // One group per country, by precedence: first-line for tested
+    // P. falciparum beats untested-only, which beats P. vivax-only, which
+    // beats severe malaria / pregnancy-only. Only the first draws a solid
+    // border; the smaller patient groups draw a dashed one.
+    const MFT_GROUPS = [
+      { id: "tested",   label: "First-line, tested P. falciparum",  short: "Tested P. falciparum", t: 1 },
+      { id: "untested", label: "Only untested P. falciparum",       short: "Untested only", t: .55 },
+      { id: "vivax",    label: "Only P. vivax",                     short: "P. vivax only", t: .33 },
+      { id: "severe",   label: "Only severe malaria or pregnancy",  short: "Severe only", t: .2 },
+    ];
+    // What the card lists, one chip per group as WHO reports them.
+    const MFT_CHIPS = [["tested", "Tested P. falciparum"], ["untested", "Untested P. falciparum"],
+                       ["vivax", "P. vivax"], ["severe", "Severe malaria"], ["pregnancy", "Pregnancy"]];
+    const mftColor = (pid) => TOKEN("--mft-" + pid) || TOKEN("--accent");
+    // Lighter shade of a drug colour for the smaller groups (donut, dots): a
+    // plain mix towards white, so it needs no colour library.
+    function mftShade(hex, t) {
+      const m = /^#?([0-9a-f]{6})$/i.exec(hex || "");
+      if (!m || t >= 1) return hex;
+      const n = parseInt(m[1], 16), mix = (c) => Math.round(255 - (255 - c) * t);
+      return "#" + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((c) => mix(c).toString(16).padStart(2, "0")).join("");
+    }
+    function mftGroups(iso3) {
+      const c = TP && TP.countries[iso3];
+      return (c && c.products && c.products[mftProductId]) || [];
+    }
+    // "none" = this product is not in the country's policy; otherwise the one
+    // group the country is drawn and counted under.
+    function mftCat(iso3) {
+      const g = mftGroups(iso3);
+      if (!g.length) return "none";
+      if (g.includes("tested")) return "tested";
+      if (g.includes("untested")) return "untested";
+      if (g.includes("vivax")) return "vivax";
+      return "severe";   // severe and/or pregnancy
+    }
+    // The countries the counts and borders cover: drawn on this map (the same
+    // 94 the access legend counts) and inside the Location filter.
+    function mftScope() {
+      const isoList = locCountry ? [locCountry] : locRegion ? regionCountries(locRegion) : null;
+      return Object.keys(M.countries).filter((iso3) => !isoList || isoList.includes(iso3));
+    }
+    function mftStage(iso3) {
+      const lvl = (iso3 in M.countries) ? (mftByIso[iso3] || null) : null;
+      return { lvl: lvl || "none", label: LEVEL_LABEL[lvl] || LEVEL_LABEL.none };
+    }
+    // WHO's own country names (as in the annex), falling back to the map's short name.
+    const mftName = (iso3) => (TP && TP.countries[iso3] && TP.countries[iso3].name) || (M.countries[iso3] && M.countries[iso3].n) || iso3;
+    const mftProductName = () => (tracked.find((p) => p.id === mftProductId) || {}).name || "";
+    const mftSource = () => {
+      const m = (TP && TP.meta) || {};
+      return `Source: WHO ${esc(m.edition || "World Malaria Report")}, Annex 4B — national policy as of ${esc(String(m.policyYear || ""))}` +
+        `${m.dataAsOf ? ", data as of " + esc(prettyDate(m.dataAsOf)) : ""}. Borders show what policy lists, not what is in use.`;
+    };
+
+    function mftTipLine(iso3) {
+      if (!mftOn || !TP) return "";
+      const cat = mftCat(iso3);
+      const g = MFT_GROUPS.find((x) => x.id === cat);
+      return `<div class="tprod">MFT policy · ${esc(mftProductName())}: ${g ? esc(g.label) : "not listed"}</div>`;
+    }
+
+    function mftPaint() {
+      if (!map.getLayer("mft-solid")) return;
+      const vis = mftOn ? "visible" : "none";
+      ["mft-halo", "mft-solid", "mft-dash"].forEach((id) => map.setLayoutProperty(id, "visibility", vis));
+      if (!mftOn) return;
+      const solid = [], dash = [];
+      mftScope().forEach((iso3) => {
+        const cat = mftCat(iso3);
+        if (cat === "none" || mftHide.has(cat)) return;
+        (cat === "tested" ? solid : dash).push(iso3);
+      });
+      const col = mftColor(mftProductId);
+      map.setFilter("mft-halo", ["in", ["get", "iso3"], ["literal", solid.concat(dash)]]);
+      map.setFilter("mft-solid", ["in", ["get", "iso3"], ["literal", solid]]);
+      map.setFilter("mft-dash", ["in", ["get", "iso3"], ["literal", dash]]);
+      map.setPaintProperty("mft-solid", "line-color", col);
+      map.setPaintProperty("mft-dash", "line-color", col);
+    }
+
+    function mftCounts() {
+      const byCat = { tested: [], untested: [], vivax: [], severe: [] };
+      mftScope().forEach((iso3) => { const c = mftCat(iso3); if (c !== "none") byCat[c].push(iso3); });
+      Object.values(byCat).forEach((l) => l.sort((a, b) => mftName(a).localeCompare(mftName(b))));
+      return byCat;
+    }
+    // Countries with this product in policy that the map cannot draw (French
+    // Guiana today: part of France's shape, not a country of its own here).
+    function mftUndrawn() {
+      if (!TP || locRegion || locCountry) return [];
+      return Object.keys(TP.countries).filter((iso3) => !(iso3 in M.countries) && mftGroups(iso3).length)
+        .map((iso3) => TP.countries[iso3].name);
+    }
+
+    function mftLegend(byCat) {
+      const el = document.getElementById("mft-legend"), rule = document.getElementById("mft-rule");
+      el.hidden = rule.hidden = !mftOn;
+      if (!mftOn) return;
+      const col = mftColor(mftProductId);
+      const total = Object.values(byCat).reduce((s, l) => s + l.length, 0);
+      if (!total) {
+        el.innerHTML = `<span class="res-t">MFT policy · ${esc(mftProductName())}</span><span>Not in any national policy on this map.</span>`;
+      } else {
+        el.innerHTML = `<span class="res-t">MFT policy · ${esc(mftProductName())}</span>` + MFT_GROUPS.map((g) => {
+          const n = byCat[g.id].length;
+          if (!n) return "";
+          const on = !mftHide.has(g.id);
+          return `<button type="button" class="mft-chip" data-g="${g.id}" aria-pressed="${on}" ` +
+            `title="${on ? "Hide" : "Show"} these countries on the map">` +
+            `<span class="mft-line" style="border-top:${g.id === "tested" ? "3px solid" : "2.5px dashed"} ${col}"></span>` +
+            `${esc(g.label)} <span class="ct">${n}</span></button>`;
+        }).join("");
+        el.querySelectorAll(".mft-chip").forEach((b) => b.addEventListener("click", () => {
+          const g = b.dataset.g;
+          if (mftHide.has(g)) mftHide.delete(g); else mftHide.add(g);
+          mftRender();
+        }));
+      }
+      rule.textContent = "Border = the selected medicine is in the country's national treatment policy (solid: first-line for tested P. falciparum; dashed: a smaller patient group only). Fill = access stage, unchanged.";
+    }
+
+    function mftDonut(byCat, col) {
+      const total = MFT_GROUPS.reduce((s, g) => s + byCat[g.id].length, 0);
+      const R = 40, W = 16, C = 2 * Math.PI * R;
+      const segs = MFT_GROUPS.filter((g) => byCat[g.id].length);
+      const gap = segs.length > 1 ? 2 : 0;   // thin white seam between groups
+      let off = 0;
+      const arcs = segs.map((g) => {
+        const len = C * byCat[g.id].length / total;
+        const s = `<circle cx="56" cy="56" r="${R}" fill="none" stroke="${mftShade(col, g.t)}" stroke-width="${W}" ` +
+          `stroke-dasharray="${Math.max(len - gap, 0.5)} ${C - Math.max(len - gap, 0.5)}" stroke-dashoffset="${-off}" transform="rotate(-90 56 56)"></circle>`;
+        off += len;
+        return s;
+      }).join("");
+      // All four groups, zeros included, so the key reads the same for every medicine.
+      const rows = MFT_GROUPS.map((g) =>
+        `<div><span class="mft-sq" style="background:${mftShade(col, g.t)}"></span><span>${esc(g.short)}</span><b>${byCat[g.id].length}</b></div>`).join("");
+      return `<div class="mft-donut"><svg viewBox="0 0 112 112" width="112" height="112" role="img" ` +
+        `aria-label="${total} ${total === 1 ? "country" : "countries"} by patient group">` +
+        `<circle cx="56" cy="56" r="${R}" fill="none" stroke="#EDF1F3" stroke-width="${W}"></circle>${arcs}` +
+        `<text class="ct-n" x="56" y="58" text-anchor="middle">${total}</text>` +
+        `<text class="ct-l" x="56" y="74" text-anchor="middle">${total === 1 ? "country" : "countries"}</text></svg>` +
+        `<div class="rows">${rows}</div></div>`;
+    }
+
+    function mftPanel(byCat) {
+      const el = document.getElementById("mft-panel");
+      el.hidden = !mftOn;
+      if (!mftOn) return;
+      el.classList.toggle("with-studies", !document.getElementById("res-panel").hidden);
+      const pname = esc(mftProductName()), col = mftColor(mftProductId);
+      const head = `<h4 class="mft-h"><span class="mft-dot" style="background:${col}"></span>MFT policy · ${pname}</h4>`;
+      const iso3 = mftSel || locCountry || null;
+
+      if (iso3) {
+        const st = mftStage(iso3), g = mftGroups(iso3), cat = mftCat(iso3);
+        const tp = TP.countries[iso3];
+        const parts = tp && tp.parts ? Object.keys(tp.parts).map((k) => {
+          const pg = (tp.parts[k].products || {})[mftProductId] || [];
+          return `${esc(k)}: ${pg.length ? "lists " + pname : "does not list " + pname}.`;
+        }).join(" ") : "";
+        const gInfo = MFT_GROUPS.find((x) => x.id === cat);
+        el.innerHTML = (mftSel && !locCountry ? `<button type="button" class="mft-back" id="mft-back">← All countries</button>` : "") +
+          head +
+          `<p class="mft-name">${esc(mftName(iso3))}</p>` +
+          `<p class="mft-sub">${esc(REGION_NAME[WHO_REGION[iso3]] || "")}</p>` +
+          `<dl class="mft-kv">` +
+            `<dt>Access stage</dt><dd><span class="mapsw ${st.lvl}"></span>${esc(st.label)}</dd>` +
+            `<dt>Policy group</dt><dd>` + (gInfo
+              ? `<span class="mft-sq" style="background:${mftShade(col, gInfo.t)}"></span>${esc(gInfo.short)}`
+              : `<span class="mft-sq" style="background:var(--map-nodata)"></span>Not in national policy`) + `</dd>` +
+          `</dl>` +
+          (g.length
+            ? `<div class="mft-grp">Listed for</div><div class="mft-chips">` +
+              MFT_CHIPS.map(([k, lab]) => `<span class="mft-pchip${g.includes(k) ? " yes" : ""}">${g.includes(k) ? "✓ " : ""}${esc(lab)}</span>`).join("") + `</div>`
+            : "") +
+          (parts ? `<p class="mft-note">${parts}</p>` : "") +
+          `<p class="mft-note">${mftSource()}</p>`;
+        const back = document.getElementById("mft-back");
+        if (back) back.addEventListener("click", () => { mftSel = null; mftRender(); });
+        return;
+      }
+
+      const total = Object.values(byCat).reduce((s, l) => s + l.length, 0);
+      const und = mftUndrawn();
+      const undNote = und.length ? `<p class="mft-note">Also in policy but not drawn on this map: ${esc(und.join(", "))}.</p>` : "";
+      if (!total) {
+        el.innerHTML = head +
+          `<p class="mft-sub">No national treatment policy ${locRegion || locCountry ? "in this area " : ""}lists ${pname} yet.</p>` +
+          undNote + `<p class="mft-note">${mftSource()}</p>`;
+        return;
+      }
+      el.innerHTML = head + mftDonut(byCat, col) +
+        MFT_GROUPS.filter((g) => byCat[g.id].length).map((g) =>
+          `<div class="mft-grp">${esc(g.short)} · ${byCat[g.id].length}</div>` + byCat[g.id].map((c) =>
+            `<button type="button" class="mft-row" data-iso3="${esc(c)}">` +
+            `<span class="nm">${esc(mftName(c))}<span class="stg"> · ${esc(mftStage(c).label)}</span></span>` +
+            `<span class="mft-dot" style="background:${mftShade(col, g.t)}" aria-hidden="true"></span></button>`).join("")).join("") +
+        undNote + `<p class="mft-note">${mftSource()}</p>`;
+      el.querySelectorAll(".mft-row").forEach((b) => b.addEventListener("click", () => { mftSel = b.dataset.iso3; mftRender(); }));
+    }
+
+    function mftRender() {
+      if (!TP || !mftProductId) return;
+      const byCat = mftCounts();
+      mftPaint();
+      mftLegend(byCat);
+      mftPanel(byCat);
+      const hint = document.getElementById("mft-hint");
+      if (hint) hint.textContent = mftOn
+        ? "On: borders show where national policy lists the selected medicine. Click a country for detail."
+        : "Off: the map shows access stages only.";
+    }
+    // Called by openMarkPanel/closePanel so the policy card follows the study
+    // dot the reader clicked.
+    function mftFollowPanel(iso3) {
+      mftPanelIso = iso3 || null;
+      if (!mftOn) return;
+      if (mftPanelIso) mftSel = mftPanelIso;   // closing the study list keeps the country card
+      mftRender();
+    }
+
+    if (TP) {
+      document.getElementById("mft-controls").hidden = false;
+      const sw = document.getElementById("mft-switch");
+      sw.addEventListener("click", () => {
+        mftOn = !mftOn;
+        sw.setAttribute("aria-checked", String(mftOn));
+        mftSel = mftOn ? mftPanelIso : null;
+        if (!mftOn) hideTip();
+        mftRender();
+      });
+      // Canvas hover/click on countries exists only while the switch is on,
+      // and only on the canvas itself — study dots are DOM markers above it
+      // and keep their own tooltip and click.
+      const onCanvas = (e) => e.originalEvent && e.originalEvent.target === map.getCanvas();
+      map.on("mousemove", "country-fill", (e) => {
+        if (!mftOn || !onCanvas(e) || !e.features.length) return;
+        const iso3 = e.features[0].properties.iso3;
+        if (!(iso3 in M.countries)) { hideTip(); return; }
+        const st = mftStage(iso3);
+        map.getCanvas().style.cursor = "pointer";
+        showTipAtPoint(e.originalEvent.clientX, e.originalEvent.clientY,
+          `<b>${esc(mftName(iso3))}</b><div class="tlvl"><span class="mapsw ${st.lvl}"></span>${esc(st.label)}</div>${mftTipLine(iso3)}`);
+      });
+      map.on("mouseleave", "country-fill", () => { if (mftOn) { hideTip(); map.getCanvas().style.cursor = ""; } });
+      map.on("click", "country-fill", (e) => {
+        if (!mftOn || !onCanvas(e) || !e.features.length) return;
+        const iso3 = e.features[0].properties.iso3;
+        if (!(iso3 in M.countries)) return;
+        mftSel = iso3;
+        mftRender();
+      });
+    }
 
     // Everything above only touches the map's style/sources once it exists,
     // but setFeatureState/setPaintProperty need the style actually loaded —
