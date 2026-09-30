@@ -218,44 +218,143 @@
     color: var(--ink-3); line-height: 1.15; margin: 1px 0 2px; padding: 0 2px;
   }
 
-  /* ---------- product rows ---------- */
-  .board { display: flex; flex-direction: column; gap: 10px; }
-  .product {
+  /* ---------- journey table (sheet rows 18/20, 30 Sep 2026) ----------
+     One summary row per medicine, A-Z. Level 1 (the chevron) opens that
+     medicine's journey: the time-scaled view by default, the original
+     pathway-order rail behind a quiet text link. Level 2 ("More detail") opens
+     the cards and milestone table that "View details" used to show. */
+  .board {
     background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
     box-shadow: var(--shadow); overflow: hidden;
   }
+  .product { border-bottom: 1px solid var(--line); }
+  .product:last-child { border-bottom: 0; }
   .product.future { opacity: .78; }
-  /* The row is a plain grid, not a button: the eight stage markers are real
-     buttons now, and HTML forbids interactive content inside a button. The
-     product toggle is the identity block on the left; the track is its sibling. */
-  .prow { display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; padding: 8px 20px; }
-  .pbtn {
-    display: block; width: 100%; padding: 0; cursor: pointer;
-    background: none; border: 0; text-align: left; color: inherit; font: inherit;
-    border-radius: 8px;
+  .product.l1-open > .srow { background: var(--surface-2); }
+  .srow {
+    display: grid; column-gap: 14px; align-items: center; padding: 10px 18px; min-height: 58px;
+    grid-template-columns: 34px minmax(150px, 1.5fr) 190px minmax(110px, 1fr) 118px 100px minmax(150px, 1.4fr);
   }
-  .pbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-  .pid .name { display: flex; align-items: baseline; gap: 7px; font-size: 16.5px; font-weight: 700; letter-spacing: -.005em; }
-  .pid .name .txt { min-width: 0; }
-  .pid .inn { color: var(--ink-2); font-size: 13px; margin-top: 1px; }
-  .pid .mfr { color: var(--ink-3); font-size: 12.5px; margin-top: 2px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .srow.hd {
+    min-height: 34px; padding-block: 6px; background: var(--surface-2); border-bottom: 1px solid var(--line);
+    font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .exp {
+    width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface);
+    color: var(--ink-2); cursor: pointer; display: grid; place-items: center; padding: 0; font: inherit;
+    font-size: 14px; font-weight: 700; transition: transform .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .exp:hover { color: var(--accent); border-color: var(--accent); }
+  .exp[aria-expanded="true"] { transform: rotate(180deg); color: var(--accent); border-color: var(--accent); }
+  .exp:focus-visible, .swv:focus-visible, .more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .nm { min-width: 0; }
+  .nm b { display: block; font-size: 15.5px; font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
+  .nm small { display: block; font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mini { display: flex; align-items: center; gap: 3px; }
+  .md { width: 14px; height: 14px; border-radius: 50%; flex: none; box-sizing: border-box; }
+  .md.done { background: var(--good); }
+  .md.prog { background: var(--warn-soft); border: 2px solid var(--warn); }
+  .md.late { background: var(--crit); }
+  .md.idle { background: var(--idle-soft); border: 1.5px dashed var(--idle); }
+  .mp { display: flex; flex-direction: column; gap: 2px; padding: 0 2px; border-left: 2px solid var(--line); border-right: 2px solid var(--line); border-radius: 6px; }
+  .mp .md { width: 9px; height: 9px; }
+  .mini .ln { width: 6px; height: 2px; background: var(--line); flex: none; }
+  .light { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .light i { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+  .light.done { color: var(--good); } .light.done i { background: var(--good); }
+  .light.prog { color: var(--warn); } .light.prog i { background: var(--warn); }
+  .light.late { color: var(--crit); } .light.late i { background: var(--crit); }
+  .light.idle { color: var(--ink-3); } .light.idle i { background: var(--idle-soft); box-shadow: inset 0 0 0 1.5px var(--idle); }
+  .srow .cell { font-size: 13.5px; }
+  .srow .num { font-variant-numeric: tabular-nums; }
+  .c-bar { font-size: 13px; line-height: 1.35; color: var(--ink); min-width: 0; text-wrap: balance; }
+  .srow.hd .c-bar { font-size: 10.5px; line-height: inherit; color: var(--ink-3); }
+  .c-bar.none { color: var(--ink-3); }
   .chip {
     font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase;
     padding: 2.5px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2);
   }
   .chip.pipeline { background: var(--accent-soft); color: var(--accent); }
   .chip.soon { background: var(--idle-soft); color: var(--ink-3); }
-  .peek {
-    display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
-    font-size: 12px; font-weight: 650; color: var(--accent);
+
+  /* level 1: the journey */
+  .l1 { display: none; padding: 4px 18px 16px; background: var(--surface-2); border-top: 1px dashed var(--line); }
+  .product.l1-open .l1 { display: block; }
+  .l1in { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px 14px; }
+  .l1h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; margin-bottom: 6px; }
+  .l1id { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--ink-3); min-width: 0; }
+  .l1ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; }
+  .l1t { font-size: 12.5px; font-weight: 650; color: var(--ink-2); }
+  .swv {
+    background: none; border: 0; padding: 4px 2px; font: inherit; font-size: 12.5px; font-weight: 600;
+    color: var(--ink-3); cursor: pointer; text-decoration: underline;
+    text-decoration-color: var(--line); text-underline-offset: 3px;
   }
-  .peek .pchev { font-size: 15px; transition: transform .15s ease; display: inline-block; }
-  .peek .peek-open { display: none; }
-  .product.open .peek .peek-open { display: inline; }
-  .product.open .peek .peek-closed { display: none; }
-  .product.open .peek .pchev { transform: rotate(180deg); }
-  .pbtn:hover .peek .peek-txt { text-decoration: underline; }
+  .swv:hover { color: var(--accent); text-decoration-color: var(--accent); }
+  .view { transition: opacity .28s ease, transform .28s ease; }
+  .view[hidden] { display: none; }
+  .view.fade-in { opacity: 0; transform: translateY(6px); }
+  .cscroll { overflow-x: auto; overflow-y: hidden; }
+  .l1f { display: flex; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  .more {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--accent);
+    color: var(--accent); border-radius: 8px; padding: 6px 13px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
+  }
+  .more:hover { background: var(--accent-soft); }
+  .more .ch { transition: transform .15s ease; }
+  .more[aria-expanded="true"] .ch { transform: rotate(180deg); }
+  @media (max-width: 1040px) {
+    .srow { grid-template-columns: 34px minmax(130px, 1.4fr) 170px 118px minmax(120px, 1fr); }
+    .srow .c-stage, .srow .c-path { display: none; }
+  }
+  @media (max-width: 640px) {
+    .srow { grid-template-columns: 34px 1fr auto; row-gap: 6px; }
+    .srow.hd { display: none; }
+    .srow .c-mini { grid-column: 2 / -1; grid-row: 2; }
+    .srow .c-bar { grid-column: 2 / -1; grid-row: 3; }
+    .l1 { padding-inline: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .view, .exp, .more .ch { transition: none; } }
+
+  /* level 1, default view: the time-scaled journey. Dated gates hang from their
+     real year on one axis that starts at the first milestone, so there are no
+     empty years; gates with no year sit in the panel on the right rather than
+     being given an invented date. */
+  .tsp { display: grid; grid-template-columns: minmax(520px, 1fr) 230px; gap: 20px; align-items: start; min-width: 780px; }
+  .tsa { position: relative; }
+  .tsa .ax { position: absolute; left: 0; right: 0; top: 26px; height: 2px; background: var(--line); }
+  .tsa .tk { position: absolute; top: 0; transform: translateX(-50%); font-size: 10.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tsa .tk.now { font-weight: 700; color: var(--ink-2); }
+  .tsa .tk.now i { font-weight: 400; font-style: italic; color: var(--ink-3); }
+  .tsa .tt { position: absolute; top: 22px; width: 1px; height: 10px; margin-left: -.5px; background: var(--ink-3); opacity: .5; }
+  .tsa .today { position: absolute; top: 20px; width: 0; border-left: 1px dashed var(--ink-3); }
+  .tsa .run { position: absolute; top: 24px; height: 6px; border-radius: 3px; }
+  .tsa .run.prog { background: var(--warn); } .tsa .run.late { background: var(--crit); }
+  .tsa .pt { position: absolute; top: 22px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 2px var(--surface); }
+  .tsa .pt.prog { background: var(--warn); } .tsa .pt.late { background: var(--crit); }
+  .tsa .stem { position: absolute; top: 32px; width: 1px; margin-left: -.5px; background: var(--line); }
+  .tsa .it { position: absolute; flex: none; min-width: 0; width: 104px; margin-left: -52px; display: flex; flex-direction: column; align-items: center; }
+  .tsa .it .smark { margin: 0; }
+  .tsa .snow { font-size: 11px; font-weight: 700; margin-top: 3px; }
+  .tsa .snow.prog { color: var(--warn); } .tsa .snow.late { color: var(--crit); }
+  .tsa .ssince { font-size: 10.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .tsz { display: flex; flex-direction: column; gap: 12px; border-left: 1px dashed var(--line); padding-left: 16px; }
+  .ugrp .h { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 5px; }
+  .uchips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .uchip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; line-height: 1.3; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px 2px 3px; }
+  .uchip .ui { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; color: var(--journey-icon); background: var(--surface); }
+  .uchip .ui svg { width: 12px; height: 12px; }
+  .uchip .ui .whoemb { width: 14px; height: 14px; }
+  .uchip .ui.m-done { background: var(--good-soft); }
+  .uchip .ui.m-prog { box-shadow: inset 0 0 0 1.5px var(--warn); }
+  .uchip .ui.m-late { box-shadow: inset 0 0 0 1.5px var(--crit); }
+  .uchip .ui.m-idle { color: var(--idle); box-shadow: inset 0 0 0 1px var(--line); }
+  .uchip .st { font-weight: 700; } .uchip .st.prog { color: var(--warn); } .uchip .st.late { color: var(--crit); }
+  .unone { font-size: 12px; color: var(--ink-3); }
+  .uicons { display: flex; flex-wrap: wrap; gap: 5px; }
+  .uicons .ui { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: var(--idle); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+  .uicons .ui svg { width: 14px; height: 14px; }
+  .uicons .ui .whoemb { width: 16px; height: 16px; filter: grayscale(1) opacity(.8); }
 
   /* pipeline track */
   /* overflow-x: auto here forces overflow-y to a used value of auto too (a
@@ -281,7 +380,7 @@
   .stage .lbl { font-size: 11px; line-height: 1.25; color: var(--ink-3); margin-top: 7px; padding: 0 3px; }
   .stage.cur .lbl { color: var(--ink); font-weight: 650; }
   /* year a gate was reached, under its label — also the value plotted on the
-     real-year timeline underneath (.tlbox), so this and that stay honest twins */
+     real-year timeline view, so this and that stay honest twins */
   .stage .syear { font-size: 11px; font-weight: 650; color: var(--ink-2); margin-top: 3px; font-variant-numeric: tabular-nums; }
   .stage.s-idle .syear { color: var(--ink-3); }
   /* ---------- parallel gate pair, drawn as a fork ----------
@@ -372,14 +471,6 @@
      again be two strokes that have to meet. */
   .stagegroup .stage .bar { visibility: hidden; }
 
-  /* trackwrap holds both the stepper (trackbox) and, underneath it, its own
-     standalone real-year timeline (.tlbox) — min-width:0 keeps the nested
-     horizontal-scroll regions from blowing out the .prow grid track. */
-  .trackwrap { min-width: 0; }
-  .tlbox { overflow-x: auto; margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--line); }
-  .tlbox svg { display: block; width: 100%; height: auto; }
-  .tl-caption { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px; }
-  .tl-caption .tl-total { font-size: 11.5px; letter-spacing: normal; text-transform: none; color: var(--ink-2); font-variant-numeric: tabular-nums; }
   /* same small pill the status legend uses for the timeline's two facts —
      a reached gate's real year (good), and one reached out of pathway order
      (neutral grey: a fact about sequence, not a delay) */
@@ -388,7 +479,6 @@
     font-variant-numeric: tabular-nums; background: var(--good-soft); color: var(--good);
   }
   .tgap-key.g-back { background: var(--surface-2); color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--line); }
-  .tl-key { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 2px; font-size: 10.5px; color: var(--ink-3); }
 
   /* illustrated stage marker: journey icon + status badge overlay */
   .stage .smark {
@@ -439,12 +529,12 @@
   }
   .stage .smark[aria-expanded="true"]::after { transform: rotate(180deg); }
   /* ---------- gate drill-down (cell tier) ----------
-     A sibling of .prow inside the product card, so it spans the card. Kept
+     Sits inside the open journey (.l1in), under the marker row. Kept
      independent of .detail: "why is this stuck" and "what is this medicine"
      are different questions, and nesting one inside the other slows the
      common case. */
   .gatepanel {
-    margin: 0 20px 4px; padding: 14px 16px;
+    margin: 10px 0 0; padding: 14px 16px;
     background: var(--surface); border: 1px solid var(--ink-3);
     border-left: 3px solid var(--accent); border-radius: 10px;
   }
@@ -528,13 +618,12 @@
   .gw-jump:hover { border-color: var(--accent); background: var(--accent-soft); }
   @media (max-width: 760px) {
     .gw-list li { grid-template-columns: 1fr; gap: 3px; }
-    .gatepanel { margin: 0 14px 4px; }
   }
 
   /* the panel carries the flag for the current gate; don't say it twice */
   .product.gate-flag .flagnote { display: none; }
   .flagnote {
-    margin: 0 20px 0 290px; font-size: 12.5px; color: var(--crit);
+    margin: 8px 0 0; font-size: 13px; color: var(--crit);
     display: flex; gap: 7px; align-items: baseline;
   }
   .flagnote::before { content: "▲"; font-size: 9px; }
@@ -563,7 +652,7 @@
   }
 
   /* ---------- detail panel ---------- */
-  .detail { display: none; border-top: 1px solid var(--line); background: var(--surface-2); padding: 20px; }
+  .detail { display: none; margin-top: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); padding: 16px; }
   .product.open .detail { display: block; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
   .card {
@@ -1010,6 +1099,10 @@
   @media print {
     body { background: #fff; }
     .product .detail { display: block !important; }
+    .product .l1 { display: block !important; }
+    .view[data-v="path"] { display: none !important; }
+    .view[data-v="time"] { display: block !important; }
+    .exp, .swv, .l1f { display: none !important; }
     .product { break-inside: avoid; box-shadow: none; }
     .hdr-actions, #tip, .gp-close, .gw-jump { display: none !important; }
     /* an open drill-down carries the analysis — keep it in the PDF */
@@ -1037,8 +1130,6 @@
     .hd-text { flex: none; }
     .hd-bar .hdr-actions { flex-wrap: nowrap; margin-left: 0; }
     .hd-bar .hdr-actions button { flex: 1 1 0; justify-content: center; padding: 10px 6px; gap: 5px; white-space: nowrap; }
-    .prow { grid-template-columns: 1fr; padding: 14px 14px; }
-    .flagnote { margin-left: 14px; margin-right: 14px; }
     .updates li { flex-wrap: wrap; gap: 4px 12px; }
     .strip { padding: 10px 14px; }
     .hdr-actions button { padding: 10px 15px; }
@@ -1098,8 +1189,7 @@
       <span class="key"><span class="dot prog" aria-hidden="true">›</span> In progress</span>
       <span class="key"><span class="dot late" aria-hidden="true">!</span> Delayed / access barrier</span>
       <span class="key"><span class="dot idle" aria-hidden="true"></span> Not started (stage glyph dimmed, no badge)</span>
-      <span class="key"><span class="tgap-key" aria-hidden="true">●</span> Actual milestone (timeline)</span>
-      <span class="key"><span class="tgap-key g-back" aria-hidden="true">↩</span> Reached out of order (line dips back)</span>
+      <span class="key"><span class="tgap-key" aria-hidden="true">●</span> Dated milestone (timeline)</span>
     </div>
   </div>
 
@@ -1464,187 +1554,142 @@
     return y >= 1990 && y <= 2100 ? y : null;
   }
 
-  // ---- standalone real-year timeline, drawn under the always-visible track --
-  // Independent of the stepper above it — no lines tie the two together. Every
-  // gate with a real year gets its own point, name written out in full, on an
-  // axis zoomed to this product's own span. Points still join in pathway order,
-  // so a gate reached out of that order (the WHO PQ listing can land years
-  // before the WHO recommendation that precedes it) shows as the
-  // join dipping backward rather than a chip explaining it — a fact about
-  // sequence, drawn in neutral grey rather than the red a real delay earns.
-  // The active gate (currentStage) always gets an open-ended "today" marker
-  // even without a date, since that's the one fact every product has.
-  function wrapLabel(label) {
-    if (label.length <= 15) return [label];
-    const words = label.split(" ");
-    if (words.length === 1) return [label];
-    let best = 0, bestDiff = Infinity;
-    for (let i = 0; i < words.length - 1; i++) {
-      const acc = words.slice(0, i + 1).join(" ");
-      const diff = Math.abs(acc.length - label.length / 2);
-      if (diff < bestDiff) { bestDiff = diff; best = i; }
+  // ---- journey table: summary-row pieces and the time-scaled journey -----------
+  // The summary row reads the same stage data the pathway rail does; nothing
+  // here is stored separately. "As-of" year is the dataset's own date, not the
+  // visitor's clock, so "today" never reads later than the data was checked.
+  const ASOF_YEAR = parseInt(DATA.meta.lastUpdated.slice(0, 4), 10);
+  const yrsText = n => n + (n === 1 ? " yr" : " yrs");
+
+  function firstYear(p) {
+    const ys = p.stages.map(stageYear).filter(y => y != null);
+    return ys.length ? Math.min(...ys) : null;
+  }
+  function onPathwayShort(p) {
+    const y = firstYear(p);
+    if (y == null) return "—";
+    const n = ASOF_YEAR - y;
+    return n > 0 ? yrsText(n) : "< 1 yr";
+  }
+  function onPathwayLong(p) {
+    const y = firstYear(p);
+    if (y == null) return "Not yet dated";
+    const n = ASOF_YEAR - y;
+    return n > 0 ? yrsText(n) + ", ongoing" : "Under 1 yr";
+  }
+  // The year the current gate has been waiting since. Uses the same journey
+  // milestones the gate panel's "Pending since" line reads, so the two agree;
+  // when a product has no journey (GanLum, ALAQ) it falls back to the latest
+  // year among the gates in the column before the current one.
+  function sinceFor(p) {
+    const j = p.detail && p.detail.journey;
+    if (Array.isArray(j) && j.length > 1 && j[j.length - 1].year === "TBC") {
+      const last = [...j].reverse().find(g => Number.isInteger(g.year));
+      if (last) return last.year;
     }
-    return [words.slice(0, best + 1).join(" "), words.slice(best + 1).join(" ")];
+    const c = STAGE_COLUMNS.findIndex(col => col.stages.includes(p.currentStage));
+    if (c > 0) {
+      const ys = STAGE_COLUMNS[c - 1].stages.map(i => stageYear(p.stages[i])).filter(y => y != null);
+      if (ys.length) return Math.max(...ys);
+    }
+    return null;
   }
-  function estHalfWidth(lines) {
-    const widest = Math.max(...lines.map(l => String(l).length));
-    return Math.max(26, Math.min(58, widest * 3 + 8));
+  function miniJourney(p) {
+    const done = p.stages.filter(st => st.status === "done").length;
+    return `<div class="mini" role="img" aria-label="${done} of ${p.stages.length} stages complete">` +
+      STAGE_COLUMNS.map(col => col.stages.length === 1
+        ? `<i class="md ${p.stages[col.stages[0]].status}"></i>`
+        : `<span class="mp">${col.stages.map(i => `<i class="md ${p.stages[i].status}"></i>`).join("")}</span>`
+      ).join('<i class="ln"></i>') + `</div>`;
   }
-  // Skyline packing: a label drops to the next tier down only when it would
-  // collide with one already claimed at the tier above it.
-  function packTiers(items) {
-    const tiers = [];
-    items.forEach(it => {
-      const start = it.x - it.halfW, end = it.x + it.halfW;
-      let placed = false;
-      for (let t = 0; t < tiers.length; t++) {
-        const clash = tiers[t].some(iv => !(end < iv[0] - 6 || start > iv[1] + 6));
-        if (!clash) { tiers[t].push([start, end]); it.tier = t; placed = true; break; }
-      }
-      if (!placed) { tiers.push([[start, end]]); it.tier = tiers.length - 1; }
-    });
-    return tiers.length;
-  }
-  function niceTicks(lo, hi, target) {
-    const span = hi - lo;
-    const steps = [1, 2, 5, 10, 20, 25, 50];
-    const step = steps.find(s => s >= span / target) || steps[steps.length - 1];
-    const ticks = [];
-    for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks.push(t);
-    return ticks;
+  function stageMarkHtml(p, i) {
+    const st = p.stages[i];
+    return `<button class="smark" type="button"
+      aria-expanded="false" aria-controls="${esc(p.id)}-gate"
+      aria-label="${esc(STAGES[i])}. ${esc(peekLine(st.status, st.date, st.nextDate))}. Opens the full detail."
+      data-stage="${esc(STAGES[i])}" data-stagei="${i}" data-pid="${esc(p.id)}"
+      data-status="${st.status}"
+      data-date="${esc(st.date)}" data-nextdate="${esc(st.nextDate)}">${stageIconImg(i, "sicon")}<span class="dot ${st.status}" aria-hidden="true">${ICON[st.status]}</span></button>`;
   }
 
-  function stageTimeline(p, years, trackWidth) {
-    // "now" here means the data's own as-of date, same as nowYear in the gate
-    // drill-down below — not the visitor's clock, which could make "today"
-    // read later than the data has actually been checked to.
-    const CUR_YEAR = parseInt(DATA.meta.lastUpdated.slice(0, 4), 10);
-    // W matches the track column's real rendered width (set by fitTimelines,
-    // once the board is in the DOM) so the SVG never scales — 1 unit stays 1px
-    // regardless of how wide the full-bleed card is. 880 is only a pre-layout
-    // fallback for the very first paint.
-    const W = trackWidth || 880, marginX = 26, dotY = 34, dipY = 60;
-
-    const real = years.filter(y => y != null);
-    const domainYears = real.concat([CUR_YEAR]);
-    let lo = Math.min(...domainYears), hi = Math.max(...domainYears);
-    if (hi - lo < 2) { const mid = (hi + lo) / 2; lo = mid - 1; hi = mid + 1; }
-    const pad = Math.max(1, Math.round((hi - lo) * 0.1));
-    lo -= pad; hi += pad;
-    const scale = y => marginX + (y - lo) / (hi - lo) * (W - 2 * marginX);
-    const todayX = scale(CUR_YEAR);
-
+  // The default journey view. Dated gates sit at their real year on one axis
+  // that starts at the first milestone (no empty years); the current gate sits
+  // at today, with a bar back to the year it has been waiting since. Gates with
+  // no year are listed on the right instead of being given an invented date.
+  function journeyTime(p) {
+    const since = sinceFor(p);
+    const ys = p.stages.map(stageYear).filter(y => y != null);
+    if (since != null) ys.push(since);
+    let lo = ys.length ? Math.min(...ys) : ASOF_YEAR - 1;
+    const hi = ASOF_YEAR;
+    if (lo >= hi) lo = hi - 1;
+    const x = y => 8 + (y - lo) / (hi - lo) * 84;
+    const span = hi - lo, step = span <= 6 ? 1 : span <= 12 ? 2 : 5;
+    const ticks = [lo];
+    for (let t = Math.ceil((lo + 1) / step) * step; t < hi; t += step) {
+      if (t - lo >= step * 0.6 && hi - t >= 1.5) ticks.push(t);
+    }
     const items = [];
-    STAGES.forEach((label, i) => {
-      let x = null, yearLine = null, isCurrent = false, curColor = null;
-      if (years[i] != null) { x = scale(years[i]); yearLine = String(years[i]); }
-      else if (i === p.currentStage) {
-        x = todayX; isCurrent = true;
-        // Same split as the stage marker's ring: on-track reads amber and says
-        // "in progress"; an actually-late current stage reads red and says
-        // "delayed" instead — the red dot with an "in progress" label was
-        // reading as a contradiction.
-        const isLate = p.stages[i].status === "late";
-        yearLine = isLate ? "delayed" : "in progress";
-        curColor = isLate ? "var(--crit)" : "var(--warn)";
-      }
-      if (x == null) return;
-      const nameLines = wrapLabel(label);
-      items.push({ idx: i, x, isCurrent, curColor, nameLines, yearLine, halfW: estHalfWidth(nameLines.concat([yearLine])) });
+    p.stages.forEach((st, i) => {
+      if (i === p.currentStage) items.push({ i, x: x(hi), cur: true });
+      else { const y = stageYear(st); if (y != null) items.push({ i, x: x(y) }); }
     });
-    if (!items.length) return "";
-    items.sort((a, b) => a.x - b.x);
-    const tierCount = packTiers(items);
-
-    const tierHeight = 38, labelTop0 = 66;
-    // Sized to the labels actually drawn (name lines at 13px, the year line, a
-    // few px for descenders) rather than a flat tierHeight per tier, which left
-    // a blank band under every timeline whose labels were short.
-    const H = Math.max(...items.map(it => labelTop0 + it.tier * tierHeight + it.nameLines.length * 13 + 5));
-    const parts = [];
-
-    parts.push(`<line x1="${marginX}" y1="${dotY}" x2="${W - marginX}" y2="${dotY}" stroke="var(--line)" stroke-width="1"/>`);
-    // skip a reference tick where it would sit close enough to "today" to
-    // collide with that label — today always wins that spot
-    niceTicks(lo, hi, 4).filter(yr => Math.abs(scale(yr) - todayX) > 34).forEach(yr => {
-      const gx = scale(yr);
-      parts.push(`<line x1="${gx}" y1="${dotY - 4}" x2="${gx}" y2="${dotY}" stroke="var(--line)" stroke-width="1"/>`);
-      parts.push(`<text x="${gx}" y="${dotY - 9}" text-anchor="middle" font-size="9.5" fill="var(--ink-3)">${yr}</text>`);
-    });
-    parts.push(`<line x1="${todayX}" y1="${dotY - 4}" x2="${todayX}" y2="${labelTop0 - 8}" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 3"/>`);
-    parts.push(`<text x="${todayX}" y="${dotY - 21}" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--ink-3)" font-variant-numeric="tabular-nums">${CUR_YEAR}</text>`);
-    parts.push(`<text x="${todayX}" y="${dotY - 9}" text-anchor="middle" font-size="9.5" fill="var(--ink-3)" font-style="italic">today</text>`);
-
-    const xByIdx = {};
-    items.forEach(it => xByIdx[it.idx] = it.x);
-    // Connect column to column, not index to index — a column holding more
-    // than one stage (the WHO pair) fans out to / in from every member
-    // instead of drawing one implied line between the members themselves.
-    // That line is the one that used to dip backward and read as an error:
-    // there is no "before" or "after" between two stages with no defined
-    // order, so nothing is drawn between them at all, in either direction.
-    for (let ci = 1; ci < STAGE_COLUMNS.length; ci++) {
-      const fromIdxs = STAGE_COLUMNS[ci - 1].stages;
-      const toIdxs = STAGE_COLUMNS[ci].stages;
-      fromIdxs.forEach(a => toIdxs.forEach(b => {
-      const ax = xByIdx[a], bx = xByIdx[b];
-      if (ax == null || bx == null) return;
-      const midX = (ax + bx) / 2;
-      if (bx < ax) {
-        const yrs = (years[b] != null && years[a] != null) ? Math.abs(years[b] - years[a]) : null;
-        const ttl = yrs != null
-          ? `${esc(STAGES[b])} was reached ${yrs} yr${yrs === 1 ? "" : "s"} before ${esc(STAGES[a])} — these gates were not cleared in pathway order.`
-          : "";
-        parts.push(`<path d="M ${ax},${dotY} Q ${midX},${dipY} ${bx},${dotY}" fill="none" stroke="var(--ink-3)" stroke-width="1.75" stroke-dasharray="4 3">${ttl ? `<title>${ttl}</title>` : ""}</path>`);
-      } else {
-        const dashed = b === p.currentStage;
-        const yrs = (years[b] != null && years[a] != null) ? years[b] - years[a]
-          : (dashed && years[a] != null) ? CUR_YEAR - years[a] : null;
-        const ttl = (yrs != null && !dashed)
-          ? `${yrs} yr${yrs === 1 ? "" : "s"} from ${esc(STAGES[a])} in ${years[a]} to ${esc(STAGES[b])} in ${years[b]}.`
-          : "";
-        parts.push(`<line x1="${ax}" y1="${dotY}" x2="${bx}" y2="${dotY}" stroke="var(--ink-3)" stroke-width="1.75"${dashed ? ' stroke-dasharray="5 4"' : ""}>${ttl ? `<title>${ttl}</title>` : ""}</line>`);
-        if (yrs != null && yrs > 0) {
-          parts.push(`<text x="${midX}" y="${dotY + 20}" text-anchor="middle" font-size="10" font-weight="700" font-variant-numeric="tabular-nums" fill="var(--ink-2)">${yrs} yr${yrs === 1 ? "" : "s"}</text>`);
-        }
-      }
-      }));
-    }
-
+    items.sort((a, b) => a.x - b.x || a.i - b.i);
+    const last = [];
     items.forEach(it => {
-      if (it.isCurrent) {
-        const softColor = it.curColor === "var(--crit)" ? "var(--crit-soft)" : "var(--warn-soft)";
-        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="5" fill="none" stroke="${it.curColor}" stroke-width="2" opacity="0.6">
-          <animate attributeName="r" values="5;16" dur="1.8s" repeatCount="indefinite"/>
-          <animate attributeName="opacity" values="0.6;0" dur="1.8s" repeatCount="indefinite"/>
-        </circle>`);
-        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="9" fill="${softColor}"/>`);
-        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="5" fill="${it.curColor}"/>`);
-      } else {
-        parts.push(`<circle cx="${it.x}" cy="${dotY}" r="4" fill="var(--good)"/>`);
-      }
-      const labelTopY = labelTop0 + it.tier * tierHeight;
-      parts.push(`<line x1="${it.x}" y1="${dotY + 6}" x2="${it.x}" y2="${labelTopY - 9}" stroke="var(--line)" stroke-width="1"/>`);
-      let ly = labelTopY;
-      it.nameLines.forEach(ln => {
-        parts.push(`<text x="${it.x}" y="${ly}" text-anchor="middle" font-size="11" fill="var(--ink-2)">${esc(ln)}</text>`);
-        ly += 13;
-      });
-      parts.push(`<text x="${it.x}" y="${ly}" text-anchor="middle" font-size="11" font-weight="700" font-variant-numeric="tabular-nums" fill="${it.isCurrent ? it.curColor : "var(--ink)"}">${esc(it.yearLine)}</text>`);
+      let tr = 0;
+      while (last[tr] != null && it.x - last[tr] < 21) tr++;
+      it.tier = tr; last[tr] = it.x;
     });
-
-    // total elapsed time so far — first real gate to today (still ongoing,
-    // since every tracked product has an active, not-yet-cleared currentStage)
-    let totalLabel = "";
-    if (real.length) {
-      const firstYear = Math.min(...real);
-      const yrs = CUR_YEAR - firstYear;
-      totalLabel = yrs > 0 ? yrs + (yrs === 1 ? " yr" : " yrs") + ", ongoing" : "";
+    const TOP = 46, TH = 104;
+    const cur = p.stages[p.currentStage];
+    let h = `<div class="ax"></div>`;
+    ticks.forEach(t => { h += `<i class="tt" style="left:${x(t)}%"></i><span class="tk" style="left:${x(t)}%">${t}</span>`; });
+    h += `<span class="tk now" style="left:${x(hi)}%">${hi} <i>today</i></span><i class="today" style="left:${x(hi)}%;height:${TOP - 20}px"></i>`;
+    if (since != null && since < hi) {
+      h += `<i class="run ${cur.status}" style="left:${x(since)}%;width:${x(hi) - x(since)}%"></i>`;
     }
+    items.forEach(it => {
+      const st = p.stages[it.i], top = TOP + it.tier * TH;
+      const sub = it.cur
+        ? `<div class="snow ${st.status}">${LABEL[st.status]}</div>` +
+          (since != null && since < hi ? `<div class="ssince">since ${since} · ${yrsText(hi - since)}</div>` : "")
+        : `<div class="syear">${stageYear(st)}</div>`;
+      h += `<i class="stem" style="left:${it.x}%;height:${top - 32}px"></i>` +
+        `<i class="pt${it.cur ? " " + st.status : ""}" style="left:${it.x}%"></i>` +
+        `<div class="it stage s-${st.status}${it.cur ? " cur" : ""}" style="left:${it.x}%;top:${top}px">` +
+        `${stageMarkHtml(p, it.i)}<div class="lbl">${esc(STAGES[it.i])}</div>${sub}</div>`;
+    });
+    // The last tier holds a full-height label block (icon, up to three label
+    // lines, status and "since" line), about 126px; earlier tiers only need TH.
+    const height = TOP + (Math.max(1, last.length) - 1) * TH + 126;
 
-    return `<div class="tlbox"><div class="tl-caption"><span>Actual timeline</span>${totalLabel ? `<span class="tl-total">${esc(totalLabel)}</span>` : ""}</div>
-      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Real timing of gates reached for ${esc(p.name)}">${parts.join("")}</svg>
-    </div>`;
+    const chip = (j, withStatus) => {
+      const st = p.stages[j];
+      return `<span class="uchip"><span class="ui m-${st.status}">${stageIconImg(j, "")}</span><span>${esc(STAGES[j])}</span>` +
+        (withStatus ? ` · <span class="st ${st.status}">${st.status === "late" ? "delayed" : "ongoing"}</span>` : "") + `</span>`;
+    };
+    const group = (title, list, withStatus) =>
+      `<div class="ugrp"><div class="h">${title}</div>` +
+      (list.length ? `<div class="uchips">${list.map(j => chip(j, withStatus)).join("")}</div>` : `<span class="unone">None</span>`) + `</div>`;
+    const noYear = [], ongoing = [], notStarted = [];
+    p.stages.forEach((st, j) => {
+      if (j === p.currentStage) return;
+      if (st.status === "done" && stageYear(st) == null) noYear.push(j);
+      else if (st.status === "prog" || st.status === "late") ongoing.push(j);
+      else if (st.status === "idle") notStarted.push(j);
+    });
+    // Not-started gates are a row of dimmed icons, not a stack of labelled chips:
+    // a product early in the pathway has up to seven of them, which made this
+    // panel the tallest thing in the row. Names are in each icon's title and
+    // aria-label, and the strip above the table names every gate.
+    const notStartedHtml = `<div class="ugrp"><div class="h">Not started · ${notStarted.length}</div>` +
+      (notStarted.length
+        ? `<div class="uicons">${notStarted.map(j => `<span class="ui" role="img" title="${esc(STAGES[j])}" aria-label="${esc(STAGES[j])}">${stageIconImg(j, "")}</span>`).join("")}</div>`
+        : `<span class="unone">None</span>`) + `</div>`;
+    return `<div class="cscroll"><div class="tsp"><div class="tsa" style="height:${height}px">${h}</div>` +
+      `<div class="tsz">${noYear.length ? group("Reached · year not recorded", noYear) : ""}` +
+      `${group("Ongoing · no date", ongoing, true)}${notStartedHtml}</div></div></div>`;
   }
 
   const lateAt = i => tracked.filter(p => p.stages[i].status === "late").length;
@@ -1668,6 +1713,10 @@
       col.stages.map(i => pathNodeHtml(i, true)).join(`<span class="pathgroup-note" aria-hidden="true">no fixed order</span>`) +
       `</span>`;
   }).join(`<span class="patharrow" aria-hidden="true">→</span>`);
+
+  board.insertAdjacentHTML("afterbegin",
+    `<div class="srow hd" role="presentation"><span></span><span>Medicine</span><span class="c-mini">Journey</span>` +
+    `<span class="c-stage">Current stage</span><span>Status</span><span class="c-path">On pathway</span><span class="c-bar">Main barrier</span></div>`);
 
   tracked.forEach(p => {
     const years = p.stages.map(stageYear);
@@ -1740,30 +1789,30 @@
 
     const node = el(`
       <section class="product" id="${esc(p.id)}">
-        <div class="prow">
-          <button class="pbtn" aria-expanded="false" aria-controls="${esc(p.id)}-detail">
-            <div class="pid">
-              <div class="name"><span class="txt">${esc(p.name)}</span></div>
-              <div class="inn">${esc(p.inn)}</div>
-              <div class="mfr">${esc(p.manufacturer)}</div>
-              <div class="chips">
-                <span class="chip ${p.class === "pipeline" ? "pipeline" : ""}">${esc(p.classLabel)}</span>
-              </div>
-              <div class="peek">
-                <span class="peek-txt peek-closed">View details</span>
-                <span class="peek-txt peek-open">Hide details</span>
-                <span class="pchev" aria-hidden="true">▾</span>
-              </div>
-            </div>
-          </button>
-          <div class="trackwrap">
-            <div class="trackbox"><div class="track">${stagesHtml}</div></div>
-            ${stageTimeline(p, years)}
-          </div>
+        <div class="srow">
+          <button class="exp" type="button" aria-expanded="false" aria-controls="${esc(p.id)}-l1"
+            aria-label="Show journey for ${esc(p.name)}">▾</button>
+          <div class="nm"><b>${esc(p.name)}</b><small>${esc(p.inn)}</small></div>
+          <div class="c-mini">${miniJourney(p)}</div>
+          <span class="cell c-stage">${esc(STAGES[p.currentStage])}</span>
+          <span class="light ${p.stages[p.currentStage].status}"><i></i>${LABEL[p.stages[p.currentStage].status]}</span>
+          <span class="cell num c-path">${onPathwayShort(p)}</span>
+          <div class="c-bar${p.barrier || p.flag ? "" : " none"}">${p.barrier || p.flag ? esc(p.barrier || p.flag) : "No barrier recorded"}</div>
         </div>
-        <div class="gatepanel" id="${esc(p.id)}-gate" hidden></div>
-        ${p.flag ? `<div class="flagnote"><span>${esc(p.flag)}</span></div>` : ""}
-        <div style="height:14px"></div>
+        <div class="l1" id="${esc(p.id)}-l1">
+          <div class="l1in">
+            <div class="l1h">
+              <div class="l1id"><span>${esc(p.manufacturer)}</span><span class="chip ${p.class === "pipeline" ? "pipeline" : ""}">${esc(p.classLabel)}</span></div>
+              <div class="l1ctl"><span class="l1t">On pathway: ${onPathwayLong(p)}</span>
+                <button class="swv" type="button">Switch to pathway order</button></div>
+            </div>
+            <div class="views">
+              <div class="view" data-v="time">${journeyTime(p)}</div>
+              <div class="view" data-v="path" hidden><div class="trackbox"><div class="track">${stagesHtml}</div></div></div>
+            </div>
+            <div class="gatepanel" id="${esc(p.id)}-gate" hidden></div>
+            ${p.flag ? `<div class="flagnote"><span>${esc(p.flag)}</span></div>` : ""}
+            <div class="l1f"><button class="more" type="button" aria-expanded="false" aria-controls="${esc(p.id)}-detail"><span class="more-t">More detail</span><span class="ch" aria-hidden="true">▾</span></button></div>
         <div class="detail" id="${esc(p.id)}-detail">
           <div class="cards">
             <div class="card">
@@ -1821,31 +1870,13 @@
             ? "Draft — not yet verified. These figures come from public sources and are still being checked. Manufacturer-specific details appear only once that manufacturer confirms in writing that they may be shown."
             : "Each figure reflects its cited public source; manufacturer-specific details are shown only where release was confirmed in writing."}</div>
         </div>
+          </div>
+        </div>
       </section>
     `);
     board.appendChild(node);
   });
 
-  // The timeline SVGs above were built against the 880 fallback width before
-  // any card had a real layout. Now that .trackwrap has one, measure it and
-  // regenerate every timeline at that exact pixel width — 1 SVG unit == 1px,
-  // so text and dots stay their authored size instead of stretching to fill
-  // the (now full-bleed, so much wider) card, and the axis still runs edge to
-  // edge with no leftover gap. Re-run on resize since the card's width is
-  // fluid.
-  function fitTimelines() {
-    const sample = document.querySelector(".trackwrap");
-    if (!sample) return;
-    const w = Math.round(sample.getBoundingClientRect().width);
-    if (!w) return;
-    tracked.forEach(p => {
-      const host = document.getElementById(p.id);
-      const tlbox = host && host.querySelector(".tlbox");
-      if (!tlbox) return;
-      const years = p.stages.map(stageYear);
-      tlbox.outerHTML = stageTimeline(p, years, w);
-    });
-  }
   // ---- fork alignment ------------------------------------------------------
   // A parallel pair (.stagegroup) is symmetric about its caption band, so its
   // spine sits far lower in its own box than an ungrouped marker's centre does
@@ -1988,13 +2019,15 @@
     alignStageForks(); drawStageForks(); alignPathGroup(); centerPathwayCard();
   }
 
-  fitTimelines();
   layoutJourney();
-  let fitTimelinesRAF = null;
+  let layoutRAF = null;
   window.addEventListener("resize", () => {
-    cancelAnimationFrame(fitTimelinesRAF);
-    fitTimelinesRAF = requestAnimationFrame(() => { fitTimelines(); layoutJourney(); });
+    cancelAnimationFrame(layoutRAF);
+    layoutRAF = requestAnimationFrame(layoutJourney);
   });
+  // first medicine (A-Z) starts open, per the design review
+  const firstProduct = board.querySelector(".product");
+  if (firstProduct) setL1(firstProduct, true);
   // labels wrap differently once webfonts land, which moves the spine
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutJourney);
 
@@ -2002,26 +2035,52 @@
   PRODUCTS.filter(p => p.placeholder).forEach(p => {
     board.appendChild(el(`
       <section class="product future">
-        <div class="prow" style="cursor:default">
-          <div class="pid">
-            <div class="name">${esc(p.name)}</div>
-            <div class="inn">${esc(p.inn)}</div>
-            <div class="mfr">${esc(p.manufacturer)}</div>
-            <div class="chips"><span class="chip soon">${esc(p.classLabel)}</span></div>
-          </div>
-          <div style="color:var(--ink-3);font-size:13.5px">${esc(p.note)}</div>
+        <div class="srow">
+          <span></span>
+          <div class="nm"><b>${esc(p.name)}</b><small>${esc(p.inn)}</small></div>
+          <div class="c-mini"><span class="chip soon">${esc(p.classLabel)}</span></div>
+          <div class="c-bar none" style="grid-column: 4 / -1">${esc(p.note)}</div>
         </div>
-        <div style="height:14px"></div>
       </section>
     `));
   });
 
-  // expand/collapse
-  document.querySelectorAll(".pbtn[aria-controls]").forEach(btn => {
+  // Level 1 (the chevron) opens a medicine's journey; level 2 ("More detail")
+  // opens the cards and milestone table. The pathway-order rail is measured to
+  // line its forks up, and a hidden rail has no size, so anything that reveals
+  // it re-runs layoutJourney().
+  const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function setL1(prod, open) {
+    prod.classList.toggle("l1-open", open);
+    prod.querySelector(".exp").setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) layoutJourney();
+  }
+  function showView(prod, which) {
+    closeCell();
+    prod.querySelectorAll(".view").forEach(v => { v.hidden = v.dataset.v !== which; });
+    prod.dataset.view = which;
+    prod.querySelector(".swv").textContent = which === "time" ? "Switch to pathway order" : "Back to timeline";
+    const active = prod.querySelector('.view[data-v="' + which + '"]');
+    if (!reduceMotion) { active.classList.add("fade-in"); void active.offsetHeight; active.classList.remove("fade-in"); }
+    if (which === "path") layoutJourney();
+  }
+  document.querySelectorAll(".exp").forEach(btn => {
     btn.addEventListener("click", () => {
       const prod = btn.closest(".product");
-      const open = prod.classList.toggle("open");
+      setL1(prod, !prod.classList.contains("l1-open"));
+    });
+  });
+  document.querySelectorAll(".swv").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const prod = btn.closest(".product");
+      showView(prod, prod.dataset.view === "path" ? "time" : "path");
+    });
+  });
+  document.querySelectorAll(".more").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const open = btn.closest(".product").classList.toggle("open");
       btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.querySelector(".more-t").textContent = open ? "Hide detail" : "More detail";
     });
   });
 
@@ -2177,8 +2236,13 @@
     if (c) { c.dataset.close === "gate" ? closeGate() : closeCell(); return; }
     const j = e.target.closest("[data-jump]");
     if (j) {
-      const mark = document.querySelector(
-        `.smark[data-pid="${j.dataset.jump}"][data-stagei="${j.dataset.jumpi}"]`);
+      // The row may be collapsed, and the time view only draws gates that have a
+      // year or are current; fall back to the pathway rail, which draws all eight.
+      const prod = document.getElementById(j.dataset.jump);
+      const pick = () => prod.querySelector(`.view:not([hidden]) .smark[data-stagei="${j.dataset.jumpi}"]`);
+      setL1(prod, true);
+      let mark = pick();
+      if (!mark) { showView(prod, "path"); mark = pick(); }
       if (mark) { openCellPanel(mark); mark.scrollIntoView({ block: "center", behavior: "smooth" }); mark.focus(); }
     }
   });
@@ -2249,7 +2313,7 @@
           // Glossary terms become focusable spans. Inside the product toggle that
           // would nest interactive content in a button — the exact thing the row
           // split removes. The same terms are still glossed in the detail panel.
-          if (parent.closest(".pbtn, .smark")) return NodeFilter.FILTER_REJECT;
+          if (parent.closest(".exp, .swv, .more, .smark")) return NodeFilter.FILTER_REJECT;
           return NodeFilter.FILTER_ACCEPT;
         }
       });

@@ -644,6 +644,73 @@ pathway strip's stacked WHO pair is still the tallest thing in that strip.
 Checked at 1400px and 390px; not at tablet width, and the map could not be
 rendered headless here so its spacing is unchecked.
 
+### 3.18 The medicine cards became a journey table (30 Sep 2026)
+
+Reviewer complaint was scrolling. Keith reviewed a published mock-up
+(summary table + time-scaled journey + original rail) before any of this was
+built, and chose the options recorded here.
+
+Structure, per medicine:
+- **Summary row** (A-Z): chevron, name + INN, a mini journey (one dot per gate,
+  the WHO pair stacked), current stage, status, years on the pathway, and a
+  "Main barrier" phrase. With all rows closed the table is about 300px, against
+  about 1,600px for four full cards.
+- **Level 1 (chevron):** the **time-scaled journey** by default. Dated gates
+  hang from their real year on one axis that starts at the first milestone (no
+  empty years), the current gate sits at today with a bar back to the year it
+  has been waiting since, and gates with no year are listed on the right
+  (reached but undated / ongoing / not started) instead of being given an
+  invented date. A quiet text link, "Switch to pathway order", swaps in the
+  **original rail**, unchanged (forks, bars, year labels), as Keith asked. The
+  swap fades (the mock-up's "Fade" option); reduced-motion users get none.
+- **Level 2 ("More detail"):** the cards and milestone table that "View details"
+  showed, now inside level 1. The gate drill-down still opens under the marker
+  row, from either view.
+- First row (ALAQ, A-Z) starts open; the rest are closed.
+
+Decisions and what was rejected:
+- **"Main barrier" is a new optional `barrier` field** in `data/products.js`
+  (short phrase; documented in the data analyst guide), not a trimmed `flag`.
+  Rejected: first clause of `flag` - "Adoption is the current access barrier"
+  repeats the column title and says nothing. I drafted the two phrases
+  (ASPY "National guideline inclusion is limited", DHA-PPQ "Only 0.9-4.5% of
+  Global Fund spend, 2022-24"); **they are the data owner's to rewrite**. With no
+  `barrier` but a `flag`, the row shows the flag clipped; with neither, "No
+  barrier recorded". No changelog entry was added: it is a display field, not a
+  change to a fact.
+- **Pending-since year** comes from `detail.journey`, the same milestones the
+  gate panel's "Pending since" line reads, so the two always agree (ASPY 2022,
+  DHA-PPQ 2015). The mock-up had used 2008 for DHA-PPQ from the stage's "Since
+  2008" text; the gate panel says 11 years from 2015, so 2015 is what ships. A
+  product with no journey falls back to the latest year in the column before the
+  current gate (GanLum: 2025); ALAQ has none and shows no bar.
+- **Not-started gates are a row of dimmed icons**, not labelled chips: a product
+  early on has up to seven, which made the right-hand panel the tallest thing in
+  the row. Names are in each icon's title/aria-label and the strip above names
+  every gate.
+- **Kept:** the full pathway strip above the table (Keith chose it over a slim
+  key). The legend lost "reached out of order": positions are now real years, so
+  that state no longer exists in the default view (the rail still shows
+  out-of-order gates by year label).
+- **Removed:** the always-visible "Actual timeline" SVG and `fitTimelines()`,
+  `stageTimeline()` and their helpers, and the `.prow`/`.pbtn`/`.peek` rules. The
+  time view is plain percent-positioned HTML, so it needs no width measurement or
+  re-render on resize.
+- The pathway-order rail is measured to line its forks up, and a hidden rail has
+  no size. `layoutJourney()` therefore re-runs whenever a row opens, when the
+  view switches to the rail and on resize. Anything new that reveals a rail must
+  call it.
+- "Open in row" in the gate list now opens the row first and, when the time view
+  has no marker for that gate (it only draws dated and current gates), switches
+  to the rail, which draws all eight.
+- Print: every row prints open in its time view, with the detail cards.
+
+Not done / left alone: tablet width was not checked; the map is unchanged; the
+stage markers in the time view keep hover tooltips and the drill-down but the
+"Switch" link is the only route to gates that have no year, apart from "Open in
+row". Real sliding of markers between the two views (mock-up option F's
+animation) was not built; it is a fade.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
