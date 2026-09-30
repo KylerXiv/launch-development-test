@@ -4096,69 +4096,13 @@
 </script>
 
 <script>
-  /* This page runs the shared report-issue widget as "Send feedback" — same
-     form and same seam, friendlier framing for a general visitor. Must be set
-     before the widget script runs.
-
-     `note` is the same short line Subscribe's own mock flag uses (10 Sep
-     2026) — plain and in red (see .ri-dialog .ri-note below), shown only
-     inside the dialog when it's open, not anywhere on the dashboard itself.
-     It replaces a longer explanation that covered the same ground; that
-     ground is still covered, just not spelled out at this length any more.
-     doneTitle/doneMessage keep saying plainly that nothing was actually
-     sent once you do press Send feedback — see report-issue.js's own
-     comment, "no endpoint wired yet (DEV-04b)". The old doneMessage also
-     pointed to "Recent dashboard updates", which is hidden for now (see the
-     changelog code above) — replaced rather than left pointing at a
-     section a visitor can no longer see. */
+  /* The shared widget (assets/report-issue.js) runs as "Send feedback" on every
+     page, with Send disabled and a red "Mock only" note until a backend is
+     connected. This page only supplies its own view id and example text. */
   window.LAUNCH_FEEDBACK_COPY = {
-    pill:         "Send feedback",
-    title:        "Send feedback",
-    intro:        "Something look wrong, out of date, or hard to follow? Tell the LAUNCH team what you're seeing.",
-    typeLabel:    "What is your feedback about?",
-    types: {
-      correction: "Something on the page looks wrong",
-      source:     "A source is missing or out of date",
-      suggestion: "An idea for making this clearer or more useful",
-      other:      "Something else"
-    },
-    messageLabel: "What would you like to tell us?",
+    view: "illustrated",
     messagePlaceholder:
-      "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026.",
-    note: "Mock only — Send feedback isn't connected yet.",
-    submit:       "Send feedback",
-    sending:      "Sending…",
-    failed:       "Sorry — your feedback could not be sent just now. Please try again in a moment.",
-    doneTitle:    "Thanks — though this isn't sent anywhere yet.",
-    doneMessage:  "This form has no inbox behind it yet, so nothing was actually sent — your note stayed in " +
-                  "this browser tab. Once it is connected, the LAUNCH team will read every message, and where " +
-                  "you have pointed us to a public source that checks out, we correct the data at the next update.",
-    again:        "Send more feedback"
+      "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026."
   };
 </script>
-
-<!-- report-issue.js builds its own <style> at runtime (document.head.
-     appendChild, once the script itself runs) and defines .ri-note in it as
-     var(--ink-3) — inserted after this page's own <style> block, so a
-     same-specificity .ri-note rule here would lose to it regardless of
-     which one reads first in the file. .ri-dialog .ri-note is one selector
-     more specific, which wins on its own terms rather than needing
-     !important. Page-local: this says nothing about the other eight pages
-     that load the same script. -->
-<style>.ri-dialog .ri-note { color: var(--crit); font-weight: 700; }</style>
-
 <script src="assets/report-issue.js" defer></script>
-<script>
-  // Disabled at Keith's request, 10 Sep 2026 — page-local, same reasoning as
-  // the Subscribe button above: block the click (not the widget's own submit
-  // handler in assets/report-issue.js) so the button keeps its normal look
-  // and the red LAUNCH_FEEDBACK_COPY.note stays the only explanation. Other
-  // pages that load the shared widget are unaffected.
-  document.addEventListener("DOMContentLoaded", () => {
-    const api = window.LAUNCH_REPORT_ISSUE;
-    const sendBtn = api && api.dialog && api.dialog.querySelector("#ri-send");
-    if (!sendBtn) return;
-    sendBtn.setAttribute("aria-disabled", "true");
-    sendBtn.addEventListener("click", e => e.preventDefault());
-  });
-</script>

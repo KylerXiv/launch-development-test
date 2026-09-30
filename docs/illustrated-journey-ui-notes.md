@@ -190,8 +190,8 @@ Same reasoning for the feedback widget, from the other direction:
 `assets/report-issue.js` is shared by **nine** pages. Rather than fork it, it
 grew a `COPY` block of every visible string, overridable per page by setting
 `window.LAUNCH_FEEDBACK_COPY` before the script tag. This page uses it to run
-the same widget as "Send feedback". Other pages are untouched and still say
-"Report an issue".
+the same widget as "Send feedback". (Other pages said "Report an issue" until 30
+Sep 2026; see 3.26, where "Send feedback" became the widget's default.)
 
 ### 3.7 The changelog gained `plain` rather than being rewritten
 
@@ -1038,6 +1038,42 @@ link rows to be replaced so the pages are consistent.
   pages; Story further down the page (map-section cards, colours); Pipeline and Story
   at 390px with the Views button. Not checked: tablet width, Story's interactive map
   states, real devices, keyboard order.
+
+### 3.26 One "Send feedback" button on every page, with each page's own wording (30 Sep 2026)
+
+Keith wanted every report button to match this page's "Send feedback", but with
+text that fits the page it is on.
+
+- **The widget's default is now "Send feedback"** (`assets/report-issue.js`): same
+  pill, dialog title, type labels ("Something on the page looks wrong" ...), red
+  "Mock only - Send feedback isn't connected yet." note, and a **disabled Send
+  button** until a backend is connected. Before, this page supplied all of that
+  itself (a page-local copy block, a red-note style and a script that blocked the
+  click); that block is now just its own `view` id and example text. The behaviour
+  here is unchanged.
+- **Each page fits it to itself** by setting `window.LAUNCH_FEEDBACK_COPY` before the
+  script tag. Pipeline: "Something in the pipeline look wrong...", the first type
+  reads "A product is in the wrong phase, or something else looks wrong", and its
+  example is about a product in the wrong phase. Story: "Something in the story look
+  wrong...", "A number, date or claim in the story looks wrong", and an example about a
+  waiting time. The example messages are invented illustrations, like the existing
+  Tanzania one.
+- **Page context in the payload:** the payload already carried page url, path and
+  title, plus the data's `lastUpdated` and `dataStatus`; it now also carries
+  `page.view` (`illustrated`, `pipeline`, `story`) so a report says which view it came
+  from. Set `connected: true` in the same object once the seam posts for real.
+- **Story's footer "Spotted an error?" line removed**, as Pipeline's was, since the
+  pill covers it.
+- **Reach, which you should know about:** the default lives in the shared file, so
+  every page that loads it now says "Send feedback" with Send disabled, including the
+  Journey board, Comparison matrix, widget-adjacent editions and the `unitaid/` and
+  `synthetic/` copies (they load the same file). Those pages previously simulated a
+  successful send. They have no `view` and use the generic example text. If those
+  pages are retired, this stops mattering.
+- Checked in headless Chrome: the dialog opens on all three pages with the right
+  pill, intro, type, example and red note, Send disabled, no script errors. Not
+  checked: the other pages that load the widget, real devices, keyboard handling of
+  the disabled button.
 
 ## 4. Newly discovered, deferred, or left alone
 
