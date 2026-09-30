@@ -2093,9 +2093,8 @@
     cancelAnimationFrame(layoutRAF);
     layoutRAF = requestAnimationFrame(layoutJourney);
   });
-  // first medicine (A-Z) starts open, per the design review
-  const firstProduct = board.querySelector(".product");
-  if (firstProduct) setL1(firstProduct, true);
+  // Every row starts closed (30 Sep 2026, Keith): the table is then about 300px
+  // and the reader chooses what to open. The first row used to start open.
   // labels wrap differently once webfonts land, which moves the spine
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutJourney);
 
