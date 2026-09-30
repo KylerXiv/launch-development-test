@@ -745,6 +745,14 @@ suggested option was accepted.
   approval (SRA): Complete"). The dots sit inside an element with `role="img"`, so
   the hover text helps sighted users; screen readers get the row's summary label,
   not per-dot names. `.strip`, `.legend` and `.tgap-key` CSS went with it.
+- **"no fixed order" text removed** from both the top strip and each medicine's
+  pathway rail (Keith, same day), since the heading line and the bracket already
+  say it. The two note elements were emptied, not deleted: the rail's fork
+  alignment (`alignStageForks`) measures the note band to place the spine, and the
+  strip's `alignPathGroup` measures the pair, so both need the structure to stay.
+  The strip's note became an 8px spacer. The group's `aria-label` still says the
+  approvals have no defined order, so screen-reader users lose nothing. The
+  mock-up for this change showed the text; that was before this request.
 - Rejected: a separate explainer page or tooltip per step (the click panel already
   exists and is where the per-medicine answer lives), and putting the wording in
   `index.html`-style hard-coded prose (nothing would keep it in step with the data).
