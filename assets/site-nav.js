@@ -1,0 +1,101 @@
+/* LAUNCH site menu: the one place the list of views lives.
+ *
+ * Load it at the top of <body>, where the bar should appear, and say which page
+ * it is on:
+ *   <script src="assets/site-nav.js" data-current="pipeline"></script>
+ *
+ * It builds a top bar ("LAUNCH" plus one link per view, the current one marked)
+ * and, on a phone, collapses the links into a "Views" button. It scrolls away with
+ * the page and is hidden in print. Colours come from each page's own tokens
+ * (--surface, --line, --accent, --ink-2 ...) with the dashboard's values as
+ * fallbacks, so the bar matches whichever page hosts it.
+ *
+ * A page can align the bar with its own content column by setting
+ * --nav-pad (side padding) and --nav-max (inner width) on :root.
+ */
+(function () {
+  "use strict";
+
+  var PAGES = [
+    { id: "illustrated", href: "illustrated-journey-dashboard.html", name: "Illustrated journey", desc: "Follow each medicine through the seven steps to patients." },
+    { id: "pipeline", href: "pipeline.html", name: "Pipeline", desc: "Where each product is, trial to launch." },
+    { id: "story", href: "story.html", name: "Story", desc: "How long each medicine waited." }
+  ];
+
+  var script = document.currentScript;
+  if (!script || !script.parentNode) return;
+  var current = script.getAttribute("data-current") || "";
+
+  // The Unitaid and synthetic editions are generated copies in subfolders and do
+  // not include the illustrated journey page, so leave it out there rather than
+  // link to a page that is not built.
+  if (/\/(unitaid|synthetic)\//.test(location.pathname)) {
+    PAGES = PAGES.filter(function (p) { return p.id !== "illustrated"; });
+  }
+
+  var CSS = [
+    ".sitenav{position:relative;display:block;background:var(--surface,#fff);border-bottom:1px solid var(--line,#DCE3E7);padding-inline:var(--nav-pad,clamp(24px,4vw,64px));font:15px/1.5 -apple-system,'Segoe UI',system-ui,Roboto,'Helvetica Neue',sans-serif}",
+    ".sitenav .sn-in{display:flex;align-items:stretch;max-width:var(--nav-max,none);margin-inline:auto}",
+    ".sitenav .sn-brand{display:flex;align-items:center;margin-right:6px;padding:10px 14px 10px 0;border-right:1px solid var(--line,#DCE3E7);font-size:14px;font-weight:800;letter-spacing:.02em;color:var(--accent,#0F5A72)}",
+    ".sitenav ul{list-style:none;margin:0;padding:0;display:flex;gap:2px;min-width:0;overflow-x:auto}",
+    ".sitenav li a{display:flex;align-items:center;height:100%;padding:10px 14px;text-decoration:none;white-space:nowrap;font-size:13.5px;font-weight:600;color:var(--ink-2,#3F5564)}",
+    ".sitenav li a:hover{color:var(--accent,#0F5A72)}",
+    ".sitenav li a[aria-current=page]{color:var(--accent,#0F5A72);box-shadow:inset 0 -3px 0 var(--accent,#0F5A72)}",
+    ".sitenav a:focus-visible,.sitenav .sn-views:focus-visible{outline:2px solid var(--accent,#0F5A72);outline-offset:-2px}",
+    ".sitenav .sn-views{display:none;margin-left:auto;align-self:center;align-items:center;gap:6px;background:var(--surface,#fff);border:1px solid var(--line,#DCE3E7);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;font-weight:650;color:var(--accent,#0F5A72);cursor:pointer}",
+    ".sitenav .sn-views[aria-expanded=true]{background:var(--accent-soft,#E6F1F4);border-color:var(--accent,#0F5A72)}",
+    ".sitenav .sn-pop{display:none;position:absolute;left:0;right:0;top:100%;z-index:30;background:var(--surface,#fff);border-bottom:1px solid var(--line,#DCE3E7);box-shadow:var(--shadow,0 8px 24px rgba(22,48,63,.08));padding:4px 14px 10px}",
+    ".sitenav .sn-pop.open{display:block}",
+    ".sitenav .sn-pop a{display:block;padding:9px 4px;border-bottom:1px solid var(--line,#DCE3E7);text-decoration:none;font-size:14px;font-weight:650;color:var(--ink,#16303F)}",
+    ".sitenav .sn-pop a:last-child{border-bottom:0}",
+    ".sitenav .sn-pop a small{display:block;font-weight:400;font-size:12px;color:var(--ink-3,#566A77)}",
+    ".sitenav .sn-pop a[aria-current=page]{color:var(--accent,#0F5A72)}",
+    "@media (max-width:640px){.sitenav{padding-inline:14px}.sitenav ul{display:none}.sitenav .sn-views{display:inline-flex}}",
+    "@media print{.sitenav{display:none!important}}"
+  ].join("\n");
+
+  var style = document.createElement("style");
+  style.textContent = CSS;
+  (document.head || document.documentElement).appendChild(style);
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+  var cur = PAGES.filter(function (p) { return p.id === current; })[0] || PAGES[0];
+
+  var nav = document.createElement("nav");
+  nav.className = "sitenav";
+  nav.setAttribute("aria-label", "LAUNCH views");
+  nav.innerHTML =
+    '<div class="sn-in">' +
+      '<span class="sn-brand">LAUNCH</span>' +
+      "<ul>" + PAGES.map(function (p) {
+        return '<li><a href="' + p.href + '"' + (p.id === current ? ' aria-current="page"' : "") + ">" + esc(p.name) + "</a></li>";
+      }).join("") + "</ul>" +
+      '<button class="sn-views" type="button" aria-expanded="false" aria-controls="sn-pop">Views: ' + esc(cur.name) + ' <span aria-hidden="true">▾</span></button>' +
+    "</div>" +
+    '<div class="sn-pop" id="sn-pop">' + PAGES.map(function (p) {
+      return '<a href="' + p.href + '"' + (p.id === current ? ' aria-current="page"' : "") + ">" + esc(p.name) + "<small>" + esc(p.desc) + "</small></a>";
+    }).join("") + "</div>";
+  // Normally the script sits inside <body> and the bar goes right where it is. A
+  // page that has no <body> tag, loading this before any content, would have the
+  // parser park the script in <head>, where a bar cannot show; in that case put the
+  // bar at the very top of the body once it exists.
+  if (script.parentNode === document.head) {
+    document.addEventListener("DOMContentLoaded", function () { document.body.insertBefore(nav, document.body.firstChild); });
+  } else {
+    script.parentNode.insertBefore(nav, script);
+  }
+
+  var btn = nav.querySelector(".sn-views"), pop = nav.querySelector(".sn-pop");
+  btn.addEventListener("click", function () {
+    var open = btn.getAttribute("aria-expanded") !== "true";
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    pop.classList.toggle("open", open);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && pop.classList.contains("open")) {
+      pop.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+      btn.focus();
+    }
+  });
+})();

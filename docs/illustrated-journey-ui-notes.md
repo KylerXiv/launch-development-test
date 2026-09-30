@@ -917,6 +917,10 @@ choice; these are the choices made.
 
 ### 3.24 A site menu and a guide to the views (sheet rows 26 + 27, 30 Sep 2026)
 
+> **Changed the same day by 3.25:** the menu now lists three views, the blurb and
+> "What are these views?" guide were removed, and the bar moved into a shared file
+> used by the illustrated journey, Pipeline and Story.
+
 Row 26 asked for a global menu linking the dashboard's views so nobody has to edit
 a URL to move between them; row 27 for on-page guidance on the available views.
 Reviewed as a published mock-up (six choices, each selectable); these are Keith's
@@ -958,6 +962,55 @@ picks.
 - Checked in headless Chrome: desktop bar and open guide, and the phone Views menu
   inside a 390px frame, no script errors. Not checked: tablet width, real devices,
   keyboard order through the bar.
+
+### 3.25 One menu on three pages, in one theme (sheet rows 26 + 27, 30 Sep 2026)
+
+Keith narrowed the menu to Illustrated journey, Pipeline and Story, asked for the
+bar on all three, for Pipeline and Story to take this page's colours and theme, for
+the Unitaid badge on both, for the blurb and guide to go everywhere, and for the old
+link rows to be replaced so the pages are consistent.
+
+- **Shared bar:** `assets/site-nav.js` holds the list of views and builds the bar;
+  each page loads it with `<script src="assets/site-nav.js" data-current="...">`.
+  One place to edit; `build-public-site.sh` copies it. The bar reads each page's own
+  tokens with this page's values as fallbacks, and pages align it to their content
+  column with `--nav-pad` and `--nav-max`. It hides in print. A phone (640px and
+  below) gets the "Views" button. If a copy lands in `/unitaid/` or `/synthetic/` it
+  drops the Illustrated journey entry, because those editions do not build that page.
+- **Gotcha, fixed:** Pipeline and Story have no `<body>` tag, so a script placed
+  before any content is parked in `<head>` and the bar was inserted where it could
+  not show. The three pages now have an explicit `<body>`, and the script falls back
+  to the top of the body if it is ever in the head. Any new page using the bar
+  should do the same.
+- **Removed:** the blurb and "What are these views?" panel (and their CSS and script)
+  from the illustrated page; the in-text link rows on Pipeline ("Journey board (A) ·
+  Comparison matrix (B) · ...") and Story's header links.
+- **Same colours and theme:** Pipeline and Story now use this page's tokens: white
+  ground, `--surface-2` #F4F7F8, the darker greys (`--ink-2` #3F5564, `--ink-3`
+  #566A77, `--line` #DCE3E7), teal #0F5A72. Story's map ramp moved to this page's
+  (registered teal, guidelines blue, MFT purple). Story is **light only** now: its
+  dark theme (the OS setting and `data-theme`) was removed, since this page is light
+  only by design. Each page keeps its own layout and type scale: Story stays a
+  scroll-driven narrative at 16px, Pipeline a poster. Rejected: rebuilding both in
+  this page's header-and-cards look (much bigger, not asked for once Keith chose
+  "tokens only").
+- **Unitaid badge:** the same flat "Powered by" logo as here, top right of each
+  header. On Story it sits opposite the Prototype pill (the old "LAUNCH" text mark
+  went; the bar carries it). The `/unitaid/` edition keeps its own logo bar.
+- **Story's closing buttons** now link only to the Illustrated journey and Pipeline
+  (they pointed at Journey board and Comparison matrix, which are no longer in the
+  menu).
+- **Left alone, worth a decision:** clicking a product card on Pipeline still goes
+  to `index.html#id` (the Journey board), and Pipeline's footer says "open the full
+  profile on the journey board". Both point outside the three-view menu. The
+  `unitaid/` and `synthetic/` copies of Pipeline and Story are committed generated
+  files and were not regenerated; regenerate them from the root pages in a separate
+  step (the bar will then appear there without the illustrated link). Menu text is
+  English only (script-built, so the translation pipeline does not see it).
+- Checked in headless Chrome: desktop bar, current page marked and badge on all three
+  pages; Story further down the page (map-section cards, colours); Pipeline and Story
+  at 390px with the Views button. Not checked: tablet width, Story's interactive map
+  states, real devices, keyboard order.
 
 ## 4. Newly discovered, deferred, or left alone
 
