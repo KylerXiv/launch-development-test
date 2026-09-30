@@ -869,6 +869,39 @@ that complete markers had no ring at all. Suggested first, then built.
   amber and red rings. Not checked: tablet width, real devices, keyboard-focus
   outline against the new rings.
 
+### 3.23 The journey panel: view switch, More detail bar, shared view (30 Sep 2026)
+
+Keith asked for the "Switch to pathway order" link to become a button group and
+for the panel to be reformatted. Reviewed as a mock-up with a selector per
+choice; these are the choices made.
+
+- **View switch:** a two-button group, "Actual timeline | Pathway order", timeline
+  first and selected on load, top right of the panel where the link was. It is a
+  pair of `aria-pressed` buttons. Cost, stated up front: with the link the
+  pathway-order rail was clearly secondary (Keith's earlier wish); as buttons both
+  views carry equal weight. The timeline is still what a row opens on.
+- **"More detail" is a full-width bar** along the foot of the panel instead of an
+  outlined button in a footer row: a bigger target, and the dashed footer row is
+  gone. The panel loses its bottom padding so the bar sits on the edge
+  (`overflow:hidden` keeps it inside the rounded corners); the detail cards open
+  **below** the bar. The mock-up had opened them above it, which reads oddly; the
+  dashboard does not.
+- **One view for every row:** choosing Pathway order on one medicine switches all
+  rows, including closed ones, so a row opened later is already on it. The rails of
+  closed rows have no size, so `setL1()` re-runs `layoutJourney()` on opening (it
+  already did). Switching still closes any open stage panel.
+- **Left as they were, deliberately** (Keith kept "today" in the mock-up for both):
+  undated gates stay in the side panel, and a medicine with under two dated gates
+  (ALAQ) still gets the full axis, about 120px of mostly empty line. The compact
+  alternatives (a strip under the chart; a summary in place of the axis) were
+  offered and not chosen; ALAQ is the case to revisit if the panel still feels
+  empty.
+- Removed: the `.swv` link and the `.l1f` footer row. Print hides the switch and the
+  bar.
+- Checked in headless Chrome: the group switches every row, the bar opens the
+  detail below it, no script errors. Not checked: tablet width, real devices,
+  keyboard focus on the bar (outline drawn inside because the panel clips).
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
