@@ -702,9 +702,9 @@ Decisions and what was rejected:
   no size. `layoutJourney()` therefore re-runs whenever a row opens, when the
   view switches to the rail and on resize. Anything new that reveals a rail must
   call it.
-- "Open in row" in the gate list now opens the row first and, when the time view
-  has no marker for that gate (it only draws dated and current gates), switches
-  to the rail, which draws all eight.
+- ~~"Open in row" from the gate list~~ was removed on 30 Sep 2026 (see 3.20); the
+  `setL1`/`showView` fallback it needed is still used by the chevron and the Switch
+  link.
 - Print: every row prints open in its time view, with the detail cards.
 
 Not done / left alone: tablet width was not checked; the map is unchanged; the
@@ -772,6 +772,37 @@ suggested option was accepted.
   confirmed by validating without these edits.
 - Not checked: tablet width, real devices, print with a step panel open.
 
+### 3.20 The step panel: explanation band + a card per medicine (30 Sep 2026)
+
+Keith asked to drop "Open in row" and redesign the panel. Reviewed as a published
+mock-up (two layouts, three options for the button); the suggested options were
+built.
+
+- **Layout A:** an explanation band across the top ("What happens here", then
+  Who decides / Why it can stall / Source as three columns), then one card per
+  medicine side by side (auto-fit, 230px minimum, A-Z). Rejected, layout B: keep
+  the two-column split with an expanding list. Its text column stopped at 70ch and
+  left an empty strip, and four medicines could not be compared at a glance.
+- **"Open in row" removed, replaced by in-place expansion.** Each card clips the
+  note to three lines and, when there is more, offers "Read more", which reveals
+  Recorded, Next step, Expected, Pending since (same `stalledSince()` rule as the
+  per-medicine gate panel) and the source. Nothing to navigate to: the jump only
+  ever existed to read what the clip hid. "Read more" appears only when the note
+  is over 120 characters or there is any extra fact, so a "Not started" card has
+  none. Rejected: keeping a "Show in table" link inside the expanded card (kept
+  only as a mock-up option; nobody asked for it).
+- **Header summary:** status counts as pills ("1 delayed, 1 in progress, 2 not
+  started"), most urgent first, replacing "N of 4 medicines delayed at this step".
+  It says how many medicines are where, not only whether any is late.
+- A delayed medicine's card is tinted red (`--crit-soft`); no accent bar on the
+  card.
+- The toggle works by showing/hiding markup already in the card (no re-render),
+  so focus stays on the button. Print opens every card fully.
+- Removed: `.gw-list`, `.gw-jump`, `.gw-grid`, `.gw-sec` and the `[data-jump]`
+  click branch.
+- Not checked: tablet width, real devices. Verified in headless Chrome at desktop
+  width: step 5 opens, ASPY's card expands, no script errors.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
