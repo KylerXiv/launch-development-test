@@ -1,13 +1,26 @@
 # RBM public data layer — what was built, how it works, how to test it
 
-*Jackson (Oakkar-Min), with Claude Code, 1–2 Oct 2026. Covers three pieces of
-work for the RBM handover (DEV-32):*
+*Jackson (Oakkar-Min), with Claude Code, 1–2 Oct 2026. Covers the work for the
+RBM handover (DEV-32). Everything below is merged into `main` and has been run
+end to end on GitHub (section 12).*
 
-| Branch | What | State |
+| PR | What | State |
 | --- | --- | --- |
-| `feat/remove-resistance-layers` → merged into the next | Treatment failure, delayed clearance and molecular markers taken off the map | inside PR #32 |
-| `feat/public-data-layer` | `dashboard.json`, the public data repo, the publish workflow, the `publish.yml` fix | **PR #32**, open |
-| `feat/rbm-handover` | translation gaps fixed; the RBM pages | local, stacked on #32 |
+| #32 `feat/public-data-layer` (includes `feat/remove-resistance-layers`) | `dashboard.json`, the public data repo, the publish workflow, the `publish.yml` fix; treatment failure, delayed clearance and molecular markers taken off the map | ✅ merged |
+| #34 `feat/rbm-handover` | translation gaps fixed; the RBM pages | ✅ merged |
+| #37 `fix/dataset-diff-lists` | the publish summary reports added/removed list entries, not shifts | ✅ merged |
+| `docs/live-links` | live links; "about a minute"; this update | PR |
+
+**The three repositories**
+
+| Repo | Role | Live |
+| --- | --- | --- |
+| `KylerXiv/launch-development-test` (private) | the pipeline: data, review, approval, translation, workflows | LAUNCH site: launch-development-test.vercel.app |
+| `codebyjackson/launch-data-test` (public) | the one published file, every earlier version, the contract | https://codebyjackson.github.io/launch-data-test/v1/dashboard.json |
+| `codebyjackson/launch-rbm-test` (public) | test copy of the pages to hand over to RBM | https://codebyjackson.github.io/launch-rbm-test/ |
+
+Diagrams: the architecture artifact (all parts, technical) and
+`docs/jackson/img/LAUNCH-how-data-reaches-RBM.png` (one picture, no jargon).
 
 Working notes with every decision and check: `docs/remove-resistance-notes.md`,
 `docs/public-data-layer-notes.md`, `docs/rbm-handover-notes.md`.
@@ -175,11 +188,12 @@ the WHO Threat Maps source entry stay. Validator now: 0 errors, **1 warning**.
 | --- | --- | --- |
 | Public repo `codebyjackson/launch-data-test` with the starter files | Jackson | ✅ |
 | GitHub Pages on `main` / root | Jackson | ✅ serving `v1/schema.json`, open CORS |
-| Deploy key: generate; private half as secret `DATA_REPO_DEPLOY_KEY` in the pipeline repo | **Kyler** | ⏳ |
-| Variable `RBM_DATA_REPO` = `codebyjackson/launch-data-test` | **Kyler** | ⏳ |
-| Public half under `launch-data-test` → Settings → Deploy keys, write access | Jackson | ⏳ after Kyler |
-| Merge PR #32 (Vercel blocks deploys of commits by non-members of Kyler's project) | **Kyler** | ⏳ |
-| Push `feat/rbm-handover`, PR, merge | Jackson / Kyler | ⏳ after #32 |
+| Deploy key: generate; private half as secret `DATA_REPO_DEPLOY_KEY` in the pipeline repo | Kyler | ✅ |
+| Variable `RBM_DATA_REPO` = `codebyjackson/launch-data-test` | Kyler | ✅ |
+| Public half under `launch-data-test` → Settings → Deploy keys, write access | Jackson | ✅ |
+| Merge PR #32, #34, #37 | Kyler / Jackson | ✅ |
+| `codebyjackson/launch-rbm-test` with the built pages; Pages on | Jackson | ✅ (section 11) |
+| Production redeploy after each revert (Vercel blocks commits not authored by Kyler) | Kyler | after every hand push by someone else |
 
 ## 9. Testing it end to end
 
@@ -245,17 +259,97 @@ Do these after the setup above. Each step names what to look for.
 
 ## 10. Known gaps and open decisions
 
-- **Not seen in a real browser:** the map (headless Chrome cannot draw it,
-  on `main` either). Check it once on the RBM pages and the LAUNCH site.
-- **Not yet run on GitHub:** the publish workflow's checkout with the deploy
-  key, and the dispatch chain — sections 9a–9d are that test.
+- **Map country data is not correct yet.** The country access lists in
+  `data/products.js` are illustrative (their `status` says so, and the map
+  shows a warning). Work so far has gone into the end-to-end workflow; the
+  registration and MFT research and fetchers are parked on
+  `feat/registration-sources`.
+- **The map in a real browser:** headless Chrome cannot draw it; check it on
+  https://codebyjackson.github.io/launch-rbm-test/en/ (demo guide, step 2).
 - **Hand-written:** the French and Portuguese of the RBM pages' two error
   messages; have a speaker review them.
-- **Still English on /fr and /pt** until the bot runs: the 43 / 42 new strings;
-  and the 12 that were already left (e.g. "Delayed", "Medicine").
+- **Still English on /fr and /pt:** 12 strings per language (e.g. "Delayed",
+  "Medicine"); the 43 / 42 added in October were translated by the bot (97%).
 - **Licence** of the dataset: to be decided; WHO-derived parts are
   CC BY-NC-SA 3.0 IGO (ShareAlike).
 - **Hosting** of the RBM pages and the `frame-ancestors` header: RBM's call.
 - **Subscribe for updates** on RBM: where its backend (`api/`) should live.
 - **Vercel** project is on Kyler's personal account: deploys of anyone else's
   commits are blocked, which also blocks PR previews.
+
+## 11. The RBM test repo (`codebyjackson/launch-rbm-test`)
+
+What RBM will receive, online for testing. Built from `main` by
+`node scripts/build-rbm-pages.js` and pushed by hand (2 Oct 2026, from
+`f264bf4`):
+
+| Path | What |
+| --- | --- |
+| `index.html` | start page: links to the three languages and the iframe test |
+| `en/`, `fr/`, `pt/` `index.html` | the dashboard, reading `dashboard.json` at runtime |
+| `iframe-test.html` | the dashboard inside an iframe with /en /fr /pt tabs, as RBM embeds it |
+| `assets/`, `data/world-map*.js` | icons, logos, map shapes (static) |
+| `README.md` | hosting, `frame-ancestors`, iframe snippets (from `rbm/README.md`) |
+
+**When it needs a rebuild:** only when the page itself changes (layout, wording,
+code). A **data** change never does: the pages read the newest `dashboard.json`
+on every visit. Rebuild: `node scripts/build-rbm-pages.js`, copy `dist/rbm/` into
+the repo (keep `index.html`, `iframe-test.html`, `.nojekyll`), commit, push.
+Automating that is a possible next step (a workflow and a second deploy key).
+
+## 12. Tested on GitHub (1–2 Oct 2026)
+
+| # | What | Result |
+| --- | --- | --- |
+| 1 | Publish now, dry run | green; variable and deploy key (read) work; summary "First publish" |
+| 2 | Publish now, real | `41619d9` "Published by @codebyjackson: First publish"; file live with open CORS; fr 87% of texts |
+| 3 | Test proposal #35 approved | decision → history (**green**, the `ref: main` fix) → translate → **publish started by itself** (`e581f61`, `trigger: approval`, issue 35); `TEST-0001` live |
+| 4 | Revert on `main` + Publish now | `82e5bf5` + `f5dc526`; GanLum back to `idle`; test snapshot removed from `history/` |
+| 5 | Test proposal #38 approved, seen on the RBM pages | GanLum's WHO PQ step done on `/en`, `/fr`, `/pt` without rebuilding the pages; reverted in `7e522d6` |
+| 6 | Translation of the new fields | bot commit `2d3d8cb`; fr/pt 97% on the page |
+
+Found and fixed on the way: the publish summary listed 40 shifted changelog
+lines instead of the real change (PR #37); Vercel blocks production deploys of
+commits not authored by Kyler (he redeploys with an empty commit).
+
+## 13. How a revert works, and what the archive is for
+
+The data exists twice: **`main`** (the source, private) and
+**`v1/dashboard.json`** (a built copy, public). They do not update each other.
+
+1. **An approval** changes `main`, and the approval chain ends by making a new
+   copy (automatic publish).
+2. **A revert** (`git revert <commit>`, or GitHub's Revert button on the merged
+   PR) adds a new commit on `main` that undoes the old one. Nothing is deleted.
+   For a *test* proposal, also delete the history snapshot the approval wrote
+   (`history/products-<date>.js`), which holds the test data. At this point
+   `main` is fixed but the public copy is still the old one.
+3. **Publish now** builds a new copy from `main` as it is now and publishes it.
+   It does not "revert" anything; it copies `main`.
+
+Only approvals publish by themselves (owner's choice), so a revert, the yearly
+WHO update or a direct fix waits for the click.
+
+**`v1/archive/`** gets one frozen copy per publish, named by build time (UTC);
+`v1/dashboard.json` is always the newest. Nothing reads the archive
+automatically: it is the audit trail ("what did the public dashboard say on
+1 Oct?"), with a plain URL per version.
+
+## 14. What Publish now runs
+
+One workflow file, `.github/workflows/publish-dataset.yml`. It starts no other
+pipeline workflow and changes nothing in the pipeline repo.
+
+| Step | Runs | Reads | Writes |
+| --- | --- | --- | --- |
+| checkout | actions/checkout | the pipeline repo, `main` now | temp copy |
+| Check the request | bash | reason, trigger | stops if no reason (manual) |
+| Build and check | `scripts/build-dataset.js`, `scripts/test-build-dataset.js` | `data/products.js`, `sources.js`, `treatment-policy.js`, `decisions.js` (approval), `i18n/translations.json` via `build-locale-pages.js`, `i18n/content.en.json` + the page via `assemble-content.js`, `public-data/v1/schema.json` | `dashboard.json` in a temp folder |
+| Is a data repo set? | bash | variable `RBM_DATA_REPO` | — |
+| checkout (2nd) | actions/checkout + secret `DATA_REPO_DEPLOY_KEY` | `codebyjackson/launch-data-test` | `data-repo/` |
+| Drift check | git log | last writer of `v1/dashboard.json` | stops on a hand change |
+| What changes | `scripts/dataset-diff.js` | published vs new | run summary, changelog text |
+| Publish | bash, git push | — | `v1/dashboard.json`, `v1/archive/<time>.json`, `v1/schema.json`, `CHANGELOG.md` |
+
+Then GitHub's own "pages build and deployment" in `launch-data-test` (about a
+minute) makes it live.
