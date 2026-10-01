@@ -23,11 +23,8 @@ on:
     paths:
       - illustrated-journey-dashboard.html
       - data/products.js
-      - data/resistance.js
-      - data/molecular-markers.js
       - data/sources.js
       - scripts/assemble-content.js
-      - scripts/i18n-identifiers.js
   workflow_dispatch:
 
 permissions:

@@ -44,7 +44,6 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { identifiers } = require("./i18n-identifiers");
 const { requireFresh } = require("./assemble-content");
 
 const ROOT = path.resolve(__dirname, "..");
@@ -57,7 +56,6 @@ const TARGET = { fr: "fr", pt: "pt-PT" };
 const DENY_EXACT = new Set([
   "P. falciparum", "P. vivax", "P. malariae", "P. ovale", "P. knowlesi",
   "application/ld+json", "repeatCount=", "(prefers-color-scheme: dark)",
-  'input[name="reslayer"]', 'input[name="reslayer"]:checked',
 ]);
 // gene markers, amplifications and mutation codes — identifiers, not prose
 const DENY_PATTERN = [
@@ -66,10 +64,7 @@ const DENY_PATTERN = [
   /^NCT\d+$/,                    // trial registry IDs
   /^[a-z-]+\[[^\]]*\]/,          // css attribute selectors
 ];
-// Drug, marker and species names are lookup keys, derived from the data files
-// rather than hand-listed so a new WHO drug is protected the day it lands.
-const IDENT = identifiers(ROOT);
-const denied = (t) => IDENT.has(t) || DENY_EXACT.has(t) || DENY_PATTERN.some((r) => r.test(t));
+const denied = (t) => DENY_EXACT.has(t) || DENY_PATTERN.some((r) => r.test(t));
 
 // ---------------------------------------------------------------------------
 // inventory — the text section of content.en.json, nothing else

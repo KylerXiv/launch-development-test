@@ -36,28 +36,17 @@ const found = rules.checkData(extracted.data);
 const errors = found.errors;
 const warnings = found.warnings;
 
-// ---- WHO study-result layers -----------------------------------------------
-// Runs only on the default (real) invocation: these are single global
-// datasets, not one per product data file, so re-checking them on the
-// synthetic run would only double the output. The rules need the file
-// contents, which is this wrapper's job to supply.
+// ---- single global files ----------------------------------------------------
+// Runs only on the default (real) invocation: these are single global files,
+// not one per product data file, so re-checking them on the synthetic run
+// would only double the output. The rules need the file contents, which is
+// this wrapper's job to supply.
 if (!process.argv[2]) {
   const read = (rel) => fs.readFileSync(path.join(__dirname, "..", rel), "utf8");
-  const layers = rules.checkStudyLayers({
-    worldMap: read("data/world-map.js"),
-    datasets: rules.DATASETS.map((ds) => {
-      const abs = path.join(__dirname, "..", ds.file);
-      return fs.existsSync(abs) ? { file: ds.file, source: fs.readFileSync(abs, "utf8") }
-                                : { file: ds.file, missing: true };
-    })
-  });
-  errors.push(...layers.errors);
-  warnings.push(...layers.warnings);
 
   // ---- the source registry -------------------------------------------------
-  // Same reasoning as the layers above: one global file, not one per product
-  // data file. Product ids are passed through so a source cannot cite a
-  // medicine that no longer exists.
+  // Product ids are passed through so a source cannot cite a medicine that no
+  // longer exists.
   const SRC = path.join(__dirname, "..", "data", "sources.js");
   const rawSrc = rules.extractData(fs.readFileSync(SRC, "utf8"), "LAUNCH_SOURCES");
   if (!rawSrc.ok) {

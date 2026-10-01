@@ -40,7 +40,7 @@ upgrade, or break.
 | `scripts/build-map.js` | One-off map-geometry generator (dev-only deps documented in its header). |
 | `.github/workflows/validate.yml` | CI: validator + preview build on every push/PR. |
 | `.github/workflows/publish.yml` | On `data/products.js` changes: validates, snapshots to `history/`, rebuilds `feed.xml`, `ontology/launch-data.jsonld` and `ontology/launch-history.jsonld`, bot-commits. Path-filtered so its own commit cannot retrigger it. |
-| `.github/workflows/translate.yml` | The translate bot. After a hand-made change to the illustrated page, `data/products.js`, `resistance.js`, `molecular-markers.js` or `sources.js` reaches `main`: rebuilds `i18n/content.en.json`, translates only new strings into French and Portuguese, checks both pages, bot-commits `i18n/` and redeploys. Also started by `publish.yml` after an approval, as a safety net. Approved proposals are translated before they merge, by `scripts/proposal-translate.sh` in `proposal-decision.yml`. See [translation-notes.md](translation-notes.md). |
+| `.github/workflows/translate.yml` | The translate bot. After a hand-made change to the illustrated page, `data/products.js` or `sources.js` reaches `main`: rebuilds `i18n/content.en.json`, translates only new strings into French and Portuguese, checks both pages, bot-commits `i18n/` and redeploys. Also started by `publish.yml` after an approval, as a safety net. Approved proposals are translated before they merge, by `scripts/proposal-translate.sh` in `proposal-decision.yml`. See [translation-notes.md](translation-notes.md). |
 | `i18n/` | The translation layer (DEV-31): `content.en.json`, the English content and its `contentHash` — **generated** by `scripts/assemble-content.js`, never hand-edited — and `translations.json`, the translation memory, where `fr`/`pt` hand corrections live. `scripts/build-locale-pages.js` builds the `/fr/` and `/pt/` pages from them at deploy time. See [jackson/DEV-31.md](jackson/DEV-31.md). |
 | `.github/workflows/reminder.yml` | Monthly cron: opens the milestone-scan checklist issue. Also runnable manually (workflow_dispatch). |
 | `.github/workflows/sourcing.yml` | Scheduled source fetch: weekly trial watch (Mon), monthly Global Fund + regulatory pulls (3rd); bot-commits outputs under `sourcing/` only and opens watch issues on changes. Manually runnable with a fetcher picker. |
@@ -202,56 +202,12 @@ No test framework by design; two layers instead:
   CDN — **except `illustrated-journey-dashboard.html`**, which loads MapLibre
   GL JS from a CDN for its own map rendering only (see below); the other 11 pages sharing
   `data/world-map.js` are unaffected and remain fully self-contained.
-- **Resistance overlay** (implemented, `illustrated-journey-dashboard.html`
-  only): WHO Malaria Threat Map treatment-failure results drawn as graduated,
-  clustered, pan/zoomable dots on top of the access choropleth, rendered with
-  MapLibre GL JS against a page-only 50m GeoJSON basemap
-  (`data/world-map-geo.js`/`scripts/build-map-geo.js` — a sibling to
-  `build-map.js`, not a replacement for it). The fill describes the *product*,
-  the dots describe the *parasite*, so the two never compete for one visual
-  channel. Data is the committed `data/resistance.js`
-  (`scripts/normalize-resistance.js`; manual export step in
-  `sourcing/README.md`), validated by a `validate-data.js` pass that runs only
-  on the default invocation, unchanged by the rendering engine. The MapLibre
-  dependency deliberately overrides this repo's otherwise strict
-  no-runtime-dependency rule, for this one page only, because a pan/zoom map
-  with per-site dots could not be built on the hand-rolled SVG renderer it
-  replaced; the reasoning is kept in the page's own `---- MapLibre init`
-  comment block. The bullets below describe the *feature*, not the current
-  renderer, and predate that migration.
-  - **Nothing is filtered.** All five *Plasmodium* species and studies of every
-    size are shipped. Only rows WHO publishes with no usable value (a literal
-    `NaN`) or no coordinates are dropped, and the normalizer counts them aloud.
-  - **One dot per study site**, clustered where sites sit too close to draw
-    apart at the current zoom (country-scoped — a cluster never crosses a
-    border). A site's own dot is its most recent study; a cluster is its
-    members' most recent studies, **patient-weighted** so one small study
-    cannot decide the colour. (Superseded from an earlier one-dot-per-country
-    model, which let a country's most recent year be decided by a handful of
-    patients — Kenya read 0% off 44 patients while ignoring 883 including
-    Siaya at 11.5%.)
-  - **Click a dot** for every study behind it — a sortable panel below the map
-    (site, region, year, patients, failure %, linked source). That is where the
-    site-level detail lives instead of zoom.
-  - **Species and drug are not independent**: chloroquine has no falciparum
-    studies at all, so pairings with no data are *disabled* in the species
-    select with their country counts shown. An empty map must never be
-    readable as "no resistance here".
-  - **The drug select is one flat A–Z list**, each option labelled with the
-    number of countries it will actually paint — 17 of the 26 drugs cover fewer
-    than five countries and 11 cover exactly one, and alphabetical order
-    scatters those through the list rather than sinking them.
-  - `studies[]` is stored as rows against `fields[]` with the repetitive
-    columns held as indices into `dict[]` — that halves the committed file
-    (373 KB → 183 KB), which matters because it is regenerated whole on every
-    WHO extract.
-  - **The two layers keep separate tooltips and separate provenance lines on
-    purpose**: the access layer is illustrative for most countries while the
-    resistance values are published WHO results, so the page must not invite a
-    reader to combine them until the country survey is verified. The
-    aggregation rule in `meta.rule` is printed under the map — if the rule
-    changes, the sentence on the page changes with it. `index.html`,
-    `option-b.html` and `story.html` are deliberately untouched.
+- **Resistance overlay** (removed 1 Oct 2026): the WHO Malaria Threat Map
+  treatment-failure, delayed-clearance and molecular-marker layers, their data
+  files, normalizers and validator rules were taken out; see
+  `docs/remove-resistance-notes.md`. The page still renders its map with
+  MapLibre GL JS against `data/world-map-geo.js`; that one-page dependency and
+  its reasoning stay in the page's `---- MapLibre init` comment block.
 - **History snapshots + RSS feed** (implemented): `.github/workflows/publish.yml`
   runs only on `data/products.js` changes, commits `history/products-<date>.js`
   and a rebuilt `feed.xml` as a bot. It cannot retrigger itself (path filter).
