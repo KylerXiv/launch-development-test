@@ -13,6 +13,9 @@
 const mail = require("../api/_mail.js");
 const subscribe = require("../api/subscribe.js");
 
+// The addresses as committed, copied before any test below swaps in its own.
+const SHIPPED = JSON.parse(JSON.stringify(mail.ADDRESSES));
+
 let pass = 0, fail = 0, only = process.argv[2];
 const failures = [];
 const queue = [];
@@ -140,6 +143,16 @@ group("configuration", async () => {
 
   r = await call(subscribe, { addr: Object.assign({}, ADDR, { from: "LAUNCH <updates@unitaid.example>" }), body: SUB });
   is("ADDRESSES.from overrides it", r.calls[1].body.from, "LAUNCH <updates@unitaid.example>");
+});
+
+group("the addresses as committed", async () => {
+  ok("ADDRESSES.to has at least one address", SHIPPED.to.length > 0);
+  ok("  and every one passes the form's own email check", SHIPPED.to.every(a => mail.EMAIL_RE.test(a)), JSON.stringify(SHIPPED.to));
+  const from = /^[^<>]+ <([^<>\s]+)>$/.exec(SHIPPED.from);
+  ok("ADDRESSES.from is empty or \"Name <address>\"", SHIPPED.from === "" || !!from, SHIPPED.from);
+  ok("  and its address passes the email check", !from || mail.EMAIL_RE.test(from[1]));
+  ok("ADDRESSES.segment is empty or a Resend segment id", SHIPPED.segment === "" ||
+     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(SHIPPED.segment), SHIPPED.segment);
 });
 
 group("subscribe", async () => {

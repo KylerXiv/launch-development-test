@@ -39,6 +39,11 @@ form shows its failure message and the function log names what is missing.
    | `from` | no | e.g. `LAUNCH dashboard <updates@your-domain>`, on the domain verified in step 1. Empty means the test sender |
    | `segment` | no | the segment ID from step 3. Empty means plain contacts, which no broadcast can target on its own |
 
+   **Set on 1 Oct 2026:** `from` is `LAUNCH dashboard <updates@tamarind.tech>`
+   (`tamarind.tech` is verified in Resend), `to` is `kyler@tamarind.tech`, and
+   `segment` is "LAUNCH dashboard updates". `RESEND_API_KEY` is on the Vercel
+   project for Production and Preview.
+
 5. **On the Vercel project, under Settings → Environment Variables, add
    `RESEND_API_KEY`** (the `re_…` key) for Production, and for Preview if PR
    previews should work too (§4). Then redeploy: env var changes reach new
@@ -154,6 +159,13 @@ this change is Subscribe alone:
   4 files**, and the feedback half was the hard part. Onto this repo's `main`
   it gave one, in `.gitignore`.
 
+Keith's `development` has since been merged into `main` (PR #26, 1 Oct;
+[merge-keith-development-notes.md](merge-keith-development-notes.md)). This
+branch was rebased onto that `main` (at `3c747bc`). The Subscribe code
+applied cleanly to Keith's reworked page. One conflict, in
+`docs/developer-guide.md`'s repo map, was resolved by keeping `main`'s wording
+for `assets/report-issue.js` and adding the `api/` row beneath it.
+
 The feedback half is kept whole on `email-feedback-wip`: its function, its 29
 tests, the two `_mail.js` helpers only it uses (`block`, `newRef`), and its
 doc sections (the opt-in `LAUNCH_FEEDBACK_ENDPOINT`, server-made references). On this branch, Send feedback is exactly as `main` has
@@ -201,11 +213,14 @@ run, passes all its checks.
 
 ## 3. How it was verified (1 Oct 2026)
 
-- **`node scripts/test-mail-api.js`: 39 checks, all passing.** `fetch` is
+- **`node scripts/test-mail-api.js`: 44 checks, all passing.** `fetch` is
   stubbed, so no key or network is needed. It covers the request guard,
   configuration from `ADDRESSES`, Subscribe's happy and failure paths, and the
   logging rule. That is 68 on `email-feedback-wip`, less the 29 that exercise
-  `api/feedback.js`.
+  `api/feedback.js`, plus 5 added on 1 Oct that check the addresses *as
+  committed*: `to` non-empty and valid, `from` in `Name <address>` form,
+  `segment` shaped like a Resend id. A sender with its closing `>` deleted was
+  tried, and was caught.
 - **Mutation check: six deliberate breaks, each caught.** They were: ignoring
   `ADDRESSES.to`, ignoring `ADDRESSES.from`, ignoring `ADDRESSES.segment`,
   removing the origin check, logging the address, and notifying the team
@@ -217,16 +232,25 @@ run, passes all its checks.
   three inline scripts parse in each. Send feedback's click block is still
   present, as intended.
 - **`vercel build`:** see §2.1.
-- **Verify block from CLAUDE.md:** both normalizers byte-identical;
-  `0 errors, 5 warnings` in the documented 3 + 2 split; synthetic 0/0;
-  `make-preview.js` clean. Also `test-serializer.js` 0 failures and
-  `test-import.js` 127 passed. No NUL bytes in any touched file.
-- **Browser, end to end:** run on 29 Sep against the same Subscribe code, and
-  not re-run on 1 Oct. `main` has not touched the page since, and the
-  Subscribe code is unchanged apart from where the addresses are read. It
-  checked validation and Enter-to-submit, the pending state, success only after
-  the server confirms, the failure message with the address kept, and a
-  contact call followed by a notify call.
+- **Verify block from CLAUDE.md:** all three normalizers byte-identical;
+  `0 errors, 6 warnings` in the documented 3 + 2 + 1 split (the third group
+  arrived with Keith's merge); synthetic 0/0; `make-preview.js` clean. Also
+  `test-serializer.js` 0 failures and `test-import.js` 127 passed. No NUL
+  bytes in any touched file.
+- **Browser, end to end, 1 Oct, after the rebase:** headless Chrome ran the
+  built English and French pages against the real `api/subscribe.js`, with
+  Resend stubbed. The 29 Sep run no longer counted, because Keith's merge had
+  reworked the page. **19 checks, all passing, and no JavaScript errors.** It
+  checked:
+  - a malformed address is refused before anything is sent;
+  - a valid one shows success only after the server answers ("Thank you —
+    you are on the list.", and in French "Merci — vous êtes sur la liste.");
+  - the contact is saved into the configured segment before the note goes to
+    `kyler@tamarind.tech` from the `tamarind.tech` sender;
+  - the field clears and the button comes back;
+  - there is no "Mock only" line;
+  - when Resend fails, the failure message shows, the address stays for a
+    retry, and the team is not told about a subscriber who was not saved.
 
 **Not exercised: a real Resend key.** Nothing has sent a real email yet. The
 calls are written against Resend's API reference as read on 1 Oct. **One
@@ -239,11 +263,14 @@ message, which would be wrong for a repeat subscriber. §1 step 6 tests it.
 
 ## 4. Deferred, open, and found in passing
 
-**Waiting on values**
+**Before real visitors**
 
-- **`ADDRESSES` is empty** in this commit: the team inbox, sender and segment
-  ID have not been supplied yet. Until `to` is filled in, the function answers
-  503 and the form shows its failure message.
+- **The team inbox is one person's address** (`kyler@tamarind.tech`), chosen
+  for testing. The handoff asks for a shared mailbox, because these outlive
+  whoever is on the project. Changing it is one line in `ADDRESSES`.
+- **The sender is on `tamarind.tech`**, the developer's domain, not Unitaid's.
+  The handoff expects a Unitaid sending domain (item 2). Changing it means
+  verifying that domain in Resend, then changing one line.
 
 **Deferred on purpose**
 
@@ -302,10 +329,10 @@ message, which would be wrong for a repeat subscriber. §1 step 6 tests it.
 
 | | |
 | --- | --- |
-| Branch | `email-subscribe`, from `main` at `a42b8e0` |
-| Commits | 1 |
-| Push state | not pushed |
-| CI | not run |
+| Branch | `email-subscribe`, rebased onto `main` at `3c747bc` on 1 Oct (first cut from `a42b8e0`) |
+| Commits | 2: the Subscribe change, then the addresses filled in |
+| Push state | pushed with this commit (force-with-lease, because of the rebase), with a pull request against `main` |
+| CI | runs on that pull request |
 | New files | `api/_mail.js`, `api/subscribe.js`, `scripts/test-mail-api.js`, this document |
 | Changed | `illustrated-journey-dashboard.html` (Subscribe only), `scripts/build-public-site.sh` (comment only), `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, `docs/Handoff_Kyler/Handoff_Kyler.md` |
 | Kept aside | `email-feedback-wip` — the whole 29 Sep work, both forms, rebased onto `main` |

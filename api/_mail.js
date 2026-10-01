@@ -21,12 +21,14 @@ const RESEND = "https://api.resend.com";
 const ADDRESSES = {
   // Sender, on a domain verified in Resend. Left empty, Resend's shared test
   // sender is used, which only delivers to the Resend account's own address.
-  from: "",
-  // The team inbox, as a list. A shared mailbox, not a person.
-  to: [],
-  // Resend segment that subscribers join, so a broadcast can go to exactly
-  // them. Optional: without it they are plain contacts.
-  segment: ""
+  from: "LAUNCH dashboard <updates@tamarind.tech>",
+  // The team inbox, as a list. A shared mailbox is the aim; one person's
+  // address while this is being tested.
+  to: ["kyler@tamarind.tech"],
+  // Resend segment that subscribers join ("LAUNCH dashboard updates"), so a
+  // broadcast can go to exactly them. Optional: without it they are plain
+  // contacts.
+  segment: "759df0a9-0fe5-4b96-ac7a-581fb77a5edc"
 };
 const DEFAULT_FROM = "LAUNCH dashboard <onboarding@resend.dev>";
 
