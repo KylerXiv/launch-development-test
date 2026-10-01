@@ -14,7 +14,8 @@
 //   2. A welcome email, with an unsubscribe link, goes to the subscriber.
 //   3. The team inbox is told.
 // A failure in 2 or 3 is logged, not shown: the person is on the list.
-// Someone already subscribed sees "already subscribed", and no email is sent.
+// Someone already subscribed sees "already subscribed", with an Unsubscribe
+// button, and no email is sent.
 
 const mail = require("./_mail.js");
 
@@ -94,11 +95,17 @@ module.exports = async function confirm(req, res) {
     if (!segmentOk) mail.logFailure("confirm", "add to segment", seg);
   }
 
+  // Already on the list: no second welcome, but the way off the list is
+  // offered here too. Someone who has lost their welcome email has no other
+  // way to find it, and clicking this link has just proved the address is
+  // theirs.
   if (state === "already") {
     console.log("[confirm] already subscribed");
     return mail.page(res, 200, {
       title: "You're already subscribed",
-      paras: ["Nothing has changed: we'll keep emailing you when the dashboard's data is updated. Every email has an unsubscribe link."]
+      paras: ["Nothing has changed: we'll keep emailing you when the dashboard's data is updated.",
+              "Don't want these emails any more?"],
+      form: { action: "/api/unsubscribe", token: mail.makeToken(cfg.secret, "unsubscribe", email), label: "Unsubscribe" }
     });
   }
 

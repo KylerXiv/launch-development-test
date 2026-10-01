@@ -155,7 +155,17 @@ How it runs:
    confirms again is re-subscribed, because clicking proves the address is
    theirs. (Under single opt-in, that had to be refused, and it was listed
    as a known gap.) Then a welcome email goes to them, and the team note to
-   `to`. Someone already subscribed gets "already subscribed" and no email.
+   `to`. Someone already subscribed gets "already subscribed", no email, and
+   an **Unsubscribe** button on that page.
+
+   **That button was added after the owner's first real test on the
+   preview.** Their address was already a contact, saved by an earlier
+   preview of the single opt-in version, so confirming correctly sent
+   nothing. But it also left them with no way off the list: they had never
+   had a welcome email, so they had no unsubscribe link. Anyone who has lost
+   their welcome email is in the same position. Offering the button on this
+   page is safe, because clicking the emailed link has just proved the
+   address is theirs.
 3. **`/api/unsubscribe`** sets the contact's `unsubscribed` flag. That is the
    flag Resend's own broadcast unsubscribe link sets, so later broadcasts skip
    the address either way. The contact is kept, as Resend keeps it: deleting
@@ -312,7 +322,7 @@ only** (§4).
 
 ## 3. How it was verified (1 Oct 2026)
 
-- **`node scripts/test-mail-api.js`: 109 checks, all passing.** `fetch` is
+- **`node scripts/test-mail-api.js`: 111 checks, all passing.** `fetch` is
   stubbed, so no key or network is needed. They cover:
   - the request guard and configuration (both secrets, a short secret);
   - the addresses as committed (§2.7);
@@ -321,8 +331,8 @@ only** (§4).
     junk;
   - subscribe: one email, nothing saved, preview hosts, bad hosts;
   - the confirm page and its button: new, returning and already-subscribed
-    addresses, a segment failure, an unknown-4xx lookup, a sending-only key,
-    and each later step failing;
+    addresses (and the latter's Unsubscribe button), a segment failure, an
+    unknown-4xx lookup, a sending-only key, and each later step failing;
   - unsubscribe, including the mail app's one-click POST and a year-old link;
   - the whole journey through all three functions;
   - the logging rule.
@@ -343,23 +353,27 @@ only** (§4).
   Eight each failed named checks; four crashed the run.
 - **Browser, the whole journey:** headless Chrome on the built dashboard, with
   the three real functions behind a local server that parses bodies as Vercel
-  does, and Resend stubbed. **14 checks, all passing, and no JavaScript
+  does, and Resend stubbed. **16 checks, all passing, and no JavaScript
   errors.** It went: subscribe ("Almost there", one email, nothing saved) →
   the emailed link (a page; nobody subscribed yet) → the button ("You're
   subscribed", the welcome with one-click headers, the note to
   `kyler@oqtiva.ai`) → the welcome's unsubscribe link (a page; nothing changed
   yet) → its button ("You're unsubscribed") → subscribe and confirm again
-  (subscribed again). Its first run is how the null-Origin bug of §2.4 was
-  found. It replaces the 19-check run of the single opt-in version.
+  (subscribed again) → once more ("already subscribed", nothing sent, and its
+  Unsubscribe button works). Its first run is how the null-Origin bug of §2.4
+  was found. It replaces the 19-check run of the single opt-in version.
 - **`vercel build`:** see §2.1.
 - **Verify block from CLAUDE.md:** all three normalizers byte-identical;
   `0 errors, 6 warnings` in the documented 3 + 2 + 1 split; synthetic 0/0;
   `make-preview.js` clean. Also `test-serializer.js` 0 failures and
   `test-import.js` 127 passed. No NUL bytes in any touched file.
 
-**Not exercised: a real Resend key.** Nothing has sent a real email yet. The
+**With the real key, on the preview (the owner's test, 1 Oct):** the
+"Please confirm" email arrived from `updates@tamarind.tech`, and its link and
+button worked. The lookup found the address already a contact (above), so the
+create, welcome and segment paths are still to be seen with real Resend. The
 calls follow Resend's API reference as read on 1 Oct. Three behaviours are not
-documented there, and the preview test settles them:
+documented there, and the rest of the preview test settles them:
 
 - **Looking up an address that is not a contact.** It is taken to be a 4xx.
   Any 4xx other than 401, 403 or 429 is read as "no such contact", and a
@@ -436,10 +450,10 @@ documented there, and the preview test settles them:
 | | |
 | --- | --- |
 | Branch | `email-subscribe`, rebased onto `main` at `3c747bc` on 1 Oct (first cut from `a42b8e0`) |
-| Commits | 4: the Subscribe change, the addresses, the inbox moved to `kyler@oqtiva.ai`, double opt-in |
+| Commits | 5: the Subscribe change, the addresses, the inbox moved to `kyler@oqtiva.ai`, double opt-in, Unsubscribe on the "already subscribed" page |
 | Pull request | #30 against `main`, open, not merged |
 | CI | runs on that pull request |
 | New files | `api/_mail.js`, `api/subscribe.js`, `api/confirm.js`, `api/unsubscribe.js`, `scripts/test-mail-api.js`, this document |
 | Changed | `illustrated-journey-dashboard.html` (Subscribe only), `scripts/build-public-site.sh` (comment only), `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, `docs/Handoff_Kyler/Handoff_Kyler.md` |
-| Waiting on | `UNSUBSCRIBE_SECRET` on the Vercel project, then the owner's test on the preview (§1 step 6) |
+| Waiting on | the rest of the owner's test on the preview (§1 step 6). `UNSUBSCRIBE_SECRET` was set on 1 Oct |
 | Kept aside | `email-feedback-wip` — the whole 29 Sep work, both forms |

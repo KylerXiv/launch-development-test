@@ -292,6 +292,10 @@ group("confirm — pressing the button", async () => {
   is("already subscribed: made sure of the segment, and nothing sent", r.calls.map(pathOf),
      ["GET /contacts/reader%40example.org", "POST /contacts/reader%40example.org/segments/seg_123"]);
   is("  the page says already subscribed", [r.status, /already subscribed/.test(r.shown)], [200, true]);
+  const offered = (/<form method="post" action="\/api\/unsubscribe"><input type="hidden" name="t" value="([^"]+)">/.exec(r.raw) || [])[1];
+  is("  and offers an Unsubscribe button, for this address", offered && mail.readToken(SECRET, "unsubscribe", offered), { email: "reader@example.org" });
+  r = await call(unsubscribe, { headers: Object.assign({}, FORM, { origin: "null" }), body: { t: offered } });
+  is("  which unsubscribes", [r.status, r.calls.map(c => [pathOf(c), c.body])], [200, [["PATCH /contacts/reader%40example.org", { unsubscribed: true }]]]);
 
   r = await call(confirm, { headers: FORM, body: { t }, addr: SEG, answer: [SUBSCRIBED, { status: 500, body: { name: "application_error" } }] });
   is("  a segment failure is not shown to them", [r.status, /already subscribed/.test(r.shown)], [200, true]);
