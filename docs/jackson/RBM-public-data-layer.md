@@ -70,7 +70,7 @@ sequenceDiagram
   T->>X: dispatch trigger=approval
   X->>X: drift check · build-dataset.js · schema + tests · what changes
   X->>G: commit "Published after proposal #n, approved by @R [publish-dataset]"
-  G-->>G: v1/dashboard.json live within ~10 min
+  G-->>G: v1/dashboard.json live about a minute later
 ```
 
 **Everything else** that reaches `main` (a revert, the yearly WHO update, a
