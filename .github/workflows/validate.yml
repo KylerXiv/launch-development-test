@@ -29,6 +29,12 @@ jobs:
         run: |
           node scripts/build-dataset.js --allow-stale --out /tmp/dashboard.json
           node scripts/test-build-dataset.js --allow-stale
+      # The pages handed over to RBM, built from the same page: a change to it
+      # that the build no longer understands fails here.
+      - name: RBM pages build
+        run: |
+          node scripts/test-build-rbm-pages.js
+          node scripts/build-rbm-pages.js --allow-stale
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
