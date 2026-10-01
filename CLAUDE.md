@@ -37,15 +37,17 @@ error/warning count, not merely to exit cleanly.
 ```bash
 node scripts/normalize-resistance.js          # regenerate; expect byte-identical
 node scripts/normalize-molecular-markers.js   # ditto
-node scripts/validate-data.js                 # expect 0 errors, 5 warnings
+node scripts/normalize-treatment-policy.js    # ditto
+node scripts/validate-data.js                 # expect 0 errors, 6 warnings
 node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 warnings
 node scripts/make-preview.js                  # smoke test
 ```
 
-The 5 warnings are 3 + 2: three long-standing `resistance:` ones (1 unnamed
-site, 730 uncited studies, 12 undrawn country values) and two
-`molecular markers:` ones (625 uncited surveys, 9 undrawn country values). Any
-other split means something moved.
+The 6 warnings are 3 + 2 + 1: three long-standing `resistance:` ones (1 unnamed
+site, 730 uncited studies, 12 undrawn country values), two
+`molecular markers:` ones (625 uncited surveys, 9 undrawn country values) and
+one `treatment policy:` one (French Guiana lists a dashboard product but is
+not drawn on the basemap). Any other split means something moved.
 
 `scripts/verify-map-clusters.js` also exists but needs puppeteer, which is not
 installed here. Headless Chrome additionally needs a software GL backend or

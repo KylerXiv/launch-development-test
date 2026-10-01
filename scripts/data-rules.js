@@ -146,6 +146,23 @@
       }
     }
 
+    // ---- stageInfo ---------------------------------------------------------
+    // Optional plain-language explainer per stage, same order as stages[]. Shown in
+    // the panel a click on a pathway step opens. Every entry needs its four strings
+    // so the panel never renders a half-empty block.
+    if (data.stageInfo !== undefined) {
+      if (!Array.isArray(data.stageInfo) || data.stageInfo.length !== nStages) {
+        err(`stageInfo: must be an array with one entry per stage (${nStages}), got ${Array.isArray(data.stageInfo) ? data.stageInfo.length : typeof data.stageInfo}`);
+      } else {
+        data.stageInfo.forEach((si, i) => {
+          ["what", "who", "stall", "source"].forEach((k) => {
+            if (!si || typeof si[k] !== "string" || !si[k].trim())
+              err(`stageInfo[${i}] (${data.stages[i]}): "${k}" must be a non-empty string`);
+          });
+        });
+      }
+    }
+
     // ---- products ----------------------------------------------------------
     if (!Array.isArray(data.products) || data.products.length === 0) {
       err("products: must be a non-empty array");
@@ -428,6 +445,103 @@
     return { errors, warnings };
   }
 
+  // ---- WHO national treatment policy (the "Show MFT policy" switch) --------
+  // data/treatment-policy.js is a different shape from the two study files
+  // above (one record per country, no study table), so it gets its own
+  // checks rather than a third DATASETS entry. Error = the switch would draw
+  // something the WHO table does not say; warning = data that exists but
+  // cannot be seen on the map. Contents, not paths, like checkStudyLayers:
+  //
+  //   checkTreatmentPolicy({
+  //     worldMap: "<contents of data/world-map.js>",
+  //     source: "<contents of data/treatment-policy.js>" | missing: true,
+  //     productIds: ["<id from data/products.js>", ...]
+  //   })
+  function checkTreatmentPolicy(sources) {
+    const errors = [];
+    const warnings = [];
+    const err = (m) => errors.push(m);
+    const warn = (m) => warnings.push(m);
+    const tag = "treatment policy";
+
+    if (sources.missing) {
+      warn(`data/treatment-policy.js is missing — run "node scripts/normalize-treatment-policy.js"`);
+      return { errors, warnings };
+    }
+    const evaluate = (source) => {
+      const box = {};
+      new Function("window", source)(box);
+      return box;
+    };
+    // A basemap that will not evaluate is already an error from
+    // checkStudyLayers; here it only means the undrawn check is skipped.
+    let drawn = null;
+    try {
+      const mapBox = evaluate(sources.worldMap);
+      drawn = (mapBox.LAUNCH_MAP && mapBox.LAUNCH_MAP.countries) || {};
+    } catch (e) { /* reported by checkStudyLayers */ }
+
+    let box;
+    try {
+      box = evaluate(sources.source);
+    } catch (e) {
+      err("data/treatment-policy.js could not be evaluated: " + e.message);
+      return { errors, warnings };
+    }
+    const T = box.LAUNCH_TREATMENT_POLICY;
+    if (!T || typeof T !== "object") { err("data/treatment-policy.js did not define window.LAUNCH_TREATMENT_POLICY"); return { errors, warnings }; }
+    const m = T.meta || {};
+    for (const k of ["source", "sourceUrl", "extract", "edition", "dataAsOf", "lastVerified", "licence", "rule", "status"])
+      if (!m[k] || !String(m[k]).trim()) err(`${tag} meta: "${k}" is required`);
+    if (m.status && !["illustrative", "draft", "verified"].includes(m.status))
+      err(`${tag} meta.status must be illustrative/draft/verified (got "${m.status}")`);
+    for (const k of ["dataAsOf", "lastVerified"])
+      if (m[k] && !/^\d{4}-\d{2}-\d{2}$/.test(m[k])) err(`${tag} meta.${k} must be YYYY-MM-DD (got "${m[k]}")`);
+    if (m.lastVerified && m.dataAsOf && m.lastVerified < m.dataAsOf)
+      err(`${tag} meta.lastVerified (${m.lastVerified}) is before the data it verifies (${m.dataAsOf})`);
+    if (m.rule && String(m.rule).trim().length < 40)
+      err(`${tag} meta.rule must spell out how a country is placed in a patient group — it is printed under the legend`);
+
+    // Product keys must be the dashboard's own product ids: the page looks
+    // them up by id, so a typo here is a drug that silently never draws.
+    const productIds = new Set(sources.productIds || []);
+    const policyProducts = Object.keys(m.products || {});
+    if (!policyProducts.length) err(`${tag} meta.products is empty — the switch would have nothing to draw`);
+    for (const id of policyProducts)
+      if (!productIds.has(id)) err(`${tag} meta.products: "${id}" is not a product id in data/products.js`);
+    const GROUPS = Object.keys(m.groups || {});
+    for (const g of ["tested", "untested", "severe", "pregnancy", "vivax"])
+      if (!GROUPS.includes(g)) err(`${tag} meta.groups is missing "${g}"`);
+
+    const REGIONS = ["AFRO", "AMRO", "EMRO", "EURO", "SEARO", "WPRO"];
+    const checkProducts = (where, prods) => {
+      for (const [id, groups] of Object.entries(prods || {})) {
+        if (!policyProducts.includes(id)) err(`${where}: product "${id}" is not in meta.products`);
+        if (!Array.isArray(groups) || !groups.length) { err(`${where} ${id}: needs at least one patient group`); continue; }
+        if (new Set(groups).size !== groups.length) err(`${where} ${id}: a patient group is listed twice`);
+        for (const g of groups) if (!GROUPS.includes(g)) err(`${where} ${id}: "${g}" is not a patient group in meta.groups`);
+      }
+    };
+    const entries = Object.entries(T.countries || {});
+    if (!entries.length) err(`${tag}: countries is empty`);
+    const undrawn = [];
+    for (const [iso3, c] of entries) {
+      const where = `${tag} ${iso3}`;
+      if (!/^[A-Z]{3}$/.test(iso3)) err(`${where}: iso3 must be 3 uppercase letters`);
+      if (!c || !c.name || !String(c.name).trim()) err(`${where}: name is required`);
+      if (!REGIONS.includes(c && c.region)) err(`${where}: region must be a WHO region code (got "${c && c.region}")`);
+      checkProducts(where, c && c.products);
+      for (const [part, v] of Object.entries((c && c.parts) || {})) checkProducts(`${where} (${part})`, v && v.products);
+      if (drawn && c && Object.keys(c.products || {}).length && !(iso3 in drawn)) undrawn.push(iso3);
+    }
+    if (Number.isInteger(m.countryCount) && m.countryCount !== entries.length)
+      err(`${tag} meta.countryCount says ${m.countryCount} but ${entries.length} countries were found — rerun the normalizer`);
+    if (undrawn.length)
+      warn(`${tag}: ${undrawn.length} country value(s) with a dashboard product in policy fall outside the drawn basemap and are invisible on the map (${undrawn.join(", ")})`);
+
+    return { errors, warnings };
+  }
+
   // ---- the source registry contract ----------------------------------------
   // data/sources.js is what the public Sources footer is drawn from, so a
   // malformed entry is a footer that silently loses a source rather than a
@@ -493,6 +607,6 @@
 
   return {
     STATUSES, DATA_STATUSES, PHASES, DATASETS, SOURCE_GROUPS, SOURCE_COLLECTION,
-    extractData, checkData, checkStudyLayers, checkSources
+    extractData, checkData, checkStudyLayers, checkTreatmentPolicy, checkSources
   };
 });

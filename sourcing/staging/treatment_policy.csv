@@ -1,0 +1,325 @@
+iso3,country,part,who_region,product_id,product,tested,untested,severe,pregnancy,vivax
+AFG,Afghanistan,,EMRO,ganlum,GanLum,0,0,0,0,0
+AFG,Afghanistan,,EMRO,alaq,ALAQ,0,0,0,0,0
+AFG,Afghanistan,,EMRO,pyramax,ASPY,0,0,0,0,0
+AFG,Afghanistan,,EMRO,dhappq,DHA–PPQ,0,0,0,0,0
+AGO,Angola,,AFRO,ganlum,GanLum,0,0,0,0,0
+AGO,Angola,,AFRO,alaq,ALAQ,0,0,0,0,0
+AGO,Angola,,AFRO,pyramax,ASPY,0,0,0,0,0
+AGO,Angola,,AFRO,dhappq,DHA–PPQ,1,1,0,0,1
+BDI,Burundi,,AFRO,ganlum,GanLum,0,0,0,0,0
+BDI,Burundi,,AFRO,alaq,ALAQ,0,0,0,0,0
+BDI,Burundi,,AFRO,pyramax,ASPY,0,0,0,0,0
+BDI,Burundi,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+BEN,Benin,,AFRO,ganlum,GanLum,0,0,0,0,0
+BEN,Benin,,AFRO,alaq,ALAQ,0,0,0,0,0
+BEN,Benin,,AFRO,pyramax,ASPY,0,0,0,0,0
+BEN,Benin,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+BFA,Burkina Faso,,AFRO,ganlum,GanLum,0,0,0,0,0
+BFA,Burkina Faso,,AFRO,alaq,ALAQ,0,0,0,0,0
+BFA,Burkina Faso,,AFRO,pyramax,ASPY,1,0,0,0,0
+BFA,Burkina Faso,,AFRO,dhappq,DHA–PPQ,1,0,0,0,0
+BGD,Bangladesh,,SEARO,ganlum,GanLum,0,0,0,0,0
+BGD,Bangladesh,,SEARO,alaq,ALAQ,0,0,0,0,0
+BGD,Bangladesh,,SEARO,pyramax,ASPY,0,0,0,0,0
+BGD,Bangladesh,,SEARO,dhappq,DHA–PPQ,0,0,0,0,0
+BOL,Bolivia (Plurinational State of),,AMRO,ganlum,GanLum,0,0,0,0,0
+BOL,Bolivia (Plurinational State of),,AMRO,alaq,ALAQ,0,0,0,0,0
+BOL,Bolivia (Plurinational State of),,AMRO,pyramax,ASPY,0,0,0,0,0
+BOL,Bolivia (Plurinational State of),,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+BRA,Brazil,,AMRO,ganlum,GanLum,0,0,0,0,0
+BRA,Brazil,,AMRO,alaq,ALAQ,0,0,0,0,0
+BRA,Brazil,,AMRO,pyramax,ASPY,0,0,0,0,0
+BRA,Brazil,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+BWA,Botswana,,AFRO,ganlum,GanLum,0,0,0,0,0
+BWA,Botswana,,AFRO,alaq,ALAQ,0,0,0,0,0
+BWA,Botswana,,AFRO,pyramax,ASPY,0,0,0,0,0
+BWA,Botswana,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+CAF,Central African Republic,,AFRO,ganlum,GanLum,0,0,0,0,0
+CAF,Central African Republic,,AFRO,alaq,ALAQ,0,0,0,0,0
+CAF,Central African Republic,,AFRO,pyramax,ASPY,0,0,0,0,0
+CAF,Central African Republic,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+CIV,Côte d'Ivoire,,AFRO,ganlum,GanLum,0,0,0,0,0
+CIV,Côte d'Ivoire,,AFRO,alaq,ALAQ,0,0,0,0,0
+CIV,Côte d'Ivoire,,AFRO,pyramax,ASPY,0,0,0,0,0
+CIV,Côte d'Ivoire,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+CMR,Cameroon,,AFRO,ganlum,GanLum,0,0,0,0,0
+CMR,Cameroon,,AFRO,alaq,ALAQ,0,0,0,0,0
+CMR,Cameroon,,AFRO,pyramax,ASPY,1,0,0,0,0
+CMR,Cameroon,,AFRO,dhappq,DHA–PPQ,1,0,0,0,0
+COD,Democratic Republic of the Congo,,AFRO,ganlum,GanLum,0,0,0,0,0
+COD,Democratic Republic of the Congo,,AFRO,alaq,ALAQ,0,0,0,0,0
+COD,Democratic Republic of the Congo,,AFRO,pyramax,ASPY,1,0,0,0,0
+COD,Democratic Republic of the Congo,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+COG,Congo,,AFRO,ganlum,GanLum,0,0,0,0,0
+COG,Congo,,AFRO,alaq,ALAQ,0,0,0,0,0
+COG,Congo,,AFRO,pyramax,ASPY,0,0,0,0,0
+COG,Congo,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+COL,Colombia,,AMRO,ganlum,GanLum,0,0,0,0,0
+COL,Colombia,,AMRO,alaq,ALAQ,0,0,0,0,0
+COL,Colombia,,AMRO,pyramax,ASPY,0,0,0,0,0
+COL,Colombia,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+COM,Comoros,,AFRO,ganlum,GanLum,0,0,0,0,0
+COM,Comoros,,AFRO,alaq,ALAQ,0,0,0,0,0
+COM,Comoros,,AFRO,pyramax,ASPY,0,0,0,0,0
+COM,Comoros,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+CRI,Costa Rica,,AMRO,ganlum,GanLum,0,0,0,0,0
+CRI,Costa Rica,,AMRO,alaq,ALAQ,0,0,0,0,0
+CRI,Costa Rica,,AMRO,pyramax,ASPY,0,0,0,0,0
+CRI,Costa Rica,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+DJI,Djibouti,,EMRO,ganlum,GanLum,0,0,0,0,0
+DJI,Djibouti,,EMRO,alaq,ALAQ,0,0,0,0,0
+DJI,Djibouti,,EMRO,pyramax,ASPY,0,0,0,0,0
+DJI,Djibouti,,EMRO,dhappq,DHA–PPQ,0,0,0,0,0
+DOM,Dominican Republic,,AMRO,ganlum,GanLum,0,0,0,0,0
+DOM,Dominican Republic,,AMRO,alaq,ALAQ,0,0,0,0,0
+DOM,Dominican Republic,,AMRO,pyramax,ASPY,0,0,0,0,0
+DOM,Dominican Republic,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+ECU,Ecuador,,AMRO,ganlum,GanLum,0,0,0,0,0
+ECU,Ecuador,,AMRO,alaq,ALAQ,0,0,0,0,0
+ECU,Ecuador,,AMRO,pyramax,ASPY,0,0,0,0,0
+ECU,Ecuador,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+ERI,Eritrea,,AFRO,ganlum,GanLum,0,0,0,0,0
+ERI,Eritrea,,AFRO,alaq,ALAQ,0,0,0,0,0
+ERI,Eritrea,,AFRO,pyramax,ASPY,0,0,0,0,0
+ERI,Eritrea,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+ETH,Ethiopia,,AFRO,ganlum,GanLum,0,0,0,0,0
+ETH,Ethiopia,,AFRO,alaq,ALAQ,0,0,0,0,0
+ETH,Ethiopia,,AFRO,pyramax,ASPY,0,0,0,0,0
+ETH,Ethiopia,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+GAB,Gabon,,AFRO,ganlum,GanLum,0,0,0,0,0
+GAB,Gabon,,AFRO,alaq,ALAQ,0,0,0,0,0
+GAB,Gabon,,AFRO,pyramax,ASPY,0,0,0,0,0
+GAB,Gabon,,AFRO,dhappq,DHA–PPQ,1,1,0,0,0
+GHA,Ghana,,AFRO,ganlum,GanLum,0,0,0,0,0
+GHA,Ghana,,AFRO,alaq,ALAQ,0,0,0,0,0
+GHA,Ghana,,AFRO,pyramax,ASPY,0,0,0,0,0
+GHA,Ghana,,AFRO,dhappq,DHA–PPQ,0,1,0,0,1
+GIN,Guinea,,AFRO,ganlum,GanLum,0,0,0,0,0
+GIN,Guinea,,AFRO,alaq,ALAQ,0,0,0,0,0
+GIN,Guinea,,AFRO,pyramax,ASPY,0,0,0,0,0
+GIN,Guinea,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+GMB,Gambia,,AFRO,ganlum,GanLum,0,0,0,0,0
+GMB,Gambia,,AFRO,alaq,ALAQ,0,0,0,0,0
+GMB,Gambia,,AFRO,pyramax,ASPY,0,0,0,0,0
+GMB,Gambia,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+GNB,Guinea-Bissau,,AFRO,ganlum,GanLum,0,0,0,0,0
+GNB,Guinea-Bissau,,AFRO,alaq,ALAQ,0,0,0,0,0
+GNB,Guinea-Bissau,,AFRO,pyramax,ASPY,0,0,0,0,0
+GNB,Guinea-Bissau,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+GNQ,Equatorial Guinea,,AFRO,ganlum,GanLum,0,0,0,0,0
+GNQ,Equatorial Guinea,,AFRO,alaq,ALAQ,0,0,0,0,0
+GNQ,Equatorial Guinea,,AFRO,pyramax,ASPY,0,0,0,0,0
+GNQ,Equatorial Guinea,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+GTM,Guatemala,,AMRO,ganlum,GanLum,0,0,0,0,0
+GTM,Guatemala,,AMRO,alaq,ALAQ,0,0,0,0,0
+GTM,Guatemala,,AMRO,pyramax,ASPY,0,0,0,0,0
+GTM,Guatemala,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+GUF,French Guiana,,AMRO,ganlum,GanLum,0,0,0,0,0
+GUF,French Guiana,,AMRO,alaq,ALAQ,0,0,0,0,0
+GUF,French Guiana,,AMRO,pyramax,ASPY,0,0,0,0,0
+GUF,French Guiana,,AMRO,dhappq,DHA–PPQ,1,0,0,0,0
+GUY,Guyana,,AMRO,ganlum,GanLum,0,0,0,0,0
+GUY,Guyana,,AMRO,alaq,ALAQ,0,0,0,0,0
+GUY,Guyana,,AMRO,pyramax,ASPY,0,0,0,0,0
+GUY,Guyana,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+HND,Honduras,,AMRO,ganlum,GanLum,0,0,0,0,0
+HND,Honduras,,AMRO,alaq,ALAQ,0,0,0,0,0
+HND,Honduras,,AMRO,pyramax,ASPY,0,0,0,0,0
+HND,Honduras,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+HTI,Haiti,,AMRO,ganlum,GanLum,0,0,0,0,0
+HTI,Haiti,,AMRO,alaq,ALAQ,0,0,0,0,0
+HTI,Haiti,,AMRO,pyramax,ASPY,0,0,0,0,0
+HTI,Haiti,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+IDN,Indonesia,,WPRO,ganlum,GanLum,0,0,0,0,0
+IDN,Indonesia,,WPRO,alaq,ALAQ,0,0,0,0,0
+IDN,Indonesia,,WPRO,pyramax,ASPY,0,0,0,0,0
+IDN,Indonesia,,WPRO,dhappq,DHA–PPQ,1,0,0,0,1
+IND,India,,SEARO,ganlum,GanLum,0,0,0,0,0
+IND,India,,SEARO,alaq,ALAQ,0,0,0,0,0
+IND,India,,SEARO,pyramax,ASPY,0,0,0,0,0
+IND,India,,SEARO,dhappq,DHA–PPQ,0,0,0,0,0
+IRN,Iran (Islamic Republic of),,EMRO,ganlum,GanLum,0,0,0,0,0
+IRN,Iran (Islamic Republic of),,EMRO,alaq,ALAQ,0,0,0,0,0
+IRN,Iran (Islamic Republic of),,EMRO,pyramax,ASPY,0,0,0,0,0
+IRN,Iran (Islamic Republic of),,EMRO,dhappq,DHA–PPQ,0,0,0,0,0
+KEN,Kenya,,AFRO,ganlum,GanLum,0,0,0,0,0
+KEN,Kenya,,AFRO,alaq,ALAQ,0,0,0,0,0
+KEN,Kenya,,AFRO,pyramax,ASPY,0,0,0,0,0
+KEN,Kenya,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+KHM,Cambodia,,WPRO,ganlum,GanLum,0,0,0,0,0
+KHM,Cambodia,,WPRO,alaq,ALAQ,0,0,0,0,0
+KHM,Cambodia,,WPRO,pyramax,ASPY,0,0,0,0,0
+KHM,Cambodia,,WPRO,dhappq,DHA–PPQ,0,0,0,0,0
+KOR,Republic of Korea,,WPRO,ganlum,GanLum,0,0,0,0,0
+KOR,Republic of Korea,,WPRO,alaq,ALAQ,0,0,0,0,0
+KOR,Republic of Korea,,WPRO,pyramax,ASPY,1,1,0,0,0
+KOR,Republic of Korea,,WPRO,dhappq,DHA–PPQ,0,0,0,0,0
+LAO,Lao People's Democratic Republic,,WPRO,ganlum,GanLum,0,0,0,0,0
+LAO,Lao People's Democratic Republic,,WPRO,alaq,ALAQ,0,0,0,0,0
+LAO,Lao People's Democratic Republic,,WPRO,pyramax,ASPY,0,0,0,0,0
+LAO,Lao People's Democratic Republic,,WPRO,dhappq,DHA–PPQ,0,0,0,0,0
+LBR,Liberia,,AFRO,ganlum,GanLum,0,0,0,0,0
+LBR,Liberia,,AFRO,alaq,ALAQ,0,0,0,0,0
+LBR,Liberia,,AFRO,pyramax,ASPY,0,0,0,0,0
+LBR,Liberia,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+MDG,Madagascar,,AFRO,ganlum,GanLum,0,0,0,0,0
+MDG,Madagascar,,AFRO,alaq,ALAQ,0,0,0,0,0
+MDG,Madagascar,,AFRO,pyramax,ASPY,0,0,0,0,0
+MDG,Madagascar,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+MEX,Mexico,,AMRO,ganlum,GanLum,0,0,0,0,0
+MEX,Mexico,,AMRO,alaq,ALAQ,0,0,0,0,0
+MEX,Mexico,,AMRO,pyramax,ASPY,0,0,0,0,0
+MEX,Mexico,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+MLI,Mali,,AFRO,ganlum,GanLum,0,0,0,0,0
+MLI,Mali,,AFRO,alaq,ALAQ,0,0,0,0,0
+MLI,Mali,,AFRO,pyramax,ASPY,0,0,0,0,0
+MLI,Mali,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+MMR,Myanmar,,SEARO,ganlum,GanLum,0,0,0,0,0
+MMR,Myanmar,,SEARO,alaq,ALAQ,0,0,0,0,0
+MMR,Myanmar,,SEARO,pyramax,ASPY,0,0,0,0,0
+MMR,Myanmar,,SEARO,dhappq,DHA–PPQ,0,0,0,0,0
+MOZ,Mozambique,,AFRO,ganlum,GanLum,0,0,0,0,0
+MOZ,Mozambique,,AFRO,alaq,ALAQ,0,0,0,0,0
+MOZ,Mozambique,,AFRO,pyramax,ASPY,0,0,0,0,0
+MOZ,Mozambique,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+MRT,Mauritania,,AFRO,ganlum,GanLum,0,0,0,0,0
+MRT,Mauritania,,AFRO,alaq,ALAQ,0,0,0,0,0
+MRT,Mauritania,,AFRO,pyramax,ASPY,0,0,0,0,0
+MRT,Mauritania,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+MWI,Malawi,,AFRO,ganlum,GanLum,0,0,0,0,0
+MWI,Malawi,,AFRO,alaq,ALAQ,0,0,0,0,0
+MWI,Malawi,,AFRO,pyramax,ASPY,0,0,0,0,0
+MWI,Malawi,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+NAM,Namibia,,AFRO,ganlum,GanLum,0,0,0,0,0
+NAM,Namibia,,AFRO,alaq,ALAQ,0,0,0,0,0
+NAM,Namibia,,AFRO,pyramax,ASPY,0,0,0,0,0
+NAM,Namibia,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+NER,Niger,,AFRO,ganlum,GanLum,0,0,0,0,0
+NER,Niger,,AFRO,alaq,ALAQ,0,0,0,0,0
+NER,Niger,,AFRO,pyramax,ASPY,0,0,0,0,0
+NER,Niger,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+NGA,Nigeria,,AFRO,ganlum,GanLum,0,0,0,0,0
+NGA,Nigeria,,AFRO,alaq,ALAQ,0,0,0,0,0
+NGA,Nigeria,,AFRO,pyramax,ASPY,1,0,0,0,0
+NGA,Nigeria,,AFRO,dhappq,DHA–PPQ,1,0,0,0,0
+NIC,Nicaragua,,AMRO,ganlum,GanLum,0,0,0,0,0
+NIC,Nicaragua,,AMRO,alaq,ALAQ,0,0,0,0,0
+NIC,Nicaragua,,AMRO,pyramax,ASPY,0,0,0,0,0
+NIC,Nicaragua,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+NPL,Nepal,,SEARO,ganlum,GanLum,0,0,0,0,0
+NPL,Nepal,,SEARO,alaq,ALAQ,0,0,0,0,0
+NPL,Nepal,,SEARO,pyramax,ASPY,0,0,0,0,0
+NPL,Nepal,,SEARO,dhappq,DHA–PPQ,0,0,0,0,0
+PAK,Pakistan,,EMRO,ganlum,GanLum,0,0,0,0,0
+PAK,Pakistan,,EMRO,alaq,ALAQ,0,0,0,0,0
+PAK,Pakistan,,EMRO,pyramax,ASPY,0,0,0,0,0
+PAK,Pakistan,,EMRO,dhappq,DHA–PPQ,0,0,0,0,0
+PAN,Panama,,AMRO,ganlum,GanLum,0,0,0,0,0
+PAN,Panama,,AMRO,alaq,ALAQ,0,0,0,0,0
+PAN,Panama,,AMRO,pyramax,ASPY,0,0,0,0,0
+PAN,Panama,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+PER,Peru,,AMRO,ganlum,GanLum,0,0,0,0,0
+PER,Peru,,AMRO,alaq,ALAQ,0,0,0,0,0
+PER,Peru,,AMRO,pyramax,ASPY,0,0,0,0,0
+PER,Peru,,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+PHL,Philippines,,WPRO,ganlum,GanLum,0,0,0,0,0
+PHL,Philippines,,WPRO,alaq,ALAQ,0,0,0,0,0
+PHL,Philippines,,WPRO,pyramax,ASPY,0,0,0,0,0
+PHL,Philippines,,WPRO,dhappq,DHA–PPQ,0,0,0,0,0
+PNG,Papua New Guinea,,WPRO,ganlum,GanLum,0,0,0,0,0
+PNG,Papua New Guinea,,WPRO,alaq,ALAQ,0,0,0,0,0
+PNG,Papua New Guinea,,WPRO,pyramax,ASPY,0,0,0,0,0
+PNG,Papua New Guinea,,WPRO,dhappq,DHA–PPQ,0,0,1,0,0
+PRK,Democratic People's Republic of Korea,,SEARO,ganlum,GanLum,0,0,0,0,0
+PRK,Democratic People's Republic of Korea,,SEARO,alaq,ALAQ,0,0,0,0,0
+PRK,Democratic People's Republic of Korea,,SEARO,pyramax,ASPY,0,0,0,0,0
+PRK,Democratic People's Republic of Korea,,SEARO,dhappq,DHA–PPQ,0,0,0,0,0
+RWA,Rwanda,,AFRO,ganlum,GanLum,0,0,0,0,0
+RWA,Rwanda,,AFRO,alaq,ALAQ,0,0,0,0,0
+RWA,Rwanda,,AFRO,pyramax,ASPY,0,0,0,0,0
+RWA,Rwanda,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+SDN,Sudan,,EMRO,ganlum,GanLum,0,0,0,0,0
+SDN,Sudan,,EMRO,alaq,ALAQ,0,0,0,0,0
+SDN,Sudan,,EMRO,pyramax,ASPY,0,0,0,0,0
+SDN,Sudan,,EMRO,dhappq,DHA–PPQ,0,0,0,0,0
+SEN,Senegal,,AFRO,ganlum,GanLum,0,0,0,0,0
+SEN,Senegal,,AFRO,alaq,ALAQ,0,0,0,0,0
+SEN,Senegal,,AFRO,pyramax,ASPY,0,0,0,0,0
+SEN,Senegal,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+SLB,Solomon Islands,,WPRO,ganlum,GanLum,0,0,0,0,0
+SLB,Solomon Islands,,WPRO,alaq,ALAQ,0,0,0,0,0
+SLB,Solomon Islands,,WPRO,pyramax,ASPY,0,0,0,0,0
+SLB,Solomon Islands,,WPRO,dhappq,DHA–PPQ,0,0,0,0,0
+SLE,Sierra Leone,,AFRO,ganlum,GanLum,0,0,0,0,0
+SLE,Sierra Leone,,AFRO,alaq,ALAQ,0,0,0,0,0
+SLE,Sierra Leone,,AFRO,pyramax,ASPY,0,0,0,0,0
+SLE,Sierra Leone,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+SOM,Somalia,,EMRO,ganlum,GanLum,0,0,0,0,0
+SOM,Somalia,,EMRO,alaq,ALAQ,0,0,0,0,0
+SOM,Somalia,,EMRO,pyramax,ASPY,0,0,0,0,0
+SOM,Somalia,,EMRO,dhappq,DHA–PPQ,0,0,0,0,0
+SSD,South Sudan,,AFRO,ganlum,GanLum,0,0,0,0,0
+SSD,South Sudan,,AFRO,alaq,ALAQ,0,0,0,0,0
+SSD,South Sudan,,AFRO,pyramax,ASPY,0,0,0,0,1
+SSD,South Sudan,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+STP,Sao Tome and Principe,,AFRO,ganlum,GanLum,0,0,0,0,0
+STP,Sao Tome and Principe,,AFRO,alaq,ALAQ,0,0,0,0,0
+STP,Sao Tome and Principe,,AFRO,pyramax,ASPY,0,0,0,0,0
+STP,Sao Tome and Principe,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+SWZ,Eswatini,,AFRO,ganlum,GanLum,0,0,0,0,0
+SWZ,Eswatini,,AFRO,alaq,ALAQ,0,0,0,0,0
+SWZ,Eswatini,,AFRO,pyramax,ASPY,0,0,0,0,0
+SWZ,Eswatini,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+TCD,Chad,,AFRO,ganlum,GanLum,0,0,0,0,0
+TCD,Chad,,AFRO,alaq,ALAQ,0,0,0,0,0
+TCD,Chad,,AFRO,pyramax,ASPY,0,0,0,0,0
+TCD,Chad,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+TGO,Togo,,AFRO,ganlum,GanLum,0,0,0,0,0
+TGO,Togo,,AFRO,alaq,ALAQ,0,0,0,0,0
+TGO,Togo,,AFRO,pyramax,ASPY,0,0,0,0,0
+TGO,Togo,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+THA,Thailand,,SEARO,ganlum,GanLum,0,0,0,0,0
+THA,Thailand,,SEARO,alaq,ALAQ,0,0,0,0,0
+THA,Thailand,,SEARO,pyramax,ASPY,1,0,0,0,0
+THA,Thailand,,SEARO,dhappq,DHA–PPQ,1,0,0,0,0
+TZA,United Republic of Tanzania (mainland),,AFRO,ganlum,GanLum,0,0,0,0,0
+TZA,United Republic of Tanzania (mainland),,AFRO,alaq,ALAQ,0,0,0,0,0
+TZA,United Republic of Tanzania (mainland),,AFRO,pyramax,ASPY,0,0,0,0,0
+TZA,United Republic of Tanzania (mainland),,AFRO,dhappq,DHA–PPQ,1,1,0,0,0
+TZA,United Republic of Tanzania (mainland),Zanzibar,AFRO,ganlum,GanLum,0,0,0,0,0
+TZA,United Republic of Tanzania (mainland),Zanzibar,AFRO,alaq,ALAQ,0,0,0,0,0
+TZA,United Republic of Tanzania (mainland),Zanzibar,AFRO,pyramax,ASPY,0,0,0,0,0
+TZA,United Republic of Tanzania (mainland),Zanzibar,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+UGA,Uganda,,AFRO,ganlum,GanLum,0,0,0,0,0
+UGA,Uganda,,AFRO,alaq,ALAQ,0,0,0,0,0
+UGA,Uganda,,AFRO,pyramax,ASPY,0,0,0,0,0
+UGA,Uganda,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+VEN,Venezuela (Bolivarian Republic of),,AMRO,ganlum,GanLum,0,0,0,0,0
+VEN,Venezuela (Bolivarian Republic of),,AMRO,alaq,ALAQ,0,0,0,0,0
+VEN,Venezuela (Bolivarian Republic of),,AMRO,pyramax,ASPY,0,0,0,0,0
+VEN,Venezuela (Bolivarian Republic of),,AMRO,dhappq,DHA–PPQ,0,0,0,0,0
+VNM,Viet Nam,,WPRO,ganlum,GanLum,0,0,0,0,0
+VNM,Viet Nam,,WPRO,alaq,ALAQ,0,0,0,0,0
+VNM,Viet Nam,,WPRO,pyramax,ASPY,0,1,0,0,0
+VNM,Viet Nam,,WPRO,dhappq,DHA–PPQ,1,1,0,0,0
+VUT,Vanuatu,,WPRO,ganlum,GanLum,0,0,0,0,0
+VUT,Vanuatu,,WPRO,alaq,ALAQ,0,0,0,0,0
+VUT,Vanuatu,,WPRO,pyramax,ASPY,0,0,0,0,0
+VUT,Vanuatu,,WPRO,dhappq,DHA–PPQ,0,0,0,0,0
+YEM,Yemen,,EMRO,ganlum,GanLum,0,0,0,0,0
+YEM,Yemen,,EMRO,alaq,ALAQ,0,0,0,0,0
+YEM,Yemen,,EMRO,pyramax,ASPY,0,0,0,0,0
+YEM,Yemen,,EMRO,dhappq,DHA–PPQ,0,0,0,0,0
+ZAF,South Africa,,AFRO,ganlum,GanLum,0,0,0,0,0
+ZAF,South Africa,,AFRO,alaq,ALAQ,0,0,0,0,0
+ZAF,South Africa,,AFRO,pyramax,ASPY,0,0,0,0,0
+ZAF,South Africa,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+ZMB,Zambia,,AFRO,ganlum,GanLum,0,0,0,0,0
+ZMB,Zambia,,AFRO,alaq,ALAQ,0,0,0,0,0
+ZMB,Zambia,,AFRO,pyramax,ASPY,0,0,0,0,0
+ZMB,Zambia,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0
+ZWE,Zimbabwe,,AFRO,ganlum,GanLum,0,0,0,0,0
+ZWE,Zimbabwe,,AFRO,alaq,ALAQ,0,0,0,0,0
+ZWE,Zimbabwe,,AFRO,pyramax,ASPY,0,0,0,0,0
+ZWE,Zimbabwe,,AFRO,dhappq,DHA–PPQ,0,0,0,0,0

@@ -31,11 +31,11 @@ cp synthetic/index.html synthetic/option-b.html synthetic/pipeline.html \
 # Shared data
 cp data/products.js data/products.synthetic.js data/world-map.js \
    data/world-map-geo.js data/resistance.js data/molecular-markers.js \
-   data/sources.js "$OUT/data/"
+   data/sources.js data/treatment-policy.js "$OUT/data/"
 
 # Shared assets
 cp assets/journey-icons/icons.js assets/journey-icons/icons-solid.js "$OUT/assets/journey-icons/"
-cp assets/who-emblem.svg assets/unitaid-mark.svg assets/report-issue.js "$OUT/assets/"
+cp assets/who-emblem.svg assets/unitaid-logo.svg assets/report-issue.js assets/site-nav.js "$OUT/assets/"
 
 # French and Portuguese editions of the illustrated journey dashboard, from
 # the translation memory (docs/translation-notes.md). --allow-stale because a

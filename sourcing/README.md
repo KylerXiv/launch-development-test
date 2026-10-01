@@ -29,6 +29,7 @@ one a positive EU-M4all / Article 58 opinion). Either way a person approves it.
 | `node scripts/fetch-nafdac.js` | **NAFDAC Greenbook** — Nigeria's public medicines register (Laravel/DataTables JSON endpoint; plain HTTP by necessity — the host's HTTPS hangs after handshake, checked 2026-08-23) | Monthly | `staging/nafdac_registrations.csv` (portfolio registrations, `iso3=NGA`: reg. no., composition, form, applicant, approval/expiry dates, Active/Inactive status) and `reports/nafdac-watch-<date>.md` diffing new registrations and status/expiry changes. The template for other NRA registers. |
 | `node scripts/fetch-tmda.js` | **TMDA IMIS2** — Tanzania's public register of medicines (Angular SPA's JSON backend: common-name lookup → paged search per candidate ingredient) | Monthly | `staging/tmda_registrations.csv` (portfolio registrations, `iso3=TZA`: certificate no., brand, active ingredient, manufacturer, issue/expiry dates, status) and `reports/tmda-watch-<date>.md`. Second NRA register, same pattern as NAFDAC. |
 | `node scripts/normalize-resistance.js [file]` | **WHO Malaria Threat Maps** — antimalarial drug efficacy and resistance; input is a **manually exported** therapeutic-efficacy sheet (see below) | On WHO release (roughly annual) | `staging/resistance_tes.csv` (every study, one row each) and `data/resistance.js` — `window.LAUNCH_RESISTANCE`, holding `studies[]` (all of them, behind the click-through panel) and two aggregated dot layers, `treatmentFailure` and `delayedClearance`. Both come out of this one extract: delayed clearance is its `POSITIVE_DAY_3 (days)` column, so it needs no second download. Read by the resistance overlay on `illustrated-journey-dashboard.html`. No species or sample-size filter is applied; only rows WHO publishes without a usable value or coordinates are dropped, and the script reports the count. Raw extract kept under `raw/mtm/`. |
+| `node scripts/normalize-treatment-policy.js [file]` | **WHO World Malaria Report, Annex 4B** — national antimalarial drug policy per country; input is a **manually downloaded** annex workbook (see below) | Yearly, on each World Malaria Report (usually December) | `staging/treatment_policy.csv` (one row per country × dashboard product, a 0/1 column per patient group) and `data/treatment-policy.js` — `window.LAUNCH_TREATMENT_POLICY`. Only the four dashboard products are kept (GanLum, ALAQ, ASPY, DHA–PPQ); every other drug in the annex is dropped and never written. Read by the **Show MFT policy** switch on `illustrated-journey-dashboard.html`. Policy is what a country lists, not what it uses. Raw workbook and its CSV export kept under `raw/wmr/`. |
 | `node scripts/normalize-pqr.js <file>` | Global Fund **PQR** Transaction Summary — input is a **manually downloaded** Tableau crosstab (see below) | Quarterly | `staging/procurement_transactions.csv` — scoped to the malaria-relevant market (anti-malaria medicine + vector-control categories, plus any portfolio match; the ~99k-row full crosstab is mostly ARV/TB), all columns passed through, headers camelCased, portfolio `productId` prepended. Full crosstab kept gzipped under `raw/pqr/`. |
 
 **The PQR manual step** (~2 minutes; scripted export is confirmed blocked by
@@ -60,6 +61,21 @@ extract carries a known source-data defect: 38 Tanzanian rows are coded `TA`
 for both country and ISO2. The normalizer maps them to `TZA` rather than
 dropping them, because Tanzania is one of the two register-verified countries
 in `data/products.js`; see the comment on `A2_TO_A3` in the script.
+
+**The WHO World Malaria Report annex manual step** (~2 minutes, once a year;
+same reason as above — WHO serves `.xlsx` only):
+
+1. Open the [World Malaria Report annexes](https://www.who.int/publications/m/item/annexes-world-malaria-report-2025)
+   (or the next edition's page) and download **Annex 4B — Antimalarial drug policy**.
+2. Save it unchanged as `raw/wmr/<data-as-of date>-wmr<year>-annex-4b.xlsx`.
+3. `python3 scripts/mtm-xlsx-to-csv.py <that .xlsx> sourcing/raw/wmr --prefix <same stem>`
+   and rename the `…-annex-b.csv` it writes to `<same stem>.csv`.
+4. Update `EXTRACT`, `EDITION`, `POLICY_YEAR` and `LAST_VERIFIED` at the top of
+   `scripts/normalize-treatment-policy.js` and run it. It stops on any country
+   name it cannot map to ISO3 — add it to `NAME_TO_ISO3` rather than guessing.
+
+WHO's publication licence is CC BY-NC-SA 3.0 IGO; WHO is credited in `meta.source`
+and on the page. Full design notes: `docs/jackson/MFT-policy-map.md`.
 
 ## Running manually
 
