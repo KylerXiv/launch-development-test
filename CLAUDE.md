@@ -35,25 +35,23 @@ back **byte-identical**; the validator is expected to report a **specific**
 error/warning count, not merely to exit cleanly.
 
 ```bash
-node scripts/normalize-resistance.js          # regenerate; expect byte-identical
-node scripts/normalize-molecular-markers.js   # ditto
-node scripts/normalize-treatment-policy.js    # ditto
-node scripts/validate-data.js                 # expect 0 errors, 6 warnings
+node scripts/normalize-treatment-policy.js    # regenerate; expect byte-identical
+node scripts/validate-data.js                 # expect 0 errors, 1 warning
 node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 warnings
 node scripts/make-preview.js                  # smoke test
+node scripts/test-build-dataset.js            # RBM dashboard.json: expect 0 failed
 ```
 
-The 6 warnings are 3 + 2 + 1: three long-standing `resistance:` ones (1 unnamed
-site, 730 uncited studies, 12 undrawn country values), two
-`molecular markers:` ones (625 uncited surveys, 9 undrawn country values) and
-one `treatment policy:` one (French Guiana lists a dashboard product but is
-not drawn on the basemap). Any other split means something moved.
+The 1 warning is `treatment policy:` (French Guiana lists a dashboard product
+but is not drawn on the basemap). Anything else means something moved. (The
+WHO resistance overlay and its 5 warnings were removed on 1 Oct 2026; see
+docs/remove-resistance-notes.md.)
 
-`scripts/verify-map-clusters.js` also exists but needs puppeteer, which is not
-installed here. Headless Chrome additionally needs a software GL backend or
-MapLibre never finishes initialising and the whole page looks broken — add
+Headless Chrome needs a software GL backend or MapLibre never finishes
+initialising and the whole page looks broken — add
 `--enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader` and drop
-`--disable-gpu`.
+`--disable-gpu`. Even then the map canvas may stay blank headless; check the
+map in a real browser.
 
 Review diffs with `git diff --ignore-cr-at-eol`. Files on disk are CRLF and the
 repo stores LF, so a raw `git diff` shows whole-file churn that is not real.

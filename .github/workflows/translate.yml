@@ -16,6 +16,11 @@ name: Translate new text
 #
 # Manual run: Actions → "Translate new text" → Run workflow — for instance once
 # the engine is back after a failure.
+#
+# After an approval (publish.yml passes after_approval=true) it is the last
+# step of the chain, so it starts publish-dataset.yml, which publishes
+# dashboard.json to RBM's data repo. A push to main or a manual run does not
+# publish; that is the "Publish now" button's job.
 
 on:
   push:
@@ -23,12 +28,14 @@ on:
     paths:
       - illustrated-journey-dashboard.html
       - data/products.js
-      - data/resistance.js
-      - data/molecular-markers.js
       - data/sources.js
       - scripts/assemble-content.js
-      - scripts/i18n-identifiers.js
   workflow_dispatch:
+    inputs:
+      after_approval:
+        description: "Set by publish.yml after an approval: publish to RBM's data repo when done. Leave unticked."
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -88,6 +95,16 @@ jobs:
           git commit -m "chore: translate new text [bot]"
           git push
           gh workflow run vercel-deploy.yml --ref main
+
+      # Only after an approval, and only when everything above passed — also
+      # when there was nothing new to translate, the usual case. An engine
+      # failure does not stop it: the step that reports it comes next, and
+      # untranslated text is published in English, as on /fr and /pt.
+      - name: Publish to RBM's data repo
+        if: success() && inputs.after_approval
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run publish-dataset.yml --ref main -f trigger=approval -f reason="Proposal approval"
 
       - name: Say that the engine failed
         if: steps.translate.outputs.failed != ''

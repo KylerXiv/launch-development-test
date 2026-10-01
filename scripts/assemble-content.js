@@ -14,17 +14,14 @@
  * by contentHash, is approved". It has three parts:
  *
  *   text         every translatable string, with its translation key
- *   values       products.js, resistance.js, molecular-markers.js and
- *                sources.js, parsed, each with its own sha256. Never sent to a
- *                translation engine.
+ *   values       products.js and sources.js, parsed, each with its own
+ *                sha256. Never sent to a translation engine.
  *   contentHash  one digest over text + values
  *
  * Three buckets of text, because they are found and substituted differently:
  *
  *   data    the strings the page renders out of data/*.js, at an explicit
- *           allow-list of field paths. For the two WHO files this is the meta
- *           block plus dict.country — NOT the study rows, which are numbers
- *           and codes, and NOT dict.drug / dict.marker, which are join keys.
+ *           allow-list of field paths.
  *   markup  visible text nodes and rendering attributes in the static HTML
  *           above the <script src="data/..."> block.
  *   js      string literals inside the page's own JavaScript that reach the
@@ -40,18 +37,12 @@
 const fs = require("fs");
 const path = require("path");
 
-const { identifiers } = require("./i18n-identifiers");
 const { key, digest } = require("./i18n-hash");
 
 const ROOT = path.resolve(__dirname, "..");
-// Drug, marker and species names are LOOKUP KEYS, not labels — the page pivots
-// and indexes on them. Derived from the data, never hand-listed.
-const IDENT = identifiers(ROOT);
 const PAGE = "illustrated-journey-dashboard.html";
 const GLOBALS = {
   "data/products.js": "window.LAUNCH_DATA",
-  "data/resistance.js": "window.LAUNCH_RESISTANCE",
-  "data/molecular-markers.js": "window.LAUNCH_MOLECULAR_MARKERS",
   "data/sources.js": "window.LAUNCH_SOURCES",
 };
 
@@ -72,7 +63,6 @@ function collect() {
   const add = (bucket, text, where, quote) => {
     const t = String(text == null ? "" : text).trim();
     if (!t || !/[A-Za-z]{2}/.test(t)) return;
-    if (IDENT.has(t)) return;                    // identifier, not a label — never translated
     const k = bucket + "\u0000" + t;
     if (seen.has(k)) return;
     seen.add(k);
@@ -114,35 +104,6 @@ function collect() {
     (p.stages || []).forEach((st, j) => add("data", st.note, `${b}.stages[${j}].note`));
     (p.journey || []).forEach((j2, j) => add("data", j2.label, `${b}.journey[${j}].label`));
   });
-
-  // the two WHO files: meta prose + the dict columns the threat map decodes.
-  //
-  // dict.source and dict.citation are provenance and stay English.
-  //
-  // dict.drug and dict.marker are JOIN KEYS, not labels, and are deliberately
-  // excluded. The page pivots its study rows through
-  //     codeOf(field, value) => DS().dict[field].indexOf(value)
-  // where `value` is a key of the untranslated pivot object DS()[LAYER]. Translate
-  // the dictionary and every indexOf returns -1, every row is skipped, and the
-  // threat map draws nothing at all while throwing no error. dict.country is safe
-  // — the location filter matches on iso3 and the country dropdown is built from
-  // data/world-map.js, so dict.country is only ever displayed.
-  for (const [rel, tag] of [["data/resistance.js", "resistance"],
-                            ["data/molecular-markers.js", "markers"]]) {
-    const D = readDataFile(rel);
-    const m = D.meta || {};
-    add("data", m.metric, `${tag}.meta.metric`);
-    add("data", m.rule, `${tag}.meta.rule`);
-    add("data", m.derivation, `${tag}.meta.derivation`);
-    Object.entries(m.metrics || {}).forEach(([k, v]) => {
-      add("data", v.short, `${tag}.meta.metrics.${k}.short`);
-      add("data", v.full, `${tag}.meta.metrics.${k}.full`);
-    });
-    Object.entries(m.markerDrug || {}).forEach(([k, v]) => add("data", v, `${tag}.meta.markerDrug[${JSON.stringify(k)}]`));
-    for (const col of ["country"]) {                       // NOT drug/marker — join keys
-      (((D.dict || {})[col]) || []).forEach((v, i) => add("data", v, `${tag}.dict.${col}[${i}]`));
-    }
-  }
 
   // sources.js: the Sources footer, rendered from the registry since 9c6be45.
   // Exactly what renderSources() puts on the page, for public entries only —

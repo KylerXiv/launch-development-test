@@ -1,0 +1,178 @@
+name: Publish to RBM data repo
+
+# Builds dashboard.json (scripts/build-dataset.js) from main and publishes it to
+# the public data repo that RBM's dashboard pages fetch at runtime.
+#
+# STARTS
+#   - by itself at the end of every approval: proposal-decision.yml → publish.yml
+#     → translate.yml, which starts this with trigger=approval once French and
+#     Portuguese are settled;
+#   - by hand ("Publish now"): Actions → "Publish to RBM data repo" → Run
+#     workflow, with a reason. For changes that reach main without a proposal:
+#     a revert, the yearly WHO update, a direct fix. Tick "dry run" to see what
+#     would change without publishing.
+#
+# UNDO. Revert the change on main, then Publish now. Emergency only: revert the
+# publish commit in the data repo, then ALWAYS revert main too — the drift check
+# below refuses to publish over a hand change to v1/dashboard.json, so a
+# forgotten main revert can never silently bring bad data back.
+#
+# NEEDS (Settings → Secrets and variables → Actions of THIS repo):
+#   variable RBM_DATA_REPO          owner/name of the public data repo
+#   secret   DATA_REPO_DEPLOY_KEY   private half of a deploy key with write
+#                                   access on that repo
+# With RBM_DATA_REPO unset the run builds and checks, then stops with a notice.
+#
+# Its own concurrency group: it pushes to another repo, never to main, so it
+# must not queue behind (or cancel) the bot-push-main runs. A third queued run
+# replacing a pending one is harmless here: every run builds from main as it
+# is at that moment, so the one that runs publishes the latest state.
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why are you publishing? (shown in the data repo's history)"
+        required: false
+        type: string
+      dry_run:
+        description: "Dry run: show what would change, publish nothing"
+        type: boolean
+        default: false
+      trigger:
+        description: "Leave as manual. The approval chain sets 'approval' itself."
+        type: choice
+        options: [manual, approval]
+        default: manual
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-dataset
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      DATA_REPO: ${{ vars.RBM_DATA_REPO }}
+    steps:
+      # main as it is now, not the commit that started this run
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The reason reaches the shell through env only: it is typed by a person,
+      # and `${{ }}` inside run: would execute it.
+      - name: Check the request
+        env:
+          TRIGGER: ${{ inputs.trigger }}
+          REASON: ${{ inputs.reason }}
+        run: |
+          if [ "$TRIGGER" = "manual" ] && [ -z "$(printf '%s' "$REASON" | tr -d '[:space:]')" ]; then
+            echo "::error::Say why you are publishing (the reason box). It goes into the data repo's history."
+            exit 1
+          fi
+
+      - name: Build dashboard.json and check it
+        env:
+          PUBLISH_TRIGGER: ${{ inputs.trigger }}
+          PUBLISHED_BY: ${{ github.actor }}
+          PUBLISH_REASON: ${{ inputs.reason }}
+        run: |
+          node scripts/build-dataset.js --out "$RUNNER_TEMP/dashboard.json"
+          node scripts/test-build-dataset.js
+
+      - name: Is a data repo set?
+        id: target
+        run: |
+          if [ -z "$DATA_REPO" ]; then
+            echo "::notice::No RBM_DATA_REPO variable is set, so nothing is published. dashboard.json was built and checked."
+            echo "set=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "set=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.target.outputs.set == 'true'
+        with:
+          repository: ${{ vars.RBM_DATA_REPO }}
+          ssh-key: ${{ secrets.DATA_REPO_DEPLOY_KEY }}
+          path: data-repo
+          fetch-depth: 0
+
+      # The last commit that touched the published file must be one of ours.
+      # Anything else (a hand revert, an edit) means main and the data repo may
+      # disagree, and publishing now could undo that change without anyone
+      # noticing.
+      - name: Drift check
+        if: steps.target.outputs.set == 'true'
+        working-directory: data-repo
+        run: |
+          LAST=$(git log -1 --format='%H%x09%s' -- v1/dashboard.json || true)
+          if [ -z "$LAST" ]; then
+            echo "First publish: no v1/dashboard.json yet."
+            exit 0
+          fi
+          case "$LAST" in
+            *"[publish-dataset]"*) echo "OK: v1/dashboard.json was last written by this workflow." ;;
+            *)
+              SHA=$(printf '%s' "$LAST" | cut -f1 | cut -c1-7)
+              echo "::error::The data repo's v1/dashboard.json was changed outside this workflow (commit $SHA). Make main match that change (for an emergency revert: revert the same change on main), then publish again."
+              exit 1 ;;
+          esac
+
+      - name: What changes for RBM
+        id: diff
+        run: |
+          OLD=-
+          [ -f data-repo/v1/dashboard.json ] && OLD=data-repo/v1/dashboard.json
+          node scripts/dataset-diff.js "$OLD" "$RUNNER_TEMP/dashboard.json" --out "$RUNNER_TEMP/changes.md"
+          {
+            echo "### dashboard.json"
+            echo
+            cat "$RUNNER_TEMP/changes.md"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish
+        if: steps.target.outputs.set == 'true' && !inputs.dry_run && steps.diff.outputs.changed == 'true'
+        working-directory: data-repo
+        env:
+          WHO: ${{ github.actor }}
+        run: |
+          STAMP=$(node -p 'require(process.env.RUNNER_TEMP + "/dashboard.json").generated_at.replace(/:/g, "-").replace(/\.\d+Z$/, "Z")')
+          mkdir -p v1/archive
+          cp "$RUNNER_TEMP/dashboard.json" v1/dashboard.json
+          cp "$RUNNER_TEMP/dashboard.json" "v1/archive/$STAMP.json"
+          cp ../public-data/v1/schema.json v1/schema.json
+          # newest entry first, under the file's own three-line header
+          [ -f CHANGELOG.md ] || printf '%s\n\n%s\n' "# Changelog" 'Every publish of `v1/dashboard.json`, newest first. Written by the publish workflow.' > CHANGELOG.md
+          {
+            head -n 3 CHANGELOG.md
+            echo
+            echo "## $STAMP"
+            echo
+            cat "$RUNNER_TEMP/changes.md"
+            tail -n +4 CHANGELOG.md
+          } > "$RUNNER_TEMP/CHANGELOG.md"
+          mv "$RUNNER_TEMP/CHANGELOG.md" CHANGELOG.md
+          SUBJECT=$(node -p 'const d = require(process.env.RUNNER_TEMP + "/dashboard.json"); d.approval.trigger === "approval" ? `Published after proposal #${d.approval.issue}, approved by @${d.approved_by}` : `Published by @${d.approved_by}: ${d.approval.reason}`' | head -c 200)
+          git config user.name  "launch-dashboard-bot"
+          git config user.email "actions@github.com"
+          git add v1 CHANGELOG.md
+          git commit -q -m "$SUBJECT [publish-dataset]" -m "Built from the pipeline repo at $(git -C .. rev-parse HEAD) by $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          git push
+          echo "Published: https://$(echo "$DATA_REPO" | cut -d/ -f1 | tr 'A-Z' 'a-z').github.io/$(echo "$DATA_REPO" | cut -d/ -f2)/v1/dashboard.json" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Say why nothing was published
+        if: steps.target.outputs.set == 'true' && (inputs.dry_run || steps.diff.outputs.changed != 'true')
+        env:
+          DRY: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY" = "true" ]; then echo "Dry run: nothing published." >> "$GITHUB_STEP_SUMMARY";
+          else echo "Nothing to publish: the data is identical to what is published." >> "$GITHUB_STEP_SUMMARY"; fi

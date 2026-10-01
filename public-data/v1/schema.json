@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oakkar-min.github.io/launch-data-test/v1/schema.json",
+  "title": "LAUNCH dashboard dataset, version 1",
+  "description": "The one file the RBM dashboard pages fetch. Every text a reader sees is given in English, French and Portuguese. Fields not listed here may be added without a version change; pages must ignore fields they do not know. Renaming, removing or retyping a listed field is a breaking change and moves to v2/. scripts/build-dataset.js checks every build against this file.",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "approved_at", "approved_by", "approval", "pipeline_commit",
+               "content_hash", "locales", "data_status", "last_updated", "source_coverage", "data"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "generated_at": { "type": "string", "description": "When this file was built (ISO 8601, UTC)." },
+    "approved_at": { "type": "string", "description": "When the change it publishes was approved: the approval date, or the time of a manual publish. Show this as 'last updated'." },
+    "approved_by": { "type": "string", "description": "GitHub login of the approver, or of whoever clicked Publish now." },
+    "approval": {
+      "type": "object",
+      "required": ["trigger", "issue", "pr", "reason"],
+      "properties": {
+        "trigger": { "enum": ["approval", "manual"] },
+        "issue": { "type": ["integer", "null"], "description": "Proposal issue number, for an approval." },
+        "pr": { "type": ["integer", "null"] },
+        "reason": { "type": ["string", "null"], "description": "Why it was published, for a manual publish." }
+      }
+    },
+    "pipeline_commit": { "type": "string", "description": "Commit of the private pipeline repo this was built from." },
+    "content_hash": { "type": "string", "description": "contentHash of the English content (i18n/content.en.json) at that commit." },
+    "locales": { "type": "array", "items": { "enum": ["en", "fr", "pt"] } },
+    "data_status": { "enum": ["illustrative", "draft", "live"], "description": "draft = compiled from public sources, pending verification. Pages should show a notice unless live." },
+    "last_updated": { "type": "string", "description": "When the data itself was last changed (meta.lastUpdated)." },
+    "source_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "url", "collection"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "$ref": "#/$defs/text" },
+          "url": { "type": ["string", "null"] },
+          "collection": { "enum": ["automated", "manual", "static", "blocked", "none"] }
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "required": ["stages", "stageColumns", "stageInfo", "glossary", "changelog", "products", "treatmentPolicy", "sources"],
+      "properties": {
+        "stages": { "type": "array", "items": { "$ref": "#/$defs/text" }, "description": "The eight pathway stages, in order. A product's stages[i] is its status at stages[i]." },
+        "stageColumns": { "type": "array", "items": { "type": "object", "required": ["stages"] } },
+        "stageInfo": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["what", "who", "stall"],
+            "properties": {
+              "what": { "$ref": "#/$defs/text" },
+              "who": { "$ref": "#/$defs/text" },
+              "stall": { "$ref": "#/$defs/text" }
+            }
+          }
+        },
+        "glossary": { "type": "object", "description": "Term → definition. Terms (keys) stay as written; definitions are text." },
+        "changelog": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["date", "product", "plain"],
+            "properties": { "date": { "type": "string" }, "product": { "type": "string" }, "plain": { "$ref": "#/$defs/textOrNull", "description": "Older entries have none (null)." } }
+          }
+        },
+        "products": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "class", "currentStage", "stages", "detail"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "class": { "enum": ["pipeline", "market"] },
+              "classLabel": { "$ref": "#/$defs/textOrNull" },
+              "flag": { "$ref": "#/$defs/textOrNull" },
+              "barrier": { "$ref": "#/$defs/textOrNull" },
+              "currentStage": { "type": "integer" },
+              "stages": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": { "enum": ["done", "prog", "late", "idle"] },
+                    "note": { "$ref": "#/$defs/textOrNull" },
+                    "next": { "$ref": "#/$defs/textOrNull" }
+                  }
+                }
+              },
+              "detail": {
+                "type": "object",
+                "properties": {
+                  "countries": {
+                    "type": "object",
+                    "required": ["status", "list"],
+                    "properties": {
+                      "status": { "enum": ["illustrative", "draft", "verified"], "description": "Anything but verified must be shown with a warning, as the dashboard does." },
+                      "note": { "type": "string" },
+                      "list": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["iso3", "level"],
+                          "properties": {
+                            "iso3": { "type": "string" },
+                            "level": { "enum": ["registered", "guidelines", "mft"] }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "treatmentPolicy": {
+          "type": "object",
+          "required": ["meta", "countries"],
+          "description": "WHO World Malaria Report Annex 4B for the four dashboard medicines, as in data/treatment-policy.js. English only."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "url", "plain"],
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "$ref": "#/$defs/textOrNull" },
+              "title": { "$ref": "#/$defs/textOrNull" },
+              "url": { "type": ["string", "null"] },
+              "plain": { "$ref": "#/$defs/text" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "object",
+      "required": ["en", "fr", "pt"],
+      "properties": { "en": { "type": "string" }, "fr": { "type": "string" }, "pt": { "type": "string" } },
+      "description": "A text a reader sees. fr and pt fall back to the English where no translation exists yet."
+    },
+    "textOrNull": { "anyOf": [{ "$ref": "#/$defs/text" }, { "type": "null" }] }
+  }
+}

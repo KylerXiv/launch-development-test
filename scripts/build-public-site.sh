@@ -34,7 +34,7 @@ cp synthetic/index.html synthetic/option-b.html synthetic/pipeline.html \
 
 # Shared data
 cp data/products.js data/products.synthetic.js data/world-map.js \
-   data/world-map-geo.js data/resistance.js data/molecular-markers.js \
+   data/world-map-geo.js \
    data/sources.js data/treatment-policy.js "$OUT/data/"
 
 # Shared assets

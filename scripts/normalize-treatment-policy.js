@@ -133,7 +133,7 @@ const NAME_TO_ISO3 = {
 // its own policy is never lost or merged into the mainland's.
 const TZA_PARTS = { "Mainland": "mainland", "Zanzibar": "Zanzibar" };
 
-// ---- CSV (same minimal RFC4180 reader as normalize-resistance.js) -----------
+// ---- CSV (a minimal RFC4180 reader) -----------
 function parseCsv(text) {
   const rows = [];
   let row = [], field = "", quoted = false;

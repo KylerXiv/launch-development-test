@@ -3,12 +3,11 @@
 
     python3 scripts/mtm-xlsx-to-csv.py <export.xlsx> <out-dir> [--prefix 2026-09-09-mm]
 
-Why this exists: scripts/normalize-resistance.js documents the .xlsx -> CSV
-step as manual ("cannot be read without a dependency and this repo has none").
-That is true of Node here, but an .xlsx is a zip of XML and Python's standard
+Why this exists: WHO publishes these extracts as .xlsx, which Node cannot read
+here without a dependency, and this repo has none. But an .xlsx is a zip of XML and Python's standard
 library reads both, so the step does not have to be manual and does not add a
 dependency. The archived CSVs remain the reproducible input that CI and
-teammates run the normalizers against -- this script only removes the trip
+teammates run the normalizer against -- this script only removes the trip
 through Excel that used to produce them.
 
 Sheet names are slugified into file names. The Disclaimer and Glossary sheets

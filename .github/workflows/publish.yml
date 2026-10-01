@@ -29,7 +29,13 @@ jobs:
   snapshot:
     runs-on: ubuntu-latest
     steps:
+      # main as it is now, not the commit that started this run: after an
+      # approval the decision job pushes its record to main while this run
+      # waits in bot-push-main, and committing on the older parent was refused
+      # at push ("fetch first") after every approval (handover §7 item 1).
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -84,8 +90,9 @@ jobs:
       # run, so dispatched from there alongside this one, it would have been a
       # second pending run and cancelled this one.
       # A push to main starts the bot by itself, so only dispatched runs do this.
+      # after_approval=true tells it to publish to RBM's data repo when done.
       - name: Start the translate bot
         if: always() && github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run translate.yml --ref main
+        run: gh workflow run translate.yml --ref main -f after_approval=true
