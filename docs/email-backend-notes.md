@@ -1,20 +1,22 @@
 # Email backend for the forms — working notes
 
 This document covers `api/`, the Vercel functions behind
-`illustrated-journey-dashboard.html`'s forms. **Today that is Subscribe for
-updates only**, as three functions: `subscribe.js`, `confirm.js` and
-`unsubscribe.js`, with shared code in `_mail.js`. Send feedback follows as its
-own change (§2.8). Per [CLAUDE.md](../CLAUDE.md), this document is updated in
-the same commit as any change it describes. What the visitor sees is covered
-in [illustrated-journey-ui-notes.md](illustrated-journey-ui-notes.md) §3.10.
-The scoping this builds on is in
+`illustrated-journey-dashboard.html`'s two forms: **Subscribe for updates**
+(`subscribe.js`, `confirm.js`, `unsubscribe.js`) and, since 2 Oct, **Send
+feedback** (`feedback.js`), with shared code in `_mail.js`. Per
+[CLAUDE.md](../CLAUDE.md), this document is updated in the same commit as any
+change it describes. What the visitor sees is covered in
+[illustrated-journey-ui-notes.md](illustrated-journey-ui-notes.md) §3.10
+(Subscribe) and §3.27 (Send feedback). The scoping this builds on is in
 [Handoff_Kyler.md](Handoff_Kyler/Handoff_Kyler.md), under "Newly scoped — the
 two buttons, and a backend for them" (23 Sep 2026).
 
 The code was first written on 29 Sep for both forms and left uncommitted. On
-1 Oct it was saved as-is on `email-feedback-wip` (`b39c3b0`, rebased onto
-`main`), and this branch took the Subscribe half of it. Later on 1 Oct,
-Subscribe became double opt-in (§2.3).
+1 Oct it was saved as-is on `email-feedback-wip` (`b39c3b0`), and
+`email-subscribe` (PR #30, merged 1 Oct) took the Subscribe half of it.
+Subscribe became double opt-in the same day (§2.3). On 2 Oct
+`email-feedback` took the feedback half, fitted to the widget as Keith had
+reworked it on 30 Sep (§2.12).
 
 ---
 
@@ -79,6 +81,41 @@ missing.
    # → 400 "Please enter an email address…" means it is deployed and configured;
    #   503 "Not configured." means a secret or the inbox is missing
    ```
+
+7. **Send feedback needs nothing more.** It uses the same key, secret and
+   `ADDRESSES.to`, and it never writes a contact or emails the visitor.
+   Test on the illustrated journey page:
+   1. Send feedback, with an email address filled in. The dialog says
+      "Thanks — your feedback has been sent." and shows a
+      `LAUNCH-XXXXXXXX` reference.
+   2. An email `[LAUNCH feedback] … (LAUNCH-XXXXXXXX)` arrives at `to`,
+      with the same reference, the message, the page and the data version.
+   3. Reply to it. The reply is addressed to the address typed in the form.
+   4. Another page (Pipeline, say) still shows Send blocked and the red
+      "Mock only" note.
+
+   From a terminal, without sending anything:
+
+   ```bash
+   curl -sS -X POST https://<host>/api/feedback \
+     -H 'Content-Type: application/json' -d '{"message":"short"}'
+   # → 400 "Please describe the issue…" means it is deployed and configured;
+   #   503 "Not configured." means a secret or the inbox is missing
+   ```
+8. **Before real visitors, add the rate-limit rule** (§2.9). Vercel → the
+   project (not the team) → **Firewall** in its sidebar → **Configure**, top
+   right → **+ New Rule**:
+   - name it, e.g. "Form endpoints";
+   - **If** Request Path *starts with* `/api/`, and Method is `POST` (every
+     condition must hold);
+   - **Then** *Rate Limit*: Fixed Window, Time Window **10 minutes**,
+     Request Limit **5**, counted by **IP**, action Default (429);
+   - **Save Rule**, then **Review Changes** → **Publish**. Nothing applies
+     until it is published. No redeploy is needed.
+
+   A Hobby project gets exactly one rate-limit rule, with a window of 10 s
+   to 10 min (Vercel's docs, read 2 Oct). Both forms already show their
+   failure message on a 429.
 
 **Sending updates to subscribers** is a Resend broadcast to the segment. It is
 written and sent from the Resend dashboard, not from this repo. Include
@@ -265,26 +302,37 @@ cleanly to Keith's reworked page. One conflict, in `docs/developer-guide.md`'s
 repo map, was resolved by keeping `main`'s wording for
 `assets/report-issue.js` and adding the `api/` row beneath it.
 
-The feedback half is kept whole on `email-feedback-wip`: its function, its 29
-tests, the two `_mail.js` helpers only it uses (`block`, `newRef`), and its
-doc sections (the opt-in `LAUNCH_FEEDBACK_ENDPOINT`, server-made references).
-On this branch, Send feedback is exactly as `main` has it: a mock, with Send
-blocked and the red flag in its dialog.
+The feedback half was kept whole on `email-feedback-wip`: its function, its
+29 tests, the two `_mail.js` helpers only it uses (`block`, `newRef`), and
+its doc sections (the opt-in `LAUNCH_FEEDBACK_ENDPOINT`, server-made
+references). Until 2 Oct, Send feedback stayed as `main` had it: a mock, with
+Send blocked and the red flag in its dialog.
+
+**The split held.** On 2 Oct `email-feedback` brought the feedback half
+across from `b39c3b0`, onto `main` at `2d3d8cb`. The function, the two
+helpers and the tests ported nearly unchanged. Its switch did not: Keith's
+rework already had one, so the 29 Sep switch was dropped in its favour
+(§2.12).
 
 ### 2.9 Abuse guards, and what was left out
 
-- **Same-origin only** on `/api/subscribe`. A request whose `Origin` does not
-  match its own host (`Host` or `x-forwarded-host`) gets a 403. A request with
+- **Same-origin only** on `/api/subscribe` and `/api/feedback`. A request
+  whose `Origin` does not match its own host (`Host` or `x-forwarded-host`) gets a 403. A request with
   no `Origin` is allowed through: that is curl or a server, which could forge
   the header anyway. This guard is against other *websites* using the
   endpoint. The link endpoints apply the same check to POSTs, plus the null
   Origin of §2.4.
-- **JSON only** on `/api/subscribe` (415 otherwise). Besides being all the
-  form sends, it forces a CORS preflight on any cross-origin browser request.
+- **JSON only** on both (415 otherwise). Besides being all the forms
+  send, it forces a CORS preflight on any cross-origin browser request.
   The function never answers one (OPTIONS gets a 405 with no CORS headers).
 - **The browser's validation, repeated on the server.** The same email regex
-  and a 254-character cap. CR/LF cannot reach a header, and every value in
-  every email and page is HTML-escaped.
+  and a 254-character cap, and for feedback the same 10-to-2000-character
+  message. CR/LF cannot reach a header, every value in every email and page
+  is HTML-escaped, and nothing a visitor typed ever becomes a link.
+- **Feedback mails only the team.** The address typed in the form goes into
+  Reply-To and nowhere else. So, unlike Subscribe, the form cannot be used to
+  mail a stranger. It can only fill the team inbox and spend the daily Resend
+  allowance (§4).
 - **The link pages** are `no-store`, `noindex`, sent with no Referer, and have
   a CSP that allows no script, no framing and posting only to themselves.
 - **One confirm email per submission, to whatever address is typed.** That
@@ -296,17 +344,29 @@ blocked and the red flag in its dialog.
   honeypot anyway.
 - **No rate limiting in the function.** Serverless instances share no memory,
   so an in-function counter limits nothing reliably. The place for it is a
-  Vercel Firewall rate-limit rule on `/api/*`. That is a dashboard setting,
-  not repo code (§4).
+  Vercel Firewall rate-limit rule on POSTs to `/api/*`. That is a dashboard
+  setting, not repo code (§1 step 8).
+- **The rule's numbers: 5 POSTs per IP per 10 minutes.** A real subscriber
+  makes 2 (subscribe, then confirm), and someone sending feedback makes 1
+  per report, so 5 leaves room for a retry or a shared office connection.
+  10 minutes is the longest window Vercel offers. Even at 1 per 10 minutes,
+  one IP could still make 144 requests a day, above Resend's 100 emails a
+  day. So the rule slows a script and stops a runaway loop, but it cannot
+  protect the daily allowance on its own. The rule also counts the mail
+  app's one-click unsubscribe, which arrives from the mail provider's
+  servers. At this list's size that is not expected to hit the limit. If it
+  did, the 429 would leave the address subscribed, but Resend's own
+  broadcast unsubscribe link would still work.
 
 ### 2.10 Logs never carry the address
 
 Function logs are kept under whatever retention the Vercel project has (the
 handoff flagged this). Successes log `[subscribe] confirmation sent`,
-`[confirm] subscribed, team notified` and `[unsubscribe] unsubscribed`, and
-nothing else. A failure logs the HTTP status plus Resend's error name and
-message. A test runs six cases (success and failure for each function) and
-fails if any log names the address. Request logs carry the link URLs, which
+`[confirm] subscribed, team notified`, `[unsubscribe] unsubscribed` and
+`[feedback] sent LAUNCH-…` (the reference only), and nothing else. A failure
+logs the HTTP status plus Resend's error name and message. A test runs eight
+cases (success and failure for each function) and fails if any log names the
+address, or for feedback the message. Request logs carry the link URLs, which
 is why the tokens are encrypted (§2.5).
 
 ### 2.11 Translation: nothing to do in `i18n/`
@@ -318,9 +378,136 @@ English, as the translation design intends ("English does not wait for
 French"). **The emails and the confirm and unsubscribe pages are English
 only** (§4).
 
+Send feedback adds nothing to translate either. Its strings live in
+`assets/report-issue.js`, which the locale build copies unchanged, so the
+widget has always been English on `/fr` and `/pt`. That includes its new
+"sent" wording, and the team's email is English too.
+
+### 2.12 Send feedback: one switch, on one page
+
+**Which pages send.** The owner decided on 2 Oct: the illustrated journey
+only. `assets/report-issue.js` is loaded by 13 pages:
+
+| Pages | Send feedback |
+| --- | --- |
+| The illustrated journey, and its `/fr/` and `/pt/` editions, built from it and served from the same Vercel project | **sends** |
+| `index`, `option-b`, `pipeline` and `story`, and the same four under `unitaid/` | mock, as before: Send blocked, red note |
+| The four under `synthetic/` (fabricated data) | no widget at all: a broken path, found in passing (§4) |
+| RBM's copies of the illustrated journey (`dist/rbm/`) | mock: switched off by the build (below) |
+
+**One switch: `connected`.** Keith's 30 Sep rework (`3b121d0`) gave the
+widget a `connected` key, which until now only unblocked Send. The 29 Sep
+code had its own switch, `window.LAUNCH_FEEDBACK_ENDPOINT`. Keeping both was
+rejected. Two switches make four states, and two of them are wrong:
+
+- `connected` without an endpoint is a working Send button, with a "sent"
+  screen, over nothing sent;
+- an endpoint without `connected` is a form that could post, but whose
+  button is blocked.
+
+So `connected: true` now does both. The endpoint is fixed in the widget as
+`/api/feedback`, the only one there is. The path is absolute, so `/fr/` and
+`/pt/` reach it.
+
+**The wording follows the switch.** A connected widget defaults its note,
+done title and done message to wording that says the message was sent. Every
+other page keeps the mock wording as its default. The 29 Sep code put the
+"sent" wording in the page's own overrides instead. That was rejected,
+because a second page switched on later would show "Mock only" above a
+working Send button, and "this isn't sent anywhere" after sending. A page's
+overrides still win. The note now names the browser as well as the page and
+the data version. The payload has always carried `userAgent`, but the 29 Sep
+note left it out.
+
+**RBM's copies are switched off explicitly.** `build-rbm-pages.js` rewrites
+`connected: true` to `connected: false`, and its test checks for that. RBM
+hosts those files without `api/`, so a connected copy would fail every report
+against an `/api/feedback` that is not there. Two alternatives were rejected:
+
+- **Relying on script order.** In RBM's copies, the page's inline scripts
+  wait for `dashboard.json`, and `report-issue.js` runs before that. So today
+  the widget there never sees the page's settings at all, and stays a mock by
+  accident (§4). Fixing that ordering would silently switch posting on.
+- **Letting RBM's copies post across origins to the LAUNCH project.** That
+  means answering CORS preflights and relaxing the same-origin guard (§2.9),
+  which is what stops other sites using the endpoint as a relay. It needs
+  RBM's origin and a decision, not a default.
+
+**Same configuration as Subscribe.** `feedback.js` uses the same `config()`,
+so it answers 503 without `UNSUBSCRIBE_SECRET`, although it encrypts
+nothing. A separate configuration per function was rejected. One switch-on
+list (§1) covers all four functions, and both secrets are already set, for
+Production and Preview.
+
+**The server makes the reference**, as on 29 Sep: `LAUNCH-` plus 8 hex
+characters from `crypto.randomBytes` (2^32 values). It is returned to the
+dialog and put in the subject line of the team's copy, so a reference someone
+quotes can be found by search. The browser-made reference it replaces was 4
+characters from the clock plus 2 random ones.
+
+**The team reads fixed labels.** `feedback.js` maps the four type values to
+four labels of its own, whatever a page calls them. The subject is
+`[LAUNCH feedback] <label> — <medicine> (<reference>)`. Replying goes to the
+visitor, through Reply-To. If no address was given, the email says it cannot
+be answered.
+
 ---
 
-## 3. How it was verified (1 Oct 2026)
+## 3. How it was verified
+
+**2 Oct 2026, Send feedback**
+
+- **`node scripts/test-mail-api.js`: 153 checks, all passing.** That is the
+  111 below plus 42 new ones for feedback, covering:
+  - the request guard and configuration;
+  - the team's email: recipient, sender, Reply-To, subject with the same
+    reference, page and data version;
+  - validation and its limits, unknown types, escaping, and CR/LF typed
+    into a field;
+  - Resend refusing or timing out;
+  - the logging rule.
+- **Mutation check: eight deliberate breaks to `feedback.js`, each caught.**
+  They were:
+  - Reply-To dropped;
+  - the 10-character minimum removed;
+  - the message logged;
+  - the reference left out of the subject;
+  - CR/LF let into the subject;
+  - a failed send reported as sent;
+  - the request guard skipped;
+  - the 2000-character cap removed.
+
+  Seven each failed a named check; one crashed the run.
+- **`node scripts/test-build-rbm-pages.js`: 11 passed**, one of them new: RBM's
+  copies are not connected. The real build was also checked: `connected:
+  false` in all three `dist/rbm/` pages, and `true` in `dist/locale/fr/`.
+- **Browser:** headless Chrome on the repo, with the real `api/feedback.js`
+  behind a local server and Resend stubbed. **29 checks, all passing, and no
+  JavaScript errors.**
+  - On the illustrated journey, Send is live and the note is the privacy
+    line. A too-short message posts nothing.
+  - A report shows "Thanks — your feedback has been sent." with the same
+    reference as the email's subject. The email goes to the team, with
+    Reply-To the visitor, and carries the page and data version.
+  - When Resend fails, the dialog shows its failure alert and keeps the
+    message, and the retry goes through. An unconfigured server shows the
+    same alert.
+  - The `/fr/` edition sends too.
+  - `index`, `pipeline`, `story`, `unitaid/index`, `unitaid/pipeline`, and
+    RBM's `en` and `fr` copies: Send blocked, red note, and pressing Send
+    posts nothing.
+- **`vercel build` was not rerun**: the CLI is not installed on this
+  machine. The PR preview's build is the check that `api/feedback` is now a
+  fourth function.
+- **Verify block from CLAUDE.md:** `normalize-treatment-policy.js`
+  byte-identical; `0 errors, 1 warning`; synthetic 0/0; `make-preview.js`
+  clean; `test-build-dataset.js` 28 passed. No NUL bytes in any touched
+  file.
+
+Not yet seen with real Resend. That is the owner's test on the preview (§1
+step 7).
+
+**1 Oct 2026, Subscribe**
 
 - **`node scripts/test-mail-api.js`: 111 checks, all passing.** `fetch` is
   stubbed, so no key or network is needed. They cover:
@@ -392,8 +579,11 @@ documented there, and the rest of the preview test settles them:
 **Before real visitors**
 
 - **The team inbox is one person's address** (`kyler@oqtiva.ai`), chosen
-  for testing. The handoff asks for a shared mailbox, because these outlive
-  whoever is on the project. Changing it is one line in `ADDRESSES`.
+  for testing and kept for feedback on 2 Oct. Feedback lands there too, and
+  replies to the public go out from it. The handoff asks for a shared
+  mailbox, because these outlive whoever is on the project. Changing it is
+  one line in `ADDRESSES`.
+- **The rate-limit rule is not set yet** (§1 step 8, §2.9).
 - **The sender is on `tamarind.tech`**, the developer's domain, not Unitaid's.
   The handoff expects a Unitaid sending domain (item 2). Changing it means
   verifying that domain in Resend, then changing one line. The emails now go
@@ -401,11 +591,12 @@ documented there, and the rest of the preview test settles them:
 
 **Deferred on purpose**
 
-- **Send feedback** (§2.8): next, from `email-feedback-wip`, reconciled with
-  whatever this branch settles first.
-- **Rate limiting** (§2.9): a Vercel Firewall rule on `/api/*`. Under double
-  opt-in it is what stops the form being used to send repeated confirm emails
-  to one address.
+- **Send feedback on the other pages.** The owner chose the illustrated
+  journey only (§2.12). Switching another page on is one key,
+  `connected: true`, in its `LAUNCH_FEEDBACK_COPY`. The fabricated-data
+  pages should stay off.
+- **Send feedback in RBM's copies** (§2.12). This needs cross-origin posting
+  to the LAUNCH project, or RBM's own intake.
 - **The emails and link pages in French and Portuguese.** A visitor on `/fr`
   gets English emails. The page they came from is known, but the email text
   would need a reviewed translation, not the engine's.
@@ -415,7 +606,7 @@ documented there, and the rest of the preview test settles them:
 - **PR previews and the secrets.** `pr-preview.yml` builds the functions into
   every preview. With both secrets set for Preview, a confirmed subscribe on a
   preview saves a real contact into the real segment and mails the real inbox
-  (§2.6). Without them, the preview's form shows the failure message. For
+  (§2.6). So does a feedback report sent from a preview. Without them, the preview's form shows the failure message. For
   testing this change they go on Preview. Whether they stay there after merge
   is an open choice.
 - **Silent failure.** If the account lapses or the domain falls out of DKIM
@@ -425,20 +616,37 @@ documented there, and the rest of the preview test settles them:
 - **Resend's free plan limits** were recorded on 29 Sep as 100 emails a day,
   3,000 a month and 1,000 contacts, and not rechecked. Each confirmed
   subscription is now three emails (confirm, welcome, team note) plus one
-  contact. An unconfirmed attempt is one email.
+  contact. An unconfirmed attempt is one email, and so is each feedback
+  report. Both forms share the allowance, so a spam run on either one blocks
+  both for the rest of the day. The rate-limit rule cannot prevent that on
+  its own (§2.9).
 - **Who receives submissions.** The privacy line says "the LAUNCH team" and
   deliberately names no organisation. Handoff item 6, the data controller, is
   still Unitaid's to answer. It is more pressing now that the project emails
   members of the public.
 - **`frame-ancestors`, and panel positioning inside a tall iframe** (handoff).
-  The Subscribe panel floats against the iframe's viewport. Test against
-  RBM's staging frame.
+  The Subscribe panel floats against the iframe's viewport, and the feedback
+  dialog is centred in it. Test against RBM's staging frame. In RBM's own
+  copies, Send feedback is a mock (§2.12), so this matters only if the LAUNCH
+  site itself is framed.
 
 **Found in passing, left alone**
 
 - **`.DS_Store` is untracked in three places** (`/`, `data/`, `sourcing/`).
   The one-line `.gitignore` fix sits on `email-feedback-wip`, and was never
   part of this work.
+- **`synthetic/`'s four pages have no Send feedback widget at all.** They load
+  `assets/report-issue.js` relative to `synthetic/`, and neither the repo nor
+  the public build has a `synthetic/assets/`. So the script 404s, there is no
+  pill, and the footer's "Report an issue" link does nothing. `unitaid/`
+  uses `../assets/` and works. This predates the change and was left alone.
+  Those pages are not to send, and whether to fix the path or drop the
+  widget from fabricated data is a separate decision.
+- **RBM's copies never see the page's widget settings.** The inline script
+  that sets `LAUNCH_FEEDBACK_COPY` waits for `dashboard.json`, but the widget
+  has already run by then. So the dialog there shows the default wording,
+  and sends `page.view` as null. This was left alone. Since §2.12 switches
+  `connected` off explicitly, fixing it is now safe.
 - **Developer-guide §8 still says the site is served from GitHub Pages.**
   Production is on Vercel. Not corrected here; it needs someone who knows the
   current hosting arrangement to rewrite it.
@@ -449,11 +657,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `email-subscribe`, rebased onto `main` at `3c747bc` on 1 Oct (first cut from `a42b8e0`) |
-| Commits | 5: the Subscribe change, the addresses, the inbox moved to `kyler@oqtiva.ai`, double opt-in, Unsubscribe on the "already subscribed" page |
-| Pull request | #30 against `main`, open, not merged |
+| Branch | `email-feedback`, from `main` at `2d3d8cb` (2 Oct) |
+| Commits | 1: Send feedback on the illustrated journey |
+| Pull request | against `main`, opened with this commit; not merged |
 | CI | runs on that pull request |
-| New files | `api/_mail.js`, `api/subscribe.js`, `api/confirm.js`, `api/unsubscribe.js`, `scripts/test-mail-api.js`, this document |
-| Changed | `illustrated-journey-dashboard.html` (Subscribe only), `scripts/build-public-site.sh` (comment only), `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, `docs/Handoff_Kyler/Handoff_Kyler.md` |
-| Waiting on | the rest of the owner's test on the preview (§1 step 6). `UNSUBSCRIBE_SECRET` was set on 1 Oct |
-| Kept aside | `email-feedback-wip` — the whole 29 Sep work, both forms |
+| New files | `api/feedback.js` |
+| Changed | `api/_mail.js` (`block`, `newRef`), `assets/report-issue.js` (the seam, connected wording), `illustrated-journey-dashboard.html` (`connected: true`, comments), `scripts/build-rbm-pages.js` and its test, `scripts/test-mail-api.js`, `rbm/README.md`, this document, `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, `docs/Handoff_Kyler/Handoff_Kyler.md` |
+| Waiting on | the owner's test on the preview (§1 step 7), then merge; the rate-limit rule (§1 step 8) |
+| Before this | `email-subscribe`, PR #30, 5 commits, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has now been used in full, and can be deleted |

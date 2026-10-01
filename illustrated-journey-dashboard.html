@@ -966,7 +966,8 @@
      dashboard itself any more; both show once their button is pressed.
      Subscribe's flag went on 1 Oct 2026, when it was connected to
      api/subscribe.js — .sub-note is a plain privacy line now. Send
-     feedback's is still there: that form is not connected yet. */
+     feedback's went on 2 Oct 2026, when it was connected to api/feedback.js;
+     the widget shows its own privacy line in its place. */
   /* The glyph is an anchor for the eye, never the label — both buttons keep
      their words — so it is aria-hidden and is not allowed to shrink. */
   .hdr-actions svg { flex: none; width: 14px; height: 14px; }
@@ -3104,10 +3105,16 @@
 
 <script>
   /* The shared widget (assets/report-issue.js) runs as "Send feedback" on every
-     page, with Send disabled and a red "Mock only" note until a backend is
-     connected. This page only supplies its own view id and example text. */
+     page, with Send disabled and a red "Mock only" note. This is the one page
+     that is connected (2 Oct 2026): `connected` set to true makes the widget
+     post to api/feedback.js, which emails the team, and switches its note and
+     done screen to wording that says the message was sent. The page also
+     supplies its own view id and example text. RBM's copies of this page are
+     hosted without api/, so scripts/build-rbm-pages.js turns `connected` off
+     there. */
   window.LAUNCH_FEEDBACK_COPY = {
     view: "illustrated",
+    connected: true,
     messagePlaceholder:
       "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026."
   };
