@@ -9,7 +9,7 @@ both.*
 
 RBM will embed the dashboard pages (iframe, one page per language) and those
 pages fetch **one file**, `v1/dashboard.json`, from a public data repo:
-`Oakkar-Min/launch-data-test`, on the owner's own account, used as the test
+`codebyjackson/launch-data-test`, on the owner's own account, used as the test
 repo before handover. Three repos: this private pipeline → the public data repo
 → the pages handed to RBM.
 
@@ -87,12 +87,12 @@ repo before handover. Three repos: this private pipeline → the public data rep
 
 ## Setup on GitHub (owner)
 
-1. **Create the public repo** `Oakkar-Min/launch-data-test`: public, empty (no
+1. **Create the public repo** `codebyjackson/launch-data-test`: public, empty (no
    README). Push the starter files once:
    ```bash
    cp -r public-data ../launch-data-test && cd ../launch-data-test
    git init -b main && git add -A && git commit -m "Starter files"
-   git remote add origin https://github.com/Oakkar-Min/launch-data-test.git
+   git remote add origin https://github.com/codebyjackson/launch-data-test.git
    git push -u origin main
    ```
 2. **Turn on Pages:** that repo → Settings → Pages → Deploy from a branch →
@@ -106,10 +106,10 @@ repo before handover. Three repos: this private pipeline → the public data rep
      `DATA_REPO_DEPLOY_KEY`. On a personal repo only its owner (Kyler) can add
      secrets, unless you are an admin there.
 4. **Set the target:** pipeline repo → same page → Variables →
-   `RBM_DATA_REPO` = `Oakkar-Min/launch-data-test`.
+   `RBM_DATA_REPO` = `codebyjackson/launch-data-test`.
 5. Push and merge this branch; then Actions → "Publish to RBM data repo" →
    Run workflow → reason "First publish", **dry run** ticked; then again
-   without. Check `https://oakkar-min.github.io/launch-data-test/v1/dashboard.json`.
+   without. Check `https://codebyjackson.github.io/launch-data-test/v1/dashboard.json`.
 
 ## Deferred
 

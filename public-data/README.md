@@ -13,9 +13,9 @@ hand; see "Corrections" below.
 ## Endpoint
 
 ```
-https://oakkar-min.github.io/launch-data-test/v1/dashboard.json    current dataset
-https://oakkar-min.github.io/launch-data-test/v1/archive/<time>.json  every earlier publish, unchanged
-https://oakkar-min.github.io/launch-data-test/v1/schema.json        the contract (JSON Schema)
+https://codebyjackson.github.io/launch-data-test/v1/dashboard.json    current dataset
+https://codebyjackson.github.io/launch-data-test/v1/archive/<time>.json  every earlier publish, unchanged
+https://codebyjackson.github.io/launch-data-test/v1/schema.json        the contract (JSON Schema)
 ```
 
 GitHub Pages serves these with open CORS (`Access-Control-Allow-Origin: *`),
@@ -23,7 +23,7 @@ so a page on any domain, inside an iframe or not, can fetch them in the
 browser. Pages caches for about 10 minutes; a new publish is visible after that.
 
 ```js
-const res = await fetch("https://oakkar-min.github.io/launch-data-test/v1/dashboard.json");
+const res = await fetch("https://codebyjackson.github.io/launch-data-test/v1/dashboard.json");
 const ds = await res.json();
 if (ds.schema_version !== 1) { /* show a maintenance notice, do not render */ }
 const lang = "fr";                                   // the page's own language
