@@ -130,5 +130,20 @@ repo before handover. Three repos: this private pipeline → the public data rep
 
 ## Status
 
-Local branch, not pushed. Two commits on top of `main` (this one and the
-resistance removal).
+Local branch, not pushed. Two commits (the resistance removal and this one),
+then a merge of `origin/main` at `0e792ec` (Kyler's email subscribe, PR #30,
+and a translate-bot commit), 1 Oct 2026.
+
+The merge conflicted only in `i18n/content.en.json`, a generated file: it was
+regenerated with `assemble-content.js` from the merged sources (319 strings;
+the 3 new ones are subscribe text, already translated on main), not resolved
+by picking a side. Re-run on the merged tree: validator 0 errors / 1 warning;
+synthetic 0 / 0; locale build strict, fr 359 / pt 366 translated, 12 left in
+English each, self-check passes; `test-build-dataset.js` 28 passed;
+`test-mail-api.js` 111 passed; the publish simulation 7/7; public build OK;
+headless page renders with no console errors (map canvas blank headless, as
+on main).
+
+Kyler's `api/` functions (email subscribe) are not part of the data and do not
+go into `dashboard.json`; they stay on Vercel and will not come with the pages
+when RBM iframes them — a handover question, not handled here.

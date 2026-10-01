@@ -407,6 +407,20 @@
       "fr": "Rapports sur les prix et la qualité du Fonds mondial",
       "pt": "Relatórios de preços e qualidade do Fundo Global"
     },
+    "1f6ba75ab7d9b415": {
+      "en": "[LAUNCH] subscribe failed:",
+      "where": "line 4046",
+      "bucket": "js",
+      "fr": "[LAUNCH] Échec de l'abonnement :",
+      "pt": "[LAUNCH] Falha na inscrição:"
+    },
+    "213134a28cca8506": {
+      "en": "Sorry — we could not add you just now. Please try again in a moment.",
+      "where": "line 4045",
+      "bucket": "js",
+      "fr": "Désolé, nous n'avons pas pu vous ajouter pour le moment. Veuillez réessayer dans quelques instants.",
+      "pt": "Lamentamos, não foi possível adicioná-lo(a) agora. Por favor, tente novamente dentro de momentos."
+    },
     "219c4a6c86a716e9": {
       "en": "Results",
       "where": "products.products[1].detail.milestones[1].next",
@@ -581,6 +595,13 @@
       "bucket": "js",
       "fr": "Chronométrage réel des portes atteintes pour ${esc(p.name)}",
       "pt": "Tempo real de acionamento dos portões para ${esc(p.name)}"
+    },
+    "32abc3d50f443ae1": {
+      "en": "Almost there — we've emailed you a link. Click it to confirm your subscription.",
+      "where": "line 4042",
+      "bucket": "js",
+      "fr": "On y est presque ! Nous vous avons envoyé un lien par courriel. Cliquez dessus pour confirmer votre abonnement.",
+      "pt": "Quase a chegar! Enviamos um link para o seu e-mail. Clique nele para confirmar a sua inscrição."
     },
     "332383ce1ce107ac": {
       "en": "Country access",
@@ -2709,6 +2730,13 @@
       "bucket": "js",
       "fr": "Voir les détails",
       "pt": "Ver detalhes"
+    },
+    "d1dc03e34fe2e0da": {
+      "en": "Your address goes to the LAUNCH team and is used only to email you about updates to this page. Every email has an unsubscribe link.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Votre adresse est transmise à l'équipe LAUNCH et sert uniquement à vous envoyer des e-mails concernant les mises à jour de cette page. Chaque e-mail contient un lien de désabonnement.",
+      "pt": "O seu endereço será enviado para a equipa LAUNCH e utilizado apenas para o envio de e-mails sobre atualizações desta página. Todos os e-mails contêm um link para cancelar a subscrição."
     },
     "d2f24d4cc453047e": {
       "en": "SRA approval (EMA Art. 58)",

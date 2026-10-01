@@ -963,7 +963,10 @@
      10 Sep 2026 — Subscribe's as .sub-note's text, Send feedback's as
      LAUNCH_FEEDBACK_COPY.note (below, page-local override) styled red by
      .ri-dialog .ri-note further down this stylesheet. Neither shows on the
-     dashboard itself any more; both show once their button is pressed. */
+     dashboard itself any more; both show once their button is pressed.
+     Subscribe's flag went on 1 Oct 2026, when it was connected to
+     api/subscribe.js — .sub-note is a plain privacy line now. Send
+     feedback's is still there: that form is not connected yet. */
   /* The glyph is an anchor for the eye, never the label — both buttons keep
      their words — so it is aria-hidden and is not allowed to shrink. */
   .hdr-actions svg { flex: none; width: 14px; height: 14px; }
@@ -1026,6 +1029,7 @@
     padding: 8px 15px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
   }
   .sub-go:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .sub-go[disabled] { opacity: .65; cursor: progress; }
   .visually-hidden {
     position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
     overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
@@ -1037,8 +1041,9 @@
      type-selector point above plain .sub-note's (0,1,0) — so it would win
      this regardless of source order. Scoped to .subwrap .sub-note instead of
      just bumping specificity some other way, since that's what it actually
-     is: a rule for this one paragraph inside this one panel. */
-  .subwrap .sub-note { margin: 9px 0 0; font-size: 11.5px; font-weight: 700; color: var(--crit); }
+     is: a rule for this one paragraph inside this one panel. Muted rather
+     than the red it was while it said "Mock only" — it is fine print now. */
+  .subwrap .sub-note { margin: 9px 0 0; font-size: 11.5px; color: var(--ink-3); }
   @media print { .subwrap { display: none !important; } }
 
   /* print view */
@@ -1115,10 +1120,10 @@
             <label class="visually-hidden" for="sub-email">Your email address</label>
             <input id="sub-email" name="email" type="email" autocomplete="email"
                    placeholder="you@organisation.org" aria-describedby="sub-msg">
-            <button class="sub-go" type="submit" aria-disabled="true">Notify me</button>
+            <button class="sub-go" type="submit">Notify me</button>
           </form>
           <p class="sub-msg" id="sub-msg" role="status" hidden></p>
-          <p class="sub-note">Mock only — Subscribe for updates isn't connected yet.</p>
+          <p class="sub-note">Your address goes to the LAUNCH team and is used only to email you about updates to this page. Every email has an unsubscribe link.</p>
         </section>
       </div>
     </div>
@@ -2941,17 +2946,20 @@
   // CSV download — stages and milestones for every tracked product
   function csvCell(v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
   // ---- subscribe for more information ---------------------------------------
-  // Front end only, deliberately: this is a static site with no backend, so the
-  // button, the panel and the validation are all there is. There is exactly one
-  // seam — replace the body of subscribeEmail() with a call to the list provider
-  // and nothing else has to change; the panel already renders the pending,
-  // success and failure states around it.
+  // One seam: subscribeEmail() posts to api/subscribe.js, which emails the
+  // address a link to confirm (double opt-in, 1 Oct 2026); api/confirm.js
+  // adds it to the list once that link is used. It resolves on success and
+  // throws on anything else; the panel below renders the pending, success and
+  // failure states around it.
   async function subscribeEmail(email) {
-    // TODO: POST { email, page: location.href } to the mailing-list endpoint and
-    // resolve on success, throw on failure. Until one exists the address is kept
-    // in memory only (LAUNCH_SUBSCRIBERS) so a demo can show what would be sent.
-    (window.LAUNCH_SUBSCRIBERS = window.LAUNCH_SUBSCRIBERS || []).push(email);
-    return { ok: false, pending: true };   // pending: no endpoint wired yet
+    const res = await fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, page: location.href })
+    });
+    const body = await res.json().catch(() => null);
+    if (!res.ok || !body || !body.ok) throw new Error("HTTP " + res.status);
+    return body;
   }
 
   const subOpen = document.getElementById("sub-open");
@@ -2960,13 +2968,7 @@
   const subMail = document.getElementById("sub-email");
   const subMsg  = document.getElementById("sub-msg");
   const subGo   = subForm.querySelector(".sub-go");
-
-  // Disabled at Keith's request, 10 Sep 2026 — inert rather than styled
-  // disabled, so it keeps the accent look and the .sub-note beneath it stays
-  // the only word on why nothing happens. Blocking the click (not the submit
-  // handler below) also blocks Enter-to-submit from the email field, since
-  // the browser routes that through this button's own click first.
-  subGo.addEventListener("click", e => e.preventDefault());
+  let subBusy = false;
 
   function openSub() {
     subWrap.hidden = false;
@@ -3004,6 +3006,7 @@
 
   subForm.addEventListener("submit", async e => {
     e.preventDefault();
+    if (subBusy) return;
     const email = subMail.value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
       subMail.setAttribute("aria-invalid", "true");
@@ -3012,14 +3015,25 @@
       return;
     }
     subMail.removeAttribute("aria-invalid");
-    const res = await subscribeEmail(email);
-    // Says what actually happened. Claiming "you are subscribed" with no list to
-    // join would be the one thing a transparency dashboard must not do.
-    subSay(res && res.ok
-      ? "Thank you — you are on the list."
-      : "Noted, but not sent: email alerts are not switched on yet. Nothing left your browser.",
-      res && res.ok ? "ok" : null);
-    subForm.reset();
+    subBusy = true;
+    subGo.disabled = true;
+    subGo.textContent = "Sending…";
+    subSay("");
+    // Says what actually happened: nobody is on the list until they have
+    // clicked the link in the email, so success says to go and do that. On
+    // failure the address stays in the field, so trying again is one click.
+    try {
+      await subscribeEmail(email);
+      subSay("Almost there — we've emailed you a link. Click it to confirm your subscription.", "ok");
+      subForm.reset();
+    } catch (err) {
+      subSay("Sorry — we could not add you just now. Please try again in a moment.", "bad");
+      if (window.console && console.warn) console.warn("[LAUNCH] subscribe failed:", err);
+    } finally {
+      subBusy = false;
+      subGo.disabled = false;
+      subGo.textContent = "Notify me";
+    }
   });
 
   document.getElementById("dl-csv").addEventListener("click", () => {

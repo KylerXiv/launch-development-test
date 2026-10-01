@@ -372,6 +372,15 @@ feedback** actually work, with submissions arriving by email to the team.
 Nothing is built yet; this records the decisions taken and what blocks the
 build.
 
+> **Subscribe built 1 Oct 2026** on `email-subscribe`, as scoped below:
+> `api/subscribe.js` on Vercel, sending through Resend. Item 5 was answered: a
+> Resend contact list plus a note to the team, made double opt-in the same
+> day: a confirm email first, then a welcome email with an unsubscribe link.
+> Item 4 stands for the secrets alone (`RESEND_API_KEY`,
+> `UNSUBSCRIBE_SECRET`); the addresses are set in `api/_mail.js`. Send
+> feedback follows as its own change, so the 13-page question below is still
+> open. All of it is in [email-backend-notes.md](../email-backend-notes.md).
+
 **Both buttons already have exactly one seam each**, left deliberately by the
 work that built them: `subscribeEmail()` at
 [illustrated-journey-dashboard.html:3511](../../illustrated-journey-dashboard.html)

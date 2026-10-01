@@ -10,6 +10,10 @@
 # editor.html is excluded too, and that omission is the ONLY thing keeping the
 # data editor off the public site. It is not an oversight — do not add it. Vercel reads the whole private repo to run this
 # script, but only files copied into $OUT end up on the public URL.
+#
+# api/ is not copied either, and must not be: Vercel deploys it from the repo
+# as functions, separately from $OUT. Their responses are public; their source
+# is not served. See docs/email-backend-notes.md.
 set -euo pipefail
 
 OUT=public-site
