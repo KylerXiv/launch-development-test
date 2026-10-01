@@ -120,6 +120,13 @@
       "fr": "République démocratique du Congo",
       "pt": "República Democrática do Congo"
     },
+    "099e16c3db33f11d": {
+      "en": "The eight-stage access pathway. Choose a step to see what happens there and where each medicine is",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Le parcours d'accès en huit étapes. Choisissez une étape pour découvrir ce qui s'y passe et où se trouve chaque médicament.",
+      "pt": "O processo de acesso em oito etapas. Escolha um passo para ver o que acontece nele e onde se encontra cada medicamento."
+    },
     "0a8787a41b1d29db": {
       "en": "' + L().unit + '",
       "where": "line 3069 (in markup)",
@@ -133,6 +140,13 @@
       "bucket": "data",
       "fr": "Bolivie (État plurinational de)",
       "pt": "Bolívia (Estado Plurinacional da)"
+    },
+    "0b0a26068a4c19b6": {
+      "en": "grid-column: 4 / -1",
+      "where": "line 2083",
+      "bucket": "js",
+      "fr": "colonne de la grille : 4 / -1",
+      "pt": "coluna-da-grade: 4 / -1"
     },
     "0bbfeb155e2239ce": {
       "en": "Congo",
@@ -176,6 +190,13 @@
       "fr": "Liste des médicaments essentiels de l'OMS",
       "pt": "Lista de Medicamentos Essenciais da OMS"
     },
+    "0f526d0ff5fb4c9b": {
+      "en": "${m.dataAsOf ? \", data as of \" + esc(prettyDate(m.dataAsOf)) : \"\"}. Borders show what policy lists, not what is in use.",
+      "where": "line 3740",
+      "bucket": "js",
+      "fr": "${m.dataAsOf ? \", data as of \" + esc(prettyDate(m.dataAsOf)) : \"\"}. Les bordures indiquent ce que les politiques listent, et non ce qui est utilisé.",
+      "pt": "${m.dataAsOf ? \", data as of \" + esc(prettyDate(m.dataAsOf)) : \"\"}. As fronteiras mostram as listas de políticas, e não o que está a ser utilizado."
+    },
     "100e29c10b651ced": {
       "en": "Purchasing figures added: the Global Fund has bought 11.5 million packs (US$41.5m) since 2008, with a sharp rise in 2025. Nine versions of the medicine have passed World Health Organization quality checks.",
       "where": "products.changelog[10].plain",
@@ -218,6 +239,13 @@
       "fr": "Rwanda",
       "pt": "Ruanda"
     },
+    "12d3dd85ba1cb5df": {
+      "en": "Step ${stepNo(i)}, ${esc(s)}. Shows what happens here and where each medicine is${n ?",
+      "where": "line 1749",
+      "bucket": "js",
+      "fr": "Étape ${stepNo(i)}, ${esc(s)}. Indique ce qui se passe ici et où se trouve chaque médicament${n ?",
+      "pt": "Passo ${stepNo(i)}, ${esc(s)}. Mostra o que acontece aqui e onde cada medicamento é ${n ?"
+    },
     "131d28de5b7a5391": {
       "en": "Pooled across these ' + mk.members.length + \" sites, each at its most recent study",
       "where": "line 3154 (in markup)",
@@ -252,6 +280,13 @@
       "bucket": "data",
       "fr": "Complet",
       "pt": "Concluir"
+    },
+    "14a350e5b3c959d9": {
+      "en": "Listed for",
+      "where": "line 3862 (in markup)",
+      "bucket": "js",
+      "fr": "Inscrit sur",
+      "pt": "Listado para"
     },
     "14cb833119ac319e": {
       "en": "MFT deployment models with pyronaridine–artesunate",
@@ -337,6 +372,13 @@
       "fr": "Développement terminé (co-développement Shin Poong / MMV)",
       "pt": "Desenvolvimento concluído (Shin Poong / MMV co-desenvolvimento)"
     },
+    "18e34b4d1889a236": {
+      "en": "More detail",
+      "where": "line 2126",
+      "bucket": "js",
+      "fr": "Plus de détails",
+      "pt": "Mais detalhes"
+    },
     "19a1b952794cc142": {
       "en": "Treatment failure (per-protocol), % of evaluable patients",
       "where": "resistance.meta.metric",
@@ -357,6 +399,13 @@
       "bucket": "data",
       "fr": "Iran (République islamique d')",
       "pt": "Irão (República Islâmica do)"
+    },
+    "1cf929b920ee584b": {
+      "en": "Untested P. falciparum",
+      "where": "line 3699",
+      "bucket": "js",
+      "fr": "Non testé P. falciparum",
+      "pt": "Não testado P. falciparum"
     },
     "1e199b200fcfa3b9": {
       "en": "Global Fund price and quality reporting",
@@ -428,6 +477,13 @@
       "fr": "${nS} sites dans ${nM} marques — zoom avant pour séparer.",
       "pt": "${nS} locais em marcas ${nM} — ampliar para separar."
     },
+    "279154303e9dc853": {
+      "en": "MFT policy",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "MFT politique",
+      "pt": "MFT política"
+    },
     "298a9207a732a11d": {
       "en": "Next step",
       "where": "line 2043",
@@ -497,6 +553,13 @@
       "bucket": "js",
       "fr": "Cas d'utilisation cible",
       "pt": "Caso de uso alvo"
+    },
+    "2eee0b18bf12e4e4": {
+      "en": "Severe only",
+      "where": "line 3696",
+      "bucket": "js",
+      "fr": "Grave seulement",
+      "pt": "Apenas casos graves"
     },
     "2f1d47eb679bb05e": {
       "en": "Bangladesh",
@@ -644,6 +707,13 @@
       "bucket": "data",
       "fr": "Préparation du dossier",
       "pt": "Preparação do dossier"
+    },
+    "39df6924fbf220ac": {
+      "en": "Show MFT policy",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Afficher la politique MFT",
+      "pt": "Mostrar política MFT"
     },
     "3a02c23fc217e5ec": {
       "en": "Something look wrong, out of date, or hard to follow? Tell the LAUNCH team what you're seeing.",
@@ -876,6 +946,13 @@
       "fr": "En attente depuis",
       "pt": "Pendente desde"
     },
+    "49e54f5c4a2fdc6c": {
+      "en": "Not yet dated",
+      "where": "line 1612",
+      "bucket": "js",
+      "fr": "Pas encore daté",
+      "pt": "Ainda não tem data."
+    },
     "4b59d6f059966858": {
       "en": "EMA approval (Eurartesim)",
       "where": "products.products[3].stages[1].note",
@@ -903,6 +980,13 @@
       "bucket": "data",
       "fr": "Efficacité contre les parasites résistants et blocage de la transmission",
       "pt": "Eficácia contra parasitas resistentes e bloqueio da transmissão"
+    },
+    "4bd4c98a60535032": {
+      "en": "Source: WHO ${esc(m.edition || \"World Malaria Report\")}, Annex 4B — national policy as of ${esc(String(m.policyYear || \"\"))}",
+      "where": "line 3739",
+      "bucket": "js",
+      "fr": "Source : OMS ${esc(m.edition || \"World Malaria Report\")}, Annexe 4B — politique nationale en date du ${esc(String(m.policyYear || \"\"))}",
+      "pt": "Fonte: OMS ${esc(m.edition || \"World Malaria Report\")}, Anexo 4B — política nacional a partir de ${esc(String(m.policyYear || \"\"))}"
     },
     "4c354ff4ef17f801": {
       "en": "Select a country first",
@@ -946,6 +1030,20 @@
       "fr": "Chaque chiffre reflète sa source publique citée ; les détails spécifiques au fabricant ne sont indiqués que lorsque la publication a été confirmée par écrit.",
       "pt": "Cada figura reflete a fonte pública citada; os detalhes específicos do fabricante são mostrados apenas quando a divulgação foi confirmada por escrito."
     },
+    "4fa6e03ddfe2c3ba": {
+      "en": "Off: the map shows access stages only.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Désactivé : la carte n'affiche que les étapes d'accès.",
+      "pt": "Desativado: o mapa mostra apenas os passos de acesso."
+    },
+    "50024c1448c282ff": {
+      "en": "What happens here",
+      "where": "line 2273 (in markup)",
+      "bucket": "js",
+      "fr": "Que se passe-t-il ici ?",
+      "pt": "O que acontece aqui?"
+    },
     "507fb04291826de9": {
       "en": "WHO PQ held for tablets and paediatric granules",
       "where": "products.products[2].detail.access[0]",
@@ -959,6 +1057,20 @@
       "bucket": "data",
       "fr": "Pérou",
       "pt": "Peru"
+    },
+    "508e64655ebb66c5": {
+      "en": "Severe malaria",
+      "where": "line 3700",
+      "bucket": "js",
+      "fr": "Paludisme grave",
+      "pt": "Malária grave"
+    },
+    "50b2b2e864f9391c": {
+      "en": "Tested P. falciparum",
+      "where": "line 3693",
+      "bucket": "js",
+      "fr": "Testé P. falciparum",
+      "pt": "Testado P. falciparum"
     },
     "50f0cbe12bbd0a33": {
       "en": "${siteCount} ${siteCount === 1 ? \"site\" : \"sites\"}, ${lo === hi ? lo : lo + \"–\" + hi}",
@@ -1198,6 +1310,13 @@
       "fr": "Prévision de la demande",
       "pt": "Previsão da procura"
     },
+    "60ddacc561de80bd": {
+      "en": "Status of the ${tracked.length} medicines at this step",
+      "where": "line 2287",
+      "bucket": "js",
+      "fr": "État des médicaments ${tracked.length} à cette étape",
+      "pt": "Situação dos medicamentos ${tracked.length} nesta fase"
+    },
     "611025cdde0afeea": {
       "en": "Malawi",
       "where": "resistance.dict.country[37]",
@@ -1282,12 +1401,26 @@
       "fr": "Dernières mises à jour du tableau de bord",
       "pt": "Atualizações recentes do painel"
     },
+    "683eb14ae92966dd": {
+      "en": "Why it can stall",
+      "where": "line 2277 (in markup)",
+      "bucket": "js",
+      "fr": "Pourquoi cela peut bloquer",
+      "pt": "Porque pode parar"
+    },
     "69d0a7b84cd1d5d0": {
       "en": "Benin",
       "where": "resistance.dict.country[3]",
       "bucket": "data",
       "fr": "Bénin",
       "pt": "Benim"
+    },
+    "69e6ab6478afef0c": {
+      "en": "Show journey for ${esc(p.name)}",
+      "where": "line 1838",
+      "bucket": "js",
+      "fr": "Afficher le parcours pour ${esc(p.name)}",
+      "pt": "Mostrar viagem para ${esc(p.name)}"
     },
     "6a0957b9a5f4421c": {
       "en": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites.",
@@ -1316,6 +1449,13 @@
       "bucket": "data",
       "fr": "Colombie",
       "pt": "Colômbia"
+    },
+    "6c9aeecc799d6b58": {
+      "en": "Hide detail",
+      "where": "line 2126",
+      "bucket": "js",
+      "fr": "Masquer les détails",
+      "pt": "Ocultar detalhes"
     },
     "6ca41f1b61085e8d": {
       "en": "Viet Nam",
@@ -1401,6 +1541,13 @@
       "fr": "Phase III (KALUMA)",
       "pt": "Fase III (KALUMA)"
     },
+    "743411639d9fe054": {
+      "en": "Access stage",
+      "where": "line 3856 (in markup)",
+      "bucket": "js",
+      "fr": "Étape d'accès",
+      "pt": "Etapa de acesso"
+    },
     "7482e374b5bddc0a": {
       "en": "Legend",
       "where": "static text",
@@ -1442,6 +1589,13 @@
       "bucket": "js",
       "fr": "Données non disponibles pour le moment",
       "pt": "Dados ainda não disponíveis"
+    },
+    "77cb90cac2fab8f0": {
+      "en": "Policy group",
+      "where": "line 3857 (in markup)",
+      "bucket": "js",
+      "fr": "Groupe de politique",
+      "pt": "Grupo de políticas"
     },
     "78408ab628836875": {
       "en": "Regulatory submissions in preparation following Phase III success",
@@ -1498,6 +1652,13 @@
       "bucket": "data",
       "fr": "Largement enregistré ; adopté comme traitement de première intention dans plusieurs pays d’Asie du Sud-Est. Enregistrements vérifiés à ce jour : Tanzanie — 10 présentations de quatre fabricants (Guilin D-ARTEPP, y compris la forme pédiatrique dispersible, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), toutes enregistrées et conformes ; Nigéria — 47 présentations, dont seulement 26 actives (22 enregistrements expirés — non maintenus, signe de sous-utilisation).",
       "pt": "Amplamente registado; adotado como primeira linha em vários países do Sudeste Asiático. Registos verificados até à data: Tanzânia — 10 apresentações de quatro fabricantes (Guilin D-ARTEPP, incluindo a versão pediátrica dispersível; KBN-Zhejiang Duo-Cotecxin; Ajanta Ridmal), todos registados/em conformidade; Nigéria — 47 apresentações, mas apenas 26 ativas (22 expiradas — registos não mantidos, o que por si só indica subutilização)."
+    },
+    "7b9f4703a573d40e": {
+      "en": "Under 1 yr",
+      "where": "line 1614",
+      "bucket": "js",
+      "fr": "Moins d'un an",
+      "pt": "Menos de 1 ano"
     },
     "7d3e67eafcb0ffb3": {
       "en": "Health-worker training (3-drug regimen)",
@@ -1589,6 +1750,13 @@
       "bucket": "markup",
       "fr": "Prototype — les données présentées ici peuvent ne pas être exactes",
       "pt": "Protótipo — os dados aqui apresentados podem não ser precisos."
+    },
+    "843170953174e409": {
+      "en": "Who decides",
+      "where": "line 2276 (in markup)",
+      "bucket": "js",
+      "fr": "Qui décide ?",
+      "pt": "Quem decide?"
     },
     "8495a26f2dcb3ea7": {
       "en": "Send more feedback",
@@ -1765,6 +1933,13 @@
       "fr": "Développé dans le cadre du partenariat DeTACT mené par MORU avec Fosun Pharma",
       "pt": "Desenvolvido através da parceria DeTACT, liderada pela MORU, com a Fosun Pharma."
     },
+    "8e2f0317be62407a": {
+      "en": "Tracking new antimalarial medicines from research and development to market access&nbsp;— where each product stands, its access barriers, and opportunities to overcome them.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Suivi des nouveaux médicaments antipaludiques, de la recherche et du développement à l'accès au marché : où en est chaque produit, quels sont les obstacles à son accès et les possibilités de les surmonter.",
+      "pt": "Acompanhamento dos novos medicamentos antimaláricos, desde a investigação e desenvolvimento até ao acesso ao mercado — a fase atual de cada produto, as suas barreiras de acesso e as oportunidades para as ultrapassar."
+    },
     "8e774d19eadd09a1": {
       "en": "Transparency Dashboard",
       "where": "static text",
@@ -1813,6 +1988,13 @@
       "bucket": "data",
       "fr": "Le registre national de tous les médicaments autorisés à la vente en Ouganda.",
       "pt": "O registo nacional de todos os medicamentos aprovados para venda no Uganda."
+    },
+    "91766a00731be267": {
+      "en": "Current stage",
+      "where": "line 1763 (in markup)",
+      "bucket": "js",
+      "fr": "Stade actuel",
+      "pt": "Estágio atual"
     },
     "929a28562d6a754a": {
       "en": "World map, pan and zoom with the mouse or arrow keys",
@@ -2017,6 +2199,13 @@
       "fr": "augmentation de l'efficacité des achats",
       "pt": "Alargamento do processo de aquisição"
     },
+    "a648385415655976": {
+      "en": "P. vivax only",
+      "where": "line 3695",
+      "bucket": "js",
+      "fr": "P. vivax seulement",
+      "pt": "P. vivax apenas"
+    },
     "a6a7436941658443": {
       "en": "A 2023 study in Ghana of how well two of these medicines still cure malaria there.",
       "where": "sources.sources[19].plain",
@@ -2037,6 +2226,13 @@
       "bucket": "data",
       "fr": "Nombre de cas à confirmer",
       "pt": "Contagem a confirmar"
+    },
+    "a907510284573861": {
+      "en": "Journey view",
+      "where": "line 1851",
+      "bucket": "js",
+      "fr": "Vue du voyage",
+      "pt": "Visão da viagem"
     },
     "a96384cbb9c2c50f": {
       "en": "Thank you — you are on the list.",
@@ -2108,6 +2304,13 @@
       "fr": "Suriname",
       "pt": "Suriname"
     },
+    "b2519ef52fdd6ac5": {
+      "en": "${esc(k)}: ${pg.length ? \"lists \" + pname : \"does not list \" + pname}.",
+      "where": "line 3848",
+      "bucket": "js",
+      "fr": "${esc(k)}: ${pg.length ? \"lists \" + pname : \"does not list \" + pname}.",
+      "pt": "${esc(k)}: ${pg.length ? \"lists \" + pname : \"does not list \" + pname}."
+    },
     "b2bd06b999d7b1e3": {
       "en": "All countries",
       "where": "line 3303 (in markup)",
@@ -2135,6 +2338,13 @@
       "bucket": "markup",
       "fr": "Qu’est-ce qui a réellement été acheté pour les pays ? Combien de paquets, à quel prix et en quelle année ?",
       "pt": "O que foi efetivamente comprado para os países — quantas embalagens, a que preço e em que ano."
+    },
+    "b42087db638977b3": {
+      "en": "Untested only",
+      "where": "line 3694",
+      "bucket": "js",
+      "fr": "Non testé seulement",
+      "pt": "Somente não testado"
     },
     "b438bbef0d7a3b70": {
       "en": "WHO assessment report: DHA–PPQ (Guilin)",
@@ -2290,6 +2500,13 @@
       "fr": "Préqualification de l'OMS — l'évaluation de la qualité, de la sécurité et de l'efficacité dont le résultat, une inscription sur la liste des produits préqualifiés de l'OMS, rend un produit admissible à l'achat par les agences des Nations Unies et les principaux donateurs.",
       "pt": "Pré-qualificação da OMS — a avaliação da qualidade, segurança e eficácia cujo resultado, a inclusão na lista de produtos pré-qualificados da OMS, torna um produto elegível para aquisição por agências da ONU e grandes doadores."
     },
+    "c335c4f7902f5e54": {
+      "en": "Only P. vivax",
+      "where": "line 3695",
+      "bucket": "js",
+      "fr": "Seulement P. vivax",
+      "pt": "Apenas P. vivax"
+    },
     "c3782c86d8099f3f": {
       "en": "Philippines",
       "where": "resistance.dict.country[49]",
@@ -2423,12 +2640,33 @@
       "fr": "Autre chose",
       "pt": "Outra coisa"
     },
+    "cd2b16c1fa71a703": {
+      "en": "Not in any national policy on this map.",
+      "where": "line 3790 (in markup)",
+      "bucket": "js",
+      "fr": "Aucune politique nationale ne figure sur cette carte.",
+      "pt": "Não consta de nenhuma política nacional presente neste mapa."
+    },
+    "cdee2c76df32d868": {
+      "en": "Pathway order",
+      "where": "line 1853 (in markup)",
+      "bucket": "js",
+      "fr": "Ordre du parcours",
+      "pt": "Ordem do caminho"
+    },
     "ce926714b6e64ed7": {
       "en": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
       "where": "products.products[2].flag",
       "bucket": "data",
       "fr": "L'adoption constitue actuellement l'obstacle à l'accès : fortement recommandée par l'OMS depuis 2022 et enregistrée dans plus de 25 pays, son intégration dans les recommandations nationales reste toutefois limitée.",
       "pt": "A adoção é a atual barreira de acesso — fortemente recomendada pela OMS desde 2022 e registada em mais de 25 países, mas a inclusão nas orientações nacionais continua limitada."
+    },
+    "ce9bb8ebf71f2b6e": {
+      "en": "Only untested P. falciparum",
+      "where": "line 3694",
+      "bucket": "js",
+      "fr": "Non testé uniquement P. falciparum",
+      "pt": "Apenas não testado P. falciparum"
     },
     "cfa45dbb2efc0bfa": {
       "en": "Patients still parasitaemic on day 3, % of those tested — WHO treats over 10% as a signal of suspected artemisinin partial resistance",
@@ -2493,6 +2731,13 @@
       "fr": "SRA approbation (EMA Art. 58)",
       "pt": "SRA aprovação (EMA Art.º 58.º)"
     },
+    "d39448698cca0cdb": {
+      "en": "Main barrier",
+      "where": "line 1763 (in markup)",
+      "bucket": "js",
+      "fr": "Barrière principale",
+      "pt": "Barreira principal"
+    },
     "d3a008ef1335692d": {
       "en": "Region",
       "where": "static text",
@@ -2541,6 +2786,13 @@
       "bucket": "js",
       "fr": "Données illustratives pour la revue de conception. Version en direct : chaque figure renvoie à sa source publique et à la date de publication confirmée par le fabricant.",
       "pt": "Dados ilustrativos para revisão de projeto. Versão online: cada figura contém um link para a sua fonte pública e a data de lançamento confirmada pelo fabricante."
+    },
+    "d7474c9144a85b4c": {
+      "en": "0 ? yrsText(n) : \"",
+      "where": "line 1608 (in markup)",
+      "bucket": "js",
+      "fr": "0 ? ansText(n) : \"",
+      "pt": "0 ? yrsText(n) : \""
     },
     "d78ad816cecba2ad": {
       "en": "Updated treatment guidelines and job aids",
@@ -2604,6 +2856,13 @@
       "bucket": "data",
       "fr": "Indonésie",
       "pt": "Indonésia"
+    },
+    "dc001b4161f9af56": {
+      "en": "First-line, tested P. falciparum",
+      "where": "line 3693",
+      "bucket": "js",
+      "fr": "Première ligne, testée P. falciparum",
+      "pt": "Primeira linha, testado P. falciparum"
     },
     "dc44911609a3ed66": {
       "en": "\" + where + \"",
@@ -2695,6 +2954,13 @@
       "bucket": "data",
       "fr": "Pipeline · nouvelle classe chimique",
       "pt": "Gasoduto · nova classe química"
+    },
+    "e0a59fe06ef50fad": {
+      "en": "Only severe malaria or pregnancy",
+      "where": "line 3696",
+      "bucket": "js",
+      "fr": "Seuls le paludisme grave ou la grossesse",
+      "pt": "Apenas casos graves de malária ou gravidez."
     },
     "e15a18aadcac09e6": {
       "en": "Nepal",
@@ -2829,6 +3095,13 @@
       "fr": "Échantillons porteurs d'un génotype associé à la résistance, % des échantillons génotypés — pour Pfkelch13, ce chiffre ne prend en compte que les marqueurs de résistance partielle à l'artémisinine validés par l'OMS, et non toutes les mutations détectées.",
       "pt": "Amostras portadoras de genótipo associado à resistência, % das amostras genotipadas — para Pfkelch13, esta contagem inclui apenas marcadores de resistência parcial à artemisinina validados pela OMS, e não todas as mutações encontradas."
     },
+    "ea09e308a350afae": {
+      "en": "On: borders show where national policy lists the selected medicine. Click a country for detail.",
+      "where": "line 3899",
+      "bucket": "js",
+      "fr": "Sur : les frontières indiquent les pays où la politique nationale autorise le médicament sélectionné. Cliquez sur un pays pour plus de détails.",
+      "pt": "Na secção \"Fronteiras\", são apresentados os países onde a política nacional inclui o medicamento selecionado. Clique num país para obter detalhes."
+    },
     "ea3bfc26fa5ca39f": {
       "en": "Guyana",
       "where": "resistance.dict.country[29]",
@@ -2905,6 +3178,12 @@
       "bucket": "data",
       "fr": "Mali",
       "pt": "Mali"
+    },
+    "ef248b20da851532": {
+      "en": "Border = the selected medicine is in the country's national treatment policy (solid: first-line for tested P. falciparum; dashed: a smaller patient group only). Fill = access stage, unchanged.",
+      "where": "line 3807",
+      "bucket": "js",
+      "pt": "Borda = o medicamento selecionado está na política nacional de tratamento do país (linha contínua: primeira linha para os doentes testados P. falciparum; linha tracejada: apenas para um grupo mais pequeno de doentes). Preenchimento = etapa de acesso, sem alterações."
     },
     "efb074d55ce99c55": {
       "en": "WHO's publication record for it",
@@ -3038,6 +3317,20 @@
       "bucket": "markup",
       "fr": "Détail",
       "pt": "Detalhe"
+    },
+    "fb8a7f0b7f5e0944": {
+      "en": "On pathway",
+      "where": "line 1763 (in markup)",
+      "bucket": "js",
+      "fr": "Sur le chemin",
+      "pt": "Na trilha"
+    },
+    "fce63bfb9ebaba3d": {
+      "en": "(prefers-reduced-motion: reduce)",
+      "where": "line 2093",
+      "bucket": "js",
+      "fr": "(préfère-mouvement-réduit : réduire)",
+      "pt": "(prefere-movimento-reduzido: reduzir)"
     },
     "fd8228bb92fa16cb": {
       "en": "WHO-recommended ACT for uncomplicated malaria — added as the fifth recommended ACT in the 2010 second-edition treatment guidelines; reaffirmed 2015",
