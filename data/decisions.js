@@ -286,6 +286,38 @@ window.LAUNCH_DECISIONS =
       "pr": 36,
       "commit": "0ba9dc8444518463641a6960880c72a86a2682c8",
       "contentHash": "63a1eb4be765c85324b33462b09d7427f5b5f1d72683cb9334dd295d50634cbf"
+    },
+    {
+      "issue": 38,
+      "state": "approved",
+      "by": "codebyjackson",
+      "on": "2026-10-01",
+      "target": {
+        "product": "ganlum",
+        "stage": 3,
+        "field": "several"
+      },
+      "proposed": [
+        {
+          "field": "status",
+          "was": "idle",
+          "now": "done"
+        },
+        {
+          "field": "date",
+          "was": "",
+          "now": "15 Sep 2026"
+        },
+        {
+          "field": "note",
+          "was": "Not on the WHO PQ EOI list yet (24th malaria EOI, 27 Feb 2026, checked)",
+          "now": "Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG)."
+        }
+      ],
+      "fingerprint": "sha1:851aa6af792b30ec",
+      "pr": 39,
+      "commit": "24acb2f13e7f90717a5d6cb72a954e5fe5951d61",
+      "contentHash": "ec54209fc4dd20544f4d7e0ed85806cf9b6d2fb6337ce8f99905d2e8edfe52f0"
     }
   ]
 }
