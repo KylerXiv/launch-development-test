@@ -118,7 +118,7 @@ change to `v1/dashboard.json` (the drift check) until `main` matches.
 ## 4. `dashboard.json`
 
 `https://codebyjackson.github.io/launch-data-test/v1/dashboard.json` — 146 KB,
-31 KB as served; open CORS (`Access-Control-Allow-Origin: *`), cached 10 min.
+31 KB as served; open CORS (`Access-Control-Allow-Origin: *`); live about a minute after a publish.
 
 ```json
 {
@@ -183,6 +183,9 @@ the WHO Threat Maps source entry stay. Validator now: 0 errors, **1 warning**.
 
 ## 9. Testing it end to end
 
+Live test copies: data https://codebyjackson.github.io/launch-data-test/v1/dashboard.json ·
+RBM pages https://codebyjackson.github.io/launch-rbm-test/ (en/, fr/, pt/, iframe-test.html).
+
 Do these after the setup above. Each step names what to look for.
 
 ### 9a. The automatic route: approval → new `dashboard.json`
@@ -204,7 +207,8 @@ Do these after the setup above. Each step names what to look for.
 4. **Check the public repo** `codebyjackson/launch-data-test`:
    ✓ a commit "Published after proposal #n, approved by @… [publish-dataset]";
    a new file in `v1/archive/`; a CHANGELOG entry at the top.
-5. **Check the file** (allow up to 10 min for the Pages cache):
+5. **Check the file** (about a minute: wait for *pages build and deployment* in
+   `launch-data-test` → Actions to go green; add `?v=1` to the URL to skip your browser's copy):
    open `https://codebyjackson.github.io/launch-data-test/v1/dashboard.json`
    and search for `TEST-0001` — ✓ it is in GanLum's WHO PQ stage note.
 6. **Check an RBM page against the real file** (on your machine):
@@ -222,7 +226,7 @@ Do these after the setup above. Each step names what to look for.
 7. Revert the test proposal on `main` (as for #28).
 8. Actions → *Publish to RBM data repo* → reason `Revert test proposal #n`,
    dry run ticked → ✓ summary shows the GanLum change going back; no commit.
-9. Same again, dry run off → ✓ new commit in `launch-data-test`; after ≤10 min
+9. Same again, dry run off → ✓ new commit in `launch-data-test`; about a minute later
    `dashboard.json` no longer contains `TEST-0001`; both commits in history.
 
 ### 9c. A hand-made change
