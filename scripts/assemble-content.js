@@ -77,6 +77,10 @@ function collect() {
   // provenance must match the source it cites)
   const P = readDataFile("data/products.js");
   (P.stages || []).forEach((s, i) => add("data", s, `products.stages[${i}]`));
+  // the step explainers (one per stage); their source line is provenance and stays English
+  (P.stageInfo || []).forEach((x, i) => {
+    ["what", "who", "stall"].forEach((k) => add("data", x[k], `products.stageInfo[${i}].${k}`));
+  });
   Object.entries(P.glossary || {}).forEach(([k, v]) => add("data", v, `products.glossary.${k}`));
   (P.changelog || []).forEach((c, i) => {
     add("data", c.plain, `products.changelog[${i}].plain`);
@@ -88,8 +92,9 @@ function collect() {
     add("data", p.next, `${b}.next`);
     add("data", p.flag, `${b}.flag`);
     add("data", p.classLabel, `${b}.classLabel`);
-    add("data", p.volumeNote, `${b}.volumeNote`);
+    add("data", p.barrier, `${b}.barrier`);
     const d = p.detail || {};
+    add("data", d.volumeNote, `${b}.detail.volumeNote`);
     add("data", d.useCase, `${b}.detail.useCase`);
     (d.access || []).forEach((x, j) => add("data", x, `${b}.detail.access[${j}]`));
     (d.adoption || []).forEach((x, j) => add("data", x, `${b}.detail.adoption[${j}]`));
@@ -101,8 +106,14 @@ function collect() {
       add("data", m.label, `${b}.detail.milestones[${j}].label`);
       add("data", m.next, `${b}.detail.milestones[${j}].next`);
     });
-    (p.stages || []).forEach((st, j) => add("data", st.note, `${b}.stages[${j}].note`));
-    (p.journey || []).forEach((j2, j) => add("data", j2.label, `${b}.journey[${j}].label`));
+    (p.stages || []).forEach((st, j) => {
+      add("data", st.note, `${b}.stages[${j}].note`);
+      add("data", st.next, `${b}.stages[${j}].next`);
+    });
+    // journey and volumeNote live under detail; until 2 Oct 2026 both were read
+    // from the product's top level, where the data has neither, so they were
+    // never collected
+    (d.journey || []).forEach((j2, j) => add("data", j2.label, `${b}.detail.journey[${j}].label`));
   });
 
   // sources.js: the Sources footer, rendered from the registry since 9c6be45.

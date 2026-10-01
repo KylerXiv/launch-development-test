@@ -123,12 +123,14 @@ function readData(rel) {
 function localiseProducts(D, loc) {
   const T = (v) => (typeof v === "string" && v.trim() ? tr(loc, v) : v);
   if (Array.isArray(D.stages)) D.stages = D.stages.map(T);
+  (D.stageInfo || []).forEach((x) => { ["what", "who", "stall"].forEach((k) => { if (x[k]) x[k] = T(x[k]); }); });
   if (D.glossary) for (const k of Object.keys(D.glossary)) D.glossary[k] = T(D.glossary[k]);
   (D.changelog || []).forEach((c) => { c.plain = T(c.plain); c.summary = T(c.summary); });
   (D.products || []).forEach((p) => {
-    ["note", "next", "flag", "classLabel", "volumeNote"].forEach((k) => { if (p[k]) p[k] = T(p[k]); });
+    ["note", "next", "flag", "classLabel", "barrier"].forEach((k) => { if (p[k]) p[k] = T(p[k]); });
     const d = p.detail || {};
     if (d.useCase) d.useCase = T(d.useCase);
+    if (d.volumeNote) d.volumeNote = T(d.volumeNote);
     if (Array.isArray(d.access)) d.access = d.access.map(T);
     if (Array.isArray(d.adoption)) d.adoption = d.adoption.map(T);
     if (d.research && d.research.question) d.research.question = T(d.research.question);
@@ -137,8 +139,12 @@ function localiseProducts(D, loc) {
     (d.milestones || []).forEach((m) => {
       ["milestone", "label", "next"].forEach((k) => { if (m[k]) m[k] = T(m[k]); });
     });
-    (p.stages || []).forEach((st) => { if (st.note) st.note = T(st.note); });
-    (p.journey || []).forEach((j) => { if (j.label) j.label = T(j.label); });
+    (p.stages || []).forEach((st) => {
+      if (st.note) st.note = T(st.note);
+      if (st.next) st.next = T(st.next);
+    });
+    // under detail, as in the data (was read from the product's top level)
+    (d.journey || []).forEach((j) => { if (j.label) j.label = T(j.label); });
   });
   return D;
 }
