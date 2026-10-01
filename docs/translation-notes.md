@@ -331,6 +331,24 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
 
 ## Status
 
+- **Merged, 30 Sep:** PR #19 (`2415307`). The repository secret
+  `GOOGLE_API_KEY` was added, with no `TRANSLATE_ENGINE` variable, so the
+  engine is Google. The translate bot's first run (`6ed2b10`) translated the
+  30 waiting strings into French and Portuguese, with no rejects.
+- **End-to-end tests:** three run on 30 Sep through the watcher fixture (#20,
+  #22, #24), each merged and then reverted. #24 was reverted only on 1 Oct, by
+  hand, after Keith's merge had landed on top of it. How:
+  [handover-translation-workflow.md](handover-translation-workflow.md) §6.
+- **1 Oct:** Keith's `development` merged into `main` (PR #26). The translate
+  bot then translated its new text (`3a117f2`): fr 563 and pt 570 translated,
+  12 left in English each, 98%. **One string was rejected**, because
+  its placeholders did not survive the engine, and stays in English: the map
+  legend line "Border = the selected medicine is in the country's national
+  treatment policy (solid: first…". It needs translating by hand in
+  `i18n/translations.json`, or a re-run.
+
+What follows is the status as recorded before the merge:
+
 - Branch `translation-workflow` on `KylerXiv/launch-development-test`, cut from
   `main` at `b8c8d05`: the merge of `feat/translation` and five commits. Pushed
   with this commit, as a draft pull request against `main`. **Not merged.**

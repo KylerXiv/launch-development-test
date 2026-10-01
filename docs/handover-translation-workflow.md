@@ -21,7 +21,7 @@ design. How the translation pipeline works inside is in
 
 1. Read [CLAUDE.md](../CLAUDE.md) (the verify block, and two failure modes that
    have already happened) and [developer-guide.md](developer-guide.md).
-2. Revert test proposal #24 (§6, "Cleaning up").
+2. ~~Revert test proposal #24~~ — done 1 Oct 2026 (§6, "Cleaning up").
 3. Fix the history workflow (§7, item 1) — it fails after every approval.
 4. Update the Status section of [translation-notes.md](translation-notes.md) in
    the same commit; it still says the branch is not merged.
@@ -253,6 +253,11 @@ cmp data/products.js history/products-2026-09-08.js   # must be identical
 # run the verify block from CLAUDE.md, then push
 ```
 
+The `cmp` holds only while nothing else has changed `data/products.js` since
+8 Sep. It stopped holding on 1 Oct, when Keith's `development` was merged
+(`docs/merge-keith-development-notes.md`) — see "Done, 1 Oct" below for how
+#24 was reverted after that.
+
 (Or on GitHub: open the proposal's merged PR → **Revert** → merge the revert
 PR.) After the push, Validate, Vercel deploy, Snapshot history and Translate
 new text should all be green, with no bot commits.
@@ -263,8 +268,26 @@ written; if the history workflow is fixed first, a test will write
 deleted and the graph rebuilt (`node scripts/build-history-graph.js`), as in
 `b1b44a4`.
 
-**Right now:** test proposal **#24** (merged in #25, commit `e44c228`) is still
-on `main` and on the live site, in all three languages. Revert it as above.
+**Done, 1 Oct 2026: test proposal #24 is reverted** (branch
+`revert-test-proposal-24`). It was still live until then, in all three
+languages. Keith's merge had landed on top of it, so a plain `git revert
+e44c228` no longer fitted, and it was taken out by hand:
+
+- **`data/products.js`:** #24's GanLum stage and changelog line reversed.
+  `meta.lastUpdated` stays `2026-09-30`, not `2026-09-08`, because Keith's
+  `stageInfo` and barrier phrases, added on 30 Sep, are real data that day.
+- **`history/products-2026-09-30.js`:** the first snapshot actually written
+  with `TEST-0001` in it. The publish run after the Keith merge wrote it (that
+  run had no race to lose). It was replaced with the corrected file, which
+  `history-continues.js` accepts as "1 [entry] from earlier that day
+  withdrawn". `feed.xml` and both `ontology/` exports were rebuilt from it, so
+  the RSS feed no longer announces the listing.
+- **`i18n/`:** the two strings #24 added to `translations.json` were removed,
+  and `content.en.json` was rebuilt with `assemble-content.js`.
+- **`data/proposals.js`:** test proposal #4's queue entry (`p-4`) was removed.
+  It had sat there as "waiting" since 29 Sep, from before approvals removed
+  their own entry.
+- `data/decisions.js` keeps #24's approval record, as for the others.
 
 ---
 
@@ -340,7 +363,9 @@ from 30 Sep was worked out in the Claude Code session in §9.
 | 30 Sep | PR #19 merged; `GOOGLE_API_KEY` added; the translate bot translated the 30 waiting strings with Google | `2415307`, `6ed2b10` |
 | 30 Sep | End-to-end test 1: #20 → merged in #21, then reverted | `3bca88d`, revert `c9e0e41` |
 | 30 Sep | End-to-end test 2: #22 → merged in #23, then reverted | `9651146`, revert `a7e1c3e` |
-| 30 Sep | End-to-end test 3: #24 → merged in #25 — **not yet reverted** | `e44c228`, `f6e9f0b` |
+| 30 Sep | End-to-end test 3: #24 → merged in #25 | `e44c228`, `f6e9f0b` |
+| 1 Oct | Keith's `development` merged into `main`, on top of #24 | PR [#26](https://github.com/KylerXiv/launch-development-test/pull/26), `5b94d8c` |
+| 1 Oct | #24 reverted by hand, with the 30 Sep snapshot, feed, linked data and test #4's stale queue entry | branch `revert-test-proposal-24` |
 
 **The local simulation** ran the workflows' own `run:` blocks against a bare
 git remote and a stub `gh` that squash-merged for real, covering: a normal
