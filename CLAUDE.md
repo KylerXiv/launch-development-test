@@ -39,6 +39,7 @@ node scripts/normalize-treatment-policy.js    # regenerate; expect byte-identica
 node scripts/validate-data.js                 # expect 0 errors, 1 warning
 node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 warnings
 node scripts/make-preview.js                  # smoke test
+node scripts/test-build-dataset.js            # RBM dashboard.json: expect 0 failed
 ```
 
 The 1 warning is `treatment policy:` (French Guiana lists a dashboard product

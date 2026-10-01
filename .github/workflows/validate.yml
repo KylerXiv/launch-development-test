@@ -23,6 +23,12 @@ jobs:
       # write fails here, before it reaches a preview or production.
       - name: French and Portuguese pages build and pass their self-check
         run: node scripts/build-locale-pages.js --allow-stale
+      # The file RBM's pages fetch. A change that would break it fails here,
+      # before anyone approves it. Builds to a temp file; publishes nothing.
+      - name: RBM dashboard.json builds and matches its schema
+        run: |
+          node scripts/build-dataset.js --allow-stale --out /tmp/dashboard.json
+          node scripts/test-build-dataset.js --allow-stale
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

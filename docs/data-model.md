@@ -201,7 +201,18 @@ flowchart LR
     end
     REAL --> O
     H --> OH
+
+    subgraph rbm [RBM public data layer]
+        DS["build-dataset.js<br/>→ dashboard.json (en, fr, pt)"]
+    end
+    REAL --> DS
+    SRCREG["data/sources.js"] --> DS
+    TPOL["data/treatment-policy.js"] --> DS
+    MEM["i18n/translations.json"] --> DS
 ```
+
+`dashboard.json` is built in the publish workflow and pushed to the public data
+repo; it is never committed here. Contract: `public-data/v1/schema.json`.
 
 Rules the lineage encodes:
 

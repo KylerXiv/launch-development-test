@@ -337,4 +337,8 @@ function main() {
   verify();
 }
 
-main();
+// scripts/build-dataset.js reuses the same localisation, so the French and
+// Portuguese in the published dashboard.json are exactly those of /fr and /pt.
+module.exports = { LOCALES, readData, localiseProducts, localiseSources, stat };
+
+if (require.main === module) main();
