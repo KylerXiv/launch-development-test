@@ -23,8 +23,13 @@ const after = read(newFile);
 
 const isText = (v) => v && typeof v === "object" && !Array.isArray(v) && typeof v.en === "string";
 const short = (v) => {
+  // a whole entry (an added changelog line, a new product): its readable part
+  if (v && typeof v === "object" && !Array.isArray(v) && !isText(v)) {
+    if (isText(v.plain)) return (v.date ? v.date + " · " : "") + v.plain.en;
+    if (typeof v.id === "string") return v.id;
+  }
   const s = isText(v) ? v.en : typeof v === "string" ? v : JSON.stringify(v);
-  return s === undefined ? "—" : s.length > 90 ? s.slice(0, 87) + "…" : s;
+  return s === undefined || s === "" ? "—" : s.length > 90 ? s.slice(0, 87) + "…" : s;
 };
 // readable addresses: products[ganlum].stages[3].status rather than products[0]…
 const label = (arr, i) => (arr[i] && arr[i].id ? arr[i].id : i);
@@ -37,8 +42,37 @@ function diff(a, b, at, out) {
     return;
   }
   if (Array.isArray(a) && Array.isArray(b)) {
-    const n = Math.max(a.length, b.length);
-    for (let i = 0; i < n; i++) diff(a[i], b[i], `${at}[${label(i < b.length ? b : a, i)}]`, out);
+    const hasIds = (arr) => arr.length && arr.every((x) => x && typeof x === "object" && typeof x.id === "string");
+    // products, sources: match by id, so a reordering is not a change
+    if (hasIds(a) && hasIds(b)) {
+      const A = new Map(a.map((x) => [x.id, x])), B = new Map(b.map((x) => [x.id, x]));
+      for (const [id, x] of B) {
+        if (A.has(id)) diff(A.get(id), x, `${at}[${id}]`, out);
+        else out.push({ at: `${at}[${id}]`, was: undefined, now: x, kind: "added" });
+      }
+      for (const [id, x] of A) if (!B.has(id)) out.push({ at: `${at}[${id}]`, was: x, now: undefined, kind: "removed" });
+      return;
+    }
+    // a list that grew or shrank (the changelog gains a line at the top on
+    // every approval): report the entries added and removed, by content —
+    // comparing by position would show every entry below as changed
+    if (a.length !== b.length) {
+      const key = (x) => JSON.stringify(x);
+      const left = new Map();
+      a.forEach((x) => left.set(key(x), (left.get(key(x)) || 0) + 1));
+      b.forEach((x) => {
+        const k = key(x);
+        if (left.get(k)) left.set(k, left.get(k) - 1);
+        else out.push({ at: `${at}[+]`, was: undefined, now: x, kind: "added" });
+      });
+      a.forEach((x) => {
+        const k = key(x);
+        if (left.get(k)) { left.set(k, left.get(k) - 1); out.push({ at: `${at}[−]`, was: x, now: undefined, kind: "removed" }); }
+      });
+      return;
+    }
+    // same length (a product's eight stages, the stage names): by position
+    for (let i = 0; i < b.length; i++) diff(a[i], b[i], `${at}[${label(b, i)}]`, out);
     return;
   }
   if (a && b && typeof a === "object" && typeof b === "object") {
@@ -62,7 +96,10 @@ if (!before) {
   lines.push(`No change for RBM's readers (${who}): the data is identical to what is published.`);
 } else {
   lines.push(`${changes.length} change${changes.length === 1 ? "" : "s"} for RBM's readers (${who}):`, "");
-  changes.slice(0, 40).forEach((c) => lines.push(`- \`${c.at}\`: ${short(c.was)} → ${short(c.now)}`));
+  changes.slice(0, 40).forEach((c) => lines.push(
+    c.kind === "added" ? `- added \`${c.at.replace(/\[\+\]$/, "")}\`: ${short(c.now)}`
+    : c.kind === "removed" ? `- removed \`${c.at.replace(/\[−\]$/, "")}\`: ${short(c.was)}`
+    : `- \`${c.at}\`: ${short(c.was)} → ${short(c.now)}`));
   if (changes.length > 40) lines.push(`- … and ${changes.length - 40} more`);
 }
 const md = lines.join("\n") + "\n";

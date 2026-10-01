@@ -29,6 +29,7 @@ jobs:
         run: |
           node scripts/build-dataset.js --allow-stale --out /tmp/dashboard.json
           node scripts/test-build-dataset.js --allow-stale
+          node scripts/test-dataset-diff.js
       # The pages handed over to RBM, built from the same page: a change to it
       # that the build no longer understands fails here.
       - name: RBM pages build
