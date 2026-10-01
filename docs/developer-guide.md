@@ -17,11 +17,12 @@ The reason: the dataset is tiny (a handful of products ×
 18-month initiative will be handed over — so there is nothing to install,
 upgrade, or break.
 
-**One exception, since 1 Oct 2026:** `api/` holds a Vercel function,
-`subscribe.js`, behind the illustrated journey page's Subscribe form. It saves
-the address in Resend and tells the team, and needs no install either — no
-package.json, plain `fetch`. Nothing else talks to it, and every page still
-works without it. Send feedback is to follow (§9c is unchanged until then).
+**One exception, since 1 Oct 2026:** `api/` holds Vercel functions behind the
+illustrated journey page's Subscribe form: `subscribe.js` emails a confirm
+link, `confirm.js` saves the address in Resend and tells the team, and
+`unsubscribe.js` takes it off again. They need no install either — no
+package.json, plain `fetch`. Nothing else talks to them, and every page still
+works without them. Send feedback is to follow (§9c is unchanged until then).
 
 ## 2. Repo map
 
@@ -34,7 +35,7 @@ works without it. Send feedback is to follow (§9c is unchanged until then).
 | `widget.html` | Embeddable one-row product tracker for partner sites (`?product=<id or name>`). Dependency-free; reads the same data file. |
 | `data/products.js` | The data contract: `window.LAUNCH_DATA = { …strict JSON… }`. The only file analysts touch; **feeds all three pages**. |
 | `assets/report-issue.js` | The **Send feedback** front end (DEV-04; called "Report an issue" until 30 Sep 2026): floating pill and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. No backend yet; see §9c. |
-| `api/` | Vercel functions for the illustrated journey page's forms: `subscribe.js` (address → Resend contact + team inbox) and `_mail.js` (shared, and where the addresses are set; the underscore keeps it from being a route). The one secret, `RESEND_API_KEY`, is an env var on the Vercel project. Decisions in [email-backend-notes.md](email-backend-notes.md). |
+| `api/` | Vercel functions for the illustrated journey page's forms, double opt-in: `subscribe.js` (emails a confirm link, saves nothing), `confirm.js` (the link's page → Resend contact, welcome email, team inbox), `unsubscribe.js` (the welcome's link and the mail app's one-click unsubscribe), and `_mail.js` (shared, and where the addresses are set; the underscore keeps it from being a route). The two secrets, `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET`, are env vars on the Vercel project. Decisions in [email-backend-notes.md](email-backend-notes.md). |
 | `data/world-map.js` | Generated geometry: `window.LAUNCH_MAP = { w, h, countries: { ISO3: { n, d } } }`. Natural Earth 110m, public domain. Committed output — regenerate with `scripts/build-map.js`, never hand-edit. |
 | `history/` | Dated snapshots of the data file, bot-committed by `publish.yml` on every data change. Append-only, one per date: a later change the same day replaces that day's snapshot, so it holds the day's final state. The raw material for future trend charts and playback. |
 | `feed.xml` | RSS 2.0 feed of changelog entries, bot-rebuilt by `publish.yml`. |
@@ -198,10 +199,12 @@ No test framework by design; two layers instead:
   snippets when they do.
 - No secrets exist anywhere in the repo or its history; the confirmation
   register lives outside the repo by policy.
-- **The Subscribe form needs `RESEND_API_KEY` on the Vercel project**, never
-  in the repo. The addresses it sends from and to are not secret and are set
-  in `api/_mail.js`. Without the key, or with no team inbox set, the form
-  shows its failure message and the function log says what is missing. The
+- **The Subscribe form needs `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET` on the
+  Vercel project**, never in the repo. The addresses it sends from and to are
+  not secret and are set in `api/_mail.js`. Without either secret, or with no
+  team inbox set, the form shows its failure message and the function log
+  says what is missing. Changing `UNSUBSCRIBE_SECRET` breaks every confirm and
+  unsubscribe link already emailed. The
   function exists only on Vercel, so on any static host the form fails the
   same way. Setup: [email-backend-notes.md](email-backend-notes.md) §1.
 

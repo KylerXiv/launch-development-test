@@ -286,6 +286,15 @@ line. `LAUNCH_SUBSCRIBERS` is gone. Send feedback is unchanged: still a mock,
 Send still blocked, red flag still in its dialog. Why a Resend contact and not
 a notify-us email: [email-backend-notes.md](email-backend-notes.md) §2.
 
+**Revised the same day: double opt-in.** Submitting now saves nothing. It
+emails a confirm link, so the success line had to stop saying "on the list"
+for the same reason as above: *"Almost there — we've emailed you a link.
+Click it to confirm your subscription."* The privacy line gained *"Every
+email has an unsubscribe link."* The confirm and unsubscribe pages are not
+part of this page; they are served by `api/confirm.js` and
+`api/unsubscribe.js`, and described in
+[email-backend-notes.md](email-backend-notes.md) §2.3–2.5.
+
 ### 3.11 The draft warning is amber, and leads with the caveat
 
 It was `--accent-soft` blue — the same treatment as every other note on the

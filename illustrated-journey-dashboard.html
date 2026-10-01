@@ -1247,7 +1247,7 @@
             <button class="sub-go" type="submit">Notify me</button>
           </form>
           <p class="sub-msg" id="sub-msg" role="status" hidden></p>
-          <p class="sub-note">Your address goes to the LAUNCH team and is used only to email you about updates to this page.</p>
+          <p class="sub-note">Your address goes to the LAUNCH team and is used only to email you about updates to this page. Every email has an unsubscribe link.</p>
         </section>
       </div>
     </div>
@@ -3961,10 +3961,11 @@
   // CSV download — stages and milestones for every tracked product
   function csvCell(v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
   // ---- subscribe for more information ---------------------------------------
-  // One seam: subscribeEmail() posts to api/subscribe.js, which saves the
-  // address as a Resend contact and tells the team inbox. It resolves on
-  // success and throws on anything else; the panel below renders the pending,
-  // success and failure states around it.
+  // One seam: subscribeEmail() posts to api/subscribe.js, which emails the
+  // address a link to confirm (double opt-in, 1 Oct 2026); api/confirm.js
+  // adds it to the list once that link is used. It resolves on success and
+  // throws on anything else; the panel below renders the pending, success and
+  // failure states around it.
   async function subscribeEmail(email) {
     const res = await fetch("/api/subscribe", {
       method: "POST",
@@ -4033,12 +4034,12 @@
     subGo.disabled = true;
     subGo.textContent = "Sending…";
     subSay("");
-    // Says what actually happened: "on the list" only once the server has
-    // confirmed the address was saved. On failure the address stays in the
-    // field, so trying again is one click.
+    // Says what actually happened: nobody is on the list until they have
+    // clicked the link in the email, so success says to go and do that. On
+    // failure the address stays in the field, so trying again is one click.
     try {
       await subscribeEmail(email);
-      subSay("Thank you — you are on the list.", "ok");
+      subSay("Almost there — we've emailed you a link. Click it to confirm your subscription.", "ok");
       subForm.reset();
     } catch (err) {
       subSay("Sorry — we could not add you just now. Please try again in a moment.", "bad");
