@@ -162,8 +162,28 @@ sentence. Add any acronym you introduce in a note.
 | `classLabel` | string | The chip text under the name. |
 | `currentStage` | integer 0–7 | Index of the highlighted stage. |
 | `flag` | string or `null` | The red sentence under the row. Required if any stage is `late`; keep it to one factual sentence with dates. |
+| `barrier` | string (optional) | A short phrase (about 8 words) for the "Main barrier" column of the illustrated journey table. Write it to stand alone without the row's other columns. Omit it when the product has no `flag`; if it is missing but a `flag` exists, the table shows the full flag sentence clipped. |
 | `stages` | array[8] | See below. |
 | `detail` | object | See below. |
+
+### Stage explainers (`stageInfo`)
+
+A top-level list, one entry per stage in the same order as `stages`, read by the
+panel that opens when someone clicks a step on the pathway strip. Each entry has
+four plain strings:
+
+| Field | What to write |
+| --- | --- |
+| `what` | Two or three sentences on what happens at this step, in words a non-specialist follows. |
+| `who` | Who runs or decides it. |
+| `stall` | The usual reason it takes longer than expected. |
+| `source` | Where a reader can check it (a register or publication name, not a URL). |
+
+It describes the step in general, not any one medicine; per-medicine status and
+notes come from each product's `stages` entry. Optional, but if present it must
+have exactly one entry per stage with all four strings (the validator checks
+this). The current wording is a first draft from `docs/domain-primer.md` and needs
+sign-off from LAUNCH before it is treated as final.
 
 ### Stage entry
 

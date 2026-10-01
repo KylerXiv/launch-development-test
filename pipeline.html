@@ -7,16 +7,22 @@
   /* Pipeline poster view — MMV-poster-style phase columns, LAUNCH teal identity.
      Single committed light look (a poster, printed and projected), explicit colors. */
   :root {
-    --ground: #F5F7F8;
+    /* Colours match the illustrated journey dashboard (30 Sep 2026), so the views
+       read as one product: same white ground, same darker greys, same teal. */
+    --ground: #FFFFFF;
     --surface: #FFFFFF;
-    --surface-2: #EDF1F3;
+    --surface-2: #F4F7F8;
     --ink: #16303F;
-    --ink-2: #4E6371;
-    --ink-3: #7C8E99;
-    --line: #D8E0E4;
-    --accent: #14657E;
-    --accent-soft: #E3EEF2;
-    --cat-newclass: #14657E;
+    --ink-2: #3F5564;
+    --ink-3: #566A77;
+    --line: #DCE3E7;
+    --accent: #0F5A72;
+    --accent-soft: #E6F1F4;
+    /* Full-width page, like the illustrated journey: one side padding, shared by
+       the menu bar and the content so their edges line up at every width. */
+    --pad: clamp(24px, 4vw, 64px);
+    --nav-pad: var(--pad);
+    --cat-newclass: #0F5A72;
     --cat-tact: #3E5C8A;
     --cat-market: #1E8A5A;
     --cat-prevention: #8A6D1E;
@@ -32,7 +38,7 @@
     font: 15px/1.5 -apple-system, "Segoe UI", system-ui, Roboto, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 56px; }
+  .wrap { margin: 0; padding: 16px var(--pad) 56px; }
 
   header { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 24px; margin-bottom: 6px; }
   .brand h1 { margin: 0; font-size: 26px; font-weight: 750; letter-spacing: -.01em; }
@@ -46,13 +52,22 @@
   @media (max-width: 760px) {
     .proto-badge { white-space: normal; margin-left: 0; margin-top: 6px; display: block; width: fit-content; }
     .meta { text-align: left; margin-left: 0; }
-    .wrap { padding: 20px 14px 48px; }
+    :root { --pad: 14px; }
+    .wrap { padding: 20px var(--pad) 48px; }
     .poster-box { padding: 12px; }
   }
   .brand p { margin: 4px 0 0; color: var(--ink-2); font-size: 15px; max-width: 62ch; }
   .meta { margin-left: auto; text-align: right; font-size: 12.5px; color: var(--ink-3); line-height: 1.6; }
   .meta b { color: var(--ink-2); font-weight: 600; }
   .meta a { color: var(--accent); }
+  /* "Powered by" + the Unitaid logo, as on the illustrated journey: no plate,
+     border, shadow or hover, sitting directly on the page. */
+  .attrib { display: flex; justify-content: flex-end; }
+  .attrib a { display: flex; align-items: center; gap: 8px; padding: 2px 0; border-radius: 4px; text-decoration: none; }
+  .attrib a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .attrib .ptxt { font-size: 12.5px; line-height: 1.3; color: var(--ink-3); }
+  .attrib img { display: block; width: 112px; height: auto; }
+  .meta .attrib { margin-bottom: 10px; }
 
   .banner {
     margin: 18px 0 20px; padding: 9px 14px; border-radius: 8px;
@@ -119,6 +134,8 @@
   footer b { color: var(--ink-2); }
 </style>
 
+<body>
+<script src="assets/site-nav.js" data-current="pipeline"></script>
 <div class="wrap">
   <header>
     <div class="brand">
@@ -126,10 +143,9 @@
       <p>Every tracked product placed at its current development phase — the portfolio at a glance, MMV-poster style. Select a product for its full journey.</p>
     </div>
     <div class="meta">
+      <div class="attrib"><a href="https://unitaid.org" target="_blank" rel="noopener noreferrer"><span class="ptxt">Powered by</span><img src="assets/unitaid-logo.svg" alt="Unitaid" width="1200" height="418"></a></div>
       <b>To be hosted by the RBM Partnership to End Malaria</b><br>
-      <span id="updated"></span><span id="meta-note"></span><br>
-      <a href="index.html">Journey board (A)</a> · <a href="option-b.html">Comparison matrix (B)</a> ·
-      <a href="illustrated-journey-dashboard.html">Illustrated journey</a> · <a href="story.html">Data story</a>
+      <span id="updated"></span><span id="meta-note"></span>
     </div>
   </header>
 
@@ -141,12 +157,11 @@
   </div>
 
   <footer>
-    <b>About the data.</b> The LAUNCH dashboard displays publicly available information only. Product-specific details
-    appear solely where the manufacturer has confirmed in writing that they may be shared.
-    Hover a card for the use case and next milestone; select it to open the full profile on the journey board.<br>
-    <b>Format.</b> Layout follows the convention of MMV's antimalarial pipeline poster (phase columns, categorised
-    project cards); content is LAUNCH's own tracked portfolio. A LAUNCH initiative of Unitaid partners.
-      <br><b>Spotted an error?</b> <a class="report-link" href="#report-issue" data-report-issue>Report an issue or contact the LAUNCH team</a> — corrections from country teams, manufacturers and partners are welcome.
+    <b>About the data.</b> This page shows publicly available information only. Product details appear only where
+    the manufacturer has confirmed in writing that they may be shared. Hover a card for the use case and next
+    milestone; select it to open that medicine in the illustrated journey.<br>
+    <b>Format.</b> The layout follows MMV's antimalarial pipeline poster: one column per development phase and one
+    card per project. The content is LAUNCH's own tracked portfolio. A LAUNCH initiative of Unitaid partners.
   </footer>
 </div>
 
@@ -239,7 +254,7 @@
     <span class="key"><span class="sw" style="background:var(--cat-tact)"></span> Triple ACT</span>
     <span class="key"><span class="sw" style="background:var(--cat-market)"></span> Marketed, underutilized</span>
     <span class="key"><span class="sw" style="background:var(--cat-prevention)"></span> Prevention (planned)</span>
-    <span class="key"><span class="flagdot"></span> Active bottleneck — see journey board</span>`;
+    <span class="key"><span class="flagdot"></span> Active bottleneck — see the illustrated journey</span>`;
 
   // tooltip + click-through
   const tip = document.getElementById("tip");
@@ -265,7 +280,7 @@
     c.addEventListener("focus", show);
     c.addEventListener("mouseleave", hideTip);
     c.addEventListener("blur", hideTip);
-    c.addEventListener("click", () => location.href = "index.html#" + c.dataset.id);
+    c.addEventListener("click", () => location.href = "illustrated-journey-dashboard.html#" + encodeURIComponent(c.dataset.id));
   });
   document.querySelectorAll(".pcard.pending").forEach(c => {
     const show = () => showTipAt(c, `<b>Planned</b>${esc(c.dataset.note)}`);
@@ -277,4 +292,13 @@
 })();
 </script>
 
+<script>
+  /* Send feedback (assets/report-issue.js) with wording for this page. */
+  window.LAUNCH_FEEDBACK_COPY = {
+    view: "pipeline",
+    intro: "Something in the pipeline look wrong, out of date, or hard to follow? Tell the LAUNCH team what you're seeing.",
+    types: { correction: "A product is in the wrong phase, or something else looks wrong" },
+    messagePlaceholder: "e.g. This product is shown in Phase III, but its Phase III results were published in March 2026."
+  };
+</script>
 <script src="assets/report-issue.js" defer></script>

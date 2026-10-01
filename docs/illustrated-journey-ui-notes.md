@@ -37,7 +37,7 @@ existed. Do not treat it as precedent.
 | `illustrated-journey-dashboard.html` | the page; all UI below lives here |
 | `assets/journey-icons/icons-solid.js` | filled stage-marker glyphs, **this page only** |
 | `assets/who-emblem.svg` | WHO emblem, mark only, permission-gated — see §3.1 |
-| `assets/unitaid-mark.svg` | Unitaid bird, extracted from the official lockup |
+| `assets/unitaid-logo.svg` | full Unitaid logo (bird + wordmark), copy of `unitaid/assets/unitaid-logo.svg`; replaced the bird-only `unitaid-mark.svg` (sheet row 11) |
 | `assets/report-issue.js` | shared by nine pages; gained a `COPY` override seam |
 | `data/products.js` | changelog entries gained an optional `plain` field |
 | `docs/data-analyst-guide.md` | documents that `plain` field |
@@ -59,7 +59,7 @@ how much they change what a reader sees:
    detail.
 5. Stage markers redrawn as a filled set, with the WHO emblem on the
    guidelines gate.
-6. "Powered by" + the Unitaid mark, top right.
+6. "Powered by" + the full Unitaid logo, top right.
 7. Sources footer became a list of named links to each official register.
 8. "Subscribe for more information" button — front end only.
 9. The summary strip became an explicit **portfolio** summary and dropped
@@ -190,8 +190,8 @@ Same reasoning for the feedback widget, from the other direction:
 `assets/report-issue.js` is shared by **nine** pages. Rather than fork it, it
 grew a `COPY` block of every visible string, overridable per page by setting
 `window.LAUNCH_FEEDBACK_COPY` before the script tag. This page uses it to run
-the same widget as "Send feedback". Other pages are untouched and still say
-"Report an issue".
+the same widget as "Send feedback". (Other pages said "Report an issue" until 30
+Sep 2026; see 3.26, where "Send feedback" became the widget's default.)
 
 ### 3.7 The changelog gained `plain` rather than being rewritten
 
@@ -495,6 +495,585 @@ question as the stepper's, and none of the join defects — there is no arriving
 bar to butt against, only an arrow that stops short of it.
 
 ---
+
+### 3.14 Contrast and type size in the detail and gate panels (sheet rows 15 + 17, 30 Sep 2026)
+
+Reviewer: the Detail section's light-grey background and grey text were hard to
+read, and the medication sections' type was small and pale.
+
+Measured rather than eyeballed: `--ink-3` (#7C8E99) was **3.15:1** on the panel's
+`--surface-2` (#F4F7F8) and 3.39:1 on white; AA body text needs 4.5:1. Changed:
+
+- `--ink-3` -> #566A77 (5.24:1 on surface-2) and `--ink-2` -> #3F5564 (7.24:1).
+  Both moved, not just ink-3, because #4E6371 and a darkened ink-3 would have
+  been near-identical and the three-step hierarchy would have collapsed. This is
+  page-wide (41 uses of ink-3), which was the intent: the same pale grey was the
+  problem everywhere, and fixing it only inside `.detail` left it low-contrast
+  in the changelog, footer and timeline labels.
+- Rejected: only recolouring `.detail`'s background to white. Cards inside it are
+  already white, so the panel would lose its visible edge, and the text colour
+  was the larger half of the problem.
+- `.gatepanel` (the drill-down the sheet calls the Detail section) is now white
+  with a `--ink-3` border instead of `--surface-2`/`--line`; body text moved from
+  ink-2 to ink.
+- Sizes: card body/list/kv 13.5 -> 15px, card sub 12.5 -> 14, table 13 -> 14.5,
+  headings/labels and provenance 10.5-11.5 -> 12-12.5, gate note 13.5 -> 15.
+- Not changed: timeline SVG text (9.5-11px, set in user units inside the SVG)
+  picks up the darker colours but not larger sizes. Vertical spacing is sheet
+  rows 18 + 20, a separate change.
+
+### 3.15 The Unitaid badge is flat: no plate, shadow, border or hover (row 11 follow-up, 30 Sep 2026)
+
+Requested by Keith after the full logo landed: the badge should blend into the
+page. Removed the white plate, the two-layer shadow, the hover lift and the
+transition. The earlier comment said the white plate was deliberate, to give the
+logo's dark navy a fixed backdrop "independent of this page's theme tokens" -
+that reasoning only matters if the page background can change. It is light-only
+(`--ground` #FFFFFF, `color-scheme: light`), so the logo's navy already has the
+backdrop it needs. **If a dark theme is ever added, this badge needs a plate
+again.** Kept deliberately: the `:focus-visible` outline, since removing it would
+make the link invisible to keyboard users; that is focus, not hover.
+
+### 3.16 The header is three rows: identity, description, status + actions (30 Sep 2026)
+
+Requested by Keith as part of the compact-layout work (sheet rows 18 + 20). The
+old header was a brand column on the left and a `.meta` column on the right that
+stacked the logo, the date and both buttons, leaving the middle empty.
+
+- Row 1: title + Prototype pill (left), "Powered by" Unitaid logo (right).
+- Row 2: description, full width.
+- Row 3: "Last updated ... Draft" (left), Download CSV + Subscribe (right).
+- Header is about 150px tall against about 210px before; the draft banner under
+  it was slimmed (padding 12/16 -> 7/14, lead text 14 -> 13.5px, margins
+  18/20 -> 14/18) and keeps its amber colour and "do not quote" wording.
+- Description cap is `160ch`, chosen after 120ch looked short on a 1400px
+  screen (two lines with a quarter of the row empty). The text is about 190
+  characters, so it is one line from roughly 1330px and two lines below that. The
+  cap exists so a 1900px+ screen does not get one 200-character line.
+- Phone keeps the same order: title wraps at 20px with the logo (72px) top-right,
+  pill drops under the title, "Powered by" text is hidden (too small to help),
+  date on its own line, then the two buttons share a row at equal width.
+  Rejected: stacking everything into one column, which was the first suggestion;
+  Keith preferred the same structure on phones.
+- Removed: the `.brand` and `.meta` wrappers and the 1180px rule that
+  left-aligned them. The Subscribe dropdown used to flip to the left edge at 1180;
+  the actions now stay right-aligned at every width above the phone breakpoint, so
+  that flip went too. On phones the dropdown spans the button row as before.
+- The ids (`#updated`, `#dl-csv`, `#sub-open`, `#subwrap`) are
+  unchanged, so no script edits were needed.
+- Follow-up, same day: the row now shows **only** "Last updated <date>". The
+  ` · Draft - figures not yet verified` suffix (and the `live` / other-status
+  variants of it) and its `#meta-note` span were removed at Keith's request. The
+  caveat is not lost - it stays in the amber banner and the Prototype pill - but
+  note the suffix was the only place the page said `live` data was "confirmed by
+  manufacturers for public release"; if the dataset ever goes `live`, that line
+  is gone and nothing replaces it. The other pages keep `#meta-note`.
+- Follow-up, same day: at about 1800px the 160ch cap left "them." alone on a
+  second line. Fixed with `text-wrap: balance` and a 120ch cap, and the
+  "Illustrated journey view -" lead-in was dropped at Keith's request, so the copy
+  now starts "Tracking new antimalarial medicines ...". Rejected: a bold
+  accent-coloured lead-in (Keith chose to remove it), a tinted callout strip
+  (about 20px taller and competes with the amber banner), and rewording the copy
+  to fit one line (an editorial change, not asked for). `text-wrap: balance`
+  is ignored by browsers older than Chrome 114 / Safari 17.5 / Firefox 121, which
+  fall back to ordinary wrapping, so the orphan can still appear there.
+  Balancing alone put the em dash at the start of line 2, so it is bound to the
+  preceding word with a non-breaking space.
+- Follow-up, same day: the buttons moved from their own third row to the right
+  of the description, bottom-aligned with the "Last updated" line that now sits
+  under the description. The header is two rows, not three (about 20-30px
+  shorter again). Reason: the balanced description is only about 650px wide, so
+  the right of that row was empty while the buttons cost a whole row. Rejected:
+  buttons under the logo (brings back the tall right column), beside the logo
+  (crowded), and moving Download CSV next to the data it exports (sensible, but
+  relocates a control people already know; left as a possible later step).
+  `.hd-text` has a 500px flex-basis: below about 860px of content width the
+  buttons wrap under the text and right-align, instead of squeezing the
+  description into four short lines. On phones the buttons sit under the date at
+  equal width, as before; `margin-left:auto` is reset there because it cancels
+  the stretch.
+- Checked in headless Chrome at 1400, 820 and 390px; not checked with the
+  Subscribe dropdown open, and not on a real phone.
+
+### 3.17 Compact page, alphabetical medicines (sheet rows 18 + 20, 30 Sep 2026)
+
+Complaint: too much scrolling, too much empty space. Measured in a 1400px
+headless screenshot, the distance from the top of the page to the start of the
+map section went from about **2,600px to about 1,980px** (roughly 600px, 24%).
+
+What moved, and why each number:
+
+- **Pathway strip** was about 290px tall, now about 190px. The cause was a
+  centring script (`centerPathwayCard`) that set the top padding to
+  `G + 2*lift`, where `lift` is how far the stacked WHO pair is raised to line
+  its icons up with the other gates. A `transform` moves paint, not layout, so the
+  bracket ended up with a gap of `G + lift` (about 50px) above *and* below it.
+  Now padding-top is `G + lift` and the bracket gets `margin-bottom: -lift`, so
+  both gaps are really `G`, which was also lowered from 14 to 8px. Rejected:
+  drawing the WHO pair side by side to flatten the strip - that is the
+  parallel-gates editorial question, deferred in the reviewer notes.
+- **Medicine cards:** row padding 26 -> 8px, board gap 14 -> 10, timeline margin
+  16 -> 6 and padding 13 -> 8, "View details" margin 9 -> 6, barrier-note top
+  margin 10 -> 0. Legend strip and pathway margins 22 -> 10. Page padding
+  28/56 -> 16/32, draft banner margins 14/18 -> 10/12, viz/updates/footer
+  margins 22/30 -> 14/18.
+- **Timeline SVG** height is now computed from the labels actually drawn
+  (`nameLines * 13 + 5` below the tier's top) instead of a flat 40px per tier plus
+  8, and `labelTop0` 76 -> 66. Checked that the three-line ASPY and DHA-PPQ labels
+  still clear each other.
+- **The timeline key** ("actual milestone" / "reached out of order") was repeated
+  under all four timelines (about 30px each). It is now two more entries in the
+  legend strip at the top, shown once.
+- **Vertical scrollbars on every stage rail** (the small up/down arrows at the
+  right of each card) came from `overflow-x:auto` forcing `overflow-y:auto`
+  while the fork's labels overflow the box by a few px. `.trackbox` is now
+  `overflow-y:hidden` with 4px of bottom padding so descenders are not clipped. A
+  scrollbar inside each card was itself a source of the "too much scrolling"
+  complaint.
+- **Order:** `tracked` is sorted alphabetically by display name, case-insensitive
+  (ALAQ, ASPY, DHA-PPQ, GanLum). Everything built from it follows: the board, the
+  gate drill-down rows, the map's drug tabs and the CSV. Rejected: reordering
+  `data/products.js` itself - other pages read it in file order, and only this
+  page was asked to change. Side effect: the map's default product is the first
+  alphabetical one that has a country survey, which may differ from before.
+
+Left alone: the **map** keeps its 960:480 aspect ratio - that is the fitted
+lon/lat window, and a shorter box would crop the world, so it is the largest
+block still on the page. The two side rails beside it are capped at 480px. The
+pathway strip's stacked WHO pair is still the tallest thing in that strip.
+Checked at 1400px and 390px; not at tablet width, and the map could not be
+rendered headless here so its spacing is unchecked.
+
+### 3.18 The medicine cards became a journey table (30 Sep 2026)
+
+Reviewer complaint was scrolling. Keith reviewed a published mock-up
+(summary table + time-scaled journey + original rail) before any of this was
+built, and chose the options recorded here.
+
+Structure, per medicine:
+- **Summary row** (A-Z): chevron, name + INN, a mini journey (one dot per gate,
+  the WHO pair stacked), current stage, status, years on the pathway, and a
+  "Main barrier" phrase. With all rows closed the table is about 300px, against
+  about 1,600px for four full cards.
+- **Level 1 (chevron):** the **time-scaled journey** by default. Dated gates
+  hang from their real year on one axis that starts at the first milestone (no
+  empty years), the current gate sits at today with a bar back to the year it
+  has been waiting since, and gates with no year are listed on the right
+  (reached but undated / ongoing / not started) instead of being given an
+  invented date. A quiet text link, "Switch to pathway order", swaps in the
+  **original rail**, unchanged (forks, bars, year labels), as Keith asked. The
+  swap fades (the mock-up's "Fade" option); reduced-motion users get none.
+- **Level 2 ("More detail"):** the cards and milestone table that "View details"
+  showed, now inside level 1. The gate drill-down still opens under the marker
+  row, from either view.
+- All rows start closed. (The first row, ALAQ, started open until later the same
+  day, when Keith asked for it closed: the table is then about 300px and nothing
+  is chosen for the reader. `setL1()` is still the single place that opens a row.)
+
+Decisions and what was rejected:
+- **"Main barrier" is a new optional `barrier` field** in `data/products.js`
+  (short phrase; documented in the data analyst guide), not a trimmed `flag`.
+  Rejected: first clause of `flag` - "Adoption is the current access barrier"
+  repeats the column title and says nothing. I drafted the two phrases
+  (ASPY "National guideline inclusion is limited", DHA-PPQ "Only 0.9-4.5% of
+  Global Fund spend, 2022-24"); **they are the data owner's to rewrite**. With no
+  `barrier` but a `flag`, the row shows the flag clipped; with neither, "No
+  barrier recorded". No changelog entry was added: it is a display field, not a
+  change to a fact.
+- **Pending-since year** comes from `detail.journey`, the same milestones the
+  gate panel's "Pending since" line reads, so the two always agree (ASPY 2022,
+  DHA-PPQ 2015). The mock-up had used 2008 for DHA-PPQ from the stage's "Since
+  2008" text; the gate panel says 11 years from 2015, so 2015 is what ships. A
+  product with no journey falls back to the latest year in the column before the
+  current gate (GanLum: 2025); ALAQ has none and shows no bar.
+- **Not-started gates are a row of dimmed icons**, not labelled chips: a product
+  early on has up to seven, which made the right-hand panel the tallest thing in
+  the row. Names are in each icon's title/aria-label and the strip above names
+  every gate.
+- **Kept:** the full pathway strip above the table (Keith chose it over a slim
+  key). The legend lost "reached out of order": positions are now real years, so
+  that state no longer exists in the default view (the rail still shows
+  out-of-order gates by year label).
+- **Removed:** the always-visible "Actual timeline" SVG and `fitTimelines()`,
+  `stageTimeline()` and their helpers, and the `.prow`/`.pbtn`/`.peek` rules. The
+  time view is plain percent-positioned HTML, so it needs no width measurement or
+  re-render on resize.
+- The pathway-order rail is measured to line its forks up, and a hidden rail has
+  no size. `layoutJourney()` therefore re-runs whenever a row opens, when the
+  view switches to the rail and on resize. Anything new that reveals a rail must
+  call it.
+- ~~"Open in row" from the gate list~~ was removed on 30 Sep 2026 (see 3.20); the
+  `setL1`/`showView` fallback it needed is still used by the chevron and the Switch
+  link.
+- Print: every row prints open in its time view, with the detail cards.
+
+Not done / left alone: tablet width was not checked; the map is unchanged; the
+stage markers in the time view keep hover tooltips and the drill-down but the
+"Switch" link is the only route to gates that have no year, apart from "Open in
+row". Real sliding of markers between the two views (mock-up option F's
+animation) was not built; it is a fade.
+
+### 3.19 The pathway strip explains itself (30 Sep 2026)
+
+Keith wanted the strip to make the order obvious, to explain what happens at each
+stage, and to drop the legend. Reviewed as a published mock-up first; every
+suggested option was accepted.
+
+- **Order:** steps are numbered 1 to 7 (`stepNo()`, the position of the stage's
+  column), and the two parallel WHO gates share **3**, inside their bracket. A
+  heading line says "Every medicine moves left to right. Step 3 is two separate
+  WHO approvals, in either order." Numbering is justified because the steps are a
+  real sequence; the shared 3 is what stops it implying an order between the WHO
+  pair. The stage label size went from 11 to 12px.
+- **Panel:** clicking a step opens one section under the strip (the old "every
+  medicine at this gate" panel, extended) with two halves: *what happens here*
+  (what, who decides, why it can stall, source) and *where each medicine is*
+  (status, the note clamped to three lines, "Open in row"). With no `stageInfo` it
+  falls back to the medicines half alone. Nothing is open on load; a hint line
+  invites a click.
+- **Wording lives in data, not HTML:** a top-level `stageInfo` array in
+  `data/products.js`, one entry per stage, validated by `validate-data.js` (length
+  must equal `stages`, all four strings non-empty) and documented in the data
+  analyst guide. Drafted from `docs/domain-primer.md` section 2. **It is unreviewed
+  wording and needs LAUNCH sign-off** - nothing on the page marks it as draft
+  beyond the page-wide prototype banner. The "typical 3 to 6 years" for trials and
+  the "about 90 working days" for collaborative registration are the primer's
+  figures, not new claims.
+- **Legend removed**, with the dated-milestone key. Status is written in words in
+  the table, the panel and the row journey, and the dots differ in shape as well as
+  colour. Safeguard added: each mini-journey dot has a `title` ("Regulatory
+  approval (SRA): Complete"). The dots sit inside an element with `role="img"`, so
+  the hover text helps sighted users; screen readers get the row's summary label,
+  not per-dot names. `.strip`, `.legend` and `.tgap-key` CSS went with it.
+- **"no fixed order" text removed** from both the top strip and each medicine's
+  pathway rail (Keith, same day), since the heading line and the bracket already
+  say it. The two note elements were emptied, not deleted: the rail's fork
+  alignment (`alignStageForks`) measures the note band to place the spine, and the
+  strip's `alignPathGroup` measures the pair, so both need the structure to stay.
+  The strip's note became an 8px spacer. The group's `aria-label` still says the
+  approvals have no defined order, so screen-reader users lose nothing. The
+  mock-up for this change showed the text; that was before this request.
+- **Heading, order note and hint removed** (Keith, same day): "How a medicine
+  reaches patients", "Every medicine moves left to right. Step 3 is two separate
+  WHO approvals, in either order." and "Select a step to see what happens there..."
+  are gone, along with their CSS and the two script lines that toggled the hint
+  (leaving those would have thrown on every click). What that costs: the page no
+  longer says in words that the strip is clickable or that step 3 is two parallel
+  approvals. The numbered badges, the chevron on each icon, the bracket and the
+  strip's `aria-label` still carry it, but a first-time reader gets no sentence
+  telling them to click. If readers do not open the steps, restore the hint line
+  first; it was the cheapest of the three.
+- Rejected: a separate explainer page or tooltip per step (the click panel already
+  exists and is where the per-medicine answer lives), and putting the wording in
+  `index.html`-style hard-coded prose (nothing would keep it in step with the data).
+- Validator now reports 6 warnings, not the 5 in CLAUDE.md. The extra is
+  `treatment policy: 1 country value(s) ... fall outside the drawn basemap (GUF)`,
+  from PR #21 (MFT policy map), already on `development` before this change;
+  confirmed by validating without these edits.
+- Not checked: tablet width, real devices, print with a step panel open.
+
+### 3.20 The step panel: explanation band + a card per medicine (30 Sep 2026)
+
+> **Superseded the same day by 3.21:** the per-medicine cards and "Read more" were
+> removed. What survives from this section is the explanation band, the status
+> count pills and the removal of "Open in row".
+
+Keith asked to drop "Open in row" and redesign the panel. Reviewed as a published
+mock-up (two layouts, three options for the button); the suggested options were
+built.
+
+- **Layout A:** an explanation band across the top ("What happens here", then
+  Who decides / Why it can stall / Source as three columns), then one card per
+  medicine side by side (auto-fit, 230px minimum, A-Z). Rejected, layout B: keep
+  the two-column split with an expanding list. Its text column stopped at 70ch and
+  left an empty strip, and four medicines could not be compared at a glance.
+- **"Open in row" removed, replaced by in-place expansion.** Each card clips the
+  note to three lines and, when there is more, offers "Read more", which reveals
+  Recorded, Next step, Expected, Pending since (same `stalledSince()` rule as the
+  per-medicine gate panel) and the source. Nothing to navigate to: the jump only
+  ever existed to read what the clip hid. "Read more" appears only when the note
+  is over 120 characters or there is any extra fact, so a "Not started" card has
+  none. Rejected: keeping a "Show in table" link inside the expanded card (kept
+  only as a mock-up option; nobody asked for it).
+- **Header summary:** status counts as pills ("1 delayed, 1 in progress, 2 not
+  started"), most urgent first, replacing "N of 4 medicines delayed at this step".
+  It says how many medicines are where, not only whether any is late.
+- A delayed medicine's card is tinted red (`--crit-soft`); no accent bar on the
+  card.
+- The toggle works by showing/hiding markup already in the card (no re-render),
+  so focus stays on the button. Print opens every card fully.
+- Removed: `.gw-list`, `.gw-jump`, `.gw-grid`, `.gw-sec` and the `[data-jump]`
+  click branch.
+- Not checked: tablet width, real devices. Verified in headless Chrome at desktop
+  width: step 5 opens, ASPY's card expands, no script errors.
+
+### 3.21 The step panel explains; the summary table shows where (30 Sep 2026)
+
+Keith spotted that the per-medicine cards repeated the summary table's content.
+Checked: for a medicine's current stage they said the same thing, and the
+per-stage detail is already one click away (expand the row, click the marker).
+The panel was also about 500px tall, most of the scrolling this work set out to
+cut. Reviewed as a mock-up first; built as suggested.
+
+- **Panel:** explanation only (what happens, who decides, why it can stall,
+  source) plus the status-count pills. About 200px.
+- **Highlight:** opening a step lights that step's column in every summary row
+  (`highlightStep()`): a ring on the dot and a tinted band. Each journey column is
+  now a `.jcell` that stretches to the row height (negative block margin cancels
+  the row padding), so the lit cells read as one continuous column. Step 3 lights
+  both WHO dots, which share a column. The header's Journey cell shows the step
+  numbers 1-7 above the dots in the same cells, so the number on the strip lines
+  up with its column. Closing the panel clears it.
+- **Rings removed, band only** (Keith): the 4px ring on each lit dot made the two
+  stacked WHO dots touch and read as an "8". Options offered were a 4px gap plus a
+  thin ring on the pair only; Keith chose the plainest, the tinted band alone. The
+  dots keep their status colours, so a lit cell reads as "this step, this status".
+- **Header step numbers removed** (Keith, after seeing them live): the small 1-7
+  above the dots are gone and the header cell is just "Journey" again. The lit
+  column and ring still tie the table to the strip; the numbers on the strip itself
+  stay. `miniNumbers()` and the `.nums` rules went with them.
+- **What was lost, knowingly:** reading all four medicines' notes for one step side
+  by side. To compare, open the rows and click the stage marker. The status-count
+  pills are the only cross-section left. A middle option (list only the delayed or
+  in-progress medicines, one line each) was offered and not chosen.
+- **Removed:** `.gw-cards`, `.gw-card`, `.gw-more`, `.gw-tg` and the Read more click
+  branch. The old `.mp` WHO-pair bracket in the dots is kept inside each cell.
+- Checked in headless Chrome: step 5 and step 3 light 5 cells each (header plus
+  four rows), switching moves the highlight, no script errors. Not checked: tablet
+  width, real devices. On phones the journey sits on its own line and the
+  highlight is a short band per row, not a continuous column.
+
+### 3.22 Marker rings take their status colour (30 Sep 2026)
+
+Keith saw that a selected marker got a teal ring whatever its status (an amber
+"in progress" marker ended up with a teal ring outside its own amber border), and
+that complete markers had no ring at all. Suggested first, then built.
+
+- **One colour per status, set once:** `.stage.s-done/-prog/-late/-idle` define
+  `--ring` (green / amber / red / grey) and `--ring-soft` (its tint). The border,
+  the selected ring and the current-stage glow all read them, so no second colour
+  can appear on a marker.
+- **Selected:** a 3px ring in `--ring` with a 2px white gap, so it cannot clash with
+  the marker's own border. Declared for `.stage.cur` too, because the current-stage
+  glow (same specificity, later in the file) used to override it.
+- **Every marker has a ring:** complete markers gained a solid 2px green border
+  (prog and late already had theirs); not-started markers keep a dashed ring, now
+  1.5px in `--idle` (was 1px in `--line`) at 65% opacity (was 55%), since dashed
+  reads as "not yet" and a solid ring would say otherwise.
+- **Current-stage glow** is the status tint, not teal.
+- Applies to the pathway-order rail and the time view, which share the markers. The
+  top pathway strip has no status, so it is unchanged.
+- Trade-off: complete markers are heavier, so a fully complete row reads busier;
+  the green check badge was already there.
+- Checked in headless Chrome: selecting an in-progress and a delayed marker gives
+  amber and red rings. Not checked: tablet width, real devices, keyboard-focus
+  outline against the new rings.
+
+### 3.23 The journey panel: view switch, More detail bar, shared view (30 Sep 2026)
+
+Keith asked for the "Switch to pathway order" link to become a button group and
+for the panel to be reformatted. Reviewed as a mock-up with a selector per
+choice; these are the choices made.
+
+- **View switch:** a two-button group, "Actual timeline | Pathway order", timeline
+  first and selected on load, top right of the panel where the link was. It is a
+  pair of `aria-pressed` buttons. Cost, stated up front: with the link the
+  pathway-order rail was clearly secondary (Keith's earlier wish); as buttons both
+  views carry equal weight. The timeline is still what a row opens on.
+- **"More detail" is a full-width bar** along the foot of the panel instead of an
+  outlined button in a footer row: a bigger target, and the dashed footer row is
+  gone. The panel loses its bottom padding so the bar sits on the edge
+  (`overflow:hidden` keeps it inside the rounded corners); the detail cards open
+  **below** the bar. The mock-up had opened them above it, which reads oddly; the
+  dashboard does not.
+- **Reversed the same day: the view is per row again** (Keith chose "Per row" in
+  the mock-up's option 7; the first build shared it across rows by mistake, from a
+  screenshot that showed the other option selected). Each row keeps its own view
+  and opening a row never changes another. The next bullet describes the shared
+  version that was built and then removed.
+- **One view for every row:** choosing Pathway order on one medicine switches all
+  rows, including closed ones, so a row opened later is already on it. The rails of
+  closed rows have no size, so `setL1()` re-runs `layoutJourney()` on opening (it
+  already did). Switching still closes any open stage panel.
+- **Left as they were, deliberately** (Keith kept "today" in the mock-up for both):
+  undated gates stay in the side panel, and a medicine with under two dated gates
+  (ALAQ) still gets the full axis, about 120px of mostly empty line. The compact
+  alternatives (a strip under the chart; a summary in place of the axis) were
+  offered and not chosen; ALAQ is the case to revisit if the panel still feels
+  empty.
+- **Provenance line under the milestone table removed** (Keith, after seeing the
+  draft wording live): the "Draft - not yet verified. These figures come from
+  public sources..." note. The same `.src` element also carried the wording for
+  `illustrative` and `live` data ("Each figure reflects its cited public source;
+  manufacturer-specific details are shown only where release was confirmed in
+  writing"), so those went too. The draft banner at the top of the page and the
+  "About the data" footer still say the same things; if the dataset goes `live`,
+  that per-figure sentence is no longer shown next to the figures.
+- Removed: the `.swv` link and the `.l1f` footer row. Print hides the switch and the
+  bar.
+- Checked in headless Chrome: the group switches every row, the bar opens the
+  detail below it, no script errors. Not checked: tablet width, real devices,
+  keyboard focus on the bar (outline drawn inside because the panel clips).
+
+### 3.24 A site menu and a guide to the views (sheet rows 26 + 27, 30 Sep 2026)
+
+> **Changed the same day by 3.25:** the menu now lists three views, the blurb and
+> "What are these views?" guide were removed, and the bar moved into a shared file
+> used by the illustrated journey, Pipeline and Story.
+
+Row 26 asked for a global menu linking the dashboard's views so nobody has to edit
+a URL to move between them; row 27 for on-page guidance on the available views.
+Reviewed as a published mock-up (six choices, each selectable); these are Keith's
+picks.
+
+- **What was actually missing:** the other pages (`index`, `option-b`, `pipeline`,
+  `story`) already carry a small row of in-text links to each other and to this
+  page. This page had none going out, so it was the dead end the row describes.
+  Building the menu here closes that without touching the other four.
+- **Menu:** a top bar above everything, "LAUNCH" then six links, the current one
+  underlined and marked `aria-current="page"`: Illustrated journey, Journey board
+  (`index.html`), Comparison (`option-b.html`), Pipeline, Story, About the data
+  (`explainer.html`). Short names. It **scrolls away** with the page (the
+  mock-up's "stays in view" was not chosen; it would cost about 44px of screen all
+  the time). `widget.html` is left out: it is an embeddable tracker for other sites,
+  not a view to browse.
+- **Guidance (row 27):** a one-line blurb on this view plus a "What are these
+  views?" button that opens a panel describing all six, each a link, with "You are
+  here" on the current one. Closed on load.
+- **Phone (640px and below):** the links collapse into a "Views: Illustrated
+  journey" button that opens a list with a one-line description each; Escape closes
+  it. The blurb and guide stay.
+- **Wording is my draft** (from `docs/project-explainer.md` section on the views)
+  and needs LAUNCH sign-off, like the step explainers in 3.19. The blurb and panel
+  text is English only: the translation pipeline leaves untranslated text as English,
+  so locale builds will show it untranslated until strings are added.
+- **Cost:** about 44px for the bar plus about 40px for the blurb row above the
+  header, against the compact-layout work in 3.17. The guide panel is closed on
+  load, so it adds nothing further unless opened.
+- **Not done, on purpose:** the same menu on `index`, `option-b`, `pipeline`,
+  `story` and `explainer` (Keith scoped this work to the illustrated dashboard).
+  They keep their in-text link rows, which name the views differently ("Comparison
+  matrix (B)", "Data story"); worth aligning if the menu is rolled out. The menu
+  is inline on this page; if other pages adopt it, move it to a shared file so the
+  page list lives in one place. Not added to the `unitaid/` or `synthetic/`
+  editions, which do not build this page.
+- Public build needs nothing new: every link target is already copied by
+  `build-public-site.sh`.
+- Checked in headless Chrome: desktop bar and open guide, and the phone Views menu
+  inside a 390px frame, no script errors. Not checked: tablet width, real devices,
+  keyboard order through the bar.
+
+### 3.25 One menu on three pages, in one theme (sheet rows 26 + 27, 30 Sep 2026)
+
+Keith narrowed the menu to Illustrated journey, Pipeline and Story, asked for the
+bar on all three, for Pipeline and Story to take this page's colours and theme, for
+the Unitaid badge on both, for the blurb and guide to go everywhere, and for the old
+link rows to be replaced so the pages are consistent.
+
+- **Shared bar:** `assets/site-nav.js` holds the list of views and builds the bar;
+  each page loads it with `<script src="assets/site-nav.js" data-current="...">`.
+  One place to edit; `build-public-site.sh` copies it. The bar reads each page's own
+  tokens with this page's values as fallbacks, and pages align it to their content
+  column with `--nav-pad` and `--nav-max`. It hides in print. A phone (640px and
+  below) gets the "Views" button. If a copy lands in `/unitaid/` or `/synthetic/` it
+  drops the Illustrated journey entry, because those editions do not build that page.
+- **Gotcha, fixed:** Pipeline and Story have no `<body>` tag, so a script placed
+  before any content is parked in `<head>` and the bar was inserted where it could
+  not show. The three pages now have an explicit `<body>`, and the script falls back
+  to the top of the body if it is ever in the head. Any new page using the bar
+  should do the same.
+- **Removed:** the blurb and "What are these views?" panel (and their CSS and script)
+  from the illustrated page; the in-text link rows on Pipeline ("Journey board (A) ·
+  Comparison matrix (B) · ...") and Story's header links.
+- **Same colours and theme:** Pipeline and Story now use this page's tokens: white
+  ground, `--surface-2` #F4F7F8, the darker greys (`--ink-2` #3F5564, `--ink-3`
+  #566A77, `--line` #DCE3E7), teal #0F5A72. Story's map ramp moved to this page's
+  (registered teal, guidelines blue, MFT purple). Story is **light only** now: its
+  dark theme (the OS setting and `data-theme`) was removed, since this page is light
+  only by design. Each page keeps its own layout and type scale: Story stays a
+  scroll-driven narrative at 16px, Pipeline a poster. Rejected: rebuilding both in
+  this page's header-and-cards look (much bigger, not asked for once Keith chose
+  "tokens only").
+- **Unitaid badge:** the same flat "Powered by" logo as here, top right of each
+  header. On Story it sits opposite the Prototype pill (the old "LAUNCH" text mark
+  went; the bar carries it). The `/unitaid/` edition keeps its own logo bar.
+- **Story's closing buttons** now link only to the Illustrated journey and Pipeline
+  (they pointed at Journey board and Comparison matrix, which are no longer in the
+  menu).
+- **No links to pages outside the three (Keith, same day):** the Journey board is
+  "replaced and overstepped" by this page, so Pipeline no longer sends people there.
+  Clicking a Pipeline card now opens `illustrated-journey-dashboard.html#<product
+  id>`, and this page opens that medicine's row and scrolls to it on load and on
+  `hashchange` (`openFromHash()`); a hash that is not a product id, such as
+  `#report-issue`, is ignored. Pipeline's legend now says "see the illustrated
+  journey", and its footer copy was reworded: "Spotted an error?" is gone (the
+  floating Report an issue button covers it), "open the full profile on the journey
+  board" became "open that medicine in the illustrated journey", and the Format line
+  was shortened. No other link to `index.html`, `option-b.html` or `explainer.html`
+  remains in this page, Pipeline, Story or `site-nav.js`. **Not done, needs a
+  decision:** `index.html`, `option-b.html` and the rest are still deployed and
+  reachable by URL (and `/` still serves the Journey board); making `/` land on this
+  page would be a redirect in `vercel.json`, which changes what the public URL serves.
+  The comment in `assets/report-issue.js` still cites `index.html#report-issue` as an
+  example share link; it works on any page that loads the script.
+- **Full width, like this page (Keith, same day):** Pipeline and Story dropped their
+  fixed 1180px column (and Story's 780/732px hero, banner and closing panel) and now
+  fill the screen with this page's side padding. Each defines `--pad:
+  clamp(24px, 4vw, 64px)` (14px on a phone) and uses it for the header, content and
+  footer; the menu bar reads the same value through `--nav-pad`, so the bar's left
+  edge lines up with the content at every width. The old `--nav-max` cap is no longer
+  set by any page. Story's hero is now left-aligned at the page edge instead of
+  centred in a 780px column (the heading and intro keep their 58ch line length), and
+  the closing panel's text is capped at 70ch so it stays readable. Checked at 1900px
+  and 390px; the scroll section's sticky stage and cards still lay out. Not checked:
+  the interactive map steps in Story, or widths between 860px and 1400px.
+- **Left alone, worth a decision:** clicking a product card on Pipeline still goes
+  to `index.html#id` (the Journey board), and Pipeline's footer says "open the full
+  profile on the journey board". Both point outside the three-view menu. The
+  `unitaid/` and `synthetic/` copies of Pipeline and Story are committed generated
+  files and were not regenerated; regenerate them from the root pages in a separate
+  step (the bar will then appear there without the illustrated link). Menu text is
+  English only (script-built, so the translation pipeline does not see it).
+- Checked in headless Chrome: desktop bar, current page marked and badge on all three
+  pages; Story further down the page (map-section cards, colours); Pipeline and Story
+  at 390px with the Views button. Not checked: tablet width, Story's interactive map
+  states, real devices, keyboard order.
+
+### 3.26 One "Send feedback" button on every page, with each page's own wording (30 Sep 2026)
+
+Keith wanted every report button to match this page's "Send feedback", but with
+text that fits the page it is on.
+
+- **The widget's default is now "Send feedback"** (`assets/report-issue.js`): same
+  pill, dialog title, type labels ("Something on the page looks wrong" ...), red
+  "Mock only - Send feedback isn't connected yet." note, and a **disabled Send
+  button** until a backend is connected. Before, this page supplied all of that
+  itself (a page-local copy block, a red-note style and a script that blocked the
+  click); that block is now just its own `view` id and example text. The behaviour
+  here is unchanged.
+- **Each page fits it to itself** by setting `window.LAUNCH_FEEDBACK_COPY` before the
+  script tag. Pipeline: "Something in the pipeline look wrong...", the first type
+  reads "A product is in the wrong phase, or something else looks wrong", and its
+  example is about a product in the wrong phase. Story: "Something in the story look
+  wrong...", "A number, date or claim in the story looks wrong", and an example about a
+  waiting time. The example messages are invented illustrations, like the existing
+  Tanzania one.
+- **Page context in the payload:** the payload already carried page url, path and
+  title, plus the data's `lastUpdated` and `dataStatus`; it now also carries
+  `page.view` (`illustrated`, `pipeline`, `story`) so a report says which view it came
+  from. Set `connected: true` in the same object once the seam posts for real.
+- **Story's footer "Spotted an error?" line removed**, as Pipeline's was, since the
+  pill covers it.
+- **Reach, which you should know about:** the default lives in the shared file, so
+  every page that loads it now says "Send feedback" with Send disabled, including the
+  Journey board, Comparison matrix, widget-adjacent editions and the `unitaid/` and
+  `synthetic/` copies (they load the same file). Those pages previously simulated a
+  successful send. They have no `view` and use the generic example text. If those
+  pages are retired, this stops mattering.
+- Checked in headless Chrome: the dialog opens on all three pages with the right
+  pill, intro, type, example and red note, Send disabled, no script errors. Not
+  checked: the other pages that load the widget, real devices, keyboard handling of
+  the disabled button.
 
 ## 4. Newly discovered, deferred, or left alone
 

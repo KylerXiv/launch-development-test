@@ -70,6 +70,17 @@ if (!process.argv[2]) {
     errors.push(...srcFound.errors);
     warnings.push(...srcFound.warnings);
   }
+
+  // ---- WHO national treatment policy (the "Show MFT policy" switch) --------
+  // One global file again, so the real run only. Product ids are passed
+  // through because the page looks the policy up by product id.
+  const TP = path.join(__dirname, "..", "data", "treatment-policy.js");
+  const tp = rules.checkTreatmentPolicy(Object.assign(
+    { worldMap: read("data/world-map.js"), productIds: (extracted.data.products || []).map((p) => p.id) },
+    fs.existsSync(TP) ? { source: fs.readFileSync(TP, "utf8") } : { missing: true }
+  ));
+  errors.push(...tp.errors);
+  warnings.push(...tp.warnings);
 }
 
 // ---- report -----------------------------------------------------------------
