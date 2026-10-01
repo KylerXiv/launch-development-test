@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://oakkar-min.github.io/launch-data-test/v1/schema.json",
+  "$id": "https://codebyjackson.github.io/launch-data-test/v1/schema.json",
   "title": "LAUNCH dashboard dataset, version 1",
   "description": "The one file the RBM dashboard pages fetch. Every text a reader sees is given in English, French and Portuguese. Fields not listed here may be added without a version change; pages must ignore fields they do not know. Renaming, removing or retyping a listed field is a breaking change and moves to v2/. scripts/build-dataset.js checks every build against this file.",
   "type": "object",
