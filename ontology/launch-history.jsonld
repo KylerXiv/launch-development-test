@@ -38,16 +38,7 @@
       "periodProduct": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
       "atStage": "launch:stage-3",
       "hasStatus": "launch:status-idle",
-      "validFrom": "2026-08-15",
-      "validUntil": "2026-09-30"
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-history.jsonld#period-ganlum-s3-1",
-      "@type": "StatusPeriod",
-      "periodProduct": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
-      "atStage": "launch:stage-3",
-      "hasStatus": "launch:status-done",
-      "validFrom": "2026-09-30"
+      "validFrom": "2026-08-15"
     },
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-history.jsonld#period-ganlum-s4-0",
