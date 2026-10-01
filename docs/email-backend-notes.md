@@ -40,8 +40,10 @@ form shows its failure message and the function log names what is missing.
    | `segment` | no | the segment ID from step 3. Empty means plain contacts, which no broadcast can target on its own |
 
    **Set on 1 Oct 2026:** `from` is `LAUNCH dashboard <updates@tamarind.tech>`
-   (`tamarind.tech` is verified in Resend), `to` is `kyler@tamarind.tech`, and
-   `segment` is "LAUNCH dashboard updates". `RESEND_API_KEY` is on the Vercel
+   (`tamarind.tech` is verified in Resend), `to` is `kyler@oqtiva.ai` (first
+   set to `kyler@tamarind.tech`, changed the same day), and `segment` is
+   "LAUNCH dashboard updates". The inbox need not be on the sender's domain:
+   only the sender has to be verified. `RESEND_API_KEY` is on the Vercel
    project for Production and Preview.
 
 5. **On the Vercel project, under Settings → Environment Variables, add
@@ -246,7 +248,7 @@ run, passes all its checks.
   - a valid one shows success only after the server answers ("Thank you —
     you are on the list.", and in French "Merci — vous êtes sur la liste.");
   - the contact is saved into the configured segment before the note goes to
-    `kyler@tamarind.tech` from the `tamarind.tech` sender;
+    `kyler@oqtiva.ai` from the `tamarind.tech` sender;
   - the field clears and the button comes back;
   - there is no "Mock only" line;
   - when Resend fails, the failure message shows, the address stays for a
@@ -265,7 +267,7 @@ message, which would be wrong for a repeat subscriber. §1 step 6 tests it.
 
 **Before real visitors**
 
-- **The team inbox is one person's address** (`kyler@tamarind.tech`), chosen
+- **The team inbox is one person's address** (`kyler@oqtiva.ai`), chosen
   for testing. The handoff asks for a shared mailbox, because these outlive
   whoever is on the project. Changing it is one line in `ADDRESSES`.
 - **The sender is on `tamarind.tech`**, the developer's domain, not Unitaid's.

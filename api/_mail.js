@@ -24,7 +24,7 @@ const ADDRESSES = {
   from: "LAUNCH dashboard <updates@tamarind.tech>",
   // The team inbox, as a list. A shared mailbox is the aim; one person's
   // address while this is being tested.
-  to: ["kyler@tamarind.tech"],
+  to: ["kyler@oqtiva.ai"],
   // Resend segment that subscribers join ("LAUNCH dashboard updates"), so a
   // broadcast can go to exactly them. Optional: without it they are plain
   // contacts.
