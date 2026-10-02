@@ -16,7 +16,7 @@
 window.LAUNCH_PROPOSALS =
 {
   "meta": {
-    "updated": "2026-10-02"
+    "updated": "2026-10-01"
   },
   "proposals": []
 }
