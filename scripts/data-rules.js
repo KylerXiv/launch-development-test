@@ -165,6 +165,9 @@
         ids.add(p.id);
         for (const k of ["name", "inn", "manufacturer", "classLabel"])
           if (!p[k]) err(`${tag}: "${k}" is required`);
+        // Optional: a legal acknowledgement a partner has asked to be shown with the medicine.
+        if (p.acknowledgement !== undefined && (typeof p.acknowledgement !== "string" || !p.acknowledgement.trim()))
+          err(`${tag}: "acknowledgement" must be a non-empty string when present`);
 
         // Placeholder rows (e.g. spatial emanators) only need identity + note.
         if (p.placeholder) {

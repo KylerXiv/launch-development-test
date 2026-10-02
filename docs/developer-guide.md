@@ -223,12 +223,17 @@ No test framework by design; two layers instead:
   CDN — **except `illustrated-journey-dashboard.html`**, which loads MapLibre
   GL JS from a CDN for its own map rendering only (see below); the other 11 pages sharing
   `data/world-map.js` are unaffected and remain fully self-contained.
-- **Resistance overlay** (removed 1 Oct 2026): the WHO Malaria Threat Map
-  treatment-failure, delayed-clearance and molecular-marker layers, their data
-  files, normalizers and validator rules were taken out; see
-  `docs/remove-resistance-notes.md`. The page still renders its map with
-  MapLibre GL JS against `data/world-map-geo.js`; that one-page dependency and
-  its reasoning stay in the page's `---- MapLibre init` comment block.
+- **Resistance overlay** (removed 1 Oct 2026, on both lines of work): the WHO
+  Malaria Threat Map treatment-failure, delayed-clearance and molecular-marker
+  layers, their data files, normalizers, validator rules and click-through
+  panel were taken out of `illustrated-journey-dashboard.html`; the page points
+  readers to the WHO Malaria Threats Map instead. See
+  `docs/remove-resistance-notes.md` (this repo's removal) and
+  [docs/handoff-remove-study-layers.md](handoff-remove-study-layers.md) (Keith's,
+  which also reworked the map's filters, legend, colours and Detail rail; merged
+  2 Oct 2026). The page still renders its map with MapLibre GL JS against
+  `data/world-map-geo.js`; its original justification (the per-site dots) no
+  longer applies — see the handoff's "Deferred" list.
 - **History snapshots + RSS feed** (implemented): `.github/workflows/publish.yml`
   runs only on `data/products.js` changes, commits `history/products-<date>.js`
   and a rebuilt `feed.xml` as a bot. It cannot retrigger itself (path filter).

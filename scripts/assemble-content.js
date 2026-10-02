@@ -3,7 +3,7 @@
  * scripts/assemble-content.js  —  DEV-31
  *
  * The one script that reads the English source. It finds every string that is
- * translated, reads the three data files, hashes everything ONCE with
+ * translated, reads the two data files, hashes everything ONCE with
  * scripts/i18n-hash.js, and writes the result to i18n/content.en.json.
  * Every other script in the pipeline reads content.en.json, never the source.
  *
