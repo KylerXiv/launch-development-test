@@ -1377,9 +1377,13 @@ This section records what was fixed, and what was left for a decision.
   `en-GB` writes a lowercase "940k" next to "11.5M".
 - **The procurement card's heading.** It no longer carries the whole period sentence, which
   ran to six uppercase lines. The period sits under the figure.
-- **Prose line length.** Lines are capped at 75ch in the disclaimer, footer, sources intro
-  and step notes; they ran to 150–219 characters per line at 1440 px. The panels stay full
-  width, so the disclaimer now has empty space on its right.
+- **Prose line length: tried, then reverted the same day.** Lines were capped at 75ch in the
+  disclaimer, footer, sources intro and step notes, where they run to 150–219 characters at
+  1440 px. The panels stay full width, so text ending at about 60% of the box left the right
+  side empty. The owner read that as misaligned and asked for the text to fill its box. The
+  caps are gone, and the step band is back to its earlier 110ch. If line length comes back,
+  the way that keeps the text's edge on the box's is to narrow the box, not the text: give
+  the whole footer one reading width beside the full-width cards.
 
 **Fixed: wording that is not reviewed copy.**
 
