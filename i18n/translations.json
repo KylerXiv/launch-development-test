@@ -2485,6 +2485,13 @@
       "fr": "Granulés pédiatriques préqualifiés",
       "pt": "Grânulos pediátricos pré-qualificados"
     },
+    "7b03535523d3641a": {
+      "en": "Thanks — your feedback has been sent.",
+      "where": "assets/report-issue.js",
+      "bucket": "reviewed",
+      "fr": "Merci — vos commentaires ont été envoyés.",
+      "pt": "Obrigado — o seu feedback foi enviado."
+    },
     "7b2952e91329fff2": {
       "en": "yrs",
       "where": "illustrated-journey-dashboard.html",
@@ -4360,6 +4367,13 @@
       "fr": "Réinitialiser",
       "pt": "Reiniciar"
     },
+    "db2cbd9352261117": {
+      "en": "Your email is optional and used only to reply to you. With your message we send the page you are on, the version of the data it shows, and your browser, so the team can see what you saw.",
+      "where": "assets/report-issue.js",
+      "bucket": "reviewed",
+      "fr": "Votre adresse e-mail est facultative et sert uniquement à vous répondre. Votre message nous permet d'envoyer la page que vous consultez, la version des données affichées et votre navigateur, afin que l'équipe puisse voir ce que vous avez vu.",
+      "pt": "O seu e-mail é opcional e será utilizado apenas para respondermos à sua mensagem. Juntamente com ela, enviamos a página que está a visitar, a versão dos dados apresentados e o seu browser, para que a equipa possa ver o que visualizou."
+    },
     "db5efdf1aa304522": {
       "en": "Other countries at the same stage · ${esc(st.label)}",
       "where": "illustrated-journey-dashboard.html",
@@ -4904,6 +4918,13 @@
       "bucket": "data",
       "fr": "Sierra Leone",
       "pt": "Serra Leoa"
+    },
+    "f4c92e89b1757884": {
+      "en": "The LAUNCH team reads every message, and where you have pointed us to a public source that checks out, we correct the data at the next update. If you left an email address, any reply from us will quote the reference below.",
+      "where": "assets/report-issue.js",
+      "bucket": "reviewed",
+      "fr": "L'équipe LAUNCH lit chaque message et, lorsque vous nous indiquez une source publique vérifiée, nous corrigeons les données lors de la prochaine mise à jour. Si vous avez laissé une adresse e-mail, toute réponse de notre part mentionnera la référence ci-dessous.",
+      "pt": "A equipa LAUNCH lê todas as mensagens e, quando nos indica uma fonte pública fidedigna, corrigimos os dados na próxima atualização. Se deixou um endereço de e-mail, qualquer resposta nossa citará a referência abaixo."
     },
     "f5ffe0e8f73d7857": {
       "en": "European Medicines Agency",
