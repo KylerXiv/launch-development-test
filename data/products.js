@@ -43,7 +43,7 @@ window.LAUNCH_DATA =
     "WHO PQ listing",
     "Country registration",
     "National policy adoption",
-    "Procurement",
+    "Procurement (public channels)",
     "In-country delivery"
   ],
   "stageColumns": [
@@ -57,12 +57,12 @@ window.LAUNCH_DATA =
   ],
   "stageInfo": [
     { "what": "Lab discovery, then three rounds of human trials: first for safety, then for the right dose, then large efficacy trials across several countries. The trials alone usually take 3 to 6 years.", "who": "The manufacturer, often with a product development partnership such as MMV.", "stall": "Recruiting enough patients, and running trial sites in several countries.", "source": "Trial registries and manufacturer announcements" },
-    { "what": "A stringent regulator reviews the full evidence on quality, safety and effectiveness. For malaria medicines this is usually the European Medicines Agency (EMA) Article 58 procedure, which covers medicines meant for use outside Europe. Every later step builds on this opinion.", "who": "EMA, or another stringent regulator such as the US FDA.", "stall": "Preparing the full dossier, then waiting out the review.", "source": "EMA registers" },
+    { "what": "A stringent regulator reviews the full evidence on quality, safety and effectiveness. For malaria medicines this is usually the European Medicines Agency (EMA) Article 58 procedure, which covers medicines meant for use outside Europe. Every later step builds on this opinion. Health-authority review status is generally not public, so this step changes only when a regulator or the manufacturer announces an outcome.", "who": "EMA, or another stringent regulator such as the US FDA.", "stall": "Preparing the full dossier, then waiting out the review.", "source": "EMA registers" },
     { "what": "A WHO expert group weighs the clinical evidence and decides whether the medicine goes into the WHO Guidelines for malaria. Most countries follow these guidelines when writing their own.", "who": "WHO Global Malaria Programme and its Guidelines Development Group.", "stall": "The group meets on its own calendar, so the timing is hard to predict.", "source": "WHO Guidelines for malaria" },
     { "what": "A separate WHO check of quality and manufacturing, including factory inspections. A place on the prequalified list is what lets UN agencies and the Global Fund buy the medicine. The product must first be invited through WHO's Expression of Interest (EOI) list.", "who": "WHO Prequalification Team.", "stall": "Waiting for an invitation round, then for inspections.", "source": "WHO prequalification list and EOI" },
     { "what": "Each country's own regulator licenses the medicine before it can be sold or used there, usually one country at a time. Regional routes, such as the African Medicines Agency and WHO's collaborative registration (about 90 working days), are meant to speed this up.", "who": "National medicines regulators.", "stall": "Going country by country, each with its own queue.", "source": "National medicines registers" },
     { "what": "The health ministry writes the medicine into the national treatment guidelines. These decide what health workers prescribe and what the public sector buys. A WHO recommendation does not automatically become national policy.", "who": "Ministries of health and national malaria programmes.", "stall": "National guideline committees meet rarely and follow their own schedules.", "source": "National treatment guidelines" },
-    { "what": "Someone has to pay. Funders and governments run tenders, agree reference prices and forecast demand. A medicine can be recommended, registered and in the guidelines and still be barely bought.", "who": "The Global Fund, the US President's Malaria Initiative, UNICEF and national governments.", "stall": "Financing cycles. Global Fund grants, for example, run for three years.", "source": "Global Fund price and quality reporting, PMI" },
+    { "what": "Someone has to pay. Funders and governments run tenders, agree reference prices and forecast demand. A medicine can be recommended, registered and in the guidelines and still be barely bought. This step covers public channels only: the figures shown are Global Fund-financed procurement, and sales through private or other channels are not included.", "who": "The Global Fund, the US President's Malaria Initiative, UNICEF and national governments.", "stall": "Financing cycles. Global Fund grants, for example, run for three years.", "source": "Global Fund price and quality reporting, PMI" },
     { "what": "Getting the medicine from the port to the health facility, training health workers, and watching for side effects once it is in use.", "who": "Governments and implementing partners.", "stall": "Supply chain readiness and health-worker training.", "source": "Manufacturer and programme communications" }
   ],
   "glossary": {
@@ -81,6 +81,8 @@ window.LAUNCH_DATA =
     "GMP": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites."
   },
   "changelog": [
+    { "date": "2026-10-02", "product": "All", "change": "Illustrated journey dashboard, wording changes from reviewer feedback. Price: the per-medicine price card is removed (the price field stays in the data for the other pages). Procurement: the step is now \"Procurement (public channels)\" and says it covers Global Fund-financed procurement only. Regulatory approval: the step and the page footer say health-authority review status is generally not public. GanLum: manufacturer and research lead now read \"Novartis\", the line \"Co-developed with MMV under access-oriented partnership\" is removed, and the required acknowledgement (new `acknowledgement` field) is shown in the medicine's details. A disclaimer is added to the footer and linked from the draft banner.", "plain": "We changed some wording after reviewer feedback. The price card is gone, the procurement step is labelled as public channels only, and the page now says that health-authority review progress is usually not public. GanLum now credits Novartis as its developer, with the required acknowledgement of its funders, and the page has a disclaimer." },
+    { "date": "2026-10-01", "product": "All", "change": "Illustrated journey dashboard: the three WHO study-result layers (treatment failure, delayed parasite clearance, molecular markers of drug resistance) were removed from the country access map, together with their data files and sourcing. Drug-resistance results are no longer reproduced here; the page links to the WHO Malaria Threats Map instead. The map's controls were also reorganised: access stages and MFT policy groups are now tickable filters in the left rail, replacing the MFT switch, and the legend under the map lists only what is ticked. The Detail panel is now an overview dashboard with a country finder, and every country on the map opens its own page for the selected medicine. The 5 Sep 2026 entry below records when the layers were added.", "plain": "We removed the drug-resistance results from the map. For that information, the page now points to the WHO Malaria Threats Map. The map's filters and legend have been tidied up, and you can now click any country to see its page." },
     { "date": "2026-09-10", "product": "All", "change": "Terminology: the two product `flag` sentences now say \"access barrier\" rather than \"bottleneck\", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed.", "plain": "We now call a blocked step an \"access barrier\" instead of a \"bottleneck\". Only the wording changed — no figures or dates were altered." },
     { "date": "2026-09-08", "product": "ASPY", "change": "First confirmed national guideline adoption recorded: Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (alongside AS-AQ and AL), per a peer-reviewed therapeutic-efficacy study (Ghana 2023 fieldwork, published 2026). National policy adoption stage remains 'late' — Ghana is the only confirmed country so far against WHO's 2022 strong recommendation. Procurement stage dates for ASPY (since 2018) and DHA–PPQ (since 2008) added — both years were already cited in the Global Fund PQR figures elsewhere in this file but had not been carried into the stage `date` field.", "plain": "We found a real example of a country acting on the World Health Organization's advice: Ghana added this medicine as a backup first-choice treatment in 2022. It's still the only country confirmed to have done so. We also recorded the years Global Fund purchasing began for both underused medicines (2018 and 2008)." },
     { "date": "2026-09-05", "product": "All", "change": "Illustrated journey dashboard: the country access map gained a WHO drug-resistance overlay. Treatment-failure results from the WHO Malaria Threat Maps (therapeutic efficacy studies, extract 5 Sep 2026) are drawn as dots over the access shading, with their own provenance line and their own tooltip. All five Plasmodium species and studies of every size are included, selectable by drug and species; pairings WHO has no data for are disabled rather than shown empty. Each dot is the most recent study year for that country, averaged across that year's sites and weighted by patient numbers — click a dot for every underlying study. The access layer remains illustrative, so the two readings are presented separately and not combined." },
@@ -108,7 +110,8 @@ window.LAUNCH_DATA =
       "id": "ganlum",
       "name": "GanLum",
       "inn": "Ganaplacide–lumefantrine (KLU156)",
-      "manufacturer": "Novartis · MMV",
+      "manufacturer": "Novartis",
+      "acknowledgement": "Developed by Novartis with the scientific and financial support of MMV, and within the framework of the WANECAM2 consortium, funded by the European & Developing Countries Clinical Trials Partnership Programme supported by the European Union, with co-funding from the German Aerospace Center and the UK Department of Health and Social Care.",
       "class": "pipeline",
       "classLabel": "Pipeline · new chemical class",
       "phase": "regulatory",
@@ -128,7 +131,6 @@ window.LAUNCH_DATA =
         "price": { "value": "TBC", "note": "Pricing not yet public — will be shown once confirmed by manufacturer", "source": "", "confirmedInWriting": false, "asOf": "2026-08-14" },
         "useCase": "Non-artemisinin combination — the first major innovation in malaria treatment since ACTs were introduced over 25 years ago (Novartis) — candidate for artemisinin partial-resistance settings and MFT strategies; kills resistant parasites and blocks transmission.",
         "access": [
-          "Co-developed with MMV under access-oriented partnership",
           "Access and affordability provisions under discussion",
           "Once-daily, 3-day granule sachet — no separate paediatric development needed"
         ],
@@ -136,7 +138,7 @@ window.LAUNCH_DATA =
           "New chemical class — pharmacovigilance planning required",
           "Health-worker training on new regimen"
         ],
-        "research": { "lead": "Novartis / MMV", "geographies": "12 African countries (KALUMA trial sites)", "timeline": "Phase III complete Nov 2025", "question": "Efficacy against resistant parasites and transmission blocking" },
+        "research": { "lead": "Novartis", "geographies": "12 African countries (KALUMA trial sites)", "timeline": "Phase III complete Nov 2025", "question": "Efficacy against resistant parasites and transmission blocking" },
         "country": { "registered": 0, "inGuidelines": 0, "inMft": 0, "forecastDemand": "—" },
         "volume": null,
         "volumeNote": "Pre-launch — no procurement yet",

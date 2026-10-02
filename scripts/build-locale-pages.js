@@ -272,24 +272,42 @@ function localisePage(html, loc) {
 // A build that can fail without saying so will fail again, so the build proves
 // the locale output is complete: every data/ and assets/ file the page loads
 // must be there, or part of the page would say its data did not load.
+//
+// It also proves each locale copy keeps the same product ids, in the same
+// order, and the same number of stages as English (from Keith's branch, merged
+// 2 Oct 2026). The ids are lookup keys shared with treatment-policy.js, and a
+// translated lookup key fails silently: the page renders, logs nothing, and
+// whatever was keyed on it draws nothing.
 // ---------------------------------------------------------------------------
+function keysOf(file) {
+  const src = fs.readFileSync(file, "utf8");
+  const m = GLOBALS["data/products.js"];
+  const D = JSON.parse(src.slice(src.indexOf(m + " =") + m.length + 2).trim().replace(/;\s*$/, ""));
+  return { ids: (D.products || []).map((p) => p.id), stages: (D.stages || []).length };
+}
+
 function verify() {
   let failures = 0;
   const say = (ok, msg) => { console.log(`       ${ok ? "✓" : "✗"} ${msg}`); if (!ok) failures++; };
+  const en = keysOf(path.join(ROOT, "data", "products.js"));
 
-  console.log("\n  Self-check — locale output must load every file the page needs:");
+  console.log("\n  Self-check — locale output must load every file the page needs, and keep English's lookup keys:");
   for (const loc of LOCALES) {
     console.log(`\n    ${loc}`);
     const missing = missingFiles(path.join(OUT, loc));
     say(!missing.length, missing.length
       ? `the page loads files that are not there: ${missing.join(", ")}`
       : "every data/ and assets/ file the page loads is there");
+    const lc = keysOf(path.join(OUT, loc, "data", "products.js"));
+    say(JSON.stringify(lc.ids) === JSON.stringify(en.ids), `product ids unchanged (${en.ids.join(", ")})`);
+    say(lc.stages === en.stages, `${lc.stages} stages (English: ${en.stages})`);
   }
 
   if (failures) {
     console.error(`\n  BUILD FAILED — ${failures} check(s) did not pass.`);
-    console.error("  The page loads a file the build did not write, and part of it would say");
-    console.error("  its data did not load.\n");
+    console.error("  Either the page loads a file the build did not write, and part of it would");
+    console.error("  say its data did not load, or a locale copy changed a product id or the");
+    console.error("  number of stages, and data keyed on them would silently not match.\n");
     process.exit(1);
   }
   console.log("\n  All checks passed.\n");

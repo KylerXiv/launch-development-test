@@ -81,8 +81,8 @@ window.LAUNCH_SOURCES =
     },
     {
       "id": "who-threat-maps",
-      "label": "WHO Malaria Threat Maps",
-      "title": "WHO Malaria Threat Maps",
+      "label": "WHO Malaria Threats Map",
+      "title": "WHO Malaria Threats Map",
       "org": "WHO Global Malaria Programme",
       "category": "Surveillance database",
       "group": "data",
@@ -92,10 +92,10 @@ window.LAUNCH_SOURCES =
       ],
       "year": "Continuous; major refresh around the World Malaria Report",
       "products": ["all"],
-      "plain": "Where malaria is becoming harder to treat — the study results behind the resistance layers on the map above.",
+      "plain": "Where malaria is becoming harder to treat. Its drug-resistance study results are not reproduced on this page — open the map to explore them.",
       "collection": "manual",
       "public": true,
-      "findings": "The therapeutic efficacy study (TES) extract behind data/resistance.js, taken as a manual Excel export and normalised by scripts/normalize-resistance.js. The antimalarial drug efficacy database under alsoSee is the same data with a different front door — it is not a second source. The ArcGIS service underneath both is documented as unstable; do not build automation on it.",
+      "findings": "Until 1 Oct 2026 its therapeutic efficacy study (TES) and molecular-marker extracts fed the map's resistance layers (data/resistance.js, data/molecular-markers.js); those layers were removed and the page now links here instead. The antimalarial drug efficacy database under alsoSee is the same data with a different front door — it is not a second source. The ArcGIS service underneath both is documented as unstable; do not build automation on it.",
       "relevance": "Tracks PCR-corrected cure rates and molecular resistance markers, including plasmepsin 2/3 duplications; underpins treatment policy transitions.",
       "checked": "2026-09-21"
     },
