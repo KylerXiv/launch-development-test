@@ -32,7 +32,7 @@
 window.LAUNCH_DATA =
 {
   "meta": {
-    "lastUpdated": "2026-09-30",
+    "lastUpdated": "2026-10-02",
     "dataStatus": "draft",
     "host": "RBM Partnership to End Malaria"
   },
