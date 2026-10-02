@@ -94,6 +94,9 @@
     ".sitenav .sn-lmenu .sn-off small{font-weight:400;font-size:12px}",
     "@media (max-width:640px){.sitenav{padding-inline:14px}.sitenav ul{display:none}.sitenav .sn-views{display:inline-flex}.sitenav .sn-lang{margin-left:8px}}",
     "@media (max-width:480px){.sitenav .sn-lname{display:none}.sitenav .sn-lcode{display:inline}.sitenav .sn-vp{display:none}.sitenav .sn-views{white-space:nowrap}}",
+    // at 320px the brand, Views and language buttons need 339px; the page title
+    // right below already says LAUNCH
+    "@media (max-width:360px){.sitenav .sn-brand{display:none}}",
     "@media print{.sitenav{display:none!important}}"
   ].join("\n");
 

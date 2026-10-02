@@ -1263,6 +1263,193 @@ dropdown of §3.27 on wide screens.
   cleared after, and again on a second click; no sideways scroll; no script errors. **Not
   checked:** a real print preview, a screen reader.
 
+### 3.31 A light gray page ground, so the data cards stand out (2 Oct 2026)
+
+Asked: make the page "pop" so the data is easy to see, with a different shade of white or
+gray. Every data block was already a white card (pathway strip, medicines table, map,
+definitions, sources) on a white page, so the only thing separating them was a 1 px
+`--line` border. The page ground (`--ground`, used only by `body`) is now **`#EEF2F4`**, a
+cool light gray in the same blue-grey family as `--ink`. The cards are unchanged and stay
+white.
+
+| Ground | White card against it | `--ink-3` text on it | |
+| --- | --- | --- | --- |
+| `#FFFFFF` (before) | 1.00:1 | 5.64:1 | cards separated by their border alone |
+| `#F4F7F8` | 1.08:1 | 5.24:1 | not chosen: too faint, and it is already `--surface-2`, the table's header row |
+| **`#EEF2F4`** | **1.13:1** | **5.01:1** | chosen |
+| `#E9EEF1` | 1.17:1 | 4.82:1 | not chosen: starts to look dingy, less margin on the lightest text |
+| `#E6EBEE` | 1.20:1 | 4.69:1 | not chosen: as above, and close to the 4.5:1 floor |
+
+For scale, GitHub's gray page is `#F6F8FA`, 1.06:1 against white. Every text colour that sits
+directly on the ground still clears 4.5:1: `--ink` 12.2, `--ink-2` 6.9, `--accent` 6.8,
+`--ink-3` 5.0.
+
+Knock-on changes:
+
+- **The tooltip's text** was `color: var(--ground)`, which would have turned it gray. It is
+  now `var(--surface)`, so it stays white on ink.
+- **The Unitaid logo** needed nothing: its SVG has no background of its own, and its navy
+  holds on the gray. The comment that said "the page background is white" is updated.
+- **Print stays white**: the print view already set `body { background: #fff }`.
+- **The site menu** (`assets/site-nav.js`) is `--surface`, so it is now a white bar above the
+  gray page. Nothing changed there.
+- **The disclaimer panel's tint** (`--accent-soft`) is now only 1.02:1 against the ground,
+  where it was 1.15:1 against white. Its 1 px border and 5 px accent edge still frame it, so
+  it was left alone. If it should stand out more, a white fill is the one-line change.
+
+**Reach:** this page only, plus its `/fr/` and `/pt/` editions and RBM's copies, which are
+built from it. RBM's iframe will therefore show a gray page, not a white one. Pipeline,
+Story, `index.html`, `option-b.html`, and the `unitaid/` and `synthetic/` editions have
+their own stylesheets and are unchanged.
+
+Checked in headless Chrome at 1440 px and 390 px, before and after. The cards stand off the
+ground, the header, draft banner and buttons read as before, and there is no sideways
+scroll. **Not checked:** a real print preview, RBM's staging frame.
+
+### 3.32 An interface review, and the fixes from it (2 Oct 2026)
+
+Asked: make the data pop and the page user-friendly, following four tactics the owner
+pasted:
+
+- a neutral ground, with one accent kept for key figures;
+- key figures at the top;
+- no clutter (heavy borders, gridlines, duplicate legends);
+- compact numbers.
+
+The page was reviewed in six domains, each in headless Chrome at 1440, 390 and 320 px:
+accessibility, layout, writing, typography, colour and polish. That gave 48 findings.
+This section records what was fixed, and what was left for a decision.
+
+**Fixed: readability and access.**
+
+| Finding | Before | Now |
+| --- | --- | --- |
+| Amber and green status text ("In progress", "Complete", the draft banner's lead line, the Prototype pill) | 3.3–4.3:1, under the 4.5:1 floor | Text-only tokens `--warn-text #8C5A00` and `--good-text #17734B`: same hues, 5.0–5.9:1. `--warn` and `--good` stay the fills, borders and dots, so nothing changes shape or tone |
+| Journey column: "complete" and "delayed" | The same solid circle, green and red. Under deuteranopia: 1.01:1, ΔE 6.4 | Delayed is a diamond |
+| "Not started" markers | `--idle` 2.4:1 on white, and 1.7:1 at the pathway rail's `.65` opacity | `#7A8A94`: 3.6:1, no opacity |
+| Dimmed tooltip rows and unticked donut rows | `opacity: .45`: 4.0:1 and 2.2:1 | Opacity `.72` (7.9:1); the donut rows use `--ink-3` |
+| The pressed view button's focus ring | Accent drawn on accent: invisible | Drawn in `--accent-ink` |
+| Map filters and Detail rail | A re-render dropped focus to `<body>` on 7 of 8 controls | Focus returns to the control's successor, or to the country heading |
+| The 235 hidden country buttons | 235 of the page's 308 Tab stops | `tabindex="-1"`: screen readers still browse the list, and keyboard users have the "Country or area" select and the Countries tab. This reverses DEV-13 D21's tab order, for that reason |
+| Subscribe panel | Stayed open when focus left it, covering what came next | Closes on focus out |
+| Reduced motion | Covered 3 of the page's 7 transitions | Covers all 7 |
+
+**Fixed: nothing hidden or cut off.**
+
+- **INN subtitles.** They were cut with an ellipsis at 1045 px and below, with no way to read
+  them; they now wrap.
+- **320 px.** The page was 339 px wide. The header buttons now wrap. The menu hides its
+  "LAUNCH" brand at 360 px and below (`assets/site-nav.js`; the page title below says it
+  too). The page is now 320 px.
+- **An opened row on a phone.** The current stage and the whole Ongoing / Not started panel
+  were past the scroll edge. Only the year axis scrolls now: the panel drops under it at
+  760 px and below, and the axis opens scrolled to the present.
+- **The map's Detail rail.** It was held to the map's height with `overflow: hidden`, so the
+  MFT policy card was cut off with no cue. It now takes its own height. The left rail is
+  still held to the map's height on desktop, and neither rail is held when they stack.
+- **The medicines table.** It cut off "Main barrier" between 641 and 675 px. The narrow
+  layout now starts at 680 px.
+- **Pathway labels.** They may break a long word instead of running into the next arrow.
+- **Timeline labels.** A second gate's stem was painted through the first gate's label.
+
+**Fixed: less clutter, figures first.**
+
+- **Card borders removed** from the pathway strip, table, map, definitions, sources and step
+  panel. The gray ground, white fill and shadow already separate them. Print gets the
+  borders back, because neither the ground nor the shadow prints.
+- **Inner borders removed** from the map rails, legend bar, "More detail" panel and step
+  explanation band; their fill groups them. `--map-border`, the country-outline colour, had
+  been their box line at 3.0:1, the heaviest lines on the page. The step panel's border was
+  a text colour; it is now `--line`.
+- **One duplicate legend fewer.** The map overview's mix card no longer repeats the
+  access-stage key under its bar; the legend and the filters already carry it. The filters'
+  counts and the legend stay, as the owner chose (Keith's handoff §9).
+- **The accent means "press me".**
+  - The map's "Select any country…" hint was a filled accent box with a pointer glyph. It
+    is plain text now.
+  - The filter count badge is outlined.
+  - Accent remains on actions, links and selected states.
+- **Key figures stand out.** "On pathway" years are bold `--ink`. Timeline years, status
+  words and "since" lines go from 10.5–11 px to 12 px.
+- **Compact numbers, at render time.** `fmtFig()` writes 940,111 as 940K and 11,493,039 as
+  11.5M, and US$14.5m as US$14.5M. It runs on the procurement card and the map's medicine
+  facts. The data, and so the CSV, keep exact figures. It uses `en-US`, because Chrome's
+  `en-GB` writes a lowercase "940k" next to "11.5M".
+- **The procurement card's heading.** It no longer carries the whole period sentence, which
+  ran to six uppercase lines. The period sits under the figure.
+- **Prose line length.** Lines are capped at 75ch in the disclaimer, footer, sources intro
+  and step notes; they ran to 150–219 characters per line at 1440 px. The panels stay full
+  width, so the disclaimer now has empty space on its right.
+
+**Fixed: wording that is not reviewed copy.**
+
+- **Load failures.** They now say "…could not be loaded. Please reload the page to try
+  again." The developer hint (`validate-data.js`) goes to the console, and Download CSV is
+  hidden when there is nothing to download.
+- **The step panel's "verified" date** reads "23 Aug 2026" like every other date on the
+  page, not 2026-08-23.
+- **The map rail heading** "Drug" is now "Medicine", the word used everywhere else.
+- **The WHO Malaria Threats Map link** was browser-default blue; it now takes the accent.
+
+**Rows open from anywhere on the row**, not only from the 30 px chevron. Links, buttons and
+glossary terms keep their own clicks, and the chevron stays the keyboard route.
+
+**Not changed, for a decision.**
+
+- **A key-figures strip at the top** (tactic 2). The figures exist:
+  - 4 medicines: 2 delayed, 2 in progress;
+  - Global Fund procurement per medicine;
+  - countries with an access stage.
+
+  Which ones lead is a content call, and one of them conflicts with another (next item).
+- **"Registered" shows two numbers for ASPY**: 8 in the step panel's map-sample counts, 25
+  on the Country access card. Reconcile the data, or label the map sample, before either
+  figure is promoted.
+- **"Treatments procured" counts packs.** The figures are PQR packs, and the project's own
+  definition says a treatment is one course. The heading is reviewed copy (§3.29), so it is
+  unchanged.
+- **A type scale.** There are 20 font sizes and 19 separately styled label rules. That
+  needs a pass of its own, coordinated with Keith's branch.
+- **On phones, the map's filters come before the map** (740–909 px of them).
+- **The map hint** says "Ctrl + scroll" beside MapLibre's own "⌘ + scroll" overlay, and
+  "Drag to pan" where touch needs two fingers.
+- **"On pathway"** counts from the first cleared gate. The label doesn't say so, and ALAQ
+  shows "—" despite a Phase III underway.
+- **Smaller items:**
+  - tabs without arrow keys;
+  - no `<main>` or skip link;
+  - the tooltip ignores Escape;
+  - the Send feedback pill is a filled accent (a shared file, so other pages too);
+  - the chevron is a text glyph.
+
+**Found in passing, left alone: the translation build rewrites code strings.**
+`translations.json` holds French and Portuguese for `"grid-column: 4 / -1"` and
+`"(prefers-reduced-motion: reduce)"`, because the extractor takes them for interface text.
+So on `/fr` and `/pt`, `matchMedia` gets a query in French and never matches, which means
+reduced motion is ignored there. The inline grid placement is broken too. The rail-height
+check above reads the grid instead of a media-query string, so as not to add a third case.
+The fix belongs in `assemble-content.js`'s skip rule (DEV-31).
+
+**Checked:** a scripted run in headless Chrome, 31 checks, all passing, no script errors. It
+covered:
+- the contrast tokens;
+- the diamond;
+- the INN wrapping;
+- the Tab order;
+- the rail content;
+- the compact figures;
+- opening a row from its name;
+- focus kept on a filter, on a Detail tab and on a country;
+- Subscribe closing on focus out;
+- no sideways scroll at 390 and 320 px, with and without a row open;
+- the opened row's panel on screen and its axis at the present;
+- the stacked rails;
+- the load-failure state with `products.js` blocked.
+
+`i18n/content.en.json` was regenerated, since the page's text changed, and
+`test-build-dataset.js` is back to 28 passed. **Not checked:** a real browser's map canvas,
+real touch devices, print, a screen reader, the `/fr` and `/pt` pages.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
