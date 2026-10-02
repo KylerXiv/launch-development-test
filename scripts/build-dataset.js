@@ -59,18 +59,25 @@ const LOCALES = ["en", ...locale.LOCALES];          // en, fr, pt
 const TEXT_PATHS = {
   products: [
     "stages[]",
-    "stageInfo[].what", "stageInfo[].who", "stageInfo[].stall",
+    "stageInfo[].what", "stageInfo[].who", "stageInfo[].stall", "stageInfo[].source",
     "glossary.*",
     "changelog[].plain",
     "products[].classLabel", "products[].flag", "products[].barrier", "products[].note", "products[].next",
     "products[].stages[].note", "products[].stages[].next",
+    "products[].stages[].date", "products[].stages[].nextDate",
     "products[].detail.useCase", "products[].detail.access[]", "products[].detail.adoption[]",
-    "products[].detail.research.question", "products[].detail.price.note", "products[].detail.volumeNote",
+    "products[].detail.research.question", "products[].detail.research.lead",
+    "products[].detail.research.geographies", "products[].detail.research.timeline",
+    "products[].detail.price.note", "products[].detail.volumeNote",
+    "products[].detail.volume.total", "products[].detail.volume.period", "products[].detail.volume.split[].channel",
     "products[].detail.milestones[].milestone", "products[].detail.milestones[].label",
-    "products[].detail.milestones[].next",
+    "products[].detail.milestones[].next", "products[].detail.milestones[].date",
+    "products[].detail.milestones[].anticipated",
     "products[].detail.journey[].label",
   ],
   sources: ["sources[].label", "sources[].title", "sources[].plain", "sources[].alsoSee[].label"],
+  // country names, from i18n/country-names.json (CLDR) through build-locale-pages.js
+  treatmentPolicy: ["countries.*.name"],
 };
 
 // Fields of a source entry that are published; findings and relevance are the
@@ -195,10 +202,12 @@ function build() {
   const S = copies("data/sources.js", locale.localiseSources);
   const products = mergeText(P.en, P, TEXT_PATHS.products, "data/products.js");
   const sources = mergeText(S.en, S, TEXT_PATHS.sources, "data/sources.js");
-  const untracked = products.untracked.concat(sources.untracked);
-
   const tpRaw = rules.extractData(fs.readFileSync(path.join(ROOT, "data", "treatment-policy.js"), "utf8"), "LAUNCH_TREATMENT_POLICY");
   if (!tpRaw.ok) throw new Error("data/treatment-policy.js cannot be read");
+  const TPc = { en: tpRaw.data };
+  for (const loc of locale.LOCALES) TPc[loc] = locale.localiseTreatmentPolicy(JSON.parse(JSON.stringify(tpRaw.data)), loc);
+  const policy = mergeText(TPc.en, TPc, TEXT_PATHS.treatmentPolicy, "data/treatment-policy.js");
+  const untracked = products.untracked.concat(sources.untracked, policy.untracked);
 
   const D = products.merged;
   const publicSources = (sources.merged.sources || []).filter((s, i) => (S.en.sources[i] || {}).public)
@@ -223,7 +232,7 @@ function build() {
       glossary: D.glossary,
       changelog: (D.changelog || []).map((c) => ({ date: c.date, product: c.product, plain: c.plain === undefined ? null : c.plain })),
       products: (D.products || []).filter((p) => !p.placeholder),
-      treatmentPolicy: tpRaw.data,
+      treatmentPolicy: policy.merged,
       sources: publicSources,
     },
   };

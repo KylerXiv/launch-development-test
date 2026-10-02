@@ -1402,10 +1402,16 @@
     ? `<img class="${cls} whoemb" src="assets/who-emblem.svg" alt="" width="205" height="181">`
     : (JI ? JI.use(i, cls) : "");
 
+  // Dates follow the page's language: the French and Portuguese copies carry
+  // <html lang="fr"> / "pt-PT", so their dates read "2 oct. 2026" / "2/10/2026".
+  // English keeps en-GB ("2 Oct 2026").
+  const PAGE_LANG = document.documentElement.lang || "en";
+  const DATE_LANG = /^en\b/i.test(PAGE_LANG) ? "en-GB" : PAGE_LANG;
+
   // header + banner from meta
   const dt = new Date(DATA.meta.lastUpdated + "T00:00:00");
   document.getElementById("updated").textContent = "Last updated " +
-    dt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    dt.toLocaleDateString(DATE_LANG, { day: "numeric", month: "short", year: "numeric" });
 
   const status = DATA.meta.dataStatus;
   const BANNERS = {
@@ -1492,7 +1498,7 @@
   // as prose rather than as a database column.
   function readableDate(iso) {
     const d = new Date(iso + "T00:00:00");
-    return isNaN(d) ? iso : d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    return isNaN(d) ? iso : d.toLocaleDateString(DATE_LANG, { day: "numeric", month: "long", year: "numeric" });
   }
 
   // pathway legend strip: the eight stages as illustrated badges
@@ -2135,7 +2141,8 @@
       st.source ? "Source: " + esc(st.source) : "",
       st.asOf ? "verified " + esc(st.asOf) : "",
       (i === 4 || i === 5) && p.detail.countries && p.detail.countries.status !== "verified"
-        ? "country survey is " + esc(p.detail.countries.status) : ""
+        // the status is a key ("illustrative"); spelled out whole so the sentence translates as one
+        ? (p.detail.countries.status === "illustrative" ? "country survey is illustrative" : "country survey is " + esc(p.detail.countries.status)) : ""
     ].filter(Boolean).join(" · ");
 
     return `
@@ -2540,6 +2547,15 @@
       // Native replacement for D13's hand-rolled "ctrl+wheel only" rule — the
       // single most complained-about behaviour in embedded maps.
       cooperativeGestures: true,
+      // MapLibre's own interface text, spelled out (these are its English
+      // defaults) so the French and Portuguese builds can translate it.
+      locale: {
+        "NavigationControl.ZoomIn": "Zoom in",
+        "NavigationControl.ZoomOut": "Zoom out",
+        "CooperativeGesturesHandler.WindowsHelpText": "Use Ctrl + scroll to zoom the map",
+        "CooperativeGesturesHandler.MacHelpText": "Use ⌘ + scroll to zoom the map",
+        "CooperativeGesturesHandler.MobileHelpText": "Use two fingers to move the map",
+      },
       attributionControl: false,
     });
     map.getCanvas().setAttribute("aria-label", "World map, pan and zoom with the mouse or arrow keys");
@@ -2694,6 +2710,7 @@
     const prettyDate = (iso) => {
       const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
       if (!m) return iso || "";
+      if (DATE_LANG !== "en-GB") return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(DATE_LANG, { day: "numeric", month: "short", year: "numeric" });
       const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
       return `${+m[3]} ${MON[+m[2] - 1]} ${m[1]}`;
     };
@@ -2936,7 +2953,7 @@
       const rows = MFT_GROUPS.map((g) =>
         `<div${on.has(g.id) ? "" : ' style="opacity:.45"'}><span class="mft-sq" style="background:${mftGroupColor(g.id)}"></span><span>${esc(g.short)}</span><b>${byCat[g.id].length}</b></div>`).join("");
       return `<div class="mft-donut"><svg viewBox="0 0 112 112" width="112" height="112" role="img" ` +
-        `aria-label="${total} ${total === 1 ? "country" : "countries"} by patient group">` +
+        `aria-label="${total} ${total === 1 ? "country by patient group" : "countries by patient group"}">` +
         `<circle cx="56" cy="56" r="${R}" fill="none" stroke="#EDF1F3" stroke-width="${W}"></circle>${arcs}` +
         `<text class="ct-n" x="56" y="58" text-anchor="middle">${total}</text>` +
         `<text class="ct-l" x="56" y="74" text-anchor="middle">${total === 1 ? "country" : "countries"}</text></svg>` +
@@ -3012,7 +3029,7 @@
 
     function detCountry(iso3) {
       const p = curProduct(), region = REGION_NAME[WHO_REGION[iso3]] || "";
-      let h = (mftSel ? `<button type="button" class="det-back" data-back>‹ Back to ${cameFrom === "countries" ? "countries" : "overview"}</button>` : "") +
+      let h = (mftSel ? `<button type="button" class="det-back" data-back>${cameFrom === "countries" ? "‹ Back to countries" : "‹ Back to overview"}</button>` : "") +
         `<div class="det-chead"><div><h4 class="det-cname">${esc(mftName(iso3))}</h4><span class="det-reg">${esc(region)}</span></div>` +
         `<div class="det-nav"><button type="button" data-step="-1" aria-label="Previous country">‹</button>` +
         `<button type="button" data-step="1" aria-label="Next country">›</button></div></div>`;

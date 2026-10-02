@@ -40,6 +40,7 @@ node scripts/validate-data.js                 # expect 0 errors, 1 warning
 node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 warnings
 node scripts/make-preview.js                  # smoke test
 node scripts/test-build-dataset.js            # RBM dashboard.json: expect 0 failed
+node scripts/build-country-names.js --check   # /fr, /pt country names: expect "covers all"
 ```
 
 The 1 warning is `treatment policy:` (French Guiana lists a dashboard product

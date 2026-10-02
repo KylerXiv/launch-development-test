@@ -53,7 +53,8 @@
             "properties": {
               "what": { "$ref": "#/$defs/text" },
               "who": { "$ref": "#/$defs/text" },
-              "stall": { "$ref": "#/$defs/text" }
+              "stall": { "$ref": "#/$defs/text" },
+              "source": { "$ref": "#/$defs/text", "description": "The kind of source behind the step, e.g. National medicines registers. A label, so it is translated." }
             }
           }
         },
@@ -121,7 +122,7 @@
         "treatmentPolicy": {
           "type": "object",
           "required": ["meta", "countries"],
-          "description": "WHO World Malaria Report Annex 4B for the four dashboard medicines, as in data/treatment-policy.js. English only."
+          "description": "WHO World Malaria Report Annex 4B for the four dashboard medicines, as in data/treatment-policy.js. Each countries.*.name is text ({ en, fr, pt }; French and Portuguese from the Unicode CLDR, i18n/country-names.json); everything else is English and codes."
         },
         "sources": {
           "type": "array",
