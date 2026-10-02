@@ -1251,7 +1251,7 @@ dropdown of §3.27 on wide screens.
 - **Small section headings with a rule** for About the data and Sources (the disclaimer's own
   heading is inside its panel).
 - **Footer text is 14 px** throughout (was 12.5 px), in `--ink-2`.
-- **Sources: open on desktop, a closed dropdown on phones** (breakpoint 720 px, the same one
+- **Sources: open on desktop, a closed dropdown on phones** *(desktop can now close it too: §3.33)* (breakpoint 720 px, the same one
   the two-column list already used). The `<details>` element is kept: the script holds it open
   on wide screens and hides its summary, so the section heading is the label; on a phone the
   summary reads "Show the sources" with a count. `#sources` and printing still open it.
@@ -1454,6 +1454,63 @@ covered:
 `test-build-dataset.js` is back to 28 passed. **Not checked:** a real browser's map canvas,
 real touch devices, print, a screen reader, the `/fr` and `/pt` pages.
 
+### 3.33 Sources can be closed on desktop too (2 Oct 2026)
+
+Branch `fix/sources-toggle`, from `main` at `56ecf13`. §3.30 held the list open on wide
+screens and hid its summary, so a laptop reader could not close it.
+
+- **A visible toggle on every screen.** It starts **open on desktop and closed on a phone**
+  (721 px and up is desktop, as before). The reader can open or close it on either.
+- **The label follows the state:** "Hide the sources" while open, "Show the sources" while
+  closed, with the count badge on both. The "Sources" section heading stays. *Not chosen:* the
+  toggle replacing the heading ("Sources (22)", like Definitions); keeping the fixed text "Show
+  the sources", which reads wrong while the list is open.
+- **Crossing the 720 px width resets it** to that screen's default (rotating a tablet,
+  resizing a window), as the script already did. Within one width the reader's choice holds.
+  The owner's answer was "open by default on a laptop, closed on a phone", so the default
+  follows the screen. *Not chosen:* keeping the reader's choice across the width change.
+- **Nothing is remembered between visits.** No `localStorage`; every visit starts from the
+  screen's default.
+- **Both labels are in the markup**, one hidden by CSS from `[open]`, not swapped by the
+  script. `assemble-content.js` collects markup text reliably. "Show the sources" keeps its
+  existing translation key, and "Hide the sources" is the one new string (`content.en.json`
+  regenerated: markup 51 → 52; all other changes are line numbers). Until `translate.yml`
+  runs, `/fr` and `/pt` show "Hide the sources" in English.
+- **Printing hides the summary** (`beforeprint` already opens the list), so a printout does not
+  say "Hide the sources".
+- **More room around the toggle (option B).** With the toggle visible on desktop, the old
+  spacing looked cramped: box padding 10 × 18 px, and 10 px from the toggle to the intro.
+  The owner picked option B from an options page of five: the same box, a toggle row at least
+  48 px tall (12 px above and below), side padding 20 px, a chevron after the count instead of
+  the browser's ▸ (it turns over when open; no turning when the reader prefers reduced motion),
+  a rule under the toggle when open, and 8 px bottom padding so the list's last margin stays
+  inside the box. Then, on request, more space between the three parts: **14 px** from the
+  rule to the intro and **12 px** from the intro to the first source (20 and 18 px were tried
+  first and judged too much).
+- **Why it looked tight in the first place:** `.ft-sec p { margin: 0 }` (0,1,1) outranks
+  `.srcs-intro` (0,1,0), so the intro's margin never applied, in any version of the footer.
+  It touched the rule above it, and the list sat only 8 px below (the list's own top margin).
+  The rule is now `.srcs .srcs-intro`, which outranks it. Option B's planned 14 px had the
+  same problem and never showed. *Not chosen:* A, today's spacing; C, a tinted
+  header bar with a round chevron button on the right; D, an accent button with no box; E, the
+  "Sources" heading row as the toggle, with no box. **Sources only:** the Definitions and Recent
+  dashboard updates panels keep the old box for now.
+
+Checked in headless Chrome at 1280 px and 390 px, real time over CDP (swiftshader flags),
+0 script errors: open with "Hide the sources" on a laptop, closed with "Show the sources" on a
+phone. Click or tap toggles both ways on both. Crossing the width resets to the default. Print
+media hides the summary with the list open. A fresh load at `#sources` opens it on a phone.
+The badge reads 22 and there is no sideways scroll. The locale build passes. On `/fr` and
+`/pt`, "Show the sources" is translated and "Hide the sources" is still English. **Not checked:** a
+real phone, a screen reader.
+
+Found in passing, left alone: `scripts/test-serializer.js` reports 2 round-trip failures
+(`products.js`, `products.synthetic.js`) on `main` too, without this change. It is not in the
+CLAUDE.md verify block. Not investigated.
+
+**Merged after §3.31 and §3.32 (2 Oct 2026).** This was written as §3.31 and renumbered on
+merge. The box keeps no outer border, like every other card on the gray ground (§3.32).
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
@@ -1590,7 +1647,7 @@ Nothing in the data model needs to change for either.
 | the feedback widget's copy seam | §3.6 |
 | changelog `plain` fields | §3.7 and `docs/data-analyst-guide.md` |
 | the hover peek or the click panel | §3.8 |
-| the sources footer or any source URL | §3.9, §3.27 |
+| the sources footer or any source URL | §3.9, §3.27, §3.33 (the dropdown's open/closed behaviour) |
 | the subscribe backend (`api/`) | §3.10 here for what the visitor sees; decisions in [email-backend-notes.md](email-backend-notes.md) |
 | the draft/dataStatus banner | §3.11 |
 | the summary strip's KPIs, or "access barrier" wording | §3.12 |

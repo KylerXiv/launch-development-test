@@ -1,5 +1,9 @@
 # Translation in the proposal workflow — working notes
 
+> **2 Oct 2026:** the pipeline now has a fourth bucket (`reviewed`), CLDR
+> country names and translated shared widgets. See
+> [docs/jackson/translation-coverage.md](jackson/translation-coverage.md).
+
 Branch: `translation-workflow`, cut from `main` at `b8c8d05` on 30 September
 2026, with `feat/translation` (`f69ecf6`) merged in. `feat/translation` is
 Keith's branch (`Keith-paradox/launch-development`, `ee1181e`) plus one commit
