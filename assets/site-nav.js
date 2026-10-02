@@ -20,6 +20,12 @@
  *   window.LAUNCH_LOCALES_LIVE = { fr: true, pt: true }   (before this script)
  * A language that is not live shows as "coming soon" rather than linking to a page
  * that does not exist yet.
+ *
+ * LANGS keeps fr and pt off on purpose: the fr/ and pt/ folders exist only in a
+ * build. scripts/build-public-site.sh writes them, and then prepends that
+ * window.LAUNCH_LOCALES_LIVE line to every copy of this file in its output, so
+ * the deployed site (Vercel, production and previews) links them. The repo
+ * served as it is keeps "coming soon".
  */
 (function () {
   "use strict";

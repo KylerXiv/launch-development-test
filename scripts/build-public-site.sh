@@ -47,7 +47,20 @@ cp assets/who-emblem.svg assets/unitaid-logo.svg assets/report-issue.js assets/s
 # does not wait for French: new text shows in English until it is translated.
 # A locale page that fails its self-check still fails the build.
 node scripts/build-locale-pages.js --allow-stale
-for loc in fr pt; do
+LOCALES="fr pt"
+for loc in $LOCALES; do
   mkdir -p "$OUT/$loc"
   cp -R "dist/locale/$loc/." "$OUT/$loc/"
+done
+
+# Switch the language menu on. assets/site-nav.js lists French and Portuguese
+# as "coming soon" by default, because the repo served as it is (a local server,
+# GitHub Pages) has no fr/ or pt/ folders to link to. This build has just
+# written them, so every copy of the menu in the output (the English page's and
+# each locale's own) is told they are live, through the menu's own
+# window.LAUNCH_LOCALES_LIVE setting. A language added to LOCALES is switched
+# on here too.
+LIVE="window.LAUNCH_LOCALES_LIVE = window.LAUNCH_LOCALES_LIVE || {$(for loc in $LOCALES; do printf ' %s: true,' "$loc"; done | sed 's/,$//') };"
+for f in "$OUT/assets/site-nav.js" $(for loc in $LOCALES; do printf '%s ' "$OUT/$loc/assets/site-nav.js"; done); do
+  { printf '%s\n' "$LIVE"; cat "$f"; } > "$f.tmp" && mv "$f.tmp" "$f"
 done
