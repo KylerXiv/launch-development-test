@@ -78,13 +78,6 @@
       "fr": "Neuf présentations préqualifiées (PQ) auprès de trois fabricants (Alfasigma, Guilin, Beijing Holley) — sécurité d’approvisionnement par la diversité",
       "pt": "Nove apresentações pré-qualificadas (PQ) de três fabricantes (Alfasigma, Guilin, Beijing Holley) — segurança do abastecimento pela diversidade"
     },
-    "07dcc067aee67beb": {
-      "en": "Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG).",
-      "where": "products.products[0].stages[3].note",
-      "bucket": "data",
-      "fr": "Préqualifié par l'OMS le 15 septembre 2026 (réf. OMS TEST-0001, Novartis Pharma AG).",
-      "pt": "Pré-qualificado pela OMS em 15 de setembro de 2026 (ref. OMS TEST-0001, Novartis Pharma AG)."
-    },
     "07e9ffda646ae720": {
       "en": "Pre-submission dialogue",
       "where": "products.products[0].detail.milestones[2].next",
@@ -1421,13 +1414,6 @@
       "bucket": "data",
       "fr": "Afghanistan",
       "pt": "Afeganistão"
-    },
-    "5df54bcce9c0468d": {
-      "en": "GanLum — who pq listing was updated from the WHO prequalification list.",
-      "where": "products.changelog[0].plain",
-      "bucket": "data",
-      "fr": "GanLum — La liste de préqualification de l'OMS a été mise à jour à partir de la liste de préqualification de l'OMS.",
-      "pt": "GanLum — a lista de pré-qualificação da OMS foi atualizada a partir da lista de pré-qualificação da OMS."
     },
     "5e95cab879f3837b": {
       "en": "Mock only — Subscribe for updates isn't connected yet.",
