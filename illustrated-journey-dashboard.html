@@ -105,6 +105,7 @@
     border: 1px solid var(--line);
   }
   .demo-banner b { color: var(--ink); }
+  .demo-banner .bl-link { color: inherit; font-weight: 700; text-underline-offset: 2px; white-space: nowrap; }
   .demo-banner.error { background: var(--crit-soft); color: var(--crit); }
   /* Unverified data has to read as a warning, not as another note in accent
      blue — amber, a heavier rule down the leading edge and a lead line that
@@ -729,8 +730,7 @@
   .updates.changes .um .up-name { color: var(--ink-2); font-weight: 650; letter-spacing: 0; }
   .updates.changes .ut { font-size: 14px; line-height: 1.55; color: var(--ink); }
 
-  footer { margin-top: 18px; font-size: 12.5px; color: var(--ink-3); line-height: 1.7; border-top: 1px solid var(--line); padding-top: 16px; }
-  footer b { color: var(--ink-2); }
+  footer { margin-top: 18px; font-size: 14px; color: var(--ink-2); line-height: 1.65; border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 16px; }
   /* Sources: one named source per line, each opening its own official site.
      Two columns on a wide screen so the list stays a footnote rather than
      becoming a page of its own; one column once that would squeeze the text. */
@@ -744,6 +744,32 @@
   .srclist .srcname { font-weight: 650; color: var(--ink-2); }
   .srclist li > span { display: block; }
   .srclist li > span a { font-weight: 400; }
+  /* Footer: the disclaimer leads, in a tinted panel with an accent edge, so it is not overlooked. */
+  .ft-sec h3 { margin: 0 0 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3);
+               border-bottom: 1px solid var(--line); padding-bottom: 5px; }
+  .ft-sec p { margin: 0; }
+  .disclaimer { background: var(--accent-soft); border: 1px solid var(--line); border-left: 5px solid var(--accent);
+                border-radius: 10px; padding: 14px 18px; color: var(--ink); scroll-margin-top: 16px; }
+  .disclaimer:focus { outline: none; }
+  .disclaimer h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 16px; color: var(--ink); }
+  .disclaimer h3 svg { flex: none; color: var(--accent); }
+  .disclaimer p { margin: 0 0 8px; font-size: 14px; line-height: 1.6; }
+  .disclaimer p:last-child { margin-bottom: 0; }
+  /* When the draft banner's link (or #disclaimer) brings the reader here, a brief glow shows where they landed. */
+  .disclaimer.flash { animation: disc-flash 1.6s ease-out 1; }
+  @keyframes disc-flash { 0%, 35% { box-shadow: 0 0 0 6px rgba(245, 200, 66, .55); } 100% { box-shadow: 0 0 0 0 rgba(245, 200, 66, 0); } }
+  @media (prefers-reduced-motion: reduce) { .disclaimer.flash { animation: none; outline: 3px solid rgba(245, 200, 66, .9); } }
+  /* The dropdown matches the Definitions band: same box, same summary. */
+  .srcs { margin-top: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+          box-shadow: var(--shadow); padding: 10px 18px; }
+  .srcs summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-2); letter-spacing: .04em; text-transform: uppercase; }
+  .srcs summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+  .srcn { font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px;
+          padding: 0 7px; margin-left: 6px; letter-spacing: 0; text-transform: none; vertical-align: 1px; }
+  .srcs-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  /* Open on desktop: the section heading is the label, so the summary is hidden and the list is held open by the script.
+     On a phone it is a closed dropdown the reader opens. */
+  @media (min-width: 721px) { .srcs summary { display: none; } .srcs-intro { margin-top: 0; } }
   .ext { margin-left: 3px; font-size: .85em; opacity: .75; }
   @media (max-width: 720px) { .srclist { columns: 1; } }
   footer a { color: var(--accent); }
@@ -1137,7 +1163,7 @@
 </style>
 
 <body>
-<script src="assets/site-nav.js" data-current="illustrated"></script>
+<script src="assets/site-nav.js" data-current="illustrated" data-languages="en,fr,pt"></script>
 <div class="wrap">
   <header>
     <div class="hd-top">
@@ -1254,11 +1280,26 @@
   </details>
 
   <footer>
-    <b>About the data.</b> The LAUNCH dashboard displays publicly available information only. Product-specific details
-    (including pricing) appear solely where the manufacturer has confirmed in writing that they may be shared.
-    Hover any stage for status detail; select a medicine to open its full profile.<br>
-    <b>Sources.</b> Everything on this page is traceable to one of the public sources below.
-    Each name opens that source's own official site in a new tab, so you can check any figure yourself.
+    <div class="disclaimer" id="disclaimer" tabindex="-1">
+      <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>Disclaimer</h3>
+      <p>Users should not consider the LAUNCH dashboard a complete and authoritative source of access information. It provides a snapshot at a point in time, based on publicly available information and on figures a manufacturer has confirmed in writing.</p>
+      <p>We do not accept legal responsibility for the accuracy of the data. In particular, we do not guarantee that it is complete, up to date or fit for a specific purpose. Country stages in this version are illustrative and have not been verified, except for the Nigeria and Tanzania registrations. Users should carry out their own country-level checks before making any decision based on this data.</p>
+      <p>A full understanding of a medicine's access situation in any country requires information that is not in this dashboard, such as the detail of a national registration, guideline or procurement decision.</p>
+    </div>
+    <section class="ft-sec">
+      <h3>About the data</h3>
+      <p>The LAUNCH dashboard displays publicly available information only. Product-specific details
+        appear solely where the manufacturer has confirmed in writing that they may be shared.
+        Health-authority review status is generally not public, so regulatory steps change only when a regulator or the
+        manufacturer announces an outcome. Procurement figures cover public channels only.
+        Hover any stage for status detail; select a medicine to open its full profile.</p>
+    </section>
+    <section class="ft-sec">
+      <h3>Sources</h3>
+    <details class="srcs" id="sources">
+      <summary>Show the sources <span class="srcn" id="srcn"></span></summary>
+      <p class="srcs-intro">Everything on this page is traceable to one of the public sources below.
+        Each name opens that source's own official site in a new tab, so you can check any figure yourself.</p>
     <ul class="srclist">
       <li>
         <a href="https://www.who.int/teams/global-malaria-programme/guidelines-for-malaria" target="_blank" rel="noopener noreferrer">WHO malaria guidelines<span class="ext" aria-hidden="true">↗</span></a>
@@ -1301,10 +1342,8 @@
         <span>Company announcements, and figures a manufacturer has confirmed to us in writing. There is no public register for these.</span>
       </li>
     </ul>
-    A LAUNCH initiative of
-    <a href="https://unitaid.org/" target="_blank" rel="noopener noreferrer">Unitaid<span class="ext" aria-hidden="true">↗</span></a>
-    partners, to be hosted by the
-    <a href="https://endmalaria.org/" target="_blank" rel="noopener noreferrer">RBM Partnership to End Malaria<span class="ext" aria-hidden="true">↗</span></a>.
+    </details>
+    </section>
   </footer>
 </div>
 
@@ -1386,8 +1425,8 @@
 
   const status = DATA.meta.dataStatus;
   const BANNERS = {
-    illustrative: "<b>Design mockup.</b> All statuses, dates, prices and volumes below are illustrative placeholders for layout review — not real programme data.",
-    draft: '<span class="bl">⚠ Draft figures — not yet verified. Please do not quote them.</span>'
+    illustrative: "<b>Design mockup.</b> All statuses, dates, prices and volumes below are illustrative placeholders for layout review — not real programme data. <a class='bl-link' href='#disclaimer'>Read the disclaimer</a>",
+    draft: '<span class="bl">⚠ Draft figures — not yet verified. Please do not quote them. <a class="bl-link" href="#disclaimer">Read the disclaimer</a></span>'
   };
   if (BANNERS[status]) {
     banner.hidden = false;
@@ -1737,7 +1776,7 @@
     const shades = ["#14657E", "#3E8CA3", "#77AFC0", "#B4D2DC"];
     const volumeCard = d.volume ? `
       <div class="card">
-        <h3>Treatments procured · ${esc(d.volume.period)}</h3>
+        <h3>Treatments procured through public channels · ${esc(d.volume.period)}</h3>
         <div class="big">${esc(d.volume.total)}</div>
         <div class="split" aria-hidden="true">
           ${d.volume.split.map((s, i) => `<div style="width:${s.pct}%;background:${shades[i % shades.length]}" title="${esc(s.channel)} ${s.pct}%"></div>`).join("")}
@@ -1752,12 +1791,6 @@
         <div class="big">—</div>
         <div class="sub">${esc(d.volumeNote || "Data not yet available")}</div>
       </div>`;
-
-    const priceProv = [
-      d.price.source ? "Source: " + d.price.source : "",
-      d.price.confirmedInWriting ? "Manufacturer-confirmed in writing" : "",
-      d.price.asOf ? "as of " + d.price.asOf : ""
-    ].filter(Boolean).join(" · ");
 
     const node = el(`
       <section class="product" id="${esc(p.id)}">
@@ -1791,12 +1824,6 @@
         <div class="detail" id="${esc(p.id)}-detail">
           <div class="cards">
             <div class="card">
-              <h3>Indicative price per treatment</h3>
-              <div class="big">${esc(d.price.value)}</div>
-              <div class="sub">${esc(d.price.note)}</div>
-              ${priceProv ? `<div class="prov">${esc(priceProv)}</div>` : ""}
-            </div>
-            <div class="card">
               <h3>Target use case</h3>
               <p>${esc(d.useCase)}</p>
             </div>
@@ -1823,6 +1850,7 @@
               <p style="margin-top:6px"><em>${esc(d.research.question)}</em></p>
             </div>
             ${volumeCard}
+            ${p.acknowledgement ? `<div class="card" style="grid-column:1/-1"><h3>Acknowledgement</h3><p>${esc(p.acknowledgement)}</p></div>` : ""}
           </div>
           <div class="mtable-box">
             <table class="mtable">
@@ -2957,7 +2985,7 @@
       return `<div class="det-card"><h4>${esc(p.name)} · medicine facts</h4>` +
         `<div class="det-small">${esc(p.inn || "")}</div>` +
         `<div class="det-k">Current stage</div><div class="det-v">${esc(STAGES[p.currentStage] || "")}</div>` +
-        (vol ? `<div class="det-k">Global Fund procurement</div><div class="det-v">${esc(vol)}</div>` : "") +
+        (vol ? `<div class="det-k">Public-channel procurement (Global Fund)</div><div class="det-v">${esc(vol)}</div>` : "") +
         (p.flag ? `<p class="det-small det-flag">${esc(p.flag)}</p>` : "") + `</div>`;
     }
     function detOverview(byCat) {
@@ -3313,7 +3341,31 @@
   window.addEventListener("beforeprint", () => {
     document.getElementById("updates").open = true;
     document.getElementById("glossary").open = true;
+    document.getElementById("sources").open = true;
   });
+  // Sources: open on desktop (the heading labels it), a closed dropdown on phones. The count is set from
+  // the list so it cannot drift; #sources opens it on any screen.
+  (function () {
+    const box = document.getElementById("sources");
+    document.getElementById("srcn").textContent = box.querySelectorAll(".srclist > li").length;
+    const wide = matchMedia("(min-width: 721px)");
+    const sync = () => { box.open = wide.matches; };
+    sync();
+    wide.addEventListener("change", sync);
+    const openIfAsked = () => { if (location.hash === "#sources") { box.open = true; box.scrollIntoView(); } };
+    openIfAsked();
+    window.addEventListener("hashchange", openIfAsked);
+  })();
+  // The disclaimer glows briefly when the draft banner's link or #disclaimer brings the reader to it.
+  (function () {
+    const disc = document.getElementById("disclaimer");
+    const flash = () => { disc.classList.remove("flash"); void disc.offsetWidth; disc.classList.add("flash"); };
+    disc.addEventListener("animationend", () => disc.classList.remove("flash"));
+    window.addEventListener("hashchange", () => { if (location.hash === "#disclaimer") flash(); });
+    if (location.hash === "#disclaimer") flash();
+    // the link is followed even when the hash is already #disclaimer, which fires no hashchange
+    document.addEventListener("click", (ev) => { if (ev.target.closest && ev.target.closest(".bl-link")) setTimeout(flash, 60); });
+  })();
 })();
 </script>
 
