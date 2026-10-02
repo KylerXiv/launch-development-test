@@ -33,12 +33,18 @@
        --accent on the page (buttons, links, chips) is unaffected. */
     --journey-icon: #009EDB;
     --good: #1E8A5A;
+    /* Text-only shades of the two status hues (2 Oct 2026). --good and --warn
+       stay the fills, borders and dots; as small text they measured 3.3-4.3:1,
+       under the 4.5:1 floor. These are the same hues, darker: 5.0-5.9:1 on
+       white, --surface-2, the ground and their own soft fills. */
+    --good-text: #17734B;
     --good-soft: #E2F2EA;
     --warn: #B87500;
+    --warn-text: #8C5A00;
     --warn-soft: #FBF0DA;
     --crit: #C0392B;
     --crit-soft: #FAE7E4;
-    --idle: #9AA8B1;
+    --idle: #7A8A94;
     --idle-soft: #EEF1F3;
     --map1: #6FC1CF;
     --map2: #2A7FA8;
@@ -102,7 +108,7 @@
     display: inline-block; vertical-align: 4px; margin-left: 8px;
     font-size: 11.5px; font-weight: 650; letter-spacing: .02em; line-height: 1.4;
     padding: 3px 10px; border-radius: 999px;
-    background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn);
+    background: var(--warn-soft); color: var(--warn-text); border: 1px solid var(--warn);
     white-space: nowrap;
   }
   .demo-banner {
@@ -123,10 +129,10 @@
   }
   .demo-banner.draft .bl {
     display: block; margin-bottom: 0;
-    font-size: 13.5px; font-weight: 750; letter-spacing: -.01em; color: var(--warn);
+    font-size: 13.5px; font-weight: 750; letter-spacing: -.01em; color: var(--warn-text);
   }
   .demo-banner.draft .tbc {
-    font-weight: 700; color: var(--warn);
+    font-weight: 700; color: var(--warn-text);
   }
 
   /* status dots (shape + color, never color alone) */
@@ -149,7 +155,7 @@
        measuring the true rendered gap afterwards is what keeps the two
        matching instead of just assuming a formula stays right forever. */
     padding: 8px 18px; margin-bottom: 10px; overflow-x: auto;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+    background: var(--surface); border-radius: 12px; box-shadow: var(--shadow);
   }
   .pathnode { flex: 1; min-width: 84px; text-align: center; }
   /* step number: the pathway is a sequence, so the order is stated, not implied.
@@ -172,7 +178,7 @@
     width: 44px; height: 44px; border-radius: 50%;
     background: var(--accent-soft); border: 1px solid var(--line);
   }
-  .pathnode .plabel { display: block; font-size: 12px; line-height: 1.25; color: var(--ink-2); margin-top: 5px; padding: 0 3px; }
+  .pathnode .plabel { display: block; font-size: 12px; line-height: 1.25; color: var(--ink-2); margin-top: 5px; padding: 0 3px; overflow-wrap: break-word; hyphens: auto; }
   /* always-on badge marking every gate icon as clickable, not just on hover */
   .pathnode .pill::after {
     content: "\25be"; position: absolute; top: -6px; right: -6px;
@@ -225,7 +231,7 @@
      pathway-order rail behind a quiet text link. Level 2 ("More detail") opens
      the cards and milestone table that "View details" used to show. */
   .board {
-    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    background: var(--surface); border-radius: 14px;
     box-shadow: var(--shadow); overflow: hidden;
   }
   .product { border-bottom: 1px solid var(--line); }
@@ -246,11 +252,13 @@
     font-size: 14px; font-weight: 700; transition: transform .15s ease, color .15s ease, border-color .15s ease;
   }
   .exp:hover { color: var(--accent); border-color: var(--accent); }
+  /* the whole row opens the journey (the chevron stays the keyboard route) */
+  .srow:has(> .exp) { cursor: pointer; }
   .exp[aria-expanded="true"] { transform: rotate(180deg); color: var(--accent); border-color: var(--accent); }
   .exp:focus-visible, .swg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .nm { min-width: 0; }
   .nm b { display: block; font-size: 15.5px; font-weight: 700; line-height: 1.2; letter-spacing: -.005em; }
-  .nm small { display: block; font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nm small { display: block; font-size: 12px; color: var(--ink-2); }
   .mini { display: flex; align-items: center; gap: 3px; }
   /* Each journey column is a cell so the step selected on the pathway strip can
      light it up in every row (30 Sep 2026). The cell stretches to the full row
@@ -266,19 +274,21 @@
   .md { width: 14px; height: 14px; border-radius: 50%; flex: none; box-sizing: border-box; }
   .md.done { background: var(--good); }
   .md.prog { background: var(--warn-soft); border: 2px solid var(--warn); }
-  .md.late { background: var(--crit); }
+  /* a diamond: in the Journey column "complete" and "delayed" were the same
+     solid circle in green and red, which merge under red-green colour blindness */
+  .md.late { background: var(--crit); border-radius: 2px; transform: rotate(45deg) scale(.8); }
   .md.idle { background: var(--idle-soft); border: 1.5px dashed var(--idle); }
   .mp { display: flex; flex-direction: column; gap: 2px; padding: 0 2px; border-left: 2px solid var(--line); border-right: 2px solid var(--line); border-radius: 6px; }
   .mp .md { width: 9px; height: 9px; }
   .mini .ln { width: 6px; height: 2px; background: var(--line); flex: none; }
   .light { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; white-space: nowrap; }
   .light i { width: 12px; height: 12px; border-radius: 50%; flex: none; }
-  .light.done { color: var(--good); } .light.done i { background: var(--good); }
-  .light.prog { color: var(--warn); } .light.prog i { background: var(--warn); }
+  .light.done { color: var(--good-text); } .light.done i { background: var(--good); }
+  .light.prog { color: var(--warn-text); } .light.prog i { background: var(--warn); }
   .light.late { color: var(--crit); } .light.late i { background: var(--crit); }
   .light.idle { color: var(--ink-3); } .light.idle i { background: var(--idle-soft); box-shadow: inset 0 0 0 1.5px var(--idle); }
   .srow .cell { font-size: 13.5px; }
-  .srow .num { font-variant-numeric: tabular-nums; }
+  .srow .num { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
   .c-bar { font-size: 13px; line-height: 1.35; color: var(--ink); min-width: 0; text-wrap: balance; }
   .srow.hd .c-bar { font-size: 10.5px; line-height: inherit; color: var(--ink-3); }
   .c-bar.none { color: var(--ink-3); }
@@ -308,6 +318,7 @@
   .swg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
   .swg button:not([aria-pressed="true"]):hover { background: var(--accent-soft); color: var(--accent); }
   .swg button:focus-visible { outline-offset: -2px; }
+  .swg button[aria-pressed="true"]:focus-visible { outline-color: var(--accent-ink); }
   .view { transition: opacity .28s ease, transform .28s ease; }
   .view[hidden] { display: none; }
   .view.fade-in { opacity: 0; transform: translateY(6px); }
@@ -332,23 +343,25 @@
     .srow { grid-template-columns: 34px minmax(130px, 1.4fr) 170px 118px minmax(120px, 1fr); }
     .srow .c-stage, .srow .c-path { display: none; }
   }
-  @media (max-width: 640px) {
+  @media (max-width: 680px) {
     .srow { grid-template-columns: 34px 1fr auto; row-gap: 6px; }
     .srow.hd { display: none; }
     .srow .c-mini { grid-column: 2 / -1; grid-row: 2; margin-block: 0; }
     .srow .c-bar { grid-column: 2 / -1; grid-row: 3; }
     .l1 { padding-inline: 10px; }
   }
-  @media (prefers-reduced-motion: reduce) { .view, .exp, .more .ch { transition: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .view, .exp, .more .ch, .pathnode .pill, .pathnode .pill::after, .stage .smark, .stage .smark::after { transition: none; }
+  }
 
   /* level 1, default view: the time-scaled journey. Dated gates hang from their
      real year on one axis that starts at the first milestone, so there are no
      empty years; gates with no year sit in the panel on the right rather than
      being given an invented date. */
-  .tsp { display: grid; grid-template-columns: minmax(520px, 1fr) 230px; gap: 20px; align-items: start; min-width: 780px; }
-  .tsa { position: relative; }
+  .tsp { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 20px; align-items: start; }
+  .tsa { position: relative; min-width: 520px; }
   .tsa .ax { position: absolute; left: 0; right: 0; top: 26px; height: 2px; background: var(--line); }
-  .tsa .tk { position: absolute; top: 0; transform: translateX(-50%); font-size: 10.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tsa .tk { position: absolute; top: 0; transform: translateX(-50%); font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .tsa .tk.now { font-weight: 700; color: var(--ink-2); }
   .tsa .tk.now i { font-weight: 400; font-style: italic; color: var(--ink-3); }
   .tsa .tt { position: absolute; top: 22px; width: 1px; height: 10px; margin-left: -.5px; background: var(--ink-3); opacity: .5; }
@@ -358,12 +371,18 @@
   .tsa .pt { position: absolute; top: 22px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 2px var(--surface); }
   .tsa .pt.prog { background: var(--warn); } .tsa .pt.late { background: var(--crit); }
   .tsa .stem { position: absolute; top: 32px; width: 1px; margin-left: -.5px; background: var(--line); }
-  .tsa .it { position: absolute; flex: none; min-width: 0; width: 104px; margin-left: -52px; display: flex; flex-direction: column; align-items: center; }
+  .tsa .it { position: absolute; z-index: 1; flex: none; min-width: 0; width: 104px; margin-left: -52px; display: flex; flex-direction: column; align-items: center; }
   .tsa .it .smark { margin: 0; }
-  .tsa .snow { font-size: 11px; font-weight: 700; margin-top: 3px; }
-  .tsa .snow.prog { color: var(--warn); } .tsa .snow.late { color: var(--crit); }
-  .tsa .ssince { font-size: 10.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .tsa .snow { font-size: 12px; font-weight: 700; margin-top: 3px; }
+  .tsa .snow.prog { color: var(--warn-text); } .tsa .snow.late { color: var(--crit); }
+  .tsa .ssince { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
   .tsz { display: flex; flex-direction: column; gap: 12px; border-left: 1px dashed var(--line); padding-left: 16px; }
+  /* On a phone the side panel goes under the axis instead of off to its right,
+     where it sat past the scroll edge with nothing to say it was there. */
+  @media (max-width: 760px) {
+    .tsp { grid-template-columns: minmax(0, 1fr); }
+    .tsz { border-left: 0; padding-left: 0; border-top: 1px dashed var(--line); padding-top: 12px; }
+  }
   .ugrp .h { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 5px; }
   .uchips { display: flex; flex-wrap: wrap; gap: 5px; }
   .uchip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; line-height: 1.3; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px 2px 3px; }
@@ -374,7 +393,7 @@
   .uchip .ui.m-prog { box-shadow: inset 0 0 0 1.5px var(--warn); }
   .uchip .ui.m-late { box-shadow: inset 0 0 0 1.5px var(--crit); }
   .uchip .ui.m-idle { color: var(--idle); box-shadow: inset 0 0 0 1px var(--line); }
-  .uchip .st { font-weight: 700; } .uchip .st.prog { color: var(--warn); } .uchip .st.late { color: var(--crit); }
+  .uchip .st { font-weight: 700; } .uchip .st.prog { color: var(--warn-text); } .uchip .st.late { color: var(--crit); }
   .unone { font-size: 12px; color: var(--ink-3); }
   .uicons { display: flex; flex-wrap: wrap; gap: 5px; }
   .uicons .ui { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: var(--idle); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
@@ -531,7 +550,7 @@
   .stage.s-done .smark { background: var(--good-soft); color: var(--journey-icon); border: 2px solid var(--good); }
   .stage.s-prog .smark { background: var(--surface-2); color: var(--journey-icon); border: 2px solid var(--warn); }
   .stage.s-late .smark { background: var(--surface-2); color: var(--journey-icon); border: 2px solid var(--crit); }
-  .stage.s-idle .smark { background: none; border: 1.5px dashed var(--idle); opacity: .65; }
+  .stage.s-idle .smark { background: none; border: 1.5px dashed var(--idle); }
   /* The WHO emblem can't take the idle grey tint the other glyphs get from
      `color` — it's an image with WHO's own fixed blue (assets/who-emblem.svg),
      not a currentColor stroke. Left alone it reads as active/blue against
@@ -565,7 +584,7 @@
      common case. */
   .gatepanel {
     margin: 10px 0 0; padding: 14px 16px;
-    background: var(--surface); border: 1px solid var(--ink-3);
+    background: var(--surface); border: 1px solid var(--line);
     border-left: 3px solid var(--accent); border-radius: 10px;
   }
   .gatepanel[hidden] { display: none; }
@@ -576,16 +595,16 @@
     margin-left: auto; background: none; border: 0; padding: 3px 8px; cursor: pointer;
     font: inherit; font-size: 13px; color: var(--ink-2); border-radius: 6px;
   }
-  .gp-head .gp-close:hover { background: var(--surface); color: var(--ink); }
+  .gp-head .gp-close:hover { background: var(--surface-2); color: var(--ink); }
   .gp-pill {
     font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
     padding: 2.5px 9px; border-radius: 999px; white-space: nowrap;
   }
-  .gp-pill.done { background: var(--good-soft); color: var(--good); }
-  .gp-pill.prog { background: var(--warn-soft); color: var(--warn); }
+  .gp-pill.done { background: var(--good-soft); color: var(--good-text); }
+  .gp-pill.prog { background: var(--warn-soft); color: var(--warn-text); }
   .gp-pill.late { background: var(--crit-soft); color: var(--crit); }
   .gp-pill.idle { background: var(--idle-soft); color: var(--ink-3); }
-  .gp-note { margin: 9px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink); }
+  .gp-note { margin: 9px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink); max-width: 75ch; }
   .gp-why {
     margin-top: 10px; padding: 9px 12px; border-radius: 8px;
     background: var(--crit-soft); color: var(--crit);
@@ -618,7 +637,7 @@
 
   .gatewrap {
     margin: 0 0 10px; padding: 16px 18px 18px;
-    background: var(--surface); border: 1px solid var(--line);
+    background: var(--surface);
     border-left: 3px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow);
   }
   .gatewrap[hidden] { display: none; }
@@ -637,9 +656,9 @@
      It used to repeat where each medicine is, which the summary table already
      says; the table now lights up the selected step instead. */
   .gw-sum { display: flex; flex-wrap: wrap; gap: 6px; margin-left: 10px; }
-  .gw-band { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 16px; }
+  .gw-band { background: var(--surface-2); border-radius: 10px; padding: 14px 16px 16px; }
   .gw-band h4 { margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-  .gw-band > p { margin: 0; font-size: 15.5px; color: var(--ink); max-width: 110ch; }
+  .gw-band > p { margin: 0; font-size: 15.5px; color: var(--ink); max-width: 75ch; }
   .gw-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 22px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
   .gw-facts h5 { margin: 0 0 2px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
   .gw-facts p { margin: 0; font-size: 14px; color: var(--ink); }
@@ -665,7 +684,7 @@
   /* country readout: every stage listed, ticked up to the one reached */
   #tip .tlvl { display: flex; align-items: center; gap: 7px; margin-top: 3px; }
   #tip .tlvl .tmark { width: 9px; flex: none; font-weight: 800; text-align: center; }
-  #tip .tlvl.off { opacity: .45; }
+  #tip .tlvl.off { opacity: .72; }
   #tip .tlvl .mapsw { width: 11px; height: 11px; }
   /* the tooltip is inverted (ink ground, white text), and the hairline is
      drawn from currentColor so it follows the text */
@@ -676,7 +695,7 @@
   }
 
   /* ---------- detail panel ---------- */
-  .detail { display: none; margin: 12px 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); padding: 16px; }
+  .detail { display: none; margin: 12px 0 14px; border-radius: 10px; background: var(--surface-2); padding: 16px; }
   .product.open .detail { display: block; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
   .card {
@@ -685,7 +704,7 @@
   .card h3 { margin: 0 0 8px; font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
   .card .big { font-size: 24px; font-weight: 750; font-variant-numeric: tabular-nums; }
   .card .sub { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
-  .card .prov { font-size: 12.5px; color: var(--ink-3); margin-top: 6px; }
+  .card .prov { font-size: 12.5px; color: var(--ink-3); margin-top: 6px; overflow-wrap: anywhere; }
   .card ul { margin: 0; padding-left: 18px; font-size: 15px; color: var(--ink); }
   .card ul li { margin: 3px 0; }
   .card p { margin: 0; font-size: 15px; color: var(--ink); }
@@ -703,8 +722,8 @@
   .mtable tr:last-child td { border-bottom: 0; }
   .mtable td:first-child { color: var(--ink); font-weight: 600; }
   .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 650; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
-  .pill.done { background: var(--good-soft); color: var(--good); }
-  .pill.prog { background: var(--warn-soft); color: var(--warn); }
+  .pill.done { background: var(--good-soft); color: var(--good-text); }
+  .pill.prog { background: var(--warn-soft); color: var(--warn-text); }
   .pill.late { background: var(--crit-soft); color: var(--crit); }
   .pill.idle { background: var(--idle-soft); color: var(--ink-3); }
 
@@ -717,7 +736,7 @@
 
   /* recent updates */
   .updates {
-    margin-top: 14px; background: var(--surface); border: 1px solid var(--line);
+    margin-top: 14px; background: var(--surface);
     border-radius: 12px; box-shadow: var(--shadow); padding: 10px 18px;
   }
   .updates summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-2); letter-spacing: .04em; text-transform: uppercase; }
@@ -753,26 +772,26 @@
   /* Footer: the disclaimer leads, in a tinted panel with an accent edge, so it is not overlooked. */
   .ft-sec h3 { margin: 0 0 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3);
                border-bottom: 1px solid var(--line); padding-bottom: 5px; }
-  .ft-sec p { margin: 0; }
+  .ft-sec p { margin: 0; max-width: 75ch; }
   .disclaimer { background: var(--accent-soft); border: 1px solid var(--line); border-left: 5px solid var(--accent);
                 border-radius: 10px; padding: 14px 18px; color: var(--ink); scroll-margin-top: 16px; }
   .disclaimer:focus { outline: none; }
   .disclaimer h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 16px; color: var(--ink); }
   .disclaimer h3 svg { flex: none; color: var(--accent); }
-  .disclaimer p { margin: 0 0 8px; font-size: 14px; line-height: 1.6; }
+  .disclaimer p { margin: 0 0 8px; font-size: 14px; line-height: 1.6; max-width: 75ch; }
   .disclaimer p:last-child { margin-bottom: 0; }
   /* When the draft banner's link (or #disclaimer) brings the reader here, a brief glow shows where they landed. */
   .disclaimer.flash { animation: disc-flash 1.6s ease-out 1; }
   @keyframes disc-flash { 0%, 35% { box-shadow: 0 0 0 6px rgba(245, 200, 66, .55); } 100% { box-shadow: 0 0 0 0 rgba(245, 200, 66, 0); } }
   @media (prefers-reduced-motion: reduce) { .disclaimer.flash { animation: none; outline: 3px solid rgba(245, 200, 66, .9); } }
   /* The dropdown matches the Definitions band: same box, same summary. */
-  .srcs { margin-top: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  .srcs { margin-top: 0; background: var(--surface); border-radius: 12px;
           box-shadow: var(--shadow); padding: 10px 18px; }
   .srcs summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-2); letter-spacing: .04em; text-transform: uppercase; }
   .srcs summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
   .srcn { font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px;
           padding: 0 7px; margin-left: 6px; letter-spacing: 0; text-transform: none; vertical-align: 1px; }
-  .srcs-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+  .srcs-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); line-height: 1.5; max-width: 75ch; }
   /* Open on desktop: the section heading is the label, so the summary is hidden and the list is held open by the script.
      On a phone it is a closed dropdown the reader opens. */
   @media (min-width: 721px) { .srcs summary { display: none; } .srcs-intro { margin-top: 0; } }
@@ -787,7 +806,7 @@
 
   /* ---------- visualization sections (map, timing) ---------- */
   .viz {
-    margin-top: 14px; background: var(--surface); border: 1px solid var(--line);
+    margin-top: 14px; background: var(--surface);
     border-radius: 14px; box-shadow: var(--shadow); padding: 14px 18px;
   }
   .viz h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.005em; }
@@ -798,7 +817,7 @@
   .map-dock { display: grid; grid-template-columns: 250px minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
   .map-dock-center { min-width: 0; }   /* lets the grid track shrink below the map's content size */
   .map-dock-rail {
-    background: var(--surface-2); border: 1px solid var(--map-border); border-radius: 10px;
+    background: var(--surface-2); border-radius: 10px;
     padding: 12px 14px; max-height: 480px; overflow-y: auto;
   }
   /* Both rails otherwise end wherever their own content does, leaving a gap
@@ -808,15 +827,12 @@
      which at narrow widths is the left rail itself, not the map — so a
      script keeps both rails' height matched to .map-dock-center specifically
      (see the ResizeObserver below). Left keeps its own scrollbar for when
-     its filters (Drug/MFT policy/Location) still don't fit in
-     that height; right stays hidden and relies on flex (.dock-detail) to
-     hand the space to its one scrollable part, the MFT policy panel. */
+     its filters (Drug/MFT policy/Location) still don't fit in that height.
+     Right (2 Oct 2026) takes its own content's height instead: held to the
+     map's, it hid the lower Detail cards behind overflow: hidden, with no
+     scrollbar or other cue that they were there. */
   .map-dock-left { max-height: none; overflow-y: auto; }
-  .map-dock-right {
-    max-height: none; overflow: hidden;
-    display: flex; flex-direction: column;
-  }
-  .map-dock-right .dock-detail { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .map-dock-right { max-height: none; }
   /* `display` on .map-dock-rail is an author rule and so outranks the browser's
      [hidden] { display: none } — same trap .map-empty already carries a fix for. */
   .map-dock-rail[hidden] { display: none; }
@@ -838,6 +854,7 @@
   }
   .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
   .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tab[aria-selected="false"]:hover, .det-tabs button[aria-selected="false"]:hover { color: var(--accent); }
 
   /* ---------- MFT policy switch (WHO World Malaria Report, Annex 4B) ----------
      Off by default: until the switch is on, nothing below is visible and the
@@ -860,7 +877,7 @@
   /* Filters (left rail): access-stage and MFT policy-group checklists. */
   .flt-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
   .flt-head h3 { margin: 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
-  .flt-act { font-size: 11px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 999px; padding: 0 7px; letter-spacing: 0; }
+  .flt-act { font-size: 11px; font-weight: 700; color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; letter-spacing: 0; }
   .flt-reset { font: inherit; font-size: 12px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
   .flt-reset:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .flt-list { margin-bottom: 14px; }
@@ -877,7 +894,7 @@
   .flt-row.off { opacity: .45; cursor: default; }
   .mft-lsw { flex: none; display: block; }
   .mft-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
-  .mft-panel { flex: 0 1 auto; min-height: 0; overflow-y: auto; margin-bottom: 10px; }
+  .mft-panel { margin-bottom: 10px; }
   .mft-panel[hidden] { display: none; }
   .mft-panel .mft-h { margin: 0 0 10px; font-size: 12px; font-weight: 750; text-transform: uppercase; letter-spacing: .05em;
                       color: var(--ink-2); display: flex; align-items: center; gap: 8px; }
@@ -889,13 +906,15 @@
   .mft-donut .rows { display: grid; gap: 7px; font-size: 13px; color: var(--ink-2); }
   .mft-donut .rows div { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
   .mft-donut .rows b { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 750; }
+  .mft-donut .rows .off, .mft-donut .rows .off b { color: var(--ink-3); font-weight: 400; }
+  .mft-donut .rows .off .mft-sq { opacity: .45; }
   .mft-sq { width: 14px; height: 14px; border-radius: 3px; display: inline-block; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
   .mft-grp { font-size: 11.5px; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); margin: 14px 0 4px; }
   .mft-name { margin: 0; font-size: 16px; font-weight: 700; color: var(--ink); }
   .mft-sub { font-size: 12.5px; color: var(--ink-3); margin: 0 0 10px; }
   .mft-chips { display: flex; flex-wrap: wrap; gap: 5px; }
   .mft-pchip { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; background: #EDF1F3; color: var(--ink-3); }
-  .mft-pchip.yes { background: #E2F2EA; color: #1E8A5A; font-weight: 650; }
+  .mft-pchip.yes { background: var(--good-soft); color: var(--good-text); font-weight: 650; }
   .mft-note { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 12px 0 0; }
   /* Detail rail: tabs, overview cards, country finder and country page. */
   .det-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin: 0 0 10px; }
@@ -905,9 +924,10 @@
   .det-tabs button:focus-visible, .det-back:focus-visible, .det-nav button:focus-visible, .det-chip:focus-visible,
   .det-row:focus-visible, .det-q:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .det-n { font-size: 10.5px; font-weight: 700; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 0 6px; margin-left: 4px; letter-spacing: 0; }
-  .det-banner { display: flex; gap: 9px; align-items: center; background: var(--accent); color: var(--accent-ink); border-radius: 9px;
-                padding: 9px 11px; font-size: 13px; font-weight: 650; line-height: 1.35; margin-bottom: 10px; }
-  .det-banner svg { flex: none; }
+  /* A hint, so it no longer wears the filled accent of the page's buttons. */
+  .det-banner { display: flex; gap: 9px; align-items: center; color: var(--ink-2);
+                font-size: 13px; line-height: 1.35; margin-bottom: 10px; }
+  .det-banner svg { flex: none; color: var(--ink-3); }
   .det-card { background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; margin-bottom: 10px; min-width: 0; }
   .det-card h4 { margin: 0 0 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
   .det-small { font-size: 12px; color: var(--ink-3); line-height: 1.4; }
@@ -962,8 +982,6 @@
   /* Rotation/pitch are locked off in the map's own options (DEV-13 D19) — the
      choropleth has always read north-up and fixed, and nothing asked for that
      to change. */
-  .maplibregl-ctrl-group { background: var(--surface); border: 1px solid var(--map-border); box-shadow: none; }
-  .maplibregl-ctrl-group button + button { border-top: 1px solid var(--map-border); }
   /* MapLibre's stock zoom-icon SVGs are dark-on-transparent; dark theme needs
      them inverted the same way the rest of this page swaps its own tokens. */
   .maplibregl-ctrl-attrib, .maplibregl-ctrl-bottom-right .maplibregl-ctrl { display: none; }
@@ -973,7 +991,7 @@
   .map-zoom-lvl {
     position: absolute; top: 8px; right: 46px; z-index: 2; font-size: 11.5px;
     font-variant-numeric: tabular-nums; color: var(--ink-3); background: var(--surface);
-    border: 1px solid var(--map-border); border-radius: 6px; padding: 4px 8px; line-height: 1;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.1); border-radius: 6px; padding: 4px 8px; line-height: 1;
   }
   /* Countries have no per-feature DOM node on a canvas map to tab through
      (DEV-13 D21) — this list is the keyboard/screen-reader equivalent of the
@@ -1004,7 +1022,7 @@
      whole map, invisible, and swallows every country hover. */
   .map-empty[hidden] { display: none; }
   .map-legend-bar {
-    margin-top: 10px; background: var(--surface-2); border: 1px solid var(--map-border); border-radius: 10px;
+    margin-top: 10px; background: var(--surface-2); border-radius: 10px;
     padding: 12px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px;
   }
   .map-legend-bar .dock-section { margin: 0; }
@@ -1023,6 +1041,7 @@
   .res-pick select { font: inherit; padding: 5px 6px; width: 100%; }
   /* The reading rule under a legend (the MFT policy rule uses it). */
   .res-rule { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 4px 0 0; }
+  .res-rule a { color: var(--accent); }
   .map-hint { font-size: 11.5px; line-height: 1.5; color: var(--ink-3); margin: 6px 0 0; }
   /* header actions — Download CSV + Subscribe -------------------------------
      These used to be the last two flex items of a legend strip, alongside three
@@ -1106,6 +1125,7 @@
   }
   .subrow input:focus { outline: 0; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .subrow input[aria-invalid="true"] { border-color: var(--crit); }
+  @media (max-width: 760px) { .subrow input, .det-q, .res-pick select { font-size: 16px; } }
   .sub-go {
     background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px;
     padding: 8px 15px; font: inherit; font-size: 13px; font-weight: 650; cursor: pointer;
@@ -1118,7 +1138,7 @@
   }
   .sub-msg { margin: 9px 0 0; font-size: 12.5px; font-weight: 600; }
   .sub-msg.bad { color: var(--crit); }
-  .sub-msg.ok { color: var(--good); }
+  .sub-msg.ok { color: var(--good-text); }
   /* .subwrap p (below) sets color:var(--ink-2) at specificity (0,1,1) — one
      type-selector point above plain .sub-note's (0,1,0) — so it would win
      this regardless of source order. Scoped to .subwrap .sub-note instead of
@@ -1131,6 +1151,9 @@
   /* print view */
   @media print {
     body { background: #fff; }
+    /* on screen the cards are separated by the gray ground and a shadow,
+       neither of which prints */
+    .pathway, .board, .viz, .updates, .srcs, .gatewrap { border: 1px solid var(--line); box-shadow: none; }
     .product .detail { display: block !important; }
     .product .l1 { display: block !important; }
     .view[data-v="path"] { display: none !important; }
@@ -1161,8 +1184,8 @@
     .attrib .ptxt { display: none; }
     .hd-bar { flex-direction: column; align-items: stretch; gap: 8px; }
     .hd-text { flex: none; }
-    .hd-bar .hdr-actions { flex-wrap: nowrap; margin-left: 0; }
-    .hd-bar .hdr-actions button { flex: 1 1 0; justify-content: center; padding: 10px 6px; gap: 5px; white-space: nowrap; }
+    .hd-bar .hdr-actions { margin-left: 0; }
+    .hd-bar .hdr-actions button { flex: 1 1 0; justify-content: center; padding: 10px 6px; gap: 5px; }
     .updates li { flex-wrap: wrap; gap: 4px 12px; }
     .hdr-actions button { padding: 10px 15px; }
     .pathway { padding: 12px 12px; }
@@ -1225,7 +1248,7 @@
     <div class="map-dock">
       <aside class="map-dock-rail map-dock-left">
         <div class="dock-section">
-          <h3>Drug</h3>
+          <h3>Medicine</h3>
           <div class="tabs" id="maptabs" role="tablist" aria-label="Select medicine for map"></div>
         </div>
         <div class="dock-section" id="filters">
@@ -1345,7 +1368,11 @@
   if (!window.LAUNCH_DATA) {
     banner.hidden = false;
     banner.classList.add("error");
-    banner.innerHTML = "<b>Data failed to load.</b> data/products.js is missing or has a syntax error — run <code>node scripts/validate-data.js</code>.";
+    banner.innerHTML = "<b>The dashboard data could not be loaded.</b> Please reload the page to try again.";
+    console.error("[LAUNCH] data/products.js is missing or has a syntax error — run node scripts/validate-data.js");
+    // its handler is attached further down, which this early return skips
+    const dl = document.getElementById("dl-csv");
+    if (dl) dl.hidden = true;
     return;
   }
 
@@ -1488,6 +1515,21 @@
   function readableDate(iso) {
     const d = new Date(iso + "T00:00:00");
     return isNaN(d) ? iso : d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  }
+  // "2026-08-23" → "23 Aug 2026", the form "Last updated" uses.
+  function shortDate(iso) {
+    const d = new Date(iso + "T00:00:00");
+    return isNaN(d) ? iso : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  }
+  // Large figures in data text read as 940K or 11.5M, and millions of dollars
+  // as US$14.5M rather than US$14.5m (2 Oct 2026). Only where they are shown:
+  // the data, and so the CSV export, keep the exact figures. en-US, because
+  // Chrome's en-GB writes a lowercase "940k" beside "11.5M".
+  const COMPACT = new Intl.NumberFormat("en-US", { notation: "compact", maximumSignificantDigits: 3 });
+  function fmtFig(s) {
+    return String(s == null ? "" : s)
+      .replace(/\b\d{1,3}(?:,\d{3})+\b/g, m => COMPACT.format(+m.replace(/,/g, "")))
+      .replace(/(US\$\d+(?:\.\d+)?)m\b/g, "$1M");
   }
 
   // pathway legend strip: the eight stages as illustrated badges
@@ -1674,9 +1716,9 @@
       (notStarted.length
         ? `<div class="uicons">${notStarted.map(j => `<span class="ui" role="img" title="${esc(STAGES[j])}" aria-label="${esc(STAGES[j])}">${stageIconImg(j, "")}</span>`).join("")}</div>`
         : `<span class="unone">None</span>`) + `</div>`;
-    return `<div class="cscroll"><div class="tsp"><div class="tsa" style="height:${height}px">${h}</div>` +
+    return `<div class="tsp"><div class="cscroll"><div class="tsa" style="height:${height}px">${h}</div></div>` +
       `<div class="tsz">${noYear.length ? group("Reached · year not recorded", noYear) : ""}` +
-      `${group("Ongoing · no date", ongoing, true)}${notStartedHtml}</div></div></div>`;
+      `${group("Ongoing · no date", ongoing, true)}${notStartedHtml}</div></div>`;
   }
 
   const lateAt = i => tracked.filter(p => p.stages[i].status === "late").length;
@@ -1755,8 +1797,9 @@
     const shades = ["#14657E", "#3E8CA3", "#77AFC0", "#B4D2DC"];
     const volumeCard = d.volume ? `
       <div class="card">
-        <h3>Treatments procured through public channels · ${esc(d.volume.period)}</h3>
-        <div class="big">${esc(d.volume.total)}</div>
+        <h3>Treatments procured through public channels</h3>
+        <div class="big">${esc(fmtFig(d.volume.total))}</div>
+        <div class="sub">${esc(fmtFig(d.volume.period))}</div>
         <div class="split" aria-hidden="true">
           ${d.volume.split.map((s, i) => `<div style="width:${s.pct}%;background:${shades[i % shades.length]}" title="${esc(s.channel)} ${s.pct}%"></div>`).join("")}
         </div>
@@ -2029,7 +2072,12 @@
   function setL1(prod, open) {
     prod.classList.toggle("l1-open", open);
     prod.querySelector(".exp").setAttribute("aria-expanded", open ? "true" : "false");
-    if (open) layoutJourney();
+    if (open) {
+      layoutJourney();
+      // where the axis scrolls (a phone), open it at the present: the current
+      // stage is drawn at the right-hand end
+      prod.querySelectorAll(".cscroll").forEach(c => { c.scrollLeft = c.scrollWidth; });
+    }
   }
   // Each row remembers its own view. The pathway-order rail is measured to line
   // its forks up, so switching to it re-runs layoutJourney().
@@ -2046,6 +2094,9 @@
     btn.addEventListener("click", () => {
       const prod = btn.closest(".product");
       setL1(prod, !prod.classList.contains("l1-open"));
+    });
+    btn.closest(".srow").addEventListener("click", e => {
+      if (!e.target.closest("button, a, .gloss")) btn.click();
     });
   });
   document.querySelectorAll(".swg button").forEach(btn => {
@@ -2128,7 +2179,7 @@
 
     const prov = [
       st.source ? "Source: " + esc(st.source) : "",
-      st.asOf ? "verified " + esc(st.asOf) : "",
+      st.asOf ? "verified " + esc(shortDate(st.asOf)) : "",
       (i === 4 || i === 5) && p.detail.countries && p.detail.countries.status !== "verified"
         ? "country survey is " + esc(p.detail.countries.status) : ""
     ].filter(Boolean).join(" · ");
@@ -2361,12 +2412,15 @@
     // fixed aspect ratio) as well as with the legend's line-wrapping.
     const mapDockCenter = document.querySelector(".map-dock-center");
     const mapDockLeft = document.querySelector(".map-dock-left");
-    const mapDockRight = document.querySelector(".map-dock-right");
     if (mapDockCenter && window.ResizeObserver) {
+      // Only the left rail (2 Oct 2026): the right one takes its own height, so
+      // no Detail card is cut off. Stacked on a phone (the dock's grid down to
+      // one column), neither is held. Read from the grid, not a media-query
+      // string: the translation build rewrites string literals on /fr and /pt.
+      const dock = mapDockCenter.parentElement;
       new ResizeObserver(() => {
-        const h = mapDockCenter.offsetHeight + "px";
-        if (mapDockLeft) mapDockLeft.style.height = h;
-        if (mapDockRight) mapDockRight.style.height = h;
+        const stacked = getComputedStyle(dock).gridTemplateColumns.trim().split(/\s+/).length < 2;
+        if (mapDockLeft) mapDockLeft.style.height = stacked ? "" : mapDockCenter.offsetHeight + "px";
       }).observe(mapDockCenter);
     }
 
@@ -2611,7 +2665,7 @@
     };
     const countryListEl = document.getElementById("map-country-list");
     countryListEl.innerHTML = GEO.features.map((f) =>
-      `<li><button type="button" data-iso3="${esc(f.properties.iso3)}" data-name="${esc(f.properties.name)}" data-lvl="">` +
+      `<li><button type="button" tabindex="-1" data-iso3="${esc(f.properties.iso3)}" data-name="${esc(f.properties.name)}" data-lvl="">` +
       `${esc(f.properties.name)} — <span class="lvl-label">${LEVEL_LABEL.none}</span></button></li>`
     ).join("");
     const countryListEls = {};
@@ -2929,7 +2983,7 @@
       }).join("");
       // All four groups, zeros included, so the key reads the same for every medicine.
       const rows = MFT_GROUPS.map((g) =>
-        `<div${on.has(g.id) ? "" : ' style="opacity:.45"'}><span class="mft-sq" style="background:${mftGroupColor(g.id)}"></span><span>${esc(g.short)}</span><b>${byCat[g.id].length}</b></div>`).join("");
+        `<div${on.has(g.id) ? "" : ' class="off"'}><span class="mft-sq" style="background:${mftGroupColor(g.id)}"></span><span>${esc(g.short)}</span><b>${byCat[g.id].length}</b></div>`).join("");
       return `<div class="mft-donut"><svg viewBox="0 0 112 112" width="112" height="112" role="img" ` +
         `aria-label="${total} ${total === 1 ? "country" : "countries"} by patient group">` +
         `<circle cx="56" cy="56" r="${R}" fill="none" stroke="#EDF1F3" stroke-width="${W}"></circle>${arcs}` +
@@ -2964,7 +3018,7 @@
       return `<div class="det-card"><h4>${esc(p.name)} · medicine facts</h4>` +
         `<div class="det-small">${esc(p.inn || "")}</div>` +
         `<div class="det-k">Current stage</div><div class="det-v">${esc(STAGES[p.currentStage] || "")}</div>` +
-        (vol ? `<div class="det-k">Public-channel procurement (Global Fund)</div><div class="det-v">${esc(vol)}</div>` : "") +
+        (vol ? `<div class="det-k">Public-channel procurement (Global Fund)</div><div class="det-v">${esc(fmtFig(vol))}</div>` : "") +
         (p.flag ? `<p class="det-small det-flag">${esc(p.flag)}</p>` : "") + `</div>`;
     }
     function detOverview(byCat) {
@@ -2975,7 +3029,7 @@
       const c = stageCounts(), withStage = c.registered + c.guidelines + c.mft;
       h += `<div class="det-card"><h4>Access stage mix · ${esc(p.name)}</h4>` +
         `<div class="det-big">${withStage}<span class="det-small"> of ${n} countries have an access stage</span></div>` +
-        stageBar(c, n) + stageLegend(c) + `</div>`;
+        stageBar(c, n) + `</div>`;
       h += `<div class="det-card"><h4>MFT policy groups · ${esc(p.name)}</h4>`;
       if (!Object.keys(mftAvail()).length) h += `<p class="det-empty">No national treatment policy lists ${esc(p.name)} yet.</p>`;
       else if (!mftOn) h += `<p class="det-empty">Tick an MFT policy group on the left to see its countries.</p>`;
@@ -3008,7 +3062,7 @@
     function detCountry(iso3) {
       const p = curProduct(), region = REGION_NAME[WHO_REGION[iso3]] || "";
       let h = (mftSel ? `<button type="button" class="det-back" data-back>‹ Back to ${cameFrom === "countries" ? "countries" : "overview"}</button>` : "") +
-        `<div class="det-chead"><div><h4 class="det-cname">${esc(mftName(iso3))}</h4><span class="det-reg">${esc(region)}</span></div>` +
+        `<div class="det-chead"><div><h4 class="det-cname" tabindex="-1">${esc(mftName(iso3))}</h4><span class="det-reg">${esc(region)}</span></div>` +
         `<div class="det-nav"><button type="button" data-step="-1" aria-label="Previous country">‹</button>` +
         `<button type="button" data-step="1" aria-label="Next country">›</button></div></div>`;
       if (!hasCountries()) return h + `<div class="det-card"><h4>${esc(p.name)}</h4><p class="det-empty">${esc(p.name)} is pre-launch, so there is no country status or policy yet.</p></div>`;
@@ -3064,6 +3118,7 @@
       panel.addEventListener("click", (e) => {
         const t = e.target.closest("[data-det-tab],[data-iso3],[data-back],[data-step]");
         if (!t) return;
+        const hadFocus = panel.contains(document.activeElement);
         if (t.dataset.detTab) { detTab = t.dataset.detTab; mftSel = null; mftRender(); }
         else if (t.dataset.iso3) selectCountry(t.dataset.iso3);
         else if (t.hasAttribute("data-back")) { mftSel = null; mftRender(); }
@@ -3071,6 +3126,15 @@
           const ids = drawnIsos(), cur = mftSel || locCountry;
           const nxt = ids[(ids.indexOf(cur) + Number(t.dataset.step) + ids.length) % ids.length];
           mftSel = nxt; mftRender();
+        }
+        // The rail was rebuilt, so the control just pressed is gone. Keep a
+        // keyboard user's place: the same tab or Next/Previous button, else the
+        // country heading, else the selected tab.
+        if (hadFocus) {
+          const key = t.dataset.detTab ? `[data-det-tab="${t.dataset.detTab}"]` : t.dataset.step ? `[data-step="${t.dataset.step}"]` : null;
+          const next = (key && panel.querySelector(key)) || panel.querySelector(".det-cname") ||
+            panel.querySelector('[role="tab"][aria-selected="true"]');
+          if (next) next.focus();
         }
       });
       panel.addEventListener("input", (e) => {
@@ -3161,6 +3225,10 @@
       } else return;
       hideTip();
       mftRender();
+      const key = t.dataset.stage ? `[data-stage="${t.dataset.stage}"]`
+        : t.dataset.group ? `[data-group="${t.dataset.group}"]` : "#flt-mft-all";
+      const again = document.querySelector("#filters " + key);
+      if (again) again.focus();
     });
     document.getElementById("flt-reset").addEventListener("click", () => {
       stageOff.clear(); mftTick.clear(); mftSel = null;
@@ -3268,6 +3336,11 @@
   document.addEventListener("keydown", e => {
     if (e.key === "Escape" && !subWrap.hidden) closeSub({ returnFocus: true });
   });
+  // Tabbing out of it closes it too: left open, it covered whatever took
+  // focus next.
+  subWrap.addEventListener("focusout", e => {
+    if (e.relatedTarget && !subWrap.contains(e.relatedTarget) && e.relatedTarget !== subOpen) closeSub();
+  });
 
   function subSay(text, cls) {
     subMsg.hidden = !text;
@@ -3341,7 +3414,8 @@
       // Say so rather than leaving an empty list. A footer that quietly loses
       // its sources still looks finished, and this page's entire claim is that
       // every figure on it is traceable to one of them.
-      dataUl.outerHTML = '<p class="viznote">Source list unavailable — data/sources.js did not load.</p>';
+      dataUl.outerHTML = '<p class="viznote">The source list could not be loaded. Please reload the page to try again.</p>';
+      console.error("[LAUNCH] data/sources.js did not load");
       if (docsWrap) docsWrap.remove();
       return;
     }
