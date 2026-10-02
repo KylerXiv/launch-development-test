@@ -7,20 +7,28 @@
  *
  * Why this exists
  * ---------------
- * resistance.js and molecular-markers.js are pivoted stores. A drug name is not
- * decoration in them, it is the key everything is looked up by:
+ * The WHO study-result files (resistance.js, molecular-markers.js) were pivoted
+ * stores. A drug name was not decoration in them, it was the key everything was
+ * looked up by:
  *
  *     RES.treatmentFailure["Artesunate-pyronaridine"]["P. falciparum"]   // pivot key
  *     dict.drug.indexOf("Artesunate-pyronaridine")                       // row lookup
  *     const PRODUCT_DRUG = { pyramax: "Artesunate-pyronaridine", ... }   // page constant
  *
  * The build never translates object keys, so translating the same string
- * ANYWHERE ELSE breaks the match. Both failures seen on 23 September were this:
- * once through dict.drug, once through PRODUCT_DRUG. Neither threw an error —
- * the page rendered perfectly and the threat map was simply empty.
+ * ANYWHERE ELSE broke the match. Both failures seen on 23 September were this.
+ * Neither threw an error — the page rendered perfectly and the map was empty.
  *
- * Deriving the set from the data means a drug WHO adds next quarter is protected
- * the day it lands, with nobody remembering to add it here.
+ * Those files and the layers that read them were removed from the dashboard
+ * (docs/handoff-remove-study-layers.md), so FILES below is now EMPTY and the set
+ * this module returns is empty. The consequence to know about: drug, marker and
+ * species names that appear as display text on the page ("P. vivax", "P.
+ * falciparum" in the MFT policy chips) were protected by this set and no longer
+ * are, so they become eligible for translation the next time content.en.json is
+ * assembled. Decide that deliberately.
+ *
+ * The module and its API are kept. If a data file with pivoted lookup keys
+ * returns, list it in FILES and the protection comes back with it.
  *
  * Every consumer treats membership as absolute: never inventoried, never sent to
  * an engine, never substituted, in any bucket.
@@ -29,10 +37,9 @@
 const fs = require("fs");
 const path = require("path");
 
-const FILES = [
-  ["data/resistance.js", "window.LAUNCH_RESISTANCE"],
-  ["data/molecular-markers.js", "window.LAUNCH_MOLECULAR_MARKERS"],
-];
+// [relative path, window global] for each data file whose pivot keys and dict
+// columns are lookup keys. Empty since the WHO study-result layers were removed.
+const FILES = [];
 // the pivots are every top-level key that is not one of the row-store members
 const NOT_A_PIVOT = new Set(["fields", "coded", "dict", "studies", "meta", "generated", "schema"]);
 

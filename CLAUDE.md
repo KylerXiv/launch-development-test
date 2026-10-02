@@ -35,22 +35,22 @@ back **byte-identical**; the validator is expected to report a **specific**
 error/warning count, not merely to exit cleanly.
 
 ```bash
-node scripts/normalize-resistance.js          # regenerate; expect byte-identical
-node scripts/normalize-molecular-markers.js   # ditto
-node scripts/normalize-treatment-policy.js    # ditto
-node scripts/validate-data.js                 # expect 0 errors, 6 warnings
+node scripts/normalize-treatment-policy.js    # regenerate; expect byte-identical
+node scripts/validate-data.js                 # expect 0 errors, 1 warning
 node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 warnings
 node scripts/make-preview.js                  # smoke test
 ```
 
-The 6 warnings are 3 + 2 + 1: three long-standing `resistance:` ones (1 unnamed
-site, 730 uncited studies, 12 undrawn country values), two
-`molecular markers:` ones (625 uncited surveys, 9 undrawn country values) and
-one `treatment policy:` one (French Guiana lists a dashboard product but is
-not drawn on the basemap). Any other split means something moved.
+The one warning is the `treatment policy:` one: French Guiana lists a dashboard
+product but is not drawn on the basemap. Anything else means something moved.
+(It was 6 warnings, 3 + 2 + 1, until the WHO study-result layers were removed;
+see [docs/handoff-remove-study-layers.md](docs/handoff-remove-study-layers.md).)
 
-`scripts/verify-map-clusters.js` also exists but needs puppeteer, which is not
-installed here. Headless Chrome additionally needs a software GL backend or
+No browser test script is installed (puppeteer is not), and
+`scripts/verify-map-clusters.js` went with the dots it tested.
+[docs/handoff-remove-study-layers.md](docs/handoff-remove-study-layers.md) §6
+describes a smoke test that drives headless Chrome over raw CDP.
+Headless Chrome additionally needs a software GL backend or
 MapLibre never finishes initialising and the whole page looks broken — add
 `--enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader` and drop
 `--disable-gpu`.
