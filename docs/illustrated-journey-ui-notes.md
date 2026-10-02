@@ -1263,6 +1263,49 @@ dropdown of §3.27 on wide screens.
   cleared after, and again on a second click; no sideways scroll; no script errors. **Not
   checked:** a real print preview, a screen reader.
 
+### 3.31 A light gray page ground, so the data cards stand out (2 Oct 2026)
+
+Asked: make the page "pop" so the data is easy to see, with a different shade of white or
+gray. Every data block was already a white card (pathway strip, medicines table, map,
+definitions, sources) on a white page, so the only thing separating them was a 1 px
+`--line` border. The page ground (`--ground`, used only by `body`) is now **`#EEF2F4`**, a
+cool light gray in the same blue-grey family as `--ink`. The cards are unchanged and stay
+white.
+
+| Ground | White card against it | `--ink-3` text on it | |
+| --- | --- | --- | --- |
+| `#FFFFFF` (before) | 1.00:1 | 5.64:1 | cards separated by their border alone |
+| `#F4F7F8` | 1.08:1 | 5.24:1 | not chosen: too faint, and it is already `--surface-2`, the table's header row |
+| **`#EEF2F4`** | **1.13:1** | **5.01:1** | chosen |
+| `#E9EEF1` | 1.17:1 | 4.82:1 | not chosen: starts to look dingy, less margin on the lightest text |
+| `#E6EBEE` | 1.20:1 | 4.69:1 | not chosen: as above, and close to the 4.5:1 floor |
+
+For scale, GitHub's gray page is `#F6F8FA`, 1.06:1 against white. Every text colour that sits
+directly on the ground still clears 4.5:1: `--ink` 12.2, `--ink-2` 6.9, `--accent` 6.8,
+`--ink-3` 5.0.
+
+Knock-on changes:
+
+- **The tooltip's text** was `color: var(--ground)`, which would have turned it gray. It is
+  now `var(--surface)`, so it stays white on ink.
+- **The Unitaid logo** needed nothing: its SVG has no background of its own, and its navy
+  holds on the gray. The comment that said "the page background is white" is updated.
+- **Print stays white**: the print view already set `body { background: #fff }`.
+- **The site menu** (`assets/site-nav.js`) is `--surface`, so it is now a white bar above the
+  gray page. Nothing changed there.
+- **The disclaimer panel's tint** (`--accent-soft`) is now only 1.02:1 against the ground,
+  where it was 1.15:1 against white. Its 1 px border and 5 px accent edge still frame it, so
+  it was left alone. If it should stand out more, a white fill is the one-line change.
+
+**Reach:** this page only, plus its `/fr/` and `/pt/` editions and RBM's copies, which are
+built from it. RBM's iframe will therefore show a gray page, not a white one. Pipeline,
+Story, `index.html`, `option-b.html`, and the `unitaid/` and `synthetic/` editions have
+their own stylesheets and are unchanged.
+
+Checked in headless Chrome at 1440 px and 390 px, before and after. The cards stand off the
+ground, the header, draft banner and buttons read as before, and there is no sideways
+scroll. **Not checked:** a real print preview, RBM's staging frame.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)

@@ -8,7 +8,12 @@
 <style>
   :root {
     color-scheme: light;
-    --ground: #FFFFFF;
+    /* The page ground is a cool light gray (2 Oct 2026, was white) so the white
+       cards — pathway strip, medicines table, map, sources — stand off it
+       (1.13:1) instead of melting into it. Same blue-grey family as --ink.
+       Every text colour still clears 4.5:1 on it: --ink-3, the lightest, is
+       5.0:1. Print stays white (see the print view). */
+    --ground: #EEF2F4;
     --surface: #FFFFFF;
     --surface-2: #F4F7F8;
     --ink: #16303F;
@@ -48,7 +53,7 @@
     --shadow: 0 1px 3px rgba(22,48,63,.07), 0 8px 24px rgba(22,48,63,.08);
   }
   /* Light theme only — dark mode intentionally removed so the page always
-     renders on a white ground regardless of OS/browser color-scheme. */
+     renders on the same light ground regardless of OS/browser color-scheme. */
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -82,8 +87,9 @@
   .hd-status { margin-top: 6px; font-size: 13px; color: var(--ink-3); line-height: 1.5; }
   /* "Powered by" + the Unitaid logo. No plate, border, shadow or hover
      effect (sheet row 11 follow-up): the logo sits directly on the page
-     background and blends in. The page background is white, so the logo's own
-     navy needs no plate. Keyboard focus keeps its outline. */
+     background and blends in. The logo's SVG has no background of its own,
+     and its navy holds on the light gray page ground, so it needs no plate.
+     Keyboard focus keeps its outline. */
   .attrib { flex: none; display: flex; justify-content: flex-end; }
   .attrib a {
     display: flex; align-items: center; gap: 8px;
@@ -649,7 +655,7 @@
   /* ---------- tooltip ---------- */
   #tip {
     position: fixed; z-index: 50; max-width: 280px; pointer-events: none;
-    background: var(--ink); color: var(--ground); padding: 10px 12px; border-radius: 8px;
+    background: var(--ink); color: var(--surface); padding: 10px 12px; border-radius: 8px;
     font-size: 12.5px; line-height: 1.45; box-shadow: var(--shadow); display: none;
   }
   #tip b { display: block; margin-bottom: 2px; }
@@ -661,8 +667,8 @@
   #tip .tlvl .tmark { width: 9px; flex: none; font-weight: 800; text-align: center; }
   #tip .tlvl.off { opacity: .45; }
   #tip .tlvl .mapsw { width: 11px; height: 11px; }
-  /* the tooltip inverts between themes (ink ground, page-coloured text), so the
-     hairline is drawn from currentColor rather than a fixed white */
+  /* the tooltip is inverted (ink ground, white text), and the hairline is
+     drawn from currentColor so it follows the text */
   #tip .tprod { position: relative; margin-top: 6px; padding-top: 6px; font-size: 11.5px; opacity: .72; }
   #tip .tprod::before {
     content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
