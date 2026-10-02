@@ -312,6 +312,29 @@ matched the intended resolution. Two gaps were fixed afterwards, on `fix/post-me
 
 After the bot's run (`dac539f`) the locale build reports 621 translated strings for French and 622 for Portuguese (100% coverage). The one new string from this follow-up waits for the next bot run.
 
+## 9b. Translated code broke /fr and /pt (found 2 Oct 2026, after the bot's first full run)
+
+The bot's run after PR #52 translated four strings that are code, because the js
+collector took them for prose (they have spaces and punctuation):
+
+| Literal | Used for | What it became | Effect |
+| --- | --- | --- | --- |
+| `"button, a, .gloss"` | `e.target.closest(…)` in the row click handler | fr `bouton, a, .gloss`; pt `botão, um, . brilho` | **fr:** a click on the chevron opened the row and the same click, bubbling to the row, closed it again, so rows never opened. **pt:** invalid selector, script error on every row click |
+| `"(min-width: 721px)"` | `matchMedia` for the Sources toggle | fr `(largeur minimale : 721 px)` | Sources started closed on laptops |
+| `"(prefers-reduced-motion: reduce)"` | `matchMedia` | fr `(préfère-mouvement-réduit : réduire)` | reduced-motion preference ignored |
+| `"grid-column: 4 / -1"` | an inline style | fr `colonne de la grille : 4 / -1` | style dropped |
+
+**Fix:** `assemble-content.js` no longer collects a media query, a CSS selector list, an
+attribute selector or a style declaration (`isCode2`). Exactly 11 js strings dropped out, all
+code; nothing else changed. The builder only substitutes collected strings, so those literals
+now stay as written, whatever the translation memory holds. Their old translations stay in
+`translations.json` as harmless orphans (owner: the memory is left alone).
+
+**Checked** with a real mouse click in headless Chrome (an `element.click()` from script does
+not reproduce it: the browser blocks the second, nested click): before the fix the French
+row stayed closed and Portuguese threw; after it, the row opens and Sources starts open at
+1280 px in all three languages, with no script errors.
+
 ## 10. Status
 
 | | |

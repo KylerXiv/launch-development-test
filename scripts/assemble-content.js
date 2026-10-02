@@ -211,6 +211,18 @@ function collect() {
   const isSvgPath  = (t) => /^[MLQACVHZmlqacvhz]\s/.test(t);         // path data
   const isMime     = (t) => /^[a-z]+\/[a-z+.-]+$/.test(t);
   const isEntity   = (t) => /^&[a-z]+;$/.test(t);
+  // Code that reads like prose because it has spaces and punctuation, and that
+  // breaks when translated (all four were, before 2 Oct 2026): a media query
+  // ("(min-width: 721px)" became "(largeur minimale : 721 px)", so the Sources
+  // list never opened on a French laptop), a CSS selector list ("button, a,
+  // .gloss" became "botão, um, . brilho", which throws, and "bouton, a, .gloss",
+  // which silently matched nothing, so a row's own click closed it again), an
+  // attribute selector, and a style declaration ("grid-column: 4 / -1").
+  const isMediaQuery = (t) => /^\(\s*(min-|max-|prefers-)[a-z-]+\s*:/.test(t);
+  const isSelectorList = (t) => /^[\w.#\[\]="'*:-]+(\s*,\s*[\w.#\[\]="'*:-]+)+$/.test(t) && /(^|,)\s*[.#\[*]/.test(t);
+  const isAttrSelector = (t) => /^\[[a-z-]+/.test(t);
+  const isStyleDecl  = (t) => /^[a-z-]+\s*:\s*[-\d.]+(px|%|em|rem)?(\s*\/\s*-?\d+)?\s*;?$/.test(t);
+  const isCode2 = (t) => isMediaQuery(t) || isSelectorList(t) || isAttrSelector(t) || isStyleDecl(t);
 
   // a UI string is prose: at least two letters, and either a space or sentence
   // punctuation. "today" and ", ongoing" are real; "esc" and "ltr" are not.
@@ -222,7 +234,7 @@ function collect() {
     if (!t) continue;
     if (isMarkup(t) || isCssVar(t) || isUrlish(t) || isFragment(t) ||
         isCodeish(t) || isAttrName(t) || isToken(t) || isUnit(t) ||
-        isCssish(t) || isCssDecl(t) || isSvgPath(t) || isMime(t) || isEntity(t)) continue;
+        isCssish(t) || isCssDecl(t) || isSvgPath(t) || isMime(t) || isEntity(t) || isCode2(t)) continue;
     if (!looksLikeProse(t)) continue;
     add("js", t, `line ${lineOf(m.index)}`, quote);
   }
