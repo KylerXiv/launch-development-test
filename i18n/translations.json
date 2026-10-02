@@ -330,6 +330,13 @@
       "fr": "Inscrit sur",
       "pt": "Listado para"
     },
+    "14b1b3cea877d421": {
+      "en": "The dashboard data could not be loaded.",
+      "where": "line 1371 (in markup)",
+      "bucket": "js",
+      "fr": "Les données du tableau de bord n'ont pas pu être chargées.",
+      "pt": "Não foi possível carregar os dados do painel de controlo."
+    },
     "14cb833119ac319e": {
       "en": "MFT deployment models with pyronaridine–artesunate",
       "where": "products.products[2].detail.research.question",
@@ -470,6 +477,13 @@
       "fr": "[LAUNCH] Échec de l'abonnement :",
       "pt": "[LAUNCH] Falha na inscrição:"
     },
+    "20d912488c606192": {
+      "en": "[LAUNCH] data/products.js is missing or has a syntax error — run node scripts/validate-data.js",
+      "where": "line 1372",
+      "bucket": "js",
+      "fr": "[LAUNCH] Le fichier data/products.js est manquant ou contient une erreur de syntaxe — exécutez node scripts/validate-data.js",
+      "pt": "[LAUNCH] O ficheiro data/products.js está em falta ou contém um erro de sintaxe — execute o node scripts/validate-data.js"
+    },
     "213134a28cca8506": {
       "en": "Sorry — we could not add you just now. Please try again in a moment.",
       "where": "line 4045",
@@ -518,6 +532,13 @@
       "bucket": "data",
       "fr": "inclusion dans les directives nationales",
       "pt": "Inclusão de orientações nacionais"
+    },
+    "239b731ca15250a6": {
+      "en": "[role=\"tab\"][aria-selected=\"true\"]",
+      "where": "line 3136",
+      "bucket": "js",
+      "fr": "[role=\"tab\"][aria-selected=\"true\"]",
+      "pt": "[role=\"tab\"][aria-selected=\"true\"]"
     },
     "23c09db769186a7b": {
       "en": "A stringent regulator reviews the full evidence on quality, safety and effectiveness. For malaria medicines this is usually the European Medicines Agency (EMA) Article 58 procedure, which covers medicines meant for use outside Europe. Every later step builds on this opinion. Health-authority review status is generally not public, so this step changes only when a regulator or the manufacturer announces an outcome.",
@@ -918,6 +939,13 @@
       "fr": "Afrique du Sud",
       "pt": "África do Sul"
     },
+    "3eb56367b966992c": {
+      "en": "Treatments procured through public channels",
+      "where": "line 1800 (in markup)",
+      "bucket": "js",
+      "fr": "Traitements obtenus par voie publique",
+      "pt": "Tratamentos obtidos através de canais públicos"
+    },
     "3ef171d147dae887": {
       "en": "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026.",
       "where": "line 3674",
@@ -1064,6 +1092,13 @@
       "bucket": "data",
       "fr": "Formation du personnel de santé au nouveau protocole",
       "pt": "Formação dos profissionais de saúde sobre o novo regime"
+    },
+    "484b58c1932010c6": {
+      "en": "The source list could not be loaded. Please reload the page to try again.",
+      "where": "line 3417 (in markup)",
+      "bucket": "js",
+      "fr": "La liste des sources n'a pas pu être chargée. Veuillez recharger la page pour réessayer.",
+      "pt": "Não foi possível carregar a lista de fontes. Recarregue a página para tentar novamente."
     },
     "485adf8da873e275": {
       "en": "PLOS Medicine: ASPY in routine use",
@@ -1653,6 +1688,13 @@
       "fr": "Pourquoi cela peut bloquer",
       "pt": "Porque pode parar"
     },
+    "6886e466d020baef": {
+      "en": "[data-stage=\"${t.dataset.stage}\"]",
+      "where": "line 3228",
+      "bucket": "js",
+      "fr": "[data-stage=\"${t.dataset.stage}\"]",
+      "pt": "[data-stage=\"${t.dataset.stage}\"]"
+    },
     "68bb1e78d5c97744": {
       "en": "Governments and implementing partners.",
       "where": "products.stageInfo[7].who",
@@ -1687,6 +1729,13 @@
       "bucket": "data",
       "fr": "Bonnes pratiques de fabrication — norme de qualité vérifiée par l'inspection des sites de production.",
       "pt": "Boas Práticas de Fabrico — padrão de qualidade verificado através da inspeção das instalações de produção."
+    },
+    "6acdb8f580b71426": {
+      "en": "[data-step=\"${t.dataset.step}\"]",
+      "where": "line 3134",
+      "bucket": "js",
+      "fr": "[data-step=\"${t.dataset.step}\"]",
+      "pt": "[data-step=\"${t.dataset.step}\"]"
     },
     "6acf83c20675d9b3": {
       "en": "WHO-Listed Authority — a regulator assessed by WHO as operating at an advanced level.",
@@ -2009,6 +2058,13 @@
       "bucket": "markup",
       "fr": "Initiative du président américain contre le paludisme",
       "pt": "Iniciativa Presidencial dos EUA contra a Malária"
+    },
+    "7f46adca4bbe58a9": {
+      "en": "button, a, .gloss",
+      "where": "line 2099",
+      "bucket": "js",
+      "fr": "bouton, a, .gloss",
+      "pt": "botão, um, . brilho"
     },
     "822041757fc756e5": {
       "en": "Sao Tome and Principe",
@@ -2968,6 +3024,13 @@
       "fr": "Une idée pour rendre cela plus clair ou plus utile",
       "pt": "Uma ideia para tornar isto mais claro ou mais útil."
     },
+    "c4d3d42ed3a4f2ba": {
+      "en": "Medicine",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Médecine",
+      "pt": "Medicina"
+    },
     "c4dd160f454085ac": {
       "en": "Phase III results, then dossier preparation",
       "where": "products.products[1].stages[0].next",
@@ -3114,6 +3177,13 @@
       "bucket": "js",
       "fr": "Autre chose",
       "pt": "Outra coisa"
+    },
+    "cc7bf55429428917": {
+      "en": "[LAUNCH] data/sources.js did not load",
+      "where": "line 3418",
+      "bucket": "js",
+      "fr": "[LAUNCH] Le fichier data/sources.js n'a pas été chargé.",
+      "pt": "[LAUNCH] O ficheiro data/sources.js não foi carregado"
     },
     "ccf2814e960ed5e1": {
       "en": "Where malaria is becoming harder to treat. Its drug-resistance study results are not reproduced on this page — open the map to explore them.",
@@ -3366,6 +3436,13 @@
       "bucket": "data",
       "fr": "Marqueurs moléculaires",
       "pt": "Marcadores moleculares"
+    },
+    "da5e48383e53c5e7": {
+      "en": "[data-det-tab=\"${t.dataset.detTab}\"]",
+      "where": "line 3134",
+      "bucket": "js",
+      "fr": "[data-det-tab=\"${t.dataset.detTab}\"]",
+      "pt": "[data-det-tab=\"${t.dataset.detTab}\"]"
     },
     "da99806f945cefea": {
       "en": "WWARN / IDDO malaria data",
@@ -3674,6 +3751,13 @@
       "bucket": "markup",
       "fr": "Unitaid",
       "pt": "Unitaid"
+    },
+    "ea84b75429953908": {
+      "en": "[data-group=\"${t.dataset.group}\"]",
+      "where": "line 3229",
+      "bucket": "js",
+      "fr": "[data-group=\"${t.dataset.group}\"]",
+      "pt": "[data-group=\"${t.dataset.group}\"]"
     },
     "eb6213d7c037b126": {
       "en": "Source: WHO Malaria Threat Maps, updated ${prettyDate(m.whoLastDataUpdate)}. Values are WHO's; site-merging is ours.",

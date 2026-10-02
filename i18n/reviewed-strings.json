@@ -23,7 +23,7 @@
     { "file": "illustrated-journey-dashboard.html", "src": "${esc(names)} — independent approvals, no defined order between them", "en": "${esc(names)} — independent approvals, no defined order between them" },
     { "file": "illustrated-journey-dashboard.html", "src": "<span></span><span>Medicine</span>", "en": "Medicine" },
     { "file": "illustrated-journey-dashboard.html", "src": "\"c-mini\">Journey<", "en": "Journey" },
-    { "file": "illustrated-journey-dashboard.html", "src": "<h3>Treatments procured through public channels · ${esc(d.volume.period)}</h3>", "en": "Treatments procured through public channels · ${esc(d.volume.period)}" },
+    { "file": "illustrated-journey-dashboard.html", "src": "<h3>Treatments procured through public channels</h3>", "en": "Treatments procured through public channels" },
     { "file": "illustrated-journey-dashboard.html", "src": "\"prov\">Source: ${", "en": "Source:" },
     { "file": "illustrated-journey-dashboard.html", "src": "\"l1t\">On pathway: ${onPathwayLong(p)}<", "en": "On pathway: ${onPathwayLong(p)}" },
     { "file": "illustrated-journey-dashboard.html", "src": "<h3>Access &amp; supply commitments</h3>", "en": "Access & supply commitments", "html": true },

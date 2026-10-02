@@ -4,7 +4,7 @@
 (local, not pushed), on `main` at `56ecf13`. This is the branch's working-notes
 document for the translation work, per [CLAUDE.md](../../CLAUDE.md). The Sources
 footer toggle on the same branch is recorded in
-[illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.31.*
+[illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.33.*
 
 **In one paragraph.** The French and Portuguese dashboards showed a lot of
 English: about 230 country names, the feedback form and site menu, the step
