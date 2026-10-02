@@ -7,7 +7,7 @@ feedback** (`feedback.js`), with shared code in `_mail.js`. Per
 [CLAUDE.md](../CLAUDE.md), this document is updated in the same commit as any
 change it describes. What the visitor sees is covered in
 [illustrated-journey-ui-notes.md](illustrated-journey-ui-notes.md) §3.10
-(Subscribe) and §3.27 (Send feedback). The scoping this builds on is in
+(Subscribe) and §3.34 (Send feedback). The scoping this builds on is in
 [Handoff_Kyler.md](Handoff_Kyler/Handoff_Kyler.md), under "Newly scoped — the
 two buttons, and a backend for them" (23 Sep 2026).
 
@@ -378,10 +378,14 @@ English, as the translation design intends ("English does not wait for
 French"). **The emails and the confirm and unsubscribe pages are English
 only** (§4).
 
-Send feedback adds nothing to translate either. Its strings live in
-`assets/report-issue.js`, which the locale build copies unchanged, so the
-widget has always been English on `/fr` and `/pt`. That includes its new
-"sent" wording, and the team's email is English too.
+Send feedback's three new strings (the privacy note and the "sent" title and
+message) are translated like the rest of the widget. Since Jackson's
+`fix/sources-toggle` (merged 2 Oct, `docs/jackson/translation-coverage.md`),
+`/fr` and `/pt` each get their own copy of `assets/report-issue.js`, with the
+strings listed in `i18n/reviewed-strings.json` swapped for their
+translations. The three are one literal each, so that list can name them;
+they show in English until `translate.yml` has run. `/api/feedback` is not on
+the list, so it is never rewritten. The team's email stays English.
 
 ### 2.12 Send feedback: one switch, on one page
 
@@ -658,8 +662,8 @@ documented there, and the rest of the preview test settles them:
 | | |
 | --- | --- |
 | Branch | `email-feedback`, from `main` at `2d3d8cb` (2 Oct) |
-| Commits | 1: Send feedback on the illustrated journey |
-| Pull request | against `main`, opened with this commit; not merged |
+| Commits | 2: Send feedback on the illustrated journey; then `main` merged in (2 Oct, after #48, #50 and #52), resolving `build-rbm-pages.js` (both changes kept) and the UI notes (this work's section is now §3.34), and putting the three new widget strings on `i18n/reviewed-strings.json` |
+| Pull request | #40 against `main` |
 | CI | runs on that pull request |
 | New files | `api/feedback.js` |
 | Changed | `api/_mail.js` (`block`, `newRef`), `assets/report-issue.js` (the seam, connected wording), `illustrated-journey-dashboard.html` (`connected: true`, comments), `scripts/build-rbm-pages.js` and its test, `scripts/test-mail-api.js`, `rbm/README.md`, this document, `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, `docs/Handoff_Kyler/Handoff_Kyler.md` |

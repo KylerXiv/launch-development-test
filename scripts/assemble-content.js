@@ -3,7 +3,7 @@
  * scripts/assemble-content.js  —  DEV-31
  *
  * The one script that reads the English source. It finds every string that is
- * translated, reads the three data files, hashes everything ONCE with
+ * translated, reads the two data files, hashes everything ONCE with
  * scripts/i18n-hash.js, and writes the result to i18n/content.en.json.
  * Every other script in the pipeline reads content.en.json, never the source.
  *
@@ -18,7 +18,7 @@
  *                sha256. Never sent to a translation engine.
  *   contentHash  one digest over text + values
  *
- * Three buckets of text, because they are found and substituted differently:
+ * Four buckets of text, because they are found and substituted differently:
  *
  *   data    the strings the page renders out of data/*.js, at an explicit
  *           allow-list of field paths.
@@ -27,6 +27,9 @@
  *   js      string literals inside the page's own JavaScript that reach the
  *           screen. Found by pattern; over-collection is harmless because the
  *           builder only substitutes strings that have a translation.
+ *   reviewed  exact snippets listed in i18n/reviewed-strings.json, for what the
+ *           js patterns cannot find safely, and for the shared widgets
+ *           (assets/report-issue.js, assets/site-nav.js) the page loads.
  *
  * --check re-hashes the source and fails (exit 1) if content.en.json is stale,
  * was edited by hand, or if any key in i18n/translations.json no longer matches
@@ -58,7 +61,7 @@ function readDataFile(rel) {
 // of { text, where, quote? }. Reads only; the rules below are unchanged from the
 // original extract-strings.js.
 function collect() {
-  const out = { data: [], markup: [], js: [] };
+  const out = { data: [], markup: [], js: [], reviewed: [] };
   const seen = new Set();
   const add = (bucket, text, where, quote) => {
     const t = String(text == null ? "" : text).trim();
@@ -77,9 +80,12 @@ function collect() {
   // provenance must match the source it cites)
   const P = readDataFile("data/products.js");
   (P.stages || []).forEach((s, i) => add("data", s, `products.stages[${i}]`));
-  // the step explainers (one per stage); their source line is provenance and stays English
+  // the step explainers (one per stage). Their `source` is a label for the kind
+  // of source ("National medicines registers"), not a citation, so it is
+  // translated too (owner's decision, 2 Oct 2026); citations are the products'
+  // own `source` fields below, which stay English.
   (P.stageInfo || []).forEach((x, i) => {
-    ["what", "who", "stall"].forEach((k) => add("data", x[k], `products.stageInfo[${i}].${k}`));
+    ["what", "who", "stall", "source"].forEach((k) => add("data", x[k], `products.stageInfo[${i}].${k}`));
   });
   Object.entries(P.glossary || {}).forEach(([k, v]) => add("data", v, `products.glossary.${k}`));
   (P.changelog || []).forEach((c, i) => {
@@ -98,17 +104,35 @@ function collect() {
     add("data", d.useCase, `${b}.detail.useCase`);
     (d.access || []).forEach((x, j) => add("data", x, `${b}.detail.access[${j}]`));
     (d.adoption || []).forEach((x, j) => add("data", x, `${b}.detail.adoption[${j}]`));
-    if (d.research) add("data", d.research.question, `${b}.detail.research.question`);
+    if (d.research) {
+      ["question", "lead", "geographies", "timeline"].forEach((k) => add("data", d.research[k], `${b}.detail.research.${k}`));
+    }
+    // procurement: the total and period are prose ("940,111 packs · US$14.5m
+    // (2018–2025)"); `source` is the citation and stays English
+    if (d.volume) {
+      add("data", d.volume.total, `${b}.detail.volume.total`);
+      add("data", d.volume.period, `${b}.detail.volume.period`);
+      (d.volume.split || []).forEach((s, j) => add("data", s.channel, `${b}.detail.volume.split[${j}].channel`));
+    }
     // price notes are excluded unless confirmed in writing — the guard, kept here
     if (d.price && d.price.confirmedInWriting === true) add("data", d.price.note, `${b}.detail.price.note`);
     (d.milestones || []).forEach((m, j) => {
       add("data", m.milestone, `${b}.detail.milestones[${j}].milestone`);
       add("data", m.label, `${b}.detail.milestones[${j}].label`);
       add("data", m.next, `${b}.detail.milestones[${j}].next`);
+      add("data", m.date, `${b}.detail.milestones[${j}].date`);
+      add("data", m.anticipated, `${b}.detail.milestones[${j}].anticipated`);
     });
+    // Stage dates are prose for a reader ("2012 (label update 2025)", "Rolling").
+    // The page reads the first four-digit year out of `date`, which a
+    // translation keeps. "TBC" stays as it is: the page drops an expected date
+    // that reads exactly TBC (peekLine), and a translated one would show.
+    const notTbc = (v) => (/^tbc$/i.test(String(v || "").trim()) ? undefined : v);
     (p.stages || []).forEach((st, j) => {
       add("data", st.note, `${b}.stages[${j}].note`);
       add("data", st.next, `${b}.stages[${j}].next`);
+      add("data", notTbc(st.date), `${b}.stages[${j}].date`);
+      add("data", notTbc(st.nextDate), `${b}.stages[${j}].nextDate`);
     });
     // journey and volumeNote live under detail; until 2 Oct 2026 both were read
     // from the product's top level, where the data has neither, so they were
@@ -229,7 +253,50 @@ function collect() {
     add("js", t, `line ${lineOf(m.index)} (in markup)`);
   }
 
+  // ---------------------------------------------------------------------------
+  // 4. reviewed — i18n/reviewed-strings.json
+  // ---------------------------------------------------------------------------
+  // What the filters above reject on purpose, because a pattern cannot tell it
+  // from code: single words ("Overview", "Close"), lower-case phrases
+  // ("in progress"), text around ${...} holes ("Step ${n} of ${m}"), and the
+  // shared widgets in assets/ that the page loads (feedback form, site menu).
+  // Each entry names its exact snippet, so the builder replaces only that.
+  for (const r of reviewed()) add("reviewed", r.en, r.file);
+
   return out;
+}
+
+// The reviewed list, checked against the files it names: a snippet that is no
+// longer in its file means the code changed under it, and the build stops
+// rather than leave that text in English without saying so.
+const REVIEWED = path.join(ROOT, "i18n", "reviewed-strings.json");
+const escHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// Where in its snippet an entry's English sits: as a whole word, not touching a
+// letter, digit, _ or . on either side — so "yr" in `${el2.yrs} yr${` is the
+// label, not the code. -1 unless there is exactly one such place.
+function placeIn(src, inner) {
+  const at = [];
+  for (let i = src.indexOf(inner); i !== -1; i = src.indexOf(inner, i + 1)) {
+    const before = src[i - 1] || "", after = src[i + inner.length] || "";
+    if (!/[\p{L}\d_.]/u.test(before) && !/[\p{L}\d_]/u.test(after)) at.push(i);
+  }
+  return at.length === 1 ? at[0] : -1;
+}
+function reviewed() {
+  if (!fs.existsSync(REVIEWED)) return [];
+  const list = JSON.parse(fs.readFileSync(REVIEWED, "utf8")).entries || [];
+  const files = {};
+  const bad = [];
+  for (const r of list) {
+    const text = (files[r.file] ||= fs.readFileSync(path.join(ROOT, r.file), "utf8"));
+    const inner = r.html ? escHtml(r.en) : r.en;
+    if (!text.includes(r.src)) bad.push(`${r.file}: not found: ${r.src}`);
+    else if (placeIn(r.src, inner) === -1) bad.push(`${r.file}: "${r.en}" is not exactly once, as a whole word, in its src: ${r.src}`);
+  }
+  if (bad.length) {
+    throw new Error(`i18n/reviewed-strings.json no longer matches the code:\n    ${bad.join("\n    ")}\n  Update the entries to the new code.`);
+  }
+  return list;
 }
 
 // ---------------------------------------------------------------------------
@@ -238,7 +305,7 @@ function collect() {
 const CONTENT = path.join(ROOT, "i18n", "content.en.json");
 const MEM = path.join(ROOT, "i18n", "translations.json");
 const SCHEMA = "launch-content/1";
-const BUCKETS = ["data", "markup", "js"];
+const BUCKETS = ["data", "markup", "js", "reviewed"];
 const rel = (f) => path.relative(ROOT, f).split(path.sep).join("/");
 
 function assemble() {
@@ -256,7 +323,7 @@ function assemble() {
     const data = readDataFile(f);
     values[f] = { sha256: digest(data), data };
   }
-  const counts = { data: found.data.length, markup: found.markup.length, js: found.js.length, total: text.length };
+  const counts = { data: found.data.length, markup: found.markup.length, js: found.js.length, reviewed: found.reviewed.length, total: text.length };
   return { schema: SCHEMA, contentHash: contentHashOf(text, values), counts, text, values };
 }
 
@@ -359,5 +426,5 @@ function main() {
   fs.writeFileSync(CONTENT, serialise(assemble()), "utf8");
 }
 
-module.exports = { assemble, load, problems, requireFresh, CONTENT };
+module.exports = { assemble, load, problems, requireFresh, reviewed, escHtml, placeIn, CONTENT };
 if (require.main === module) main();

@@ -104,3 +104,26 @@ inside an iframe on another domain.
 ## Status
 
 Local branch, not pushed, two commits on top of `feat/public-data-layer`.
+
+## 3. The publish summary listed shifted changelog lines (fixed 2 Oct)
+
+The first automatic publish (approval of test proposal #35) worked, but its
+"what changes" summary was 40 lines of `changelog[13].plain: … → …`: every
+approval adds a line at the top of the changelog, and `dataset-diff.js`
+compared lists by position, so every line below looked changed and the real
+change (GanLum's WHO PQ stage) fell into "… and 13 more". Now: lists whose
+items have an `id` (products, sources) are matched by id; a list that grew or
+shrank (the changelog) reports only the entries added or removed; fixed-length
+lists (a product's stages) still compare by position. On the real #35 publish
+and its revert the summary is now 6 lines: the added (removed) changelog line
+and the five fields of GanLum's stage 3. `test-dataset-diff.js`: 8 passed, run
+in `validate.yml`.
+
+## End-to-end test on GitHub (2 Oct 2026)
+
+First publish (Publish now) → test proposal #35 approved → decision, history
+(green after the `ref: main` fix), translate, **publish started by itself**
+(`trigger: approval`, issue 35) → `TEST-0001` live in `dashboard.json` → revert
+on `main` (also removing the test snapshot `history/products-2026-10-01.js`) →
+Publish now → GanLum back to `idle`, `TEST-0001` gone. The data repo keeps all
+three publishes and their archive copies.

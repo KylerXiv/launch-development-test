@@ -157,6 +157,7 @@ sentence. Add any acronym you introduce in a note.
 | --- | --- | --- |
 | `id` | lowercase slug | Unique, stable — used as the HTML anchor. Never rename it, even if the display name changes (e.g. ASPY's id remains `pyramax`). |
 | `name`, `inn`, `manufacturer` | string | Display identity. |
+| `acknowledgement` | string (optional) | A legal acknowledgement a partner has asked to be shown with the medicine, word for word as they gave it. Shown in the medicine's detail and in the page footer's Acknowledgements section. Do not paraphrase it. |
 | `class` | `"pipeline"` \| `"market"` | Pipeline = pre-launch; market = launched but underutilized. Feeds the "expected to market" stat. |
 | `phase` | `"preclinical"` \| `"phase1"` \| `"phase2"` \| `"phase3"` \| `"regulatory"` \| `"access"` | Where the product sits on the pipeline-poster view. Move it forward when a phase gate is passed (e.g. Phase III readout → `"regulatory"`; first launches → `"access"`). A product without a phase is omitted from the poster (validator warns). |
 | `classLabel` | string | The chip text under the name. |

@@ -196,26 +196,21 @@
     messageLabel:"What would you like to tell us?",
     messagePlaceholder:
                  "e.g. A date on this page looks out of date: the source I checked gives a newer one.",
-    note:        "Mock only \u2014 Send feedback isn't connected yet.",
+    note:        "Mock only — Send feedback isn't connected yet.",
     submit:      "Send feedback",
-    sending:     "Sending\u2026",
-    failed:      "Sorry \u2014 your feedback could not be sent just now. Please try again in a moment.",
-    doneTitle:   "Thanks \u2014 though this isn't sent anywhere yet.",
-    doneMessage: "This form has no inbox behind it yet, so nothing was actually sent \u2014 your note stayed in " +
-                 "this browser tab. Once it is connected, the LAUNCH team will read every message, and where " +
-                 "you have pointed us to a public source that checks out, we correct the data at the next update.",
+    sending:     "Sending…",
+    failed:      "Sorry — your feedback could not be sent just now. Please try again in a moment.",
+    doneTitle:   "Thanks — though this isn't sent anywhere yet.",
+    doneMessage: "This form has no inbox behind it yet, so nothing was actually sent — your note stayed in this browser tab. Once it is connected, the LAUNCH team will read every message, and where you have pointed us to a public source that checks out, we correct the data at the next update.",
     again:       "Send more feedback"
   };
   // A connected page sends, so the three strings that say it does not are
-  // replaced. A page's own overrides (below) still win.
+  // replaced. A page's own overrides (below) still win. One literal each, so
+  // i18n/reviewed-strings.json can name them for the /fr and /pt copies.
   if (CONNECTED) {
-    COPY.note =        "Your email is optional and used only to reply to you. With your message we send the " +
-                       "page you are on, the version of the data it shows, and your browser, so the team can " +
-                       "see what you saw.";
+    COPY.note =        "Your email is optional and used only to reply to you. With your message we send the page you are on, the version of the data it shows, and your browser, so the team can see what you saw.";
     COPY.doneTitle =   "Thanks — your feedback has been sent.";
-    COPY.doneMessage = "The LAUNCH team reads every message, and where you have pointed us to a public source " +
-                       "that checks out, we correct the data at the next update. If you left an email address, " +
-                       "any reply from us will quote the reference below.";
+    COPY.doneMessage = "The LAUNCH team reads every message, and where you have pointed us to a public source that checks out, we correct the data at the next update. If you left an email address, any reply from us will quote the reference below.";
   }
   (function (over) {
     if (!over) return;

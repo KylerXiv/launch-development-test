@@ -48,18 +48,25 @@
 const fs = require("fs");
 const path = require("path");
 const { normalise } = require("./i18n-hash");
-const { requireFresh, problems, assemble } = require("./assemble-content");
+const { requireFresh, problems, assemble, reviewed, escHtml, placeIn } = require("./assemble-content");
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "dist", "locale");
 const PAGE = "illustrated-journey-dashboard.html";
 const MEM = path.join(ROOT, "i18n", "translations.json");
+const COUNTRY_NAMES = path.join(ROOT, "i18n", "country-names.json");
 const LOCALES = ["fr", "pt"];
 const HTML_LANG = { fr: "fr", pt: "pt-PT" };
+// Shared widgets the page loads from assets/. Their locale copies get the
+// reviewed-strings substitution (i18n/reviewed-strings.json).
+const ASSET_SCRIPTS = ["assets/report-issue.js", "assets/site-nav.js"];
 
 const GLOBALS = {
   "data/products.js": "window.LAUNCH_DATA",
   "data/sources.js": "window.LAUNCH_SOURCES",
+  "data/treatment-policy.js": "window.LAUNCH_TREATMENT_POLICY",
+  "data/world-map.js": "window.LAUNCH_MAP",
+  "data/world-map-geo.js": "window.LAUNCH_MAP_GEO",
 };
 
 const isCodeChars = (t) => /[!=&|{}\\]/.test(t) || /=>/.test(t) ||
@@ -78,7 +85,16 @@ const MEMORY = JSON.parse(fs.readFileSync(MEM, "utf8")).entries;
 // does no hashing: a string that is not in content.en.json has no key, so it is
 // never substituted, whatever the memory holds. --verify only inspects dist/ and
 // does not need the content file.
-const KEY_OF = new Map();
+//
+// Three lookups, one per kind of substitution. The page's own JavaScript is
+// matched only against strings collected FROM the page (markup and js): a word
+// that is UI text in the data or in the reviewed list ("TBC", "None", "Source")
+// can also be a literal the code compares against, and translating that
+// literal breaks the comparison silently. Reviewed strings are replaced only
+// at their exact snippet.
+const KEY_OF = new Map();        // every bucket: data files and static markup
+const PAGE_KEY_OF = new Map();   // markup + js: literals and text nodes in the page script
+const REVIEWED_KEY_OF = new Map();
 if (!verifyOnly) {
   let text;
   const stale = allowStale ? problems() : [];
@@ -90,12 +106,35 @@ if (!verifyOnly) {
   } else {
     text = requireFresh().text;
   }
-  for (const e of text) KEY_OF.set(normalise(e.en), e.key);
+  for (const e of text) {
+    if (e.bucket === "reviewed") { REVIEWED_KEY_OF.set(normalise(e.en), e.key); continue; }
+    KEY_OF.set(normalise(e.en), e.key);
+    if (e.bucket === "markup" || e.bucket === "js") PAGE_KEY_OF.set(normalise(e.en), e.key);
+  }
 }
-const entryOf = (text) => {
-  const k = KEY_OF.get(normalise(text));
+const lookup = (map) => (text) => {
+  const k = map.get(normalise(text));
   return k ? MEMORY[k] : undefined;
 };
+const entryOf = lookup(KEY_OF);
+const pageEntryOf = lookup(PAGE_KEY_OF);
+const reviewedEntryOf = lookup(REVIEWED_KEY_OF);
+
+// A translation goes into a JavaScript string whose quote character the
+// substitution cannot always see. A straight apostrophe would end a '...'
+// literal, so it becomes the typographic one (’), which is also the correct
+// French apostrophe; until 2 Oct 2026 such translations were skipped instead,
+// which left "Lire l'avertissement" and most French with an apostrophe in
+// English. Double quotes, backticks and backslashes outside ${...} holes are
+// still refused.
+const HOLE = /\$\{(?:[^{}]|\{[^{}]*\})*\}/g;
+const holesOf = (t) => (String(t).match(HOLE) || []).sort().join("\u0000");
+function scriptSafe(en, v) {
+  const out = String(v).replace(/'/g, "’");
+  if (holesOf(out) !== holesOf(en)) return null;               // a placeholder was lost or changed
+  if (/["`\\]/.test(out.replace(HOLE, ""))) return null;
+  return out;
+}
 
 const stat = {};
 function tr(locale, text) {
@@ -103,6 +142,7 @@ function tr(locale, text) {
   const e = entryOf(t);
   const v = e && e[locale];
   const s = (stat[locale] ||= { hit: 0, miss: 0, missed: new Set() });
+  if (!v && !/[A-Za-z]{2}/.test(t)) return t;   // "—", "2026", "Q4 2026": nothing to translate, not a miss
   if (v && /^\[stub-[a-z]+\] /.test(v)) s.stub = (s.stub || 0) + 1;
   if (v) { s.hit++; return v; }
   s.miss++; if (s.missed.size < 40) s.missed.add(t.slice(0, 70));
@@ -123,7 +163,7 @@ function readData(rel) {
 function localiseProducts(D, loc) {
   const T = (v) => (typeof v === "string" && v.trim() ? tr(loc, v) : v);
   if (Array.isArray(D.stages)) D.stages = D.stages.map(T);
-  (D.stageInfo || []).forEach((x) => { ["what", "who", "stall"].forEach((k) => { if (x[k]) x[k] = T(x[k]); }); });
+  (D.stageInfo || []).forEach((x) => { ["what", "who", "stall", "source"].forEach((k) => { if (x[k]) x[k] = T(x[k]); }); });
   if (D.glossary) for (const k of Object.keys(D.glossary)) D.glossary[k] = T(D.glossary[k]);
   (D.changelog || []).forEach((c) => { c.plain = T(c.plain); c.summary = T(c.summary); });
   (D.products || []).forEach((p) => {
@@ -133,15 +173,24 @@ function localiseProducts(D, loc) {
     if (d.volumeNote) d.volumeNote = T(d.volumeNote);
     if (Array.isArray(d.access)) d.access = d.access.map(T);
     if (Array.isArray(d.adoption)) d.adoption = d.adoption.map(T);
-    if (d.research && d.research.question) d.research.question = T(d.research.question);
+    if (d.research) ["question", "lead", "geographies", "timeline"].forEach((k) => { if (d.research[k]) d.research[k] = T(d.research[k]); });
+    // the citation (volume.source) stays English, as every source line does
+    if (d.volume) {
+      ["total", "period"].forEach((k) => { if (d.volume[k]) d.volume[k] = T(d.volume[k]); });
+      (d.volume.split || []).forEach((s) => { if (s.channel) s.channel = T(s.channel); });
+    }
     // the price guard — an unconfirmed note is never translated and never moves
     if (d.price && d.price.confirmedInWriting === true && d.price.note) d.price.note = T(d.price.note);
     (d.milestones || []).forEach((m) => {
-      ["milestone", "label", "next"].forEach((k) => { if (m[k]) m[k] = T(m[k]); });
+      ["milestone", "label", "next", "date", "anticipated"].forEach((k) => { if (m[k]) m[k] = T(m[k]); });
     });
+    // "TBC" stays: the page drops an expected date that reads exactly TBC
+    const Tdate = (v) => (/^tbc$/i.test(String(v || "").trim()) ? v : T(v));
     (p.stages || []).forEach((st) => {
       if (st.note) st.note = T(st.note);
       if (st.next) st.next = T(st.next);
+      if (st.date) st.date = Tdate(st.date);
+      if (st.nextDate) st.nextDate = Tdate(st.nextDate);
     });
     // under detail, as in the data (was read from the product's top level)
     (d.journey || []).forEach((j) => { if (j.label) j.label = T(j.label); });
@@ -162,10 +211,61 @@ function localiseSources(D, loc) {
   });
   return D;
 }
+// Country names — from i18n/country-names.json (Unicode CLDR, written by
+// scripts/build-country-names.js), never from the translation memory: a
+// country's name is reference data with one standard form. Keyed by the
+// English spelling each file uses. A name the table lacks stays English and is
+// reported.
+const COUNTRIES = fs.existsSync(COUNTRY_NAMES) ? JSON.parse(fs.readFileSync(COUNTRY_NAMES, "utf8")).names : {};
+const countryStat = {};
+function countryName(loc, en) {
+  const s = (countryStat[loc] ||= { hit: 0, missed: new Set() });
+  const v = COUNTRIES[en] && COUNTRIES[en][loc];
+  if (v) { s.hit++; return v; }
+  if (en) s.missed.add(en);
+  return en;
+}
+function localiseTreatmentPolicy(D, loc) {
+  for (const c of Object.values(D.countries || {})) if (c.name) c.name = countryName(loc, c.name);
+  return D;
+}
+function localiseMap(D, loc) {
+  for (const c of Object.values(D.countries || {})) if (c.n) c.n = countryName(loc, c.n);
+  return D;
+}
+function localiseMapGeo(D, loc) {
+  for (const f of D.features || []) if (f.properties && f.properties.name) f.properties.name = countryName(loc, f.properties.name);
+  return D;
+}
+
 const LOCALISE = {
   "data/products.js": localiseProducts,
   "data/sources.js": localiseSources,
+  "data/treatment-policy.js": localiseTreatmentPolicy,
+  "data/world-map.js": localiseMap,
+  "data/world-map-geo.js": localiseMapGeo,
 };
+
+// Reviewed strings (i18n/reviewed-strings.json) in one file's text: every
+// occurrence of each exact snippet, with its English swapped for the
+// translation. Applied before the pattern passes, which then leave the
+// translated text alone (it is not English, so it has no key).
+const REVIEWED = verifyOnly ? [] : reviewed();
+function applyReviewed(text, file, loc) {
+  const s = (stat[loc] ||= { hit: 0, miss: 0, missed: new Set() });
+  for (const r of REVIEWED) {
+    if (r.file !== file) continue;
+    const e = reviewedEntryOf(r.en);
+    const v = e && e[loc] && scriptSafe(r.en, e[loc]);
+    if (!v) { s.miss++; if (s.missed.size < 40) s.missed.add(r.en.slice(0, 70)); continue; }
+    const inner = r.html ? escHtml(r.en) : r.en;
+    const at = placeIn(r.src, inner);              // checked by reviewed(): exactly one whole-word place
+    const out = r.src.slice(0, at) + (r.html ? escHtml(v) : v) + r.src.slice(at + inner.length);
+    text = text.split(r.src).join(out);
+    s.hit++;
+  }
+  return text;
+}
 
 // Every data file the page loads, from its own <script src> tags. A fixed list
 // here is how the locale pages lost data/sources.js when the Sources footer
@@ -184,6 +284,7 @@ function missingFiles(dir) {
 // the page
 // ---------------------------------------------------------------------------
 function localisePage(html, loc) {
+  html = applyReviewed(html, PAGE, loc);
   const lines = html.split("\n");
   const cut = lines.findIndex((l) => l.includes('src="data/products.js"'));
   if (cut === -1) throw new Error("could not find the data script block");
@@ -233,13 +334,13 @@ function localisePage(html, loc) {
   jsPart = jsPart.replace(LIT, (whole, q, body) => {
     const t = body.trim();
     if (!t) return whole;
-    const e = entryOf(t);
+    const e = pageEntryOf(t);
     if (!e || !e[loc]) return whole;
-    const out = e[loc];
     // never introduce a quote that would close the literal early
-    if (out.includes(q)) return whole;
+    const out = scriptSafe(t, e[loc]);
+    if (!out || out.includes(q)) return whole;
     stat[loc].hit++;
-    return q + body.replace(t, out) + q;
+    return q + body.replace(t, () => out) + q;
   });
 
   // Text nodes inside markup-bearing JS literals. Safe for the same reason the
@@ -252,11 +353,12 @@ function localisePage(html, loc) {
     // a text node, and substituting into it rewrites live code
     if (!/^[\p{L}\d\u2022\u00b7\u26a0"'(]/u.test(norm)) return whole;
     if (isCodeChars(norm)) return whole;
-    const e = entryOf(norm);
+    const e = pageEntryOf(norm);
     if (!e || !e[loc]) return whole;
-    if (/["'`\\]/.test(e[loc])) return whole;      // never inject a quote into a literal
+    const out = scriptSafe(norm, e[loc]);          // never inject a quote into a literal
+    if (!out) return whole;
     stat[loc].hit++;
-    return ">" + text.replace(norm, e[loc]) + "<";
+    return ">" + text.replace(norm, () => out) + "<";
   });
 
   let page = staticPart + "\n" + jsPart;
@@ -266,30 +368,54 @@ function localisePage(html, loc) {
   return page;
 }
 
+// A shared widget's locale copy: the file as it is, with its reviewed strings
+// translated. Also used by build-rbm-pages.js for the RBM pages' copies.
+function localiseAsset(rel, loc) {
+  return applyReviewed(fs.readFileSync(path.join(ROOT, rel), "utf8"), rel, loc);
+}
+
 // ---------------------------------------------------------------------------
 // Post-build self-check.
 //
 // A build that can fail without saying so will fail again, so the build proves
 // the locale output is complete: every data/ and assets/ file the page loads
 // must be there, or part of the page would say its data did not load.
+//
+// It also proves each locale copy keeps the same product ids, in the same
+// order, and the same number of stages as English (from Keith's branch, merged
+// 2 Oct 2026). The ids are lookup keys shared with treatment-policy.js, and a
+// translated lookup key fails silently: the page renders, logs nothing, and
+// whatever was keyed on it draws nothing.
 // ---------------------------------------------------------------------------
+function keysOf(file) {
+  const src = fs.readFileSync(file, "utf8");
+  const m = GLOBALS["data/products.js"];
+  const D = JSON.parse(src.slice(src.indexOf(m + " =") + m.length + 2).trim().replace(/;\s*$/, ""));
+  return { ids: (D.products || []).map((p) => p.id), stages: (D.stages || []).length };
+}
+
 function verify() {
   let failures = 0;
   const say = (ok, msg) => { console.log(`       ${ok ? "✓" : "✗"} ${msg}`); if (!ok) failures++; };
+  const en = keysOf(path.join(ROOT, "data", "products.js"));
 
-  console.log("\n  Self-check — locale output must load every file the page needs:");
+  console.log("\n  Self-check — locale output must load every file the page needs, and keep English's lookup keys:");
   for (const loc of LOCALES) {
     console.log(`\n    ${loc}`);
     const missing = missingFiles(path.join(OUT, loc));
     say(!missing.length, missing.length
       ? `the page loads files that are not there: ${missing.join(", ")}`
       : "every data/ and assets/ file the page loads is there");
+    const lc = keysOf(path.join(OUT, loc, "data", "products.js"));
+    say(JSON.stringify(lc.ids) === JSON.stringify(en.ids), `product ids unchanged (${en.ids.join(", ")})`);
+    say(lc.stages === en.stages, `${lc.stages} stages (English: ${en.stages})`);
   }
 
   if (failures) {
     console.error(`\n  BUILD FAILED — ${failures} check(s) did not pass.`);
-    console.error("  The page loads a file the build did not write, and part of it would say");
-    console.error("  its data did not load.\n");
+    console.error("  Either the page loads a file the build did not write, and part of it would");
+    console.error("  say its data did not load, or a locale copy changed a product id or the");
+    console.error("  number of stages, and data keyed on them would silently not match.\n");
     process.exit(1);
   }
   console.log("\n  All checks passed.\n");
@@ -308,6 +434,8 @@ function main() {
     const page = localisePage(html, loc);
     const localised = {};
     for (const [rel, fn] of Object.entries(LOCALISE)) localised[rel] = fn(readData(rel), loc);
+    // the shared widgets' own wording (feedback form, site menu)
+    const assets = Object.fromEntries(ASSET_SCRIPTS.map((rel) => [rel, localiseAsset(rel, loc)]));
 
     const s = stat[loc];
     const pct = s.hit + s.miss ? Math.round((s.hit / (s.hit + s.miss)) * 100) : 0;
@@ -328,8 +456,11 @@ function main() {
       // the WHO emblem, report-issue.js). Without these the locale page renders
       // with broken images and no stage glyphs.
       fs.cpSync(path.join(ROOT, "assets"), path.join(dir, "assets"), { recursive: true });
+      for (const [rel, text] of Object.entries(assets)) fs.writeFileSync(path.join(dir, rel), text, "utf8");
       console.log(`       wrote ${path.relative(ROOT, dir)}/`);
     }
+    const c = countryStat[loc] || { hit: 0, missed: new Set() };
+    console.log(`       country names: ${c.hit} renamed${c.missed.size ? ` · ${c.missed.size} not in i18n/country-names.json: ${[...c.missed].slice(0, 8).join(", ")}` : ""}`);
   }
 
   const anyMiss = LOCALES.some((l) => stat[l].miss);
@@ -345,6 +476,6 @@ function main() {
 
 // scripts/build-dataset.js reuses the same localisation, so the French and
 // Portuguese in the published dashboard.json are exactly those of /fr and /pt.
-module.exports = { LOCALES, readData, localiseProducts, localiseSources, stat };
+module.exports = { LOCALES, readData, localiseProducts, localiseSources, localiseTreatmentPolicy, localiseAsset, stat };
 
 if (require.main === module) main();

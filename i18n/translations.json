@@ -99,6 +99,13 @@
       "fr": "Ghana seulement — 1 pays confirmé",
       "pt": "Apenas Gana — 1 país confirmado"
     },
+    "083ec21983e965cc": {
+      "en": "(min-width: 721px)",
+      "where": "line 3373",
+      "bucket": "js",
+      "fr": "(largeur minimale : 721 px)",
+      "pt": "(largura mínima: 721px)"
+    },
     "084504165b077587": {
       "en": "Malaysia",
       "where": "resistance.dict.country[38]",
@@ -260,6 +267,13 @@
       "fr": "Inscriptions du pays",
       "pt": "Registos por país"
     },
+    "129c678fce59acee": {
+      "en": "Disclaimer",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Clause de non-responsabilité",
+      "pt": "Isenção de responsabilidade"
+    },
     "12c8f8f4912cbdb3": {
       "en": "Rwanda",
       "where": "resistance.dict.country[50]",
@@ -315,6 +329,13 @@
       "bucket": "js",
       "fr": "Inscrit sur",
       "pt": "Listado para"
+    },
+    "14b1b3cea877d421": {
+      "en": "The dashboard data could not be loaded.",
+      "where": "line 1371 (in markup)",
+      "bucket": "js",
+      "fr": "Les données du tableau de bord n'ont pas pu être chargées.",
+      "pt": "Não foi possível carregar os dados do painel de controlo."
     },
     "14cb833119ac319e": {
       "en": "MFT deployment models with pyronaridine–artesunate",
@@ -442,12 +463,26 @@
       "fr": "Rapports sur les prix et la qualité du Fonds mondial",
       "pt": "Relatórios de preços e qualidade do Fundo Global"
     },
+    "1ee9a53a671c2e44": {
+      "en": "[data-det-tab],[data-iso3],[data-back],[data-step]",
+      "where": "line 3059",
+      "bucket": "js",
+      "fr": "[data-det-tab],[data-iso3],[data-back],[data-step]",
+      "pt": "[data-det-tab],[data-iso3],[data-back],[data-step]"
+    },
     "1f6ba75ab7d9b415": {
       "en": "[LAUNCH] subscribe failed:",
       "where": "line 4046",
       "bucket": "js",
       "fr": "[LAUNCH] Échec de l'abonnement :",
       "pt": "[LAUNCH] Falha na inscrição:"
+    },
+    "20d912488c606192": {
+      "en": "[LAUNCH] data/products.js is missing or has a syntax error — run node scripts/validate-data.js",
+      "where": "line 1372",
+      "bucket": "js",
+      "fr": "[LAUNCH] Le fichier data/products.js est manquant ou contient une erreur de syntaxe — exécutez node scripts/validate-data.js",
+      "pt": "[LAUNCH] O ficheiro data/products.js está em falta ou contém um erro de sintaxe — execute o node scripts/validate-data.js"
     },
     "213134a28cca8506": {
       "en": "Sorry — we could not add you just now. Please try again in a moment.",
@@ -497,6 +532,20 @@
       "bucket": "data",
       "fr": "inclusion dans les directives nationales",
       "pt": "Inclusão de orientações nacionais"
+    },
+    "239b731ca15250a6": {
+      "en": "[role=\"tab\"][aria-selected=\"true\"]",
+      "where": "line 3136",
+      "bucket": "js",
+      "fr": "[role=\"tab\"][aria-selected=\"true\"]",
+      "pt": "[role=\"tab\"][aria-selected=\"true\"]"
+    },
+    "23c09db769186a7b": {
+      "en": "A stringent regulator reviews the full evidence on quality, safety and effectiveness. For malaria medicines this is usually the European Medicines Agency (EMA) Article 58 procedure, which covers medicines meant for use outside Europe. Every later step builds on this opinion. Health-authority review status is generally not public, so this step changes only when a regulator or the manufacturer announces an outcome.",
+      "where": "products.stageInfo[1].what",
+      "bucket": "data",
+      "fr": "Un organisme de réglementation rigoureux examine l'ensemble des données probantes relatives à la qualité, à la sécurité et à l'efficacité des médicaments. Pour les médicaments antipaludiques, il s'agit généralement de la procédure prévue à l'article 58 de l'Agence européenne des médicaments (EMA), qui concerne les médicaments destinés à être utilisés hors d'Europe. Chaque étape ultérieure s'appuie sur cet avis. Le statut de l'évaluation par les autorités sanitaires n'est généralement pas public ; cette étape n'évolue donc que lorsqu'un organisme de réglementation ou le fabricant annonce une décision.",
+      "pt": "Uma entidade reguladora rigorosa analisa todas as evidências sobre a qualidade, segurança e eficácia. No caso dos medicamentos contra a malária, trata-se geralmente do procedimento do artigo 58.º da Agência Europeia do Medicamento (EMA), que abrange os medicamentos destinados a serem utilizados fora da Europa. Cada etapa subsequente baseia-se nessa avaliação. O estado da análise da autoridade sanitária não é geralmente público, pelo que esta etapa só se altera quando uma entidade reguladora ou o fabricante anuncia um resultado."
     },
     "25464f74dbb99fe6": {
       "en": "An independent overview of which malaria medicines exist and who makes them.",
@@ -743,6 +792,13 @@
       "fr": "Ouganda : Registre national des médicaments",
       "pt": "Uganda: Registo Nacional de Medicamentos"
     },
+    "3811eb61c627406c": {
+      "en": "Public-channel procurement (Global Fund)",
+      "where": "line 2961 (in markup)",
+      "bucket": "js",
+      "fr": "Achats publics (Fonds mondial)",
+      "pt": "Compras através de canais públicos (Fundo Global)"
+    },
     "382ac5f308f76c24": {
       "en": "Last updated",
       "where": "line 1319",
@@ -862,12 +918,33 @@
       "fr": "Zoomez pour les séparer\" + \"",
       "pt": "Aumente o zoom para os separar\" + \""
     },
+    "3d6d0cddec370b39": {
+      "en": "Drug-resistance results are not shown on this map. To explore them, see the",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Les résultats concernant la résistance aux médicaments ne sont pas affichés sur cette carte. Pour les consulter, voir la carte.",
+      "pt": "Os resultados de resistência aos medicamentos não são apresentados neste mapa. Para os explorar, consulte o"
+    },
+    "3da0a908d1da22ef": {
+      "en": "Read the disclaimer",
+      "where": "line 1401 (in markup)",
+      "bucket": "js",
+      "fr": "Lisez l'avertissement",
+      "pt": "Leia o aviso legal"
+    },
     "3e049d78d958038a": {
       "en": "South Africa",
       "where": "markers.dict.country[62]",
       "bucket": "data",
       "fr": "Afrique du Sud",
       "pt": "África do Sul"
+    },
+    "3eb56367b966992c": {
+      "en": "Treatments procured through public channels",
+      "where": "line 1800 (in markup)",
+      "bucket": "js",
+      "fr": "Traitements obtenus par voie publique",
+      "pt": "Tratamentos obtidos através de canais públicos"
     },
     "3ef171d147dae887": {
       "en": "e.g. The map shows this medicine as not yet registered in Tanzania, but it was approved there in June 2026.",
@@ -910,6 +987,13 @@
       "bucket": "data",
       "fr": "Des chiffres d'achat ont été ajoutés : le Fonds mondial a acquis 940 000 packs (pour un montant de 14,5 millions de dollars américains) depuis 2018, principalement en 2025 pour l'Ouganda et le Burkina Faso. La date de décision de la Commission européenne sur les médicaments est désormais enregistrée.",
       "pt": "Dados de compras adicionados: o Fundo Global adquiriu 940.000 embalagens (14,5 milhões de dólares) desde 2018, a maior parte destinada ao Uganda e ao Burkina Faso em 2025. A data da decisão europeia sobre medicamentos já foi registada."
+    },
+    "40ce0a8450a59669": {
+      "en": "style=\"background:${stageVar(STAGE_KEYS[lv - 1])}\"",
+      "where": "line 3016",
+      "bucket": "js",
+      "fr": "style=\"background:${stageVar(STAGE_KEYS[lv - 1])}\"",
+      "pt": "estilo=\"fundo:${stageVar(STAGE_KEYS[lv - 1])}\""
     },
     "4106845b3e4c1b7a": {
       "en": "WHO's rules for how a medicine gets prequalified.",
@@ -1008,6 +1092,13 @@
       "bucket": "data",
       "fr": "Formation du personnel de santé au nouveau protocole",
       "pt": "Formação dos profissionais de saúde sobre o novo regime"
+    },
+    "484b58c1932010c6": {
+      "en": "The source list could not be loaded. Please reload the page to try again.",
+      "where": "line 3417 (in markup)",
+      "bucket": "js",
+      "fr": "La liste des sources n'a pas pu être chargée. Veuillez recharger la page pour réessayer.",
+      "pt": "Não foi possível carregar a lista de fontes. Recarregue a página para tentar novamente."
     },
     "485adf8da873e275": {
       "en": "PLOS Medicine: ASPY in routine use",
@@ -1142,6 +1233,13 @@
       "fr": "Le registre national de tous les médicaments autorisés à la vente au Nigéria.",
       "pt": "O registo nacional de todos os medicamentos aprovados para venda na Nigéria."
     },
+    "4dd79e5db3bfd9cb": {
+      "en": "Click for details ›",
+      "where": "line 3188 (in markup)",
+      "bucket": "js",
+      "fr": "Cliquez pour plus de détails ›",
+      "pt": "Clique para mais detalhes ›"
+    },
     "4e2967c1258181c4": {
       "en": "Each figure reflects its cited public source; manufacturer-specific details are shown only where release was confirmed in writing.",
       "where": "line 1806",
@@ -1162,6 +1260,13 @@
       "bucket": "js",
       "fr": "Que se passe-t-il ici ?",
       "pt": "O que acontece aqui?"
+    },
+    "502c277b0cca9a56": {
+      "en": "View ›",
+      "where": "line 2993 (in markup)",
+      "bucket": "js",
+      "fr": "Voir >",
+      "pt": "Ver >"
     },
     "507fb04291826de9": {
       "en": "WHO PQ held for tablets and paediatric granules",
@@ -1197,6 +1302,13 @@
       "bucket": "js",
       "fr": "${siteCount} ${siteCount === 1 ? \"site\" : \"sites\"}, ${lo === hi ? lo : lo + \"–\" + hi}",
       "pt": "${siteCount} ${siteCount === 1 ? \"site\" : \"sites\"}, ${lo === hi ? lo : lo + \"–\" + hi}"
+    },
+    "5214e61ae7a3a4e4": {
+      "en": "Off. Tick a policy group on the left to draw its borders.",
+      "where": "line 2903 (in markup)",
+      "bucket": "js",
+      "fr": "Désactivé. Cochez un groupe politique à gauche pour tracer ses frontières.",
+      "pt": "Desativado. Marque um grupo de políticas à esquerda para desenhar os seus limites."
     },
     "5293e854ab993a1e": {
       "en": "Drag to pan · Ctrl + scroll or double-click to zoom · arrow keys pan when the map has focus",
@@ -1240,6 +1352,13 @@
       "fr": "Avis positif de l'EMA au titre de l'article 58",
       "pt": "Parecer positivo da EMA sobre o artigo 58.º"
     },
+    "546ebb8eb993ea56": {
+      "en": "Filters",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Filtres",
+      "pt": "Filtros"
+    },
     "546fb60fa0ae591b": {
       "en": "No WHO results for ${curDim} vs ${curSpecies}.",
       "where": "line 3188",
@@ -1260,6 +1379,13 @@
       "bucket": "markup",
       "fr": "Sélectionnez le médicament pour la carte",
       "pt": "Selecione o medicamento para o mapa"
+    },
+    "54c37693dac92781": {
+      "en": "We do not accept legal responsibility for the accuracy of the data. In particular, we do not guarantee that it is complete, up to date or fit for a specific purpose. Country stages in this version are illustrative and have not been verified, except for the Nigeria and Tanzania registrations. Users should carry out their own country-level checks before making any decision based on this data.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Nous déclinons toute responsabilité quant à l'exactitude des données. En particulier, nous ne garantissons ni leur exhaustivité, ni leur mise à jour, ni leur adéquation à un usage particulier. Les informations relatives aux pays présentées dans cette version sont données à titre indicatif et n'ont pas été vérifiées, à l'exception des enregistrements du Nigéria et de la Tanzanie. Il est conseillé aux utilisateurs d'effectuer leurs propres vérifications au niveau national avant de prendre toute décision sur la base de ces données.",
+      "pt": "Não nos responsabilizamos legalmente pela exatidão dos dados. Em particular, não garantimos que estejam completos, atualizados ou adequados a uma finalidade específica. Os estágios por país nesta versão são ilustrativos e não foram verificados, com exceção dos registos da Nigéria e da Tanzânia. Os utilizadores devem realizar as suas próprias verificações a nível nacional antes de tomarem qualquer decisão com base nestes dados."
     },
     "54f67e129a9d4f31": {
       "en": "Prevention tools are on a separate list",
@@ -1372,6 +1498,13 @@
       "bucket": "data",
       "fr": "Développé en collaboration avec MMV dans le cadre d'un partenariat axé sur l'accès",
       "pt": "Desenvolvido em conjunto com a MMV no âmbito de uma parceria orientada para o acesso."
+    },
+    "5b53d42617da4cbc": {
+      "en": "Someone has to pay. Funders and governments run tenders, agree reference prices and forecast demand. A medicine can be recommended, registered and in the guidelines and still be barely bought. This step covers public channels only: the figures shown are Global Fund-financed procurement, and sales through private or other channels are not included.",
+      "where": "products.stageInfo[6].what",
+      "bucket": "data",
+      "fr": "Il faut bien que quelqu'un paie. Les bailleurs de fonds et les gouvernements lancent des appels d'offres, fixent des prix de référence et prévoient la demande. Un médicament peut être recommandé, enregistré et figurer dans les directives, et pourtant être très peu acheté. Cette étape ne concerne que les circuits publics : les chiffres présentés correspondent aux achats financés par le Fonds mondial, et les ventes réalisées par des circuits privés ou autres ne sont pas prises en compte.",
+      "pt": "Alguém tem de pagar. Os financiadores e os governos realizam concursos, acordam preços de referência e preveem a procura. Um medicamento pode ser recomendado, registado e constar das diretrizes, e ainda assim ser pouco comprado. Esta etapa abrange apenas os canais públicos: os valores apresentados referem-se às aquisições financiadas pelo Fundo Global, não estando incluídas as vendas através de canais privados ou outros."
     },
     "5bbb421ecf0956df": {
       "en": "you@organisation.org",
@@ -1492,6 +1625,13 @@
       "fr": "Simulation uniquement — L'envoi de commentaires n'est pas encore activé.",
       "pt": "Apenas simulação — o envio de feedback ainda não está ligado."
     },
+    "637676305f047e01": {
+      "en": "Procurement (public channels)",
+      "where": "products.stages[6]",
+      "bucket": "data",
+      "fr": "Achats (voies publiques)",
+      "pt": "Concursos (canais públicos)"
+    },
     "63a5e0438e217a36": {
       "en": "Recorded that Eurartesim passed its World Health Organization quality re-check in January 2025. Figures we cannot yet confirm are shown as TBC.",
       "where": "products.changelog[19].plain",
@@ -1505,6 +1645,13 @@
       "bucket": "data",
       "fr": "Pipéraquine",
       "pt": "Piperaquina"
+    },
+    "65fc42e0700e6b5d": {
+      "en": "Find a country",
+      "where": "line 2997 (in markup)",
+      "bucket": "js",
+      "fr": "Trouver un pays",
+      "pt": "Encontre um país"
     },
     "664bfb3d9c3c4211": {
       "en": "Click for the full detail",
@@ -1541,6 +1688,13 @@
       "fr": "Pourquoi cela peut bloquer",
       "pt": "Porque pode parar"
     },
+    "6886e466d020baef": {
+      "en": "[data-stage=\"${t.dataset.stage}\"]",
+      "where": "line 3228",
+      "bucket": "js",
+      "fr": "[data-stage=\"${t.dataset.stage}\"]",
+      "pt": "[data-stage=\"${t.dataset.stage}\"]"
+    },
     "68bb1e78d5c97744": {
       "en": "Governments and implementing partners.",
       "where": "products.stageInfo[7].who",
@@ -1562,12 +1716,26 @@
       "fr": "Afficher le parcours pour ${esc(p.name)}",
       "pt": "Mostrar viagem para ${esc(p.name)}"
     },
+    "6a04030dbcb15d0f": {
+      "en": "Show the sources",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Afficher les sources",
+      "pt": "Mostre as fontes"
+    },
     "6a0957b9a5f4421c": {
       "en": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites.",
       "where": "products.glossary.GMP",
       "bucket": "data",
       "fr": "Bonnes pratiques de fabrication — norme de qualité vérifiée par l'inspection des sites de production.",
       "pt": "Boas Práticas de Fabrico — padrão de qualidade verificado através da inspeção das instalações de produção."
+    },
+    "6acdb8f580b71426": {
+      "en": "[data-step=\"${t.dataset.step}\"]",
+      "where": "line 3134",
+      "bucket": "js",
+      "fr": "[data-step=\"${t.dataset.step}\"]",
+      "pt": "[data-step=\"${t.dataset.step}\"]"
     },
     "6acf83c20675d9b3": {
       "en": "WHO-Listed Authority — a regulator assessed by WHO as operating at an advanced level.",
@@ -1589,6 +1757,13 @@
       "bucket": "data",
       "fr": "Colombie",
       "pt": "Colômbia"
+    },
+    "6b74b31170ddd41e": {
+      "en": "Users should not consider the LAUNCH dashboard a complete and authoritative source of access information. It provides a snapshot at a point in time, based on publicly available information and on figures a manufacturer has confirmed in writing.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Les utilisateurs ne doivent pas considérer le tableau de bord LAUNCH comme une source d'information complète et faisant autorité en matière d'accès. Il fournit un aperçu à un instant T, basé sur des informations publiques et sur des chiffres confirmés par écrit par le fabricant.",
+      "pt": "Os utilizadores não devem considerar o painel LAUNCH como uma fonte completa e definitiva de informação de acesso. Fornece um retrato momentâneo, baseado em informações publicamente disponíveis e em dados confirmados por escrito pelo fabricante."
     },
     "6c9aeecc799d6b58": {
       "en": "Hide detail",
@@ -1659,6 +1834,13 @@
       "bucket": "data",
       "fr": "L'essai principal s'est terminé le 25 novembre 2025 avec 1 720 participants — chiffre désormais confirmé par le registre public des essais cliniques.",
       "pt": "O ensaio clínico principal terminou a 25 de novembro de 2025 com 1.720 participantes — um número agora confirmado pelo registo público de ensaios clínicos."
+    },
+    "7217d30c113f1030": {
+      "en": "A full understanding of a medicine's access situation in any country requires information that is not in this dashboard, such as the detail of a national registration, guideline or procurement decision.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Pour bien comprendre la situation d'accès à un médicament dans un pays donné, il faut disposer d'informations qui ne figurent pas sur ce tableau de bord, comme les détails d'un enregistrement national, d'une directive ou d'une décision d'achat.",
+      "pt": "Para compreender plenamente a situação de acesso a um medicamento em qualquer país, são necessárias informações que não constam neste painel, tais como detalhes de um registo nacional, orientações ou decisões de aquisição."
     },
     "723177879f63ec31": {
       "en": "9 presentations · 3 makers",
@@ -1744,12 +1926,26 @@
       "fr": "Groupe de politique",
       "pt": "Grupo de políticas"
     },
+    "77eedbf8af5d7dfc": {
+      "en": "All statuses, dates, prices and volumes below are illustrative placeholders for layout review — not real programme data.",
+      "where": "line 1401 (in markup)",
+      "bucket": "js",
+      "fr": "Tous les statuts, dates, prix et volumes ci-dessous sont des exemples pour la révision de la mise en page — et non des données réelles du programme.",
+      "pt": "Todos os estados, datas, preços e volumes abaixo são meramente ilustrativos e servem apenas para revisão do layout — não são dados reais do programa."
+    },
     "78408ab628836875": {
       "en": "Regulatory submissions in preparation following Phase III success",
       "where": "products.products[0].stages[1].note",
       "bucket": "data",
       "fr": "Préparation des dossiers réglementaires suite au succès de la phase III",
       "pt": "Submissões regulamentares em preparação após o sucesso da Fase III."
+    },
+    "78a94dd92fd60850": {
+      "en": "Tick an MFT policy group on the left to see its countries.",
+      "where": "line 2975 (in markup)",
+      "bucket": "js",
+      "fr": "Cochez un groupe politique MFT à gauche pour voir ses pays.",
+      "pt": "Assinale um grupo de políticas MFT à esquerda para ver os países a ele associados."
     },
     "78beb096bbd119dd": {
       "en": "In preparation",
@@ -1862,6 +2058,13 @@
       "bucket": "markup",
       "fr": "Initiative du président américain contre le paludisme",
       "pt": "Iniciativa Presidencial dos EUA contra a Malária"
+    },
+    "7f46adca4bbe58a9": {
+      "en": "button, a, .gloss",
+      "where": "line 2099",
+      "bucket": "js",
+      "fr": "bouton, a, .gloss",
+      "pt": "botão, um, . brilho"
     },
     "822041757fc756e5": {
       "en": "Sao Tome and Principe",
@@ -2073,6 +2276,13 @@
       "fr": "Guinée équatoriale",
       "pt": "Guiné Equatorial"
     },
+    "8a00e701a262d07d": {
+      "en": "Not listed in national treatment policy",
+      "where": "line 3019 (in markup)",
+      "bucket": "js",
+      "fr": "Non répertorié dans la politique nationale de traitement",
+      "pt": "Não consta da política nacional de tratamento."
+    },
     "8a67a6e6d2041cec": {
       "en": "Filter map by country",
       "where": "static @aria-label",
@@ -2121,6 +2331,13 @@
       "bucket": "data",
       "fr": "Développé dans le cadre du partenariat DeTACT mené par MORU avec Fosun Pharma",
       "pt": "Desenvolvido através da parceria DeTACT, liderada pela MORU, com a Fosun Pharma."
+    },
+    "8e24f67bb34ba612": {
+      "en": "We removed the drug-resistance results from the map. For that information, the page now points to the WHO Malaria Threats Map. The map's filters and legend have been tidied up, and you can now click any country to see its page.",
+      "where": "products.changelog[1].plain",
+      "bucket": "data",
+      "fr": "Nous avons retiré les résultats relatifs à la résistance aux médicaments de la carte. Pour obtenir ces informations, la page renvoie désormais à la carte des menaces liées au paludisme de l'OMS. Les filtres et la légende de la carte ont été améliorés ; vous pouvez maintenant cliquer sur n'importe quel pays pour accéder à sa page.",
+      "pt": "Retiramos os resultados sobre a resistência aos medicamentos do mapa. Para obter esta informação, a página direciona agora para o Mapa de Ameaças da Malária da OMS. Os filtros e a legenda do mapa foram melhorados e agora pode clicar em qualquer país para ver a página correspondente."
     },
     "8e2f0317be62407a": {
       "en": "Tracking new antimalarial medicines from research and development to market access&nbsp;— where each product stands, its access barriers, and opportunities to overcome them.",
@@ -2234,6 +2451,13 @@
       "fr": "Nicaragua",
       "pt": "Nicarágua"
     },
+    "951846fb61e9fd34": {
+      "en": "In guidelines",
+      "where": "line 3017 (in markup)",
+      "bucket": "js",
+      "fr": "Dans les directives",
+      "pt": "Em orientações"
+    },
     "9555664fcf433126": {
       "en": "Tanzania",
       "where": "resistance.dict.country[58]",
@@ -2276,6 +2500,12 @@
       "fr": "scripts node/validate-data.js",
       "pt": "scripts node/validate-data.js"
     },
+    "9811531d684a1c74": {
+      "en": "Border = the selected medicine is in the country's national treatment policy (solid: first-line for tested P. falciparum; each smaller patient group has its own colour and line pattern). Fill = access stage, unchanged.",
+      "where": "line 2908",
+      "bucket": "js",
+      "pt": "Borda = o medicamento selecionado está na política nacional de tratamento do país (linha contínua: primeira linha para os doentes testados P. falciparum; cada grupo mais pequeno de doentes tem a sua própria cor e padrão de linha). Preenchimento = etapa de acesso, sem alterações."
+    },
     "98eef7184d97edd7": {
       "en": "National guideline inclusion is limited",
       "where": "products.products[2].barrier",
@@ -2289,6 +2519,20 @@
       "bucket": "markup",
       "fr": "Une initiative LAUNCH de",
       "pt": "Uma iniciativa LAUNCH de"
+    },
+    "9b64c3bae691a1e1": {
+      "en": "WHO Malaria Threats Map",
+      "where": "sources.sources[2].label",
+      "bucket": "data",
+      "fr": "Carte des menaces de paludisme de l'OMS",
+      "pt": "Mapa de Ameaças da Malária da OMS"
+    },
+    "9b8197f3d9d1b528": {
+      "en": "About the data",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "À propos des données",
+      "pt": "Sobre os dados"
     },
     "9ba46dd6af5e2b79": {
       "en": "Strong recommendation in revised WHO Guidelines for malaria",
@@ -2556,6 +2800,13 @@
       "fr": "Qu’est-ce qui a réellement été acheté pour les pays ? Combien de paquets, à quel prix et en quelle année ?",
       "pt": "O que foi efetivamente comprado para os países — quantas embalagens, a que preço e em que ano."
     },
+    "b3c25b513a7d5122": {
+      "en": "No country matches.",
+      "where": "line 2989 (in markup)",
+      "bucket": "js",
+      "fr": "Aucun pays ne correspond.",
+      "pt": "Sem correspondência de país."
+    },
     "b42087db638977b3": {
       "en": "Untested only",
       "where": "line 3694",
@@ -2724,12 +2975,26 @@
       "fr": "Site non identifié",
       "pt": "Local sem nome"
     },
+    "c25013f493cee44e": {
+      "en": "Tick a policy group to draw its borders on the map. Nothing ticked means MFT policy is off.",
+      "where": "line 3146",
+      "bucket": "js",
+      "fr": "Cochez un groupe de politiques pour afficher ses frontières sur la carte. Aucune case cochée signifie que la politique MFT est désactivée.",
+      "pt": "Marque um grupo de políticas para desenhar as suas fronteiras no mapa. Nada assinalado significa que a política MFT está desativada."
+    },
     "c25ec3f03b83e110": {
       "en": "WHO prequalification — the quality, safety and efficacy assessment whose outcome, a listing on the WHO prequalified-products list, makes a product eligible for procurement by UN agencies and major donors.",
       "where": "products.glossary.PQ",
       "bucket": "data",
       "fr": "Préqualification de l'OMS — l'évaluation de la qualité, de la sécurité et de l'efficacité dont le résultat, une inscription sur la liste des produits préqualifiés de l'OMS, rend un produit admissible à l'achat par les agences des Nations Unies et les principaux donateurs.",
       "pt": "Pré-qualificação da OMS — a avaliação da qualidade, segurança e eficácia cujo resultado, a inclusão na lista de produtos pré-qualificados da OMS, torna um produto elegível para aquisição por agências da ONU e grandes doadores."
+    },
+    "c2944d12a230ec83": {
+      "en": "stroke=\"${mftGroupColor(gid)}\" stroke-width=\"${p.w}\"${p.da ?",
+      "where": "line 2820",
+      "bucket": "js",
+      "fr": "trait=\"${mftGroupColor(gid)}\" largeur-trait=\"${p.w}\"${p.da ?",
+      "pt": "traço=\"${mftGroupColor(gid)}\" largura-do-traço=\"${p.w}\"${p.da ?"
     },
     "c335c4f7902f5e54": {
       "en": "Only P. vivax",
@@ -2759,6 +3024,13 @@
       "fr": "Une idée pour rendre cela plus clair ou plus utile",
       "pt": "Uma ideia para tornar isto mais claro ou mais útil."
     },
+    "c4d3d42ed3a4f2ba": {
+      "en": "Medicine",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Médecine",
+      "pt": "Medicina"
+    },
     "c4dd160f454085ac": {
       "en": "Phase III results, then dossier preparation",
       "where": "products.products[1].stages[0].next",
@@ -2779,6 +3051,13 @@
       "bucket": "data",
       "fr": "Vanuatu",
       "pt": "Vanuatu"
+    },
+    "c5fd21cb7eba116d": {
+      "en": "No national treatment policy lists ${mftProductName()} yet.",
+      "where": "line 3145",
+      "bucket": "js",
+      "fr": "Aucune liste de politique nationale de traitement ${mftProductName()} pour le moment.",
+      "pt": "Nenhuma política nacional de tratamento lista ${mftProductName()} ainda."
     },
     "c65742ceb289d67f": {
       "en": "Papua New Guinea",
@@ -2864,6 +3143,13 @@
       "fr": "Désactivé",
       "pt": "Desligado"
     },
+    "caf85b0888d78f1f": {
+      "en": "Sources",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Sources",
+      "pt": "Fontes"
+    },
     "cb52be0fb5b2a74d": {
       "en": "In MFT plans",
       "where": "static text",
@@ -2891,6 +3177,20 @@
       "bucket": "js",
       "fr": "Autre chose",
       "pt": "Outra coisa"
+    },
+    "cc7bf55429428917": {
+      "en": "[LAUNCH] data/sources.js did not load",
+      "where": "line 3418",
+      "bucket": "js",
+      "fr": "[LAUNCH] Le fichier data/sources.js n'a pas été chargé.",
+      "pt": "[LAUNCH] O ficheiro data/sources.js não foi carregado"
+    },
+    "ccf2814e960ed5e1": {
+      "en": "Where malaria is becoming harder to treat. Its drug-resistance study results are not reproduced on this page — open the map to explore them.",
+      "where": "sources.sources[2].plain",
+      "bucket": "data",
+      "fr": "Dans les régions où le paludisme devient plus difficile à traiter, les résultats des études sur la résistance aux médicaments ne sont pas reproduits sur cette page ; ouvrez la carte pour les consulter.",
+      "pt": "Onde a malária está a tornar-se mais difícil de tratar. Os resultados do estudo sobre a resistência aos medicamentos não estão reproduzidos nesta página — abra o mapa para os explorar."
     },
     "cd2b16c1fa71a703": {
       "en": "Not in any national policy on this map.",
@@ -2982,6 +3282,13 @@
       "bucket": "markup",
       "fr": "RBM Partenariat pour mettre fin au paludisme",
       "pt": "RBM Parceria para Acabar com a Malária"
+    },
+    "d1558dbaed17e0e2": {
+      "en": "Select any country on the map, or from the Countries tab, to open its page.",
+      "where": "line 2967 (in markup)",
+      "bucket": "js",
+      "fr": "Sélectionnez un pays sur la carte ou dans l'onglet Pays pour ouvrir sa page.",
+      "pt": "Selecione qualquer país no mapa ou no separador Países para abrir a página correspondente."
     },
     "d1bf045bb524dae5": {
       "en": "View details",
@@ -3088,12 +3395,26 @@
       "fr": "SRA/Soumission WLA — le partenariat vise une approbation d'ici 2027",
       "pt": "SRA/Submissão da WLA — parceria visa aprovação até aproximadamente 2027"
     },
+    "d7c309b4f878e4e5": {
+      "en": "We changed some wording after reviewer feedback. The price card is gone, the procurement step is labelled as public channels only, and the page now says that health-authority review progress is usually not public. GanLum now credits Novartis as its developer, with the required acknowledgement of its funders, and the page has a disclaimer.",
+      "where": "products.changelog[0].plain",
+      "bucket": "data",
+      "fr": "Suite aux commentaires des relecteurs, nous avons modifié certains termes. La grille tarifaire a été supprimée, l'étape d'approvisionnement est désormais indiquée comme étant réservée aux canaux publics, et la page précise que l'avancement de l'examen par les autorités sanitaires n'est généralement pas public. GanLum mentionne désormais Novartis comme développeur, avec la mention requise de ses financeurs, et la page comporte une clause de non-responsabilité.",
+      "pt": "Alterámos alguns termos após o feedback dos revisores. O cartão de preços foi removido, a etapa de aquisição está agora identificada como sendo apenas por canais públicos e a página informa agora que o progresso da revisão por parte da autoridade de saúde não é geralmente público. GanLum agora credita Novartis como seu desenvolvedor, com o devido reconhecimento dos seus financiadores, e a página contém um aviso legal."
+    },
     "d7ddd542f6269ed4": {
       "en": "Otherwise standard ACT case-management training",
       "where": "products.products[3].detail.adoption[1]",
       "bucket": "data",
       "fr": "Sinon, formation standard en gestion de cas ACT",
       "pt": "Caso contrário, formação padrão em gestão de casos ACT"
+    },
+    "d7e272ae3be93ad1": {
+      "en": "\", draft: '",
+      "where": "line 1401 (in markup)",
+      "bucket": "js",
+      "fr": "\", brouillon: '",
+      "pt": "\", rascunho: '"
     },
     "d889e2172a211a1d": {
       "en": "Bhutan",
@@ -3116,6 +3437,13 @@
       "fr": "Marqueurs moléculaires",
       "pt": "Marcadores moleculares"
     },
+    "da5e48383e53c5e7": {
+      "en": "[data-det-tab=\"${t.dataset.detTab}\"]",
+      "where": "line 3134",
+      "bucket": "js",
+      "fr": "[data-det-tab=\"${t.dataset.detTab}\"]",
+      "pt": "[data-det-tab=\"${t.dataset.detTab}\"]"
+    },
     "da99806f945cefea": {
       "en": "WWARN / IDDO malaria data",
       "where": "sources.sources[10].label",
@@ -3129,6 +3457,13 @@
       "bucket": "data",
       "fr": "L’approvisionnement constitue actuellement l’obstacle à l’accès — 0,9 à 4,5 % des dépenses du Fonds mondial pour les antipaludiques entre 2022 et 2024, malgré une recommandation de l’OMS datant de 2010, bien que les commandes de 2025 aient fortement augmenté (PQR, rapport encore incomplet).",
       "pt": "A aquisição é a atual barreira de acesso — representando 0,9–4,5% das despesas do Fundo Global com antimaláricos entre 2022 e 2024, apesar de uma recomendação da OMS datada de 2010, embora os pedidos para 2025 tenham aumentado consideravelmente (PQR, relatório ainda incompleto)."
+    },
+    "daee7606b339f3c3": {
+      "en": "Reset",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Réinitialiser",
+      "pt": "Reiniciar"
     },
     "db64cb18e9f20411": {
       "en": "This form has no inbox behind it yet, so nothing was actually sent — your note stayed in",
@@ -3192,6 +3527,13 @@
       "bucket": "data",
       "fr": "Guinée",
       "pt": "Guiné"
+    },
+    "dedc27d45784fa5e": {
+      "en": "The LAUNCH dashboard displays publicly available information only. Product-specific details appear solely where the manufacturer has confirmed in writing that they may be shared. Health-authority review status is generally not public, so regulatory steps change only when a regulator or the manufacturer announces an outcome. Procurement figures cover public channels only. Hover any stage for status detail; select a medicine to open its full profile.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Le tableau de bord LAUNCH affiche uniquement les informations publiques. Les détails spécifiques à un produit apparaissent uniquement lorsque le fabricant a confirmé par écrit qu'ils pouvaient être partagés. L'état d'avancement de l'évaluation par les autorités sanitaires n'est généralement pas public ; les étapes réglementaires ne changent donc que lorsqu'un organisme de réglementation ou le fabricant annonce une décision. Les données d'approvisionnement concernent uniquement les canaux publics. Survolez une étape pour afficher les détails de son statut ; sélectionnez un médicament pour ouvrir son profil complet.",
+      "pt": "O painel LAUNCH apenas apresenta informações publicamente disponíveis. Os detalhes específicos do produto aparecem apenas quando o fabricante confirma por escrito que podem ser partilhados. O estado da revisão pelas autoridades de saúde não é geralmente público, pelo que as etapas regulamentares só mudam quando um organismo regulador ou o fabricante anuncia um resultado. Os dados de aquisição abrangem apenas os canais públicos. Passe o cursor sobre qualquer passo para obter detalhes do estado; selecione um medicamento para abrir o seu perfil completo."
     },
     "df0d329db25ca84c": {
       "en": "The LAUNCH dashboard displays publicly available information only. Product-specific details (including pricing) appear solely where the manufacturer has confirmed in writing that they may be shared. Hover any stage for status detail; select a medicine to open its full profile.",
@@ -3410,6 +3752,13 @@
       "fr": "Unitaid",
       "pt": "Unitaid"
     },
+    "ea84b75429953908": {
+      "en": "[data-group=\"${t.dataset.group}\"]",
+      "where": "line 3229",
+      "bucket": "js",
+      "fr": "[data-group=\"${t.dataset.group}\"]",
+      "pt": "[data-group=\"${t.dataset.group}\"]"
+    },
     "eb6213d7c037b126": {
       "en": "Source: WHO Malaria Threat Maps, updated ${prettyDate(m.whoLastDataUpdate)}. Values are WHO's; site-merging is ours.",
       "where": "line 3199",
@@ -3485,6 +3834,13 @@
       "bucket": "data",
       "fr": "Le bilan de publication de l'OMS à ce sujet",
       "pt": "O histórico das publicações da OMS sobre o tema."
+    },
+    "f04bfe05196a2a25": {
+      "en": "${esc(k)}: ${pg.length ? \"lists \" : \"does not list \"}${esc(p.name)}.",
+      "where": "line 3013",
+      "bucket": "js",
+      "fr": "${esc(k)}: ${pg.length ? \"lists \" : \"does not list \"}${esc(p.name)}.",
+      "pt": "${esc(k)}: ${pg.length ? \"lists \" : \"does not list \"}${esc(p.name)}."
     },
     "f0ea22a14fb2608c": {
       "en": "${esc(STAGES[b])} was reached ${yrs} yr${yrs === 1 ? \"\" : \"s\"} before ${esc(STAGES[a])} — these gates were not cleared in pathway order.",

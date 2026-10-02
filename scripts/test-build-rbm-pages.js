@@ -17,8 +17,10 @@ const ok = (c, name) => { if (c) passed++; else { failed++; console.log("  FAIL 
 
 const { html: out } = transform(html, "fr");
 ok(!/<script src="(\.\.\/)?data\/(products|sources|treatment-policy)\.js"/.test(out), "products, sources and policy are not loaded as files");
-ok(/<script src="\.\.\/data\/world-map\.js"><\/script>/.test(out) && /\.\.\/data\/world-map-geo\.js/.test(out), "map shapes load from ../data/");
-ok(!/(src|href)="(assets|data)\//.test(out), "every relative asset path points one level up");
+// the map files and the feedback widget differ by language, so each page loads its own copy beside it
+ok(/<script src="data\/world-map\.js"><\/script>/.test(out) && /src="data\/world-map-geo\.js"/.test(out), "map shapes load from the language's own data/");
+ok(/src="assets\/report-issue\.js"/.test(out), "the feedback widget loads from the language's own assets/");
+ok(!/(src|href)="(assets|data)\/(?!world-map\.js"|world-map-geo\.js"|report-issue\.js")/.test(out), "every other relative asset path points one level up");
 ok(!/site-nav\.js/.test(out), "no site menu");
 ok(/#sub-open, #subwrap \{ display: none !important; \}/.test(out), "Subscribe hidden");
 ok(/\bconnected\s*:\s*true\b/.test(html) && !/\bconnected\s*:\s*true\b/.test(out) && /\bconnected: false\b/.test(out),

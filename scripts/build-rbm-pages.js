@@ -10,8 +10,10 @@
 //
 // Output (self-contained; host it as static files anywhere):
 //   dist/rbm/en/index.html, fr/index.html, pt/index.html
-//   dist/rbm/assets/            icons, logos, report-issue.js
-//   dist/rbm/data/world-map.js, world-map-geo.js   map shapes (static, never change)
+//   dist/rbm/{en,fr,pt}/data/world-map.js, world-map-geo.js   map shapes, with that
+//                               language's country names (static, never change)
+//   dist/rbm/{en,fr,pt}/assets/report-issue.js   the feedback form, in that language
+//   dist/rbm/assets/            icons and logos (shared)
 //   dist/rbm/README.md          how to host and embed
 //
 // HOW. The English page and the French and Portuguese pages that
@@ -23,7 +25,8 @@
 //      always read (LAUNCH_DATA, LAUNCH_SOURCES, LAUNCH_TREATMENT_POLICY), and
 //      only then runs the page's own scripts (kept, unchanged, as deferred
 //      <script type="text/x-launch-app"> blocks);
-//   2. relative paths point one level up, to the shared assets/ and data/;
+//   2. relative paths point one level up, to the shared assets/, except the
+//      per-language map files and feedback widget (PER_LANGUAGE);
 //   3. the site menu goes (its Pipeline and Story pages are not part of the
 //      handover; RBM's platform has its own navigation);
 //   4. Subscribe for updates goes, and Send feedback is not connected (their
@@ -50,6 +53,10 @@ const SCHEMA = 1;
 // Data files the loader replaces. Anything else the page loads (the map shapes)
 // is copied as a static file.
 const REPLACED = ["data/products.js", "data/sources.js", "data/treatment-policy.js"];
+// Files whose text differs by language, so each language folder has its own
+// copy, from the locale build: country names in the map files, the feedback
+// form's wording in report-issue.js. Everything else in assets/ is shared.
+const PER_LANGUAGE = ["data/world-map.js", "data/world-map-geo.js", "assets/report-issue.js"];
 
 // Reader-facing messages, per language. New strings the translation memory does
 // not hold, so they are written here by hand — NOT reviewed yet: have a French
@@ -142,9 +149,12 @@ function transform(html, lang) {
   // /api/feedback does not exist, so the widget keeps Send blocked and its red
   // note instead of failing every report
   out = out.replace(/(\bconnected\s*:\s*)true\b/g, "$1false");
-  // shared files one level up
+  // shared files one level up, except the ones each language has its own copy
+  // of (PER_LANGUAGE): the map files carry the country names, the feedback
+  // widget its wording
   out = out.replace(/(src|href)="(assets|data)\//g, '$1="../$2/');
   out = out.replace(/url\((["']?)(assets|data)\//g, "url($1../$2/");
+  for (const rel of PER_LANGUAGE) out = out.split(`="../${rel}"`).join(`="${rel}"`);
   // the loader runs before the deferred scripts, right after the map/icon libraries
   const firstApp = out.indexOf('<script type="text/x-launch-app">');
   out = out.slice(0, firstApp) + loader(lang) + out.slice(firstApp);
@@ -162,14 +172,19 @@ function main() {
     const { html, removed, deferred } = transform(fs.readFileSync(sources[lang], "utf8"), lang);
     fs.mkdirSync(path.join(OUT, lang), { recursive: true });
     fs.writeFileSync(path.join(OUT, lang, "index.html"), html, "utf8");
-    console.log(`  ${lang}/index.html  (${removed} data files → dashboard.json, ${deferred} scripts deferred)`);
+    // this language's own map files and feedback widget
+    const from = lang === "en" ? ROOT : path.join(ROOT, "dist", "locale", lang);
+    for (const rel of PER_LANGUAGE) {
+      fs.mkdirSync(path.dirname(path.join(OUT, lang, rel)), { recursive: true });
+      fs.copyFileSync(path.join(from, rel), path.join(OUT, lang, rel));
+    }
+    console.log(`  ${lang}/index.html + ${PER_LANGUAGE.join(", ")}  (${removed} data files → dashboard.json, ${deferred} scripts deferred)`);
   }
   fs.cpSync(path.join(ROOT, "assets"), path.join(OUT, "assets"), { recursive: true });
   fs.rmSync(path.join(OUT, "assets", "site-nav.js"), { force: true });
-  fs.mkdirSync(path.join(OUT, "data"), { recursive: true });
-  for (const f of ["world-map.js", "world-map-geo.js"]) fs.copyFileSync(path.join(ROOT, "data", f), path.join(OUT, "data", f));
+  fs.rmSync(path.join(OUT, "assets", "report-issue.js"), { force: true });   // per language now
   fs.copyFileSync(path.join(ROOT, "rbm", "README.md"), path.join(OUT, "README.md"));
-  console.log(`  assets/, data/world-map*.js, README.md\n  data: ${DATA_URL}\n  → ${path.relative(ROOT, OUT)}/`);
+  console.log(`  assets/ (shared), README.md\n  data: ${DATA_URL}\n  → ${path.relative(ROOT, OUT)}/`);
 }
 
 module.exports = { transform, loader };

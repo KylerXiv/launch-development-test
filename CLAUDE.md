@@ -40,13 +40,19 @@ node scripts/validate-data.js                 # expect 0 errors, 1 warning
 node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 warnings
 node scripts/make-preview.js                  # smoke test
 node scripts/test-build-dataset.js            # RBM dashboard.json: expect 0 failed
+node scripts/build-country-names.js --check   # /fr, /pt country names: expect "covers all"
 ```
 
 The 1 warning is `treatment policy:` (French Guiana lists a dashboard product
-but is not drawn on the basemap). Anything else means something moved. (The
-WHO resistance overlay and its 5 warnings were removed on 1 Oct 2026; see
-docs/remove-resistance-notes.md.)
+but is not drawn on the basemap). Anything else means something moved. (It
+was 6 warnings, 3 + 2 + 1, until the WHO resistance overlay was removed on
+1 Oct 2026; see docs/remove-resistance-notes.md and
+docs/handoff-remove-study-layers.md.)
 
+No browser test script is installed (puppeteer is not), and
+`scripts/verify-map-clusters.js` went with the dots it tested.
+[docs/handoff-remove-study-layers.md](docs/handoff-remove-study-layers.md) §6
+describes a smoke test that drives headless Chrome over raw CDP.
 Headless Chrome needs a software GL backend or MapLibre never finishes
 initialising and the whole page looks broken — add
 `--enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader` and drop

@@ -283,7 +283,7 @@ contact was saved. Any failure, including an unconfigured server, shows
 for a retry. The button shows *Sending…* while in flight. Its 10 Sep click
 block is removed, and the red "Mock only" `.sub-note` is now a muted privacy
 line. `LAUNCH_SUBSCRIBERS` is gone. Send feedback is unchanged: still a mock,
-Send still blocked, red flag still in its dialog (until 2 Oct, §3.27). Why a Resend contact and not
+Send still blocked, red flag still in its dialog (until 2 Oct, §3.34). Why a Resend contact and not
 a notify-us email: [email-backend-notes.md](email-backend-notes.md) §2.
 
 **Revised the same day: double opt-in.** Submitting now saves nothing. It
@@ -1097,7 +1097,421 @@ text that fits the page it is on.
   checked: the other pages that load the widget, real devices, keyboard handling of
   the disabled button.
 
-### 3.27 Send feedback is connected, on this page only (2 Oct 2026)
+### 3.27 The sources list is a closed dropdown, and the closing line is gone (2 Oct 2026)
+
+Branch `feat/sources-dropdown`, from `development` at `d23706b`.
+
+*(Updated by §3.30: Sources is now open on desktop and closed on phones, and sits after the
+disclaimer.)* The footer's source list (ten entries, two columns) was the longest thing on the
+page after the map. It became a `<details id="sources">` below the "About the data"
+paragraph, **closed by default**, in the same box and summary style as the
+Definitions band. The summary reads "Sources" with a count badge, set from the
+list so it cannot drift when a source is added.
+
+- **"About the data" stays visible.** It carries the caveat that only publicly
+  available information is shown and that pricing appears only where the
+  manufacturer confirmed it in writing. That is the one thing not to hide behind a
+  click. *Rejected:* collapsing both blocks (shorter page, hidden caveat); a
+  one-line list of source names in the closed bar (shows provenance without a
+  click, but a longer bar and one more place to update).
+- **The intro sentence moved inside the dropdown** ("Everything on this page is
+  traceable to one of the public sources below…"), because "below" no longer
+  works while it is closed.
+- **It opens for print** (`beforeprint` opens it with the other panels) and when
+  the page is opened at `#sources`, which also scrolls to it.
+- **Removed on request:** the closing line "A LAUNCH initiative of Unitaid
+  partners, to be hosted by the RBM Partnership to End Malaria", with its two links.
+  The Unitaid logo and "Powered by" attribution in the header are unchanged.
+- Styled with its own `.srcs` rules, not the `.updates` class: `.updates li` is a
+  flex row with a dashed divider and would have broken the two-column source list.
+- Checked in headless Chrome: closed on load, count 10 of 10, "About the data"
+  visible, opens on click, `beforeprint` and `#sources` both open it, no script
+  errors. Not checked: a real print preview, phone widths.
+- Anyone who copies the page into another repo needs the `#sources` block, the
+  `.srcs`, `.srcn` and `.srcs-intro` rules, and the small script after the
+  `beforeprint` listener. The translation pipeline sees no new strings except the
+  word "Sources" and the count.
+
+### 3.28 A language button in the nav bar, switched on per language (2 Oct 2026)
+
+Same branch as §3.27 (`feat/sources-dropdown`).
+
+The top bar on the illustrated journey page gets a **language button** at its
+right-hand end: a globe, the current language, a caret, and a menu of English,
+Français and Português. It lives in `assets/site-nav.js`, the shared nav script,
+and is **opt-in**: it appears only on a page whose script tag carries
+`data-languages="en,fr,pt"`. Pipeline and Story do not, because only the
+illustrated journey page has a translation pipeline (DEV-31).
+
+- **Links, not scripts.** English is the page itself; French and Portuguese are
+  `fr/` and `pt/` folders beside it, which is where `scripts/build-locale-pages.js`
+  writes them (`dist/locale/fr`, `dist/locale/pt`). From inside a translated copy
+  the English link goes up a folder, and the Pipeline and Story links go up too,
+  since only the translated page itself exists there. The current language is read
+  from `<html lang>`, which the builder sets (`fr`, `pt-PT`).
+- **Not live yet, so the menu says so.** `fr` and `pt` are `live: false` in the
+  `LANGS` table at the top of the script, and show greyed as "coming soon" rather
+  than linking to a 404, because the translated copies are not deployed and the
+  English snapshot behind them is stale (see `docs/handoff-remove-study-layers.md`
+  §5.1). To switch a language on, set its `live` to `true` in that table, or set
+  `window.LAUNCH_LOCALES_LIVE = { fr: true, pt: true }` before the script, once the
+  folders are deployed.
+- **Rejected:** a runtime switcher that swaps text in the browser (it breaks Rule 1
+  of the pipeline, build-time substitution, and would translate lookup keys);
+  showing the button on all three pages with "English only" notes on two (promises
+  something those pages cannot do); a mock that only remembers the choice (nothing
+  to wire up later).
+- **Phones:** the language button stays beside the "Views" button; below 480 px it
+  shows the code (EN) and the Views label drops its "Views:" prefix so the bar stays
+  on one line.
+- Checked in headless Chrome: default menu (English current, French and Portuguese
+  "coming soon"); both switched on (links `fr/…` and `pt/…`); a simulated French
+  copy (English `../…`, Portuguese `../pt/…`, Pipeline and Story `../…`); closes on
+  Escape and outside click; no button on Pipeline; no sideways scroll at 390 px; no
+  script errors. **Not checked:** real translated pages (none are built or
+  deployed), screen-reader announcement of the menu.
+- Deploy note: `scripts/build-public-site.sh` copies `site-nav.js` but does not yet
+  copy `dist/locale/` into the site, and has never copied `treatment-policy.js`
+  either. Both are needed before the button can be switched on.
+
+### 3.29 Reviewer feedback: disclaimer, GanLum acknowledgement, price, procurement, regulatory status (2 Oct 2026)
+
+Same branch as §3.27 and §3.28 (`feat/sources-dropdown`). The options were chosen on an
+options page; the choices and what they cost are recorded here.
+
+**Disclaimer.** Full three-paragraph text in the footer (`#disclaimer`), linked from
+the amber draft banner ("Read the disclaimer"). It is an adaptation of the Medicines
+Patent Pool's MedsPaL disclaimer, which the project was given as an example: the MPP
+text is about patents and was **not** copied. The wording is **draft, written by us**
+and has not been signed off by anyone; do not treat it as approved. It names the
+Nigeria and Tanzania registrations as the only verified country stages, so it must be
+reworded when the country survey is verified. *Rejected:* a closed dropdown (easiest
+to argue nobody read it), a pop-up window (most to build), a one-sentence version
+(covers too little).
+
+**GanLum acknowledgement.** New optional product field `acknowledgement` in
+`data/products.js` (validator: non-empty string when present; documented in the analyst
+guide §4). The text is the reviewer's, word for word. It shows as an Acknowledgement
+card in the medicine's expanded details only. A footer Acknowledgements section was built
+and then removed on request (2 Oct 2026), so the text appears once, next to the medicine. The funder's name in it, "European
+& Developing Countries Clinical Trials Partnership Programme", is as written in the
+reviewer's note and **has not been confirmed with MMV**.
+The reviewer said MMV is not responsible for access, so for GanLum only: manufacturer is
+now "Novartis" (was "Novartis · MMV"), research lead "Novartis" (was "Novartis / MMV"), and
+the line "Co-developed with MMV under access-oriented partnership" is removed. Source
+citations that name MMV press releases are unchanged: they are sources, not roles.
+**ASPY still reads "Shin Poong Pharmaceutical · MMV", "MMV and partners" and carries the
+same "Co-developed with MMV…" line.** The feedback named GanLum only, so it was left
+alone; it likely needs the same decision. The synthetic dataset is not mirrored (the
+field is optional).
+
+**Price (Novartis comment).** The "Indicative price per treatment" card is removed from
+the medicine details on this page, with nothing in its place. "Including pricing" is dropped
+from the footer. The `price` field stays in the data and is still shown on `index.html`,
+`option-b.html` and `pipeline.html` and used by Power BI and Streamlit; removing it
+everywhere is a separate schema change, not made. A one-line note saying price is not
+shown (and why) was offered and not chosen. *Rejected:* keeping the card.
+
+**Procurement (highlighted comment).** The step is renamed "Procurement (public channels)"
+in `data.stages`, so it changes on every page that reads that file. Its explainer, the
+footer and the volume card heading ("Treatments procured through public channels") and
+the facts label ("Public-channel procurement (Global Fund)") now say the figures are
+Global Fund-financed procurement only. The phrase "public channels" is the reviewer's;
+whether they would prefer "public-sector" or "donor-funded" has not been asked.
+
+**Regulatory status.** The Regulatory approval step's explainer and the footer say
+health-authority review status is generally not public, so the step changes only when a
+regulator or the manufacturer announces an outcome. **Not changed:** GanLum's regulatory
+step still reads "In progress" (sourced to a Novartis announcement); whether it should
+say something else is an open question.
+
+**Changelog.** One entry (2 Oct 2026) in `data/products.js`. Merging to `main` fires
+`publish.yml` (history snapshot, feed, ontology).
+
+Checked in headless Chrome: banner link `#disclaimer`, three disclaimer paragraphs, no
+"pricing" in the footer, the acknowledgement in GanLum's details only, the renamed step in the
+pathway strip and table (fits on one line), GanLum's details with no price card and no
+"Co-developed with MMV" or "Novartis / MMV", ASPY unchanged, no script errors.
+Validator 0 errors, 1 warning; synthetic 0 and 0. The other pages (`index`, `option-b`, `pipeline`, `story`, the widget) load with
+no script errors after the stage rename; `index`, `option-b` and the widget show the new
+name. **Not checked:** the Power BI and Streamlit views, a real print preview.
+
+### 3.30 The footer is reworked so nothing is overlooked (2 Oct 2026)
+
+Same branch as §3.27 to §3.29 (`feat/sources-dropdown`). The choices were made on an
+options page and pasted back as text; they supersede the "closed by default" Sources
+dropdown of §3.27 on wide screens.
+
+- **Disclaimer first**, then About the data, then Sources.
+- **Disclaimer as a tinted panel with an accent edge** and an info icon, in the page's own
+  blue (`--accent-soft`, `--accent`), 14 px. The Medicines Patent Pool page the project
+  was shown uses a full-width tinted band; that was offered and not chosen (a large block on
+  a data page). *Also not chosen:* an amber panel matching the draft banner, plain text, a
+  two-column footer, tabs (only one part visible at a time).
+- **Small section headings with a rule** for About the data and Sources (the disclaimer's own
+  heading is inside its panel).
+- **Footer text is 14 px** throughout (was 12.5 px), in `--ink-2`.
+- **Sources: open on desktop, a closed dropdown on phones** *(desktop can now close it too: §3.33)* (breakpoint 720 px, the same one
+  the two-column list already used). The `<details>` element is kept: the script holds it open
+  on wide screens and hides its summary, so the section heading is the label; on a phone the
+  summary reads "Show the sources" with a count. `#sources` and printing still open it.
+- **The disclaimer glows briefly on arrival** from the draft banner's "Read the disclaimer"
+  link or from a `#disclaimer` URL (about 1.6 s; a static outline instead when the reader
+  prefers reduced motion). The link works again when the hash is already `#disclaimer`.
+- Checked in headless Chrome at desktop and 390 px: order disclaimer, About, Sources; sources
+  open at desktop with the summary hidden, closed at 390 px and opening on tap; glow on click,
+  cleared after, and again on a second click; no sideways scroll; no script errors. **Not
+  checked:** a real print preview, a screen reader.
+
+### 3.31 A light gray page ground, so the data cards stand out (2 Oct 2026)
+
+Asked: make the page "pop" so the data is easy to see, with a different shade of white or
+gray. Every data block was already a white card (pathway strip, medicines table, map,
+definitions, sources) on a white page, so the only thing separating them was a 1 px
+`--line` border. The page ground (`--ground`, used only by `body`) is now **`#EEF2F4`**, a
+cool light gray in the same blue-grey family as `--ink`. The cards are unchanged and stay
+white.
+
+| Ground | White card against it | `--ink-3` text on it | |
+| --- | --- | --- | --- |
+| `#FFFFFF` (before) | 1.00:1 | 5.64:1 | cards separated by their border alone |
+| `#F4F7F8` | 1.08:1 | 5.24:1 | not chosen: too faint, and it is already `--surface-2`, the table's header row |
+| **`#EEF2F4`** | **1.13:1** | **5.01:1** | chosen |
+| `#E9EEF1` | 1.17:1 | 4.82:1 | not chosen: starts to look dingy, less margin on the lightest text |
+| `#E6EBEE` | 1.20:1 | 4.69:1 | not chosen: as above, and close to the 4.5:1 floor |
+
+For scale, GitHub's gray page is `#F6F8FA`, 1.06:1 against white. Every text colour that sits
+directly on the ground still clears 4.5:1: `--ink` 12.2, `--ink-2` 6.9, `--accent` 6.8,
+`--ink-3` 5.0.
+
+Knock-on changes:
+
+- **The tooltip's text** was `color: var(--ground)`, which would have turned it gray. It is
+  now `var(--surface)`, so it stays white on ink.
+- **The Unitaid logo** needed nothing: its SVG has no background of its own, and its navy
+  holds on the gray. The comment that said "the page background is white" is updated.
+- **Print stays white**: the print view already set `body { background: #fff }`.
+- **The site menu** (`assets/site-nav.js`) is `--surface`, so it is now a white bar above the
+  gray page. Nothing changed there.
+- **The disclaimer panel's tint** (`--accent-soft`) is now only 1.02:1 against the ground,
+  where it was 1.15:1 against white. Its 1 px border and 5 px accent edge still frame it, so
+  it was left alone. If it should stand out more, a white fill is the one-line change.
+
+**Reach:** this page only, plus its `/fr/` and `/pt/` editions and RBM's copies, which are
+built from it. RBM's iframe will therefore show a gray page, not a white one. Pipeline,
+Story, `index.html`, `option-b.html`, and the `unitaid/` and `synthetic/` editions have
+their own stylesheets and are unchanged.
+
+Checked in headless Chrome at 1440 px and 390 px, before and after. The cards stand off the
+ground, the header, draft banner and buttons read as before, and there is no sideways
+scroll. **Not checked:** a real print preview, RBM's staging frame.
+
+### 3.32 An interface review, and the fixes from it (2 Oct 2026)
+
+Asked: make the data pop and the page user-friendly, following four tactics the owner
+pasted:
+
+- a neutral ground, with one accent kept for key figures;
+- key figures at the top;
+- no clutter (heavy borders, gridlines, duplicate legends);
+- compact numbers.
+
+The page was reviewed in six domains, each in headless Chrome at 1440, 390 and 320 px:
+accessibility, layout, writing, typography, colour and polish. That gave 48 findings.
+This section records what was fixed, and what was left for a decision.
+
+**Fixed: readability and access.**
+
+| Finding | Before | Now |
+| --- | --- | --- |
+| Amber and green status text ("In progress", "Complete", the draft banner's lead line, the Prototype pill) | 3.3–4.3:1, under the 4.5:1 floor | Text-only tokens `--warn-text #8C5A00` and `--good-text #17734B`: same hues, 5.0–5.9:1. `--warn` and `--good` stay the fills, borders and dots, so nothing changes shape or tone |
+| Journey column: "complete" and "delayed" | The same solid circle, green and red. Under deuteranopia: 1.01:1, ΔE 6.4 | Delayed is a diamond |
+| "Not started" markers | `--idle` 2.4:1 on white, and 1.7:1 at the pathway rail's `.65` opacity | `#7A8A94`: 3.6:1, no opacity |
+| Dimmed tooltip rows and unticked donut rows | `opacity: .45`: 4.0:1 and 2.2:1 | Opacity `.72` (7.9:1); the donut rows use `--ink-3` |
+| The pressed view button's focus ring | Accent drawn on accent: invisible | Drawn in `--accent-ink` |
+| Map filters and Detail rail | A re-render dropped focus to `<body>` on 7 of 8 controls | Focus returns to the control's successor, or to the country heading |
+| The 235 hidden country buttons | 235 of the page's 308 Tab stops | `tabindex="-1"`: screen readers still browse the list, and keyboard users have the "Country or area" select and the Countries tab. This reverses DEV-13 D21's tab order, for that reason |
+| Subscribe panel | Stayed open when focus left it, covering what came next | Closes on focus out |
+| Reduced motion | Covered 3 of the page's 7 transitions | Covers all 7 |
+
+**Fixed: nothing hidden or cut off.**
+
+- **INN subtitles.** They were cut with an ellipsis at 1045 px and below, with no way to read
+  them; they now wrap.
+- **320 px.** The page was 339 px wide. The header buttons now wrap. The menu hides its
+  "LAUNCH" brand at 360 px and below (`assets/site-nav.js`; the page title below says it
+  too). The page is now 320 px.
+- **An opened row on a phone.** The current stage and the whole Ongoing / Not started panel
+  were past the scroll edge. Only the year axis scrolls now: the panel drops under it at
+  760 px and below, and the axis opens scrolled to the present.
+- **The map's Detail rail.** It was held to the map's height with `overflow: hidden`, so the
+  MFT policy card was cut off with no cue. It now takes its own height. The left rail is
+  still held to the map's height on desktop, and neither rail is held when they stack.
+- **The medicines table.** It cut off "Main barrier" between 641 and 675 px. The narrow
+  layout now starts at 680 px.
+- **Pathway labels.** They may break a long word instead of running into the next arrow.
+- **Timeline labels.** A second gate's stem was painted through the first gate's label.
+
+**Fixed: less clutter, figures first.**
+
+- **Card borders removed** from the pathway strip, table, map, definitions, sources and step
+  panel. The gray ground, white fill and shadow already separate them. Print gets the
+  borders back, because neither the ground nor the shadow prints.
+- **Inner borders removed** from the map rails, legend bar, "More detail" panel and step
+  explanation band; their fill groups them. `--map-border`, the country-outline colour, had
+  been their box line at 3.0:1, the heaviest lines on the page. The step panel's border was
+  a text colour; it is now `--line`.
+- **One duplicate legend fewer.** The map overview's mix card no longer repeats the
+  access-stage key under its bar; the legend and the filters already carry it. The filters'
+  counts and the legend stay, as the owner chose (Keith's handoff §9).
+- **The accent means "press me".**
+  - The map's "Select any country…" hint was a filled accent box with a pointer glyph. It
+    is plain text now.
+  - The filter count badge is outlined.
+  - Accent remains on actions, links and selected states.
+- **Key figures stand out.** "On pathway" years are bold `--ink`. Timeline years, status
+  words and "since" lines go from 10.5–11 px to 12 px.
+- **Compact numbers, at render time.** `fmtFig()` writes 940,111 as 940K and 11,493,039 as
+  11.5M, and US$14.5m as US$14.5M. It runs on the procurement card and the map's medicine
+  facts. The data, and so the CSV, keep exact figures. It uses `en-US`, because Chrome's
+  `en-GB` writes a lowercase "940k" next to "11.5M".
+- **The procurement card's heading.** It no longer carries the whole period sentence, which
+  ran to six uppercase lines. The period sits under the figure.
+- **Prose line length: tried, then reverted the same day.** Lines were capped at 75ch in the
+  disclaimer, footer, sources intro and step notes, where they run to 150–219 characters at
+  1440 px. The panels stay full width, so text ending at about 60% of the box left the right
+  side empty. The owner read that as misaligned and asked for the text to fill its box. The
+  caps are gone, and the step band is back to its earlier 110ch. If line length comes back,
+  the way that keeps the text's edge on the box's is to narrow the box, not the text: give
+  the whole footer one reading width beside the full-width cards.
+
+**Fixed: wording that is not reviewed copy.**
+
+- **Load failures.** They now say "…could not be loaded. Please reload the page to try
+  again." The developer hint (`validate-data.js`) goes to the console, and Download CSV is
+  hidden when there is nothing to download.
+- **The step panel's "verified" date** reads "23 Aug 2026" like every other date on the
+  page, not 2026-08-23.
+- **The map rail heading** "Drug" is now "Medicine", the word used everywhere else.
+- **The WHO Malaria Threats Map link** was browser-default blue; it now takes the accent.
+
+**Rows open from anywhere on the row**, not only from the 30 px chevron. Links, buttons and
+glossary terms keep their own clicks, and the chevron stays the keyboard route.
+
+**Not changed, for a decision.**
+
+- **A key-figures strip at the top** (tactic 2). The figures exist:
+  - 4 medicines: 2 delayed, 2 in progress;
+  - Global Fund procurement per medicine;
+  - countries with an access stage.
+
+  Which ones lead is a content call, and one of them conflicts with another (next item).
+- **"Registered" shows two numbers for ASPY**: 8 in the step panel's map-sample counts, 25
+  on the Country access card. Reconcile the data, or label the map sample, before either
+  figure is promoted.
+- **"Treatments procured" counts packs.** The figures are PQR packs, and the project's own
+  definition says a treatment is one course. The heading is reviewed copy (§3.29), so it is
+  unchanged.
+- **A type scale.** There are 20 font sizes and 19 separately styled label rules. That
+  needs a pass of its own, coordinated with Keith's branch.
+- **On phones, the map's filters come before the map** (740–909 px of them).
+- **The map hint** says "Ctrl + scroll" beside MapLibre's own "⌘ + scroll" overlay, and
+  "Drag to pan" where touch needs two fingers.
+- **"On pathway"** counts from the first cleared gate. The label doesn't say so, and ALAQ
+  shows "—" despite a Phase III underway.
+- **Smaller items:**
+  - tabs without arrow keys;
+  - no `<main>` or skip link;
+  - the tooltip ignores Escape;
+  - the Send feedback pill is a filled accent (a shared file, so other pages too);
+  - the chevron is a text glyph.
+
+**Found in passing, left alone: the translation build rewrites code strings.**
+`translations.json` holds French and Portuguese for `"grid-column: 4 / -1"` and
+`"(prefers-reduced-motion: reduce)"`, because the extractor takes them for interface text.
+So on `/fr` and `/pt`, `matchMedia` gets a query in French and never matches, which means
+reduced motion is ignored there. The inline grid placement is broken too. The rail-height
+check above reads the grid instead of a media-query string, so as not to add a third case.
+The fix belongs in `assemble-content.js`'s skip rule (DEV-31).
+
+**Checked:** a scripted run in headless Chrome, 31 checks, all passing, no script errors. It
+covered:
+- the contrast tokens;
+- the diamond;
+- the INN wrapping;
+- the Tab order;
+- the rail content;
+- the compact figures;
+- opening a row from its name;
+- focus kept on a filter, on a Detail tab and on a country;
+- Subscribe closing on focus out;
+- no sideways scroll at 390 and 320 px, with and without a row open;
+- the opened row's panel on screen and its axis at the present;
+- the stacked rails;
+- the load-failure state with `products.js` blocked.
+
+`i18n/content.en.json` was regenerated, since the page's text changed, and
+`test-build-dataset.js` is back to 28 passed. **Not checked:** a real browser's map canvas,
+real touch devices, print, a screen reader, the `/fr` and `/pt` pages.
+
+### 3.33 Sources can be closed on desktop too (2 Oct 2026)
+
+Branch `fix/sources-toggle`, from `main` at `56ecf13`. §3.30 held the list open on wide
+screens and hid its summary, so a laptop reader could not close it.
+
+- **A visible toggle on every screen.** It starts **open on desktop and closed on a phone**
+  (721 px and up is desktop, as before). The reader can open or close it on either.
+- **The label follows the state:** "Hide the sources" while open, "Show the sources" while
+  closed, with the count badge on both. The "Sources" section heading stays. *Not chosen:* the
+  toggle replacing the heading ("Sources (22)", like Definitions); keeping the fixed text "Show
+  the sources", which reads wrong while the list is open.
+- **Crossing the 720 px width resets it** to that screen's default (rotating a tablet,
+  resizing a window), as the script already did. Within one width the reader's choice holds.
+  The owner's answer was "open by default on a laptop, closed on a phone", so the default
+  follows the screen. *Not chosen:* keeping the reader's choice across the width change.
+- **Nothing is remembered between visits.** No `localStorage`; every visit starts from the
+  screen's default.
+- **Both labels are in the markup**, one hidden by CSS from `[open]`, not swapped by the
+  script. `assemble-content.js` collects markup text reliably. "Show the sources" keeps its
+  existing translation key, and "Hide the sources" is the one new string (`content.en.json`
+  regenerated: markup 51 → 52; all other changes are line numbers). Until `translate.yml`
+  runs, `/fr` and `/pt` show "Hide the sources" in English.
+- **Printing hides the summary** (`beforeprint` already opens the list), so a printout does not
+  say "Hide the sources".
+- **More room around the toggle (option B).** With the toggle visible on desktop, the old
+  spacing looked cramped: box padding 10 × 18 px, and 10 px from the toggle to the intro.
+  The owner picked option B from an options page of five: the same box, a toggle row at least
+  48 px tall (12 px above and below), side padding 20 px, a chevron after the count instead of
+  the browser's ▸ (it turns over when open; no turning when the reader prefers reduced motion),
+  a rule under the toggle when open, and 8 px bottom padding so the list's last margin stays
+  inside the box. Then, on request, more space between the three parts: **14 px** from the
+  rule to the intro and **12 px** from the intro to the first source (20 and 18 px were tried
+  first and judged too much).
+- **Why it looked tight in the first place:** `.ft-sec p { margin: 0 }` (0,1,1) outranks
+  `.srcs-intro` (0,1,0), so the intro's margin never applied, in any version of the footer.
+  It touched the rule above it, and the list sat only 8 px below (the list's own top margin).
+  The rule is now `.srcs .srcs-intro`, which outranks it. Option B's planned 14 px had the
+  same problem and never showed. *Not chosen:* A, today's spacing; C, a tinted
+  header bar with a round chevron button on the right; D, an accent button with no box; E, the
+  "Sources" heading row as the toggle, with no box. **Sources only:** the Definitions and Recent
+  dashboard updates panels keep the old box for now.
+
+Checked in headless Chrome at 1280 px and 390 px, real time over CDP (swiftshader flags),
+0 script errors: open with "Hide the sources" on a laptop, closed with "Show the sources" on a
+phone. Click or tap toggles both ways on both. Crossing the width resets to the default. Print
+media hides the summary with the list open. A fresh load at `#sources` opens it on a phone.
+The badge reads 22 and there is no sideways scroll. The locale build passes. On `/fr` and
+`/pt`, "Show the sources" is translated and "Hide the sources" is still English. **Not checked:** a
+real phone, a screen reader.
+
+Found in passing, left alone: `scripts/test-serializer.js` reports 2 round-trip failures
+(`products.js`, `products.synthetic.js`) on `main` too, without this change. It is not in the
+CLAUDE.md verify block. Not investigated.
+
+**Merged after §3.31 and §3.32 (2 Oct 2026).** This was written as §3.31 and renumbered on
+merge. The box keeps no outer border, like every other card on the gray ground (§3.32).
+
+### 3.34 Send feedback is connected, on this page only (2 Oct 2026)
 
 The owner chose this page alone. It now sets `connected: true` in its
 `LAUNCH_FEEDBACK_COPY`, and the widget posts the report to `api/feedback.js`,
@@ -1123,11 +1537,16 @@ What the visitor sees here:
 
 Those three strings are the widget's defaults for a connected page, not this
 page's own overrides. A page switched on later says the same without having
-to remember to. The `/fr/` and `/pt/` editions send too, with the widget's
-text in English, as it always was. Every other page, and RBM's copies of this
+to remember to. The `/fr/` and `/pt/` editions send too. Since §3.33's branch,
+each language has its own copy of the widget with its wording translated
+(`docs/jackson/translation-coverage.md`), so the three "sent" strings show
+in English there until `translate.yml` has run. Every other page, and RBM's copies of this
 one, are unchanged: Send blocked, red note. Checked in headless Chrome with
 the real function behind a local server and Resend stubbed (29 checks, listed
 in email-backend-notes.md §3).
+
+Written as §3.27 on `email-feedback` and renumbered §3.34 when merged after
+§3.27–3.33.
 
 ## 4. Newly discovered, deferred, or left alone
 
@@ -1265,7 +1684,7 @@ Nothing in the data model needs to change for either.
 | the feedback widget's copy seam | §3.6 |
 | changelog `plain` fields | §3.7 and `docs/data-analyst-guide.md` |
 | the hover peek or the click panel | §3.8 |
-| the sources footer or any source URL | §3.9 |
+| the sources footer or any source URL | §3.9, §3.27, §3.33 (the dropdown's open/closed behaviour) |
 | the subscribe backend (`api/`) | §3.10 here for what the visitor sees; decisions in [email-backend-notes.md](email-backend-notes.md) |
 | the draft/dataStatus banner | §3.11 |
 | the summary strip's KPIs, or "access barrier" wording | §3.12 |
