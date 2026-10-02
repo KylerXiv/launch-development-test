@@ -85,6 +85,7 @@
     { "file": "illustrated-journey-dashboard.html", "src": "data-det-tab=\"overview\">Overview<", "en": "Overview" },
     { "file": "illustrated-journey-dashboard.html", "src": "data-det-tab=\"countries\">Countries <", "en": "Countries" },
     { "file": "illustrated-journey-dashboard.html", "src": ": \"No barrier recorded\"}", "en": "No barrier recorded" },
+    { "file": "illustrated-journey-dashboard.html", "src": "</b> Please reload the page to try again.\"", "en": "Please reload the page to try again." },
 
     { "file": "assets/report-issue.js", "src": "\"Something on the page looks wrong\"", "en": "Something on the page looks wrong" },
     { "file": "assets/report-issue.js", "src": "\"A source is missing or out of date\"", "en": "A source is missing or out of date" },
