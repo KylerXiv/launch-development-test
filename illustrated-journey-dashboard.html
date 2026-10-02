@@ -767,9 +767,10 @@
   .srcn { font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px;
           padding: 0 7px; margin-left: 6px; letter-spacing: 0; text-transform: none; vertical-align: 1px; }
   .srcs-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
-  /* Open on desktop: the section heading is the label, so the summary is hidden and the list is held open by the script.
-     On a phone it is a closed dropdown the reader opens. */
-  @media (min-width: 721px) { .srcs summary { display: none; } .srcs-intro { margin-top: 0; } }
+  /* A dropdown on every screen: the script opens it on desktop and leaves it closed on a phone.
+     Both labels are in the markup, so both are translated; the open state picks one. */
+  .srcs[open] .srcs-show, .srcs:not([open]) .srcs-hide { display: none; }
+  @media print { .srcs summary { display: none; } }
   .ext { margin-left: 3px; font-size: .85em; opacity: .75; }
   @media (max-width: 720px) { .srclist { columns: 1; } }
   footer a { color: var(--accent); }
@@ -1302,7 +1303,7 @@
     <section class="ft-sec">
       <h3>Sources</h3>
     <details class="srcs" id="sources">
-      <summary>Show the sources <span class="srcn" id="srcn"></span></summary>
+      <summary><span class="srcs-show">Show the sources</span><span class="srcs-hide">Hide the sources</span> <span class="srcn" id="srcn"></span></summary>
       <p class="srcs-intro">Everything on this page is traceable to one of the public sources below.
         Each name opens that source's own official site in a new tab, so you can check any figure yourself.</p>
     <!-- Both lists are rendered from data/sources.js (see renderSources below).
@@ -3365,8 +3366,9 @@
     document.getElementById("glossary").open = true;
     document.getElementById("sources").open = true;
   });
-  // Sources: open on desktop (the heading labels it), a closed dropdown on phones. The count is set from
-  // the list so it cannot drift; #sources opens it on any screen.
+  // Sources: a dropdown that starts open on desktop and closed on a phone; crossing the 720 px width
+  // resets it to that screen's default. The count is set from the list so it cannot drift; #sources
+  // opens it on any screen.
   (function () {
     const box = document.getElementById("sources");
     document.getElementById("srcn").textContent = box.querySelectorAll(".srclist > li").length;
