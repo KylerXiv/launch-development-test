@@ -4,7 +4,7 @@
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#dataset",
       "@type": "Dataset",
-      "lastUpdated": "2026-09-30",
+      "lastUpdated": "2026-10-02",
       "dataStatus": "launch:datastatus-draft",
       "tracksProduct": [
         "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
@@ -466,10 +466,11 @@
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum-stage-3",
           "@type": "StageEntry",
           "atStage": "launch:stage-3",
-          "hasStatus": "launch:status-idle",
-          "note": "Not on the WHO PQ EOI list yet (24th malaria EOI, 27 Feb 2026, checked)",
-          "source": "WHO PQ EOI list (24th edition)",
-          "asOf": "2026-08-22"
+          "hasStatus": "launch:status-done",
+          "note": "Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG).",
+          "dateLabel": "15 Sep 2026",
+          "source": "WHO prequalification list (TEST-0001 — https://extranet.who.int/prequal/medicines/prequalified/finished-pharmaceutical-products)",
+          "asOf": "2026-09-21"
         },
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum-stage-4",
@@ -1478,145 +1479,152 @@
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-0",
       "@type": "ChangelogEntry",
+      "changeDate": "2026-10-02",
+      "productDisplayName": "GanLum",
+      "changeText": "WHO PQ listing: status set to “done”; date set to “15 Sep 2026”; sentence set to “Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG).”. Source: WHO prequalification list, 2026-09-21. Proposed in issue #41, approved by review."
+    },
+    {
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-1",
+      "@type": "ChangelogEntry",
       "changeDate": "2026-09-10",
       "productDisplayName": "All",
       "changeText": "Terminology: the two product `flag` sentences now say \"access barrier\" rather than \"bottleneck\", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-1",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-2",
       "@type": "ChangelogEntry",
       "changeDate": "2026-09-08",
       "productDisplayName": "ASPY",
       "changeText": "First confirmed national guideline adoption recorded: Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (alongside AS-AQ and AL), per a peer-reviewed therapeutic-efficacy study (Ghana 2023 fieldwork, published 2026). National policy adoption stage remains 'late' — Ghana is the only confirmed country so far against WHO's 2022 strong recommendation. Procurement stage dates for ASPY (since 2018) and DHA–PPQ (since 2008) added — both years were already cited in the Global Fund PQR figures elsewhere in this file but had not been carried into the stage `date` field."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-2",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-3",
       "@type": "ChangelogEntry",
       "changeDate": "2026-09-05",
       "productDisplayName": "All",
       "changeText": "Illustrated journey dashboard: the country access map gained a WHO drug-resistance overlay. Treatment-failure results from the WHO Malaria Threat Maps (therapeutic efficacy studies, extract 5 Sep 2026) are drawn as dots over the access shading, with their own provenance line and their own tooltip. All five Plasmodium species and studies of every size are included, selectable by drug and species; pairings WHO has no data for are disabled rather than shown empty. Each dot is the most recent study year for that country, averaged across that year's sites and weighted by patient numbers — click a dot for every underlying study. The access layer remains illustrative, so the two readings are presented separately and not combined."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-3",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-4",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-25",
       "productDisplayName": "All",
       "changeText": "Version 2 merged: the collected-data updates reviewed in the /v2/ preview (Global Fund PQR volumes, WHO PQ listings, EMA dates, trial-registry records, Nigeria + Tanzania register verification, sourced fact corrections) are now the live draft dataset. The preview edition is retired."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-4",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-5",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "Nigeria and Tanzania registrations verified against the national registers: TZA 10 presentations across four manufacturers (all compliant); NGA 47 presentations but only 26 Active — 22 lapsed, a registration-maintenance signal."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-5",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-6",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ASPY",
       "changeText": "Nigeria and Tanzania registrations verified against the national registers: TZA 2 (TMDA, 2022), NGA 1 (Greenbook granules, approved Feb 2024). The NGA/TZA registered-level map entries are now register-verified."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-6",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-7",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "WHO guideline recommendation year corrected to 2010 (second-edition treatment guidelines; reaffirmed 2015) — previously shown as 2015."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-7",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-8",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ALAQ",
       "changeText": "Co-formulated pivotal Phase III renamed to FD-TACT (successor to the DeTACT programme); unverified 'taste-masked' wording replaced with the sourced 'child-friendly dispersible'."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-8",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-9",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "GanLum",
       "changeText": "Use-case wording aligned with the sourced Novartis claim (first major innovation in malaria treatment since ACTs were introduced 25+ years ago)."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-9",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-10",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "All",
       "changeText": "Version 2 preview: first collected-data updates from the public-source staging layer (Global Fund PQR extract 23 Aug 2026, WHO PQ lists, EMA EU-M4all table, ClinicalTrials.gov)."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-10",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-11",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "Global Fund volumes filled from PQR: 11.5m packs / US$41.5m since 2008; 0.9–4.5% of Global Fund antimalarial spend 2022–24 with a sharp 2025 uptick (US$15.3m). Nine PQ'd presentations across Alfasigma, Guilin and Beijing Holley (2015–2023) recorded."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-11",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-12",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ASPY",
       "changeText": "Global Fund volumes filled from PQR: 940k packs / US$14.5m since 2018, with US$11.6m of it in 2025 (Uganda, Burkina Faso). EMA opinion outcome date 5 Jun 2025 recorded from the EU-M4all table."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-12",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-13",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "GanLum",
       "changeText": "KALUMA registry record (NCT05842954) added: trial completed 25 Nov 2025, 1,720 participants (registry actual)."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-13",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-14",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-15",
       "productDisplayName": "All",
       "changeText": "Added MMV-style pipeline poster view (pipeline.html) placing each product in its development phase."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-14",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-15",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-15",
       "productDisplayName": "All",
       "changeText": "Added country access map (illustrative until verified), cross-product pathway timing chart, embeddable product widget, RSS update feed and automatic data-history snapshots."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-15",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-16",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "ASPY",
       "changeText": "Renamed from Pyramax to ASPY (pyronaridine–artesunate); trade name retained in the subtitle."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-16",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-17",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "All",
       "changeText": "Added glossary tooltips, CSV download, print view and pathway timing (time between gates) for marketed products."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-17",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-18",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "GanLum",
       "changeText": "Phase III (KALUMA) marked complete — primary endpoint met, announced 12 Nov 2025; regulatory submission preparation now in progress."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-18",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-19",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "ASPY",
       "changeText": "EMA Article 58 date corrected to 2012; July 2025 pregnancy label update added to milestones."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-19",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-20",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "DHA–PPQ",
       "changeText": "Eurartesim WHO PQ requalification (Jan 2025) recorded; unknown counts set to TBC pending verification."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-20",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-21",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "All",
