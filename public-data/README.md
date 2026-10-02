@@ -1,5 +1,10 @@
 # LAUNCH dashboard data
 
+**Live:** [v1/dashboard.json](https://codebyjackson.github.io/launch-data-test/v1/dashboard.json)
+· [v1/schema.json](https://codebyjackson.github.io/launch-data-test/v1/schema.json)
+· [CHANGELOG](CHANGELOG.md)
+· used by the [RBM test pages](https://codebyjackson.github.io/launch-rbm-test/)
+
 The published dataset behind the LAUNCH malaria-medicines dashboard on the
 RBM Partnership to End Malaria's platform. One JSON file holds everything the
 dashboard pages show, in English, French and Portuguese. It is approved output
@@ -20,7 +25,10 @@ https://codebyjackson.github.io/launch-data-test/v1/schema.json        the contr
 
 GitHub Pages serves these with open CORS (`Access-Control-Allow-Origin: *`),
 so a page on any domain, inside an iframe or not, can fetch them in the
-browser. Pages caches for about 10 minutes; a new publish is visible after that.
+browser. A new publish is live about a minute after its commit (once GitHub's
+"pages build and deployment" run is green). Browsers may keep a copy for up to
+10 minutes (`Cache-Control: max-age=600`); fetch with `cache: "no-cache"`, as the
+dashboard pages do, to always get the current file.
 
 ```js
 const res = await fetch("https://codebyjackson.github.io/launch-data-test/v1/dashboard.json");
