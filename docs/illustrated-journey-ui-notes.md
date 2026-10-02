@@ -1293,8 +1293,9 @@ screens and hid its summary, so a laptop reader could not close it.
   48 px tall (12 px above and below), side padding 20 px, a chevron after the count instead of
   the browser's ▸ (it turns over when open; no turning when the reader prefers reduced motion),
   a rule under the toggle when open, and 8 px bottom padding so the list's last margin stays
-  inside the box. Then, on request, more space between the three parts: **20 px** from the
-  rule to the intro and **18 px** from the intro to the first source.
+  inside the box. Then, on request, more space between the three parts: **14 px** from the
+  rule to the intro and **12 px** from the intro to the first source (20 and 18 px were tried
+  first and judged too much).
 - **Why it looked tight in the first place:** `.ft-sec p { margin: 0 }` (0,1,1) outranks
   `.srcs-intro` (0,1,0), so the intro's margin never applied, in any version of the footer.
   It touched the rule above it, and the list sat only 8 px below (the list's own top margin).
