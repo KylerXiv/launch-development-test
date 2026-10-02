@@ -1075,6 +1075,172 @@ text that fits the page it is on.
   checked: the other pages that load the widget, real devices, keyboard handling of
   the disabled button.
 
+### 3.27 The sources list is a closed dropdown, and the closing line is gone (2 Oct 2026)
+
+Branch `feat/sources-dropdown`, from `development` at `d23706b`.
+
+*(Updated by §3.30: Sources is now open on desktop and closed on phones, and sits after the
+disclaimer.)* The footer's source list (ten entries, two columns) was the longest thing on the
+page after the map. It became a `<details id="sources">` below the "About the data"
+paragraph, **closed by default**, in the same box and summary style as the
+Definitions band. The summary reads "Sources" with a count badge, set from the
+list so it cannot drift when a source is added.
+
+- **"About the data" stays visible.** It carries the caveat that only publicly
+  available information is shown and that pricing appears only where the
+  manufacturer confirmed it in writing. That is the one thing not to hide behind a
+  click. *Rejected:* collapsing both blocks (shorter page, hidden caveat); a
+  one-line list of source names in the closed bar (shows provenance without a
+  click, but a longer bar and one more place to update).
+- **The intro sentence moved inside the dropdown** ("Everything on this page is
+  traceable to one of the public sources below…"), because "below" no longer
+  works while it is closed.
+- **It opens for print** (`beforeprint` opens it with the other panels) and when
+  the page is opened at `#sources`, which also scrolls to it.
+- **Removed on request:** the closing line "A LAUNCH initiative of Unitaid
+  partners, to be hosted by the RBM Partnership to End Malaria", with its two links.
+  The Unitaid logo and "Powered by" attribution in the header are unchanged.
+- Styled with its own `.srcs` rules, not the `.updates` class: `.updates li` is a
+  flex row with a dashed divider and would have broken the two-column source list.
+- Checked in headless Chrome: closed on load, count 10 of 10, "About the data"
+  visible, opens on click, `beforeprint` and `#sources` both open it, no script
+  errors. Not checked: a real print preview, phone widths.
+- Anyone who copies the page into another repo needs the `#sources` block, the
+  `.srcs`, `.srcn` and `.srcs-intro` rules, and the small script after the
+  `beforeprint` listener. The translation pipeline sees no new strings except the
+  word "Sources" and the count.
+
+### 3.28 A language button in the nav bar, switched on per language (2 Oct 2026)
+
+Same branch as §3.27 (`feat/sources-dropdown`).
+
+The top bar on the illustrated journey page gets a **language button** at its
+right-hand end: a globe, the current language, a caret, and a menu of English,
+Français and Português. It lives in `assets/site-nav.js`, the shared nav script,
+and is **opt-in**: it appears only on a page whose script tag carries
+`data-languages="en,fr,pt"`. Pipeline and Story do not, because only the
+illustrated journey page has a translation pipeline (DEV-31).
+
+- **Links, not scripts.** English is the page itself; French and Portuguese are
+  `fr/` and `pt/` folders beside it, which is where `scripts/build-locale-pages.js`
+  writes them (`dist/locale/fr`, `dist/locale/pt`). From inside a translated copy
+  the English link goes up a folder, and the Pipeline and Story links go up too,
+  since only the translated page itself exists there. The current language is read
+  from `<html lang>`, which the builder sets (`fr`, `pt-PT`).
+- **Not live yet, so the menu says so.** `fr` and `pt` are `live: false` in the
+  `LANGS` table at the top of the script, and show greyed as "coming soon" rather
+  than linking to a 404, because the translated copies are not deployed and the
+  English snapshot behind them is stale (see `docs/handoff-remove-study-layers.md`
+  §5.1). To switch a language on, set its `live` to `true` in that table, or set
+  `window.LAUNCH_LOCALES_LIVE = { fr: true, pt: true }` before the script, once the
+  folders are deployed.
+- **Rejected:** a runtime switcher that swaps text in the browser (it breaks Rule 1
+  of the pipeline, build-time substitution, and would translate lookup keys);
+  showing the button on all three pages with "English only" notes on two (promises
+  something those pages cannot do); a mock that only remembers the choice (nothing
+  to wire up later).
+- **Phones:** the language button stays beside the "Views" button; below 480 px it
+  shows the code (EN) and the Views label drops its "Views:" prefix so the bar stays
+  on one line.
+- Checked in headless Chrome: default menu (English current, French and Portuguese
+  "coming soon"); both switched on (links `fr/…` and `pt/…`); a simulated French
+  copy (English `../…`, Portuguese `../pt/…`, Pipeline and Story `../…`); closes on
+  Escape and outside click; no button on Pipeline; no sideways scroll at 390 px; no
+  script errors. **Not checked:** real translated pages (none are built or
+  deployed), screen-reader announcement of the menu.
+- Deploy note: `scripts/build-public-site.sh` copies `site-nav.js` but does not yet
+  copy `dist/locale/` into the site, and has never copied `treatment-policy.js`
+  either. Both are needed before the button can be switched on.
+
+### 3.29 Reviewer feedback: disclaimer, GanLum acknowledgement, price, procurement, regulatory status (2 Oct 2026)
+
+Same branch as §3.27 and §3.28 (`feat/sources-dropdown`). The options were chosen on an
+options page; the choices and what they cost are recorded here.
+
+**Disclaimer.** Full three-paragraph text in the footer (`#disclaimer`), linked from
+the amber draft banner ("Read the disclaimer"). It is an adaptation of the Medicines
+Patent Pool's MedsPaL disclaimer, which the project was given as an example: the MPP
+text is about patents and was **not** copied. The wording is **draft, written by us**
+and has not been signed off by anyone; do not treat it as approved. It names the
+Nigeria and Tanzania registrations as the only verified country stages, so it must be
+reworded when the country survey is verified. *Rejected:* a closed dropdown (easiest
+to argue nobody read it), a pop-up window (most to build), a one-sentence version
+(covers too little).
+
+**GanLum acknowledgement.** New optional product field `acknowledgement` in
+`data/products.js` (validator: non-empty string when present; documented in the analyst
+guide §4). The text is the reviewer's, word for word. It shows as an Acknowledgement
+card in the medicine's expanded details only. A footer Acknowledgements section was built
+and then removed on request (2 Oct 2026), so the text appears once, next to the medicine. The funder's name in it, "European
+& Developing Countries Clinical Trials Partnership Programme", is as written in the
+reviewer's note and **has not been confirmed with MMV**.
+The reviewer said MMV is not responsible for access, so for GanLum only: manufacturer is
+now "Novartis" (was "Novartis · MMV"), research lead "Novartis" (was "Novartis / MMV"), and
+the line "Co-developed with MMV under access-oriented partnership" is removed. Source
+citations that name MMV press releases are unchanged: they are sources, not roles.
+**ASPY still reads "Shin Poong Pharmaceutical · MMV", "MMV and partners" and carries the
+same "Co-developed with MMV…" line.** The feedback named GanLum only, so it was left
+alone; it likely needs the same decision. The synthetic dataset is not mirrored (the
+field is optional).
+
+**Price (Novartis comment).** The "Indicative price per treatment" card is removed from
+the medicine details on this page, with nothing in its place. "Including pricing" is dropped
+from the footer. The `price` field stays in the data and is still shown on `index.html`,
+`option-b.html` and `pipeline.html` and used by Power BI and Streamlit; removing it
+everywhere is a separate schema change, not made. A one-line note saying price is not
+shown (and why) was offered and not chosen. *Rejected:* keeping the card.
+
+**Procurement (highlighted comment).** The step is renamed "Procurement (public channels)"
+in `data.stages`, so it changes on every page that reads that file. Its explainer, the
+footer and the volume card heading ("Treatments procured through public channels") and
+the facts label ("Public-channel procurement (Global Fund)") now say the figures are
+Global Fund-financed procurement only. The phrase "public channels" is the reviewer's;
+whether they would prefer "public-sector" or "donor-funded" has not been asked.
+
+**Regulatory status.** The Regulatory approval step's explainer and the footer say
+health-authority review status is generally not public, so the step changes only when a
+regulator or the manufacturer announces an outcome. **Not changed:** GanLum's regulatory
+step still reads "In progress" (sourced to a Novartis announcement); whether it should
+say something else is an open question.
+
+**Changelog.** One entry (2 Oct 2026) in `data/products.js`. Merging to `main` fires
+`publish.yml` (history snapshot, feed, ontology).
+
+Checked in headless Chrome: banner link `#disclaimer`, three disclaimer paragraphs, no
+"pricing" in the footer, the acknowledgement in GanLum's details only, the renamed step in the
+pathway strip and table (fits on one line), GanLum's details with no price card and no
+"Co-developed with MMV" or "Novartis / MMV", ASPY unchanged, no script errors.
+Validator 0 errors, 1 warning; synthetic 0 and 0. The other pages (`index`, `option-b`, `pipeline`, `story`, the widget) load with
+no script errors after the stage rename; `index`, `option-b` and the widget show the new
+name. **Not checked:** the Power BI and Streamlit views, a real print preview.
+
+### 3.30 The footer is reworked so nothing is overlooked (2 Oct 2026)
+
+Same branch as §3.27 to §3.29 (`feat/sources-dropdown`). The choices were made on an
+options page and pasted back as text; they supersede the "closed by default" Sources
+dropdown of §3.27 on wide screens.
+
+- **Disclaimer first**, then About the data, then Sources.
+- **Disclaimer as a tinted panel with an accent edge** and an info icon, in the page's own
+  blue (`--accent-soft`, `--accent`), 14 px. The Medicines Patent Pool page the project
+  was shown uses a full-width tinted band; that was offered and not chosen (a large block on
+  a data page). *Also not chosen:* an amber panel matching the draft banner, plain text, a
+  two-column footer, tabs (only one part visible at a time).
+- **Small section headings with a rule** for About the data and Sources (the disclaimer's own
+  heading is inside its panel).
+- **Footer text is 14 px** throughout (was 12.5 px), in `--ink-2`.
+- **Sources: open on desktop, a closed dropdown on phones** (breakpoint 720 px, the same one
+  the two-column list already used). The `<details>` element is kept: the script holds it open
+  on wide screens and hides its summary, so the section heading is the label; on a phone the
+  summary reads "Show the sources" with a count. `#sources` and printing still open it.
+- **The disclaimer glows briefly on arrival** from the draft banner's "Read the disclaimer"
+  link or from a `#disclaimer` URL (about 1.6 s; a static outline instead when the reader
+  prefers reduced motion). The link works again when the hash is already `#disclaimer`.
+- Checked in headless Chrome at desktop and 390 px: order disclaimer, About, Sources; sources
+  open at desktop with the summary hidden, closed at 390 px and opening on tap; glow on click,
+  cleared after, and again on a second click; no sideways scroll; no script errors. **Not
+  checked:** a real print preview, a screen reader.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
@@ -1211,7 +1377,7 @@ Nothing in the data model needs to change for either.
 | the feedback widget's copy seam | §3.6 |
 | changelog `plain` fields | §3.7 and `docs/data-analyst-guide.md` |
 | the hover peek or the click panel | §3.8 |
-| the sources footer or any source URL | §3.9 |
+| the sources footer or any source URL | §3.9, §3.27 |
 | wiring a subscribe backend | §3.10 — replace the seam, note the provider |
 | the draft/dataStatus banner | §3.11 |
 | the summary strip's KPIs, or "access barrier" wording | §3.12 |
