@@ -604,7 +604,7 @@
   .gp-pill.prog { background: var(--warn-soft); color: var(--warn-text); }
   .gp-pill.late { background: var(--crit-soft); color: var(--crit); }
   .gp-pill.idle { background: var(--idle-soft); color: var(--ink-3); }
-  .gp-note { margin: 9px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink); max-width: 75ch; }
+  .gp-note { margin: 9px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink); }
   .gp-why {
     margin-top: 10px; padding: 9px 12px; border-radius: 8px;
     background: var(--crit-soft); color: var(--crit);
@@ -658,7 +658,7 @@
   .gw-sum { display: flex; flex-wrap: wrap; gap: 6px; margin-left: 10px; }
   .gw-band { background: var(--surface-2); border-radius: 10px; padding: 14px 16px 16px; }
   .gw-band h4 { margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-  .gw-band > p { margin: 0; font-size: 15.5px; color: var(--ink); max-width: 75ch; }
+  .gw-band > p { margin: 0; font-size: 15.5px; color: var(--ink); max-width: 110ch; }
   .gw-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 22px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
   .gw-facts h5 { margin: 0 0 2px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
   .gw-facts p { margin: 0; font-size: 14px; color: var(--ink); }
@@ -772,13 +772,13 @@
   /* Footer: the disclaimer leads, in a tinted panel with an accent edge, so it is not overlooked. */
   .ft-sec h3 { margin: 0 0 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3);
                border-bottom: 1px solid var(--line); padding-bottom: 5px; }
-  .ft-sec p { margin: 0; max-width: 75ch; }
+  .ft-sec p { margin: 0; }
   .disclaimer { background: var(--accent-soft); border: 1px solid var(--line); border-left: 5px solid var(--accent);
                 border-radius: 10px; padding: 14px 18px; color: var(--ink); scroll-margin-top: 16px; }
   .disclaimer:focus { outline: none; }
   .disclaimer h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 16px; color: var(--ink); }
   .disclaimer h3 svg { flex: none; color: var(--accent); }
-  .disclaimer p { margin: 0 0 8px; font-size: 14px; line-height: 1.6; max-width: 75ch; }
+  .disclaimer p { margin: 0 0 8px; font-size: 14px; line-height: 1.6; }
   .disclaimer p:last-child { margin-bottom: 0; }
   /* When the draft banner's link (or #disclaimer) brings the reader here, a brief glow shows where they landed. */
   .disclaimer.flash { animation: disc-flash 1.6s ease-out 1; }
@@ -791,7 +791,7 @@
   .srcs summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
   .srcn { font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px;
           padding: 0 7px; margin-left: 6px; letter-spacing: 0; text-transform: none; vertical-align: 1px; }
-  .srcs-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); line-height: 1.5; max-width: 75ch; }
+  .srcs-intro { margin: 10px 0 2px; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
   /* Open on desktop: the section heading is the label, so the summary is hidden and the list is held open by the script.
      On a phone it is a closed dropdown the reader opens. */
   @media (min-width: 721px) { .srcs summary { display: none; } .srcs-intro { margin-top: 0; } }
