@@ -1292,8 +1292,14 @@ screens and hid its summary, so a laptop reader could not close it.
   The owner picked option B from an options page of five: the same box, a toggle row at least
   48 px tall (12 px above and below), side padding 20 px, a chevron after the count instead of
   the browser's ▸ (it turns over when open; no turning when the reader prefers reduced motion),
-  a rule under the toggle when open, then 14 px to the intro, and 8 px bottom padding so the
-  list's last margin stays inside the box. *Not chosen:* A, today's spacing; C, a tinted
+  a rule under the toggle when open, and 8 px bottom padding so the list's last margin stays
+  inside the box. Then, on request, more space between the three parts: **20 px** from the
+  rule to the intro and **18 px** from the intro to the first source.
+- **Why it looked tight in the first place:** `.ft-sec p { margin: 0 }` (0,1,1) outranks
+  `.srcs-intro` (0,1,0), so the intro's margin never applied, in any version of the footer.
+  It touched the rule above it, and the list sat only 8 px below (the list's own top margin).
+  The rule is now `.srcs .srcs-intro`, which outranks it. Option B's planned 14 px had the
+  same problem and never showed. *Not chosen:* A, today's spacing; C, a tinted
   header bar with a round chevron button on the right; D, an accent button with no box; E, the
   "Sources" heading row as the toggle, with no box. **Sources only:** the Definitions and Recent
   dashboard updates panels keep the old box for now.
