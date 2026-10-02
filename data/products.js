@@ -32,7 +32,7 @@
 window.LAUNCH_DATA =
 {
   "meta": {
-    "lastUpdated": "2026-09-30",
+    "lastUpdated": "2026-10-02",
     "dataStatus": "draft",
     "host": "RBM Partnership to End Malaria"
   },
@@ -81,6 +81,7 @@ window.LAUNCH_DATA =
     "GMP": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites."
   },
   "changelog": [
+    { "date": "2026-10-02", "product": "GanLum", "change": "WHO PQ listing: status set to “done”; date set to “15 Sep 2026”; sentence set to “Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG).”. Source: WHO prequalification list, 2026-09-21. Proposed in issue #41, approved by review.", "plain": "GanLum — who pq listing was updated from the WHO prequalification list." },
     { "date": "2026-09-10", "product": "All", "change": "Terminology: the two product `flag` sentences now say \"access barrier\" rather than \"bottleneck\", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed.", "plain": "We now call a blocked step an \"access barrier\" instead of a \"bottleneck\". Only the wording changed — no figures or dates were altered." },
     { "date": "2026-09-08", "product": "ASPY", "change": "First confirmed national guideline adoption recorded: Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (alongside AS-AQ and AL), per a peer-reviewed therapeutic-efficacy study (Ghana 2023 fieldwork, published 2026). National policy adoption stage remains 'late' — Ghana is the only confirmed country so far against WHO's 2022 strong recommendation. Procurement stage dates for ASPY (since 2018) and DHA–PPQ (since 2008) added — both years were already cited in the Global Fund PQR figures elsewhere in this file but had not been carried into the stage `date` field.", "plain": "We found a real example of a country acting on the World Health Organization's advice: Ghana added this medicine as a backup first-choice treatment in 2022. It's still the only country confirmed to have done so. We also recorded the years Global Fund purchasing began for both underused medicines (2018 and 2008)." },
     { "date": "2026-09-05", "product": "All", "change": "Illustrated journey dashboard: the country access map gained a WHO drug-resistance overlay. Treatment-failure results from the WHO Malaria Threat Maps (therapeutic efficacy studies, extract 5 Sep 2026) are drawn as dots over the access shading, with their own provenance line and their own tooltip. All five Plasmodium species and studies of every size are included, selectable by drug and species; pairings WHO has no data for are disabled rather than shown empty. Each dot is the most recent study year for that country, averaged across that year's sites and weighted by patient numbers — click a dot for every underlying study. The access layer remains illustrative, so the two readings are presented separately and not combined." },
@@ -118,7 +119,7 @@ window.LAUNCH_DATA =
         { "status": "done", "note": "Phase III (KALUMA, NCT05842954) met primary endpoint: 97.4% PCR-corrected cure rate; registry records 1,720 participants and trial completion 25 Nov 2025 (34 sites, 12 African countries)", "date": "Announced 12 Nov 2025; trial completed 25 Nov 2025", "next": "", "nextDate": "", "source": "Novartis / MMV press releases, 12 Nov 2025; ClinicalTrials.gov NCT05842954", "asOf": "2026-08-22" },
         { "status": "prog", "note": "Regulatory submissions in preparation following Phase III success", "date": "", "next": "Dossier submission (SRA pathway)", "nextDate": "TBC", "source": "Novartis announcement, Nov 2025", "asOf": "2026-08-14" },
         { "status": "idle", "note": "Not started", "date": "", "next": "GDG engagement expected alongside regulatory review", "nextDate": "" },
-        { "status": "idle", "note": "Not on the WHO PQ EOI list yet (24th malaria EOI, 27 Feb 2026, checked)", "date": "", "next": "", "nextDate": "", "source": "WHO PQ EOI list (24th edition)", "asOf": "2026-08-22" },
+        { "status": "done", "note": "Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG).", "date": "15 Sep 2026", "next": "", "nextDate": "", "source": "WHO prequalification list (TEST-0001 — https://extranet.who.int/prequal/medicines/prequalified/finished-pharmaceutical-products)", "asOf": "2026-09-21" },
         { "status": "idle", "note": "Not started", "date": "", "next": "", "nextDate": "" },
         { "status": "idle", "note": "Not started", "date": "", "next": "", "nextDate": "" },
         { "status": "idle", "note": "Not started", "date": "", "next": "", "nextDate": "" },
