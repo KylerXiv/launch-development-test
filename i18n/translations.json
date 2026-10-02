@@ -4675,6 +4675,13 @@
       "fr": "inclusion dans les directives nationales générales",
       "pt": "Inclusão ampla de orientações nacionais"
     },
+    "e7a7ca6f48a8021e": {
+      "en": "Please reload the page to try again.",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Veuillez recharger la page pour réessayer.",
+      "pt": "Por favor, atualize a página para tentar novamente."
+    },
     "e7b552847955ba77": {
       "en": "Drug",
       "where": "static text",
