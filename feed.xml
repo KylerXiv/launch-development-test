@@ -5,7 +5,21 @@
     <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
     <description>Changes to tracked antimalarial product statuses on the LAUNCH dashboard (draft data).</description>
     <language>en</language>
-    <lastBuildDate>Wed, 30 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 02 Oct 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>All: Illustrated journey dashboard, wording changes from reviewer feedback. Price:…</title>
+      <description>Illustrated journey dashboard, wording changes from reviewer feedback. Price: the per-medicine price card is removed (the price field stays in the data for the other pages). Procurement: the step is now "Procurement (public channels)" and says it covers Global Fund-financed procurement only. Regulatory approval: the step and the page footer say health-authority review status is generally not public. GanLum: manufacturer and research lead now read "Novartis", the line "Co-developed with MMV under access-oriented partnership" is removed, and the required acknowledgement (new `acknowledgement` field) is shown in the medicine's details. A disclaimer is added to the footer and linked from the draft banner.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-10-02:All:Illustrated journey dashboard, wording c</guid>
+      <pubDate>Fri, 02 Oct 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>All: Illustrated journey dashboard: the three WHO study-result layers (treatment f…</title>
+      <description>Illustrated journey dashboard: the three WHO study-result layers (treatment failure, delayed parasite clearance, molecular markers of drug resistance) were removed from the country access map, together with their data files and sourcing. Drug-resistance results are no longer reproduced here; the page links to the WHO Malaria Threats Map instead. The map's controls were also reorganised: access stages and MFT policy groups are now tickable filters in the left rail, replacing the MFT switch, and the legend under the map lists only what is ticked. The Detail panel is now an overview dashboard with a country finder, and every country on the map opens its own page for the selected medicine. The 5 Sep 2026 entry below records when the layers were added.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-10-01:All:Illustrated journey dashboard: the three</guid>
+      <pubDate>Thu, 01 Oct 2026 12:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>All: Terminology: the two product `flag` sentences now say "access barrier" rather…</title>
       <description>Terminology: the two product `flag` sentences now say "access barrier" rather than "bottleneck", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed.</description>
