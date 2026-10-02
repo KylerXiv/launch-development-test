@@ -313,3 +313,15 @@ probe is what tells them apart.
 | Commits | 1 merge commit, carrying Keith's 5 |
 | Hand-edited in the merge | `illustrated-journey-dashboard.html` (footer), `data/products.js`, `data/sources.js`, `scripts/data-rules.js`, `scripts/build-locale-pages.js`, `scripts/assemble-content.js` (one comment), `CLAUDE.md`, `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, this document |
 | Regenerated | `i18n/content.en.json` |
+
+### Follow-up: `meta.lastUpdated` bumped to 2026-10-02
+
+After #45 merged, "Snapshot history and rebuild feed" failed on `a3b7ff2`
+with `history/products-2026-09-30.js already exists with different content (a
+changelog entry is dated after 2026-09-30 — bump meta.lastUpdated)`. The guard
+is right and the data was wrong. Keith's two changelog entries are dated 1 and
+2 Oct, but `meta.lastUpdated` still said 30 Sep, because his handoff (§2.5)
+deliberately left it alone. Bumping it moves the snapshot to
+`history/products-2026-10-02.js`, the feed, and the page's "Last updated" line
+to the day the data changed. The merge should have caught this. The verify block
+does not run `history-continues.js`, so only the workflow did.
