@@ -29,8 +29,9 @@
 //      per-language map files and feedback widget (PER_LANGUAGE);
 //   3. the site menu goes (its Pipeline and Story pages are not part of the
 //      handover; RBM's platform has its own navigation);
-//   4. Subscribe for updates goes (its email backend, api/, runs on the LAUNCH
-//      Vercel project and does not come with these files).
+//   4. Subscribe for updates goes, and Send feedback is not connected (their
+//      email backend, api/, runs on the LAUNCH Vercel project and does not come
+//      with these files).
 // If dashboard.json cannot be fetched, or its schema_version is not 1, the page
 // says so in its banner and draws nothing, rather than a half-rendered chart.
 //
@@ -144,6 +145,10 @@ function transform(html, lang) {
   // Subscribe out (its backend is not handed over): hidden by CSS that comes
   // with the loader (the page has no </head> to put it in), so the page's own
   // code still finds the elements it wires up
+  // Send feedback not connected, for the same reason: on RBM's host
+  // /api/feedback does not exist, so the widget keeps Send blocked and its red
+  // note instead of failing every report
+  out = out.replace(/(\bconnected\s*:\s*)true\b/g, "$1false");
   // shared files one level up, except the ones each language has its own copy
   // of (PER_LANGUAGE): the map files carry the country names, the feedback
   // widget its wording

@@ -64,8 +64,9 @@ iframe scrolling inside it is the simplest option.
   has its own navigation).
 - No "Subscribe for updates" (its email service runs on the LAUNCH project's
   own hosting and is not included).
-- "Send feedback" is unchanged and, as on the LAUNCH site, not yet connected
-  to a backend.
+- "Send feedback" is not connected: Send is blocked, and the dialog says so.
+  On the LAUNCH site it emails the team through the same hosting as
+  Subscribe, which is not included.
 
 ## Rebuilding
 

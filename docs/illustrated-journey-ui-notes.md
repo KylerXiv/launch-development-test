@@ -283,7 +283,7 @@ contact was saved. Any failure, including an unconfigured server, shows
 for a retry. The button shows *Sending…* while in flight. Its 10 Sep click
 block is removed, and the red "Mock only" `.sub-note` is now a muted privacy
 line. `LAUNCH_SUBSCRIBERS` is gone. Send feedback is unchanged: still a mock,
-Send still blocked, red flag still in its dialog. Why a Resend contact and not
+Send still blocked, red flag still in its dialog (until 2 Oct, §3.34). Why a Resend contact and not
 a notify-us email: [email-backend-notes.md](email-backend-notes.md) §2.
 
 **Revised the same day: double opt-in.** Submitting now saves nothing. It
@@ -1510,6 +1510,43 @@ CLAUDE.md verify block. Not investigated.
 
 **Merged after §3.31 and §3.32 (2 Oct 2026).** This was written as §3.31 and renumbered on
 merge. The box keeps no outer border, like every other card on the gray ground (§3.32).
+
+### 3.34 Send feedback is connected, on this page only (2 Oct 2026)
+
+The owner chose this page alone. It now sets `connected: true` in its
+`LAUNCH_FEEDBACK_COPY`, and the widget posts the report to `api/feedback.js`,
+which emails the team inbox. Backend decisions:
+[email-backend-notes.md](email-backend-notes.md) §2.12.
+
+What the visitor sees here:
+
+- **Send works.** The red "Mock only" note is replaced by a muted privacy
+  line: *"Your email is optional and used only to reply to you. With your
+  message we send the page you are on, the version of the data it shows, and
+  your browser, so the team can see what you saw."*
+- **"Sending…"** on the button while the report is in flight.
+- **Done screen:** *"Thanks — your feedback has been sent."*, then *"The
+  LAUNCH team reads every message, and where you have pointed us to a public
+  source that checks out, we correct the data at the next update. If you
+  left an email address, any reply from us will quote the reference below."*
+  The reference is now made by the server, and is the one in the team's
+  subject line.
+- **Any failure**, including an unconfigured server or a rate-limit 429,
+  shows *"Sorry — your feedback could not be sent just now…"*. The report
+  stays in the form for a retry.
+
+Those three strings are the widget's defaults for a connected page, not this
+page's own overrides. A page switched on later says the same without having
+to remember to. The `/fr/` and `/pt/` editions send too. Since §3.33's branch,
+each language has its own copy of the widget with its wording translated
+(`docs/jackson/translation-coverage.md`), so the three "sent" strings show
+in English there until `translate.yml` has run. Every other page, and RBM's copies of this
+one, are unchanged: Send blocked, red note. Checked in headless Chrome with
+the real function behind a local server and Resend stubbed (29 checks, listed
+in email-backend-notes.md §3).
+
+Written as §3.27 on `email-feedback` and renumbered §3.34 when merged after
+§3.27–3.33.
 
 ## 4. Newly discovered, deferred, or left alone
 

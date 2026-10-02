@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Tests for the Vercel functions behind the illustrated journey page's
-// "Subscribe for updates" — api/subscribe.js, api/confirm.js and
-// api/unsubscribe.js — and the shared api/_mail.js. api/feedback.js and its
-// tests join these when Send feedback is connected.
+// Tests for the Vercel functions behind the illustrated journey page's forms:
+// "Subscribe for updates" (api/subscribe.js, api/confirm.js,
+// api/unsubscribe.js), "Send feedback" (api/feedback.js), and the shared
+// api/_mail.js.
 //
 // No network and no Resend key: global fetch is replaced with a stub that
 // records every call and answers as Resend would, so these check exactly what
@@ -15,6 +15,7 @@ const mail = require("../api/_mail.js");
 const subscribe = require("../api/subscribe.js");
 const confirm = require("../api/confirm.js");
 const unsubscribe = require("../api/unsubscribe.js");
+const feedback = require("../api/feedback.js");
 
 // The addresses as committed, copied before any test below swaps in its own.
 const SHIPPED = JSON.parse(JSON.stringify(mail.ADDRESSES));
@@ -54,7 +55,7 @@ const DAY = 86400 * 1000;
 // Resend's answers, queued per call; anything unqueued is a plain success.
 let calls = [], answers = [];
 global.fetch = async (url, init) => {
-  calls.push({ url, method: init.method, body: init.body ? JSON.parse(init.body) : undefined });
+  calls.push({ url, method: init.method, auth: init.headers.Authorization, body: init.body ? JSON.parse(init.body) : undefined });
   const a = answers.shift() || { status: 200, body: { id: "stub-id" } };
   if (a.throws) throw a.throws;
   return { ok: a.status >= 200 && a.status < 300, status: a.status, json: async () => a.body };
@@ -109,6 +110,22 @@ const UNSUBSCRIBED = { status: 200, body: { object: "contact", id: "c1", email: 
 // ---- groups ----------------------------------------------------------------
 
 const SUB = { email: "reader@example.org" };
+
+// What the widget (assets/report-issue.js) posts.
+const REPORT = {
+  type: "correction",
+  productId: "coartem-baby",
+  productName: "Coartem Baby",
+  message: "Tanzania approved this in June 2026 — TMDA register entry TZ/123.",
+  name: "Amina",
+  email: "amina@moh.example",
+  organisation: "Ministry of Health",
+  page: { url: "https://" + HOST + "/illustrated-journey-dashboard.html", path: "/illustrated-journey-dashboard.html", title: "LAUNCH", view: "illustrated" },
+  data: { lastUpdated: "2026-09-20", dataStatus: "draft" },
+  submittedAt: "2026-10-02T10:00:00.000Z",
+  userAgent: "Mozilla/5.0 test"
+};
+const withReport = over => Object.assign({}, REPORT, over);
 
 group("request guard", async () => {
   let r = await call(subscribe, { method: "GET" });
@@ -334,6 +351,85 @@ group("confirm — pressing the button", async () => {
   is("an expired link cannot be confirmed", [r.status, r.calls.length], [400, 0]);
 });
 
+group("feedback — request guard and configuration", async () => {
+  // The guard is _mail.js's, tested in full above through subscribe; these
+  // check feedback goes through it at all.
+  let r = await call(feedback, { method: "GET" });
+  is("GET is refused with 405", r.status, 405);
+  r = await call(feedback, { headers: { origin: "https://evil.example" }, body: REPORT });
+  is("another site's Origin is refused with 403", [r.status, r.calls.length], [403, 0]);
+  r = await call(feedback, { headers: { origin: "https://" + HOST }, body: REPORT });
+  is("the page's own Origin is accepted", r.status, 200);
+  r = await call(feedback, { headers: { "content-type": "text/plain" }, body: JSON.stringify(REPORT) });
+  is("text/plain is refused with 415", r.status, 415);
+  r = await call(feedback, { bodyThrows: true });
+  is("malformed JSON is a 400, not a crash", r.status, 400);
+
+  r = await call(feedback, { env: { UNSUBSCRIBE_SECRET: SECRET }, body: REPORT });
+  is("no RESEND_API_KEY → 503", [r.status, r.calls.length], [503, 0]);
+  ok("  and the log names what is needed", r.logs.some(l => l.startsWith("[feedback] not configured") && l.includes("RESEND_API_KEY")));
+  r = await call(feedback, { env: { RESEND_API_KEY: "re_x" }, body: REPORT });
+  is("no UNSUBSCRIBE_SECRET → 503 too: one switch-on list for every function", r.status, 503);
+  r = await call(feedback, { addr: { to: [] }, body: REPORT });
+  is("no ADDRESSES.to → 503", r.status, 503);
+});
+
+group("feedback — the team's email", async () => {
+  let r = await call(feedback, { body: REPORT });
+  is("a valid report is a 200", r.status, 200);
+  ok("  answering ok with a LAUNCH-XXXXXXXX reference", r.json && r.json.ok === true && /^LAUNCH-[0-9A-F]{8}$/.test(r.json.ref), JSON.stringify(r.json));
+  is("  in exactly one call to Resend", r.calls.length, 1);
+  const c = r.calls[0];
+  is("  to the send-email endpoint", pathOf(c), "POST /emails");
+  is("  authorised with the key", c.auth, "Bearer re_test_key");
+  is("  addressed to ADDRESSES.to", c.body.to, ["team@example.org"]);
+  is("  from ADDRESSES.from (here the test sender)", c.body.from, "LAUNCH dashboard <onboarding@resend.dev>");
+  is("  with Reply-To set to the visitor", c.body.reply_to, "amina@moh.example");
+  ok("  subject carries type, medicine and the same reference",
+     c.body.subject === `[LAUNCH feedback] A data point looks wrong — Coartem Baby (${r.json.ref})`, c.body.subject);
+  ok("  text body carries the message", c.body.text.includes(REPORT.message));
+  ok("  and the page it came from", c.body.text.includes("Page: https://" + HOST + "/illustrated-journey-dashboard.html"));
+  ok("  and the data version the visitor saw", c.body.text.includes("Data version: 2026-09-20 · draft"));
+  is("  and is tagged for filtering in Resend", c.body.tags, [{ name: "form", value: "feedback" }]);
+  const r2 = await call(feedback, { body: REPORT });
+  ok("two reports get different references", r2.json.ref !== r.json.ref);
+
+  r = await call(feedback, { body: withReport({ email: null }) });
+  is("no email given → no reply_to at all", "reply_to" in r.calls[0].body, false);
+  ok("  and the team is told it cannot be answered", r.calls[0].body.text.includes("none given"));
+
+  r = await call(feedback, { body: withReport({ message: "too short" }) });
+  is("a message under 10 characters is a 400", [r.status, r.calls.length], [400, 0]);
+  r = await call(feedback, { body: withReport({ message: "          x         " }) });
+  is("padding does not count towards the 10", r.status, 400);
+  r = await call(feedback, { body: withReport({ message: "x".repeat(5000) }) });
+  is("a long message is capped at the widget's 2000", r.calls[0].body.text.split("\n")[2].length, 2000);
+  r = await call(feedback, { body: withReport({ message: "Line one of it\r\nline two" }) });
+  ok("line breaks in the message survive, as \\n", r.calls[0].body.text.includes("Line one of it\nline two"));
+  r = await call(feedback, { body: withReport({ email: "not-an-address" }) });
+  is("a malformed email is a 400", [r.status, r.calls.length], [400, 0]);
+
+  r = await call(feedback, { body: withReport({ type: "__proto__" }) });
+  ok("an unknown type falls back to 'Something else'", r.status === 200 && r.calls[0].body.subject.includes("Something else"));
+  r = await call(feedback, { body: withReport({ productName: null }) });
+  ok("no medicine → 'General'", r.calls[0].body.subject.includes("General — the dashboard as a whole"));
+  r = await call(feedback, { body: withReport({ productName: "X\r\nBcc: victim@example.org" }) });
+  ok("CR/LF typed into a field cannot break the subject line", !/[\r\n]/.test(r.calls[0].body.subject), JSON.stringify(r.calls[0].body.subject));
+  r = await call(feedback, { body: withReport({ message: '<script>alert(1)</script> <a href="https://phish.example">click</a>' }) });
+  const html = r.calls[0].body.html;
+  ok("HTML in the message is escaped, not rendered", html.includes("&lt;script&gt;") && !html.includes("<script>"));
+  ok("  and no visitor URL becomes a link", !html.includes('href="https://phish.example"'));
+  r = await call(feedback, { body: withReport({ page: "a string", data: 7, name: 42, userAgent: {} }) });
+  is("wrong-typed optional fields are ignored, not fatal", r.status, 200);
+
+  r = await call(feedback, { body: REPORT, answer: [{ status: 403, body: { name: "validation_error", message: "You can only send testing emails to your own email address" } }] });
+  is("Resend refusing is a 502 to the widget", r.status, 502);
+  is("  answering ok:false, which the widget shows as its failure message", r.json.ok, false);
+  ok("  and Resend's reason is in the log", r.logs.some(l => l.includes("HTTP 403 validation_error You can only send testing")));
+  r = await call(feedback, { body: REPORT, answer: [{ throws: Object.assign(new Error("timed out"), { name: "TimeoutError" }) }] });
+  is("a network failure or timeout is a 502, not a crash", r.status, 502);
+});
+
 group("unsubscribe", async () => {
   const t = token("unsubscribe");
   let r = await call(unsubscribe, { method: "GET", url: "/api/unsubscribe?t=" + t });
@@ -393,6 +489,13 @@ group("logs never carry the submission", async () => {
   ];
   ok("six runs, success and failure, each logged something", runs.every(r => r.logs.length > 0), JSON.stringify(runs.map(r => r.logs)));
   ok("  and none of it names the address", runs.every(r => r.logs.every(l => !l.includes("private.person"))), JSON.stringify(runs.map(r => r.logs)));
+
+  const text = "UNIQUE-MESSAGE-TEXT-7731";
+  let r = await call(feedback, { body: withReport({ message: "Please look at " + text, email: who }) });
+  ok("a sent report logs the reference only", r.logs.length === 1 && r.logs[0] === `[feedback] sent ${r.json.ref}`, JSON.stringify(r.logs));
+  r = await call(feedback, { body: withReport({ message: "Please look at " + text, email: who }), answer: [{ status: 500, body: { name: "application_error", message: "An unexpected error occurred." } }] });
+  ok("a failed report logs neither message nor address",
+     r.logs.length > 0 && r.logs.every(l => !l.includes(text) && !l.includes("private.person")), JSON.stringify(r.logs));
 });
 
 (async () => {

@@ -4,8 +4,8 @@
 // Transforms the English page in memory (writes nothing) and checks what the
 // handover depends on: the data comes only from dashboard.json, the page's own
 // code waits for it, paths point at the shared folders, the menu and Subscribe
-// are gone, and a page that has drifted from what the build expects fails
-// loudly instead of producing a broken bundle.
+// are gone, Send feedback is not connected, and a page that has drifted from
+// what the build expects fails loudly instead of producing a broken bundle.
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -23,6 +23,8 @@ ok(/src="assets\/report-issue\.js"/.test(out), "the feedback widget loads from t
 ok(!/(src|href)="(assets|data)\/(?!world-map\.js"|world-map-geo\.js"|report-issue\.js")/.test(out), "every other relative asset path points one level up");
 ok(!/site-nav\.js/.test(out), "no site menu");
 ok(/#sub-open, #subwrap \{ display: none !important; \}/.test(out), "Subscribe hidden");
+ok(/\bconnected\s*:\s*true\b/.test(html) && !/\bconnected\s*:\s*true\b/.test(out) && /\bconnected: false\b/.test(out),
+   "Send feedback, connected on the LAUNCH site, is not connected here");
 ok(/LANG = "fr"/.test(out) && /dashboard\.json/.test(out), "the loader reads dashboard.json in the page's language");
 const app = (out.match(/<script type="text\/x-launch-app">/g) || []).length;
 const plain = (html.match(/<script>/g) || []).length;

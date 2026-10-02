@@ -1,8 +1,8 @@
 // Shared code for the Vercel functions behind the illustrated journey page's
-// forms — today the three of "Subscribe for updates": api/subscribe.js,
-// api/confirm.js and api/unsubscribe.js. api/feedback.js ("Send feedback")
-// joins them next. The leading underscore keeps Vercel from deploying this
-// file as a route of its own.
+// forms: the three of "Subscribe for updates" (api/subscribe.js,
+// api/confirm.js, api/unsubscribe.js) and "Send feedback" (api/feedback.js).
+// The leading underscore keeps Vercel from deploying this file as a route of
+// its own.
 //
 // Resend is called with plain fetch, not its npm package: the repo has no
 // package.json on purpose (docs/developer-guide.md §1), and a handful of
@@ -131,9 +131,21 @@ function line(v, max) {
   return v.replace(/[\u0000-\u001f\u007f]+/g, " ").trim().slice(0, max);
 }
 
+// A block of visitor text: keeps line breaks and tabs, drops other controls.
+function block(v, max) {
+  if (typeof v !== "string") return "";
+  return v.replace(/\r\n?/g, "\n").replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "").trim().slice(0, max);
+}
+
 function esc(s) {
   return String(s).replace(/[&<>"']/g, c =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+// A feedback report's reference. The visitor is shown it and may quote it, so
+// it also goes in the subject line of the team's copy, where search finds it.
+function newRef() {
+  return "LAUNCH-" + crypto.randomBytes(4).toString("hex").toUpperCase();
 }
 
 // ---- links in emails ---------------------------------------------------------
@@ -355,6 +367,6 @@ function addToSegment(cfg, email) {
 module.exports = {
   ADDRESSES, EMAIL_RE, DASHBOARD, CONFIRM_DAYS,
   config, reply, readRequest, notConfigured, logNotConfigured,
-  line, esc, siteUrl, makeToken, readToken, readLink, page,
+  line, block, esc, newRef, siteUrl, makeToken, readToken, readLink, page,
   render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure
 };

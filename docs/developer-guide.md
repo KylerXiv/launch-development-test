@@ -18,11 +18,12 @@ The reason: the dataset is tiny (a handful of products ×
 upgrade, or break.
 
 **One exception, since 1 Oct 2026:** `api/` holds Vercel functions behind the
-illustrated journey page's Subscribe form: `subscribe.js` emails a confirm
-link, `confirm.js` saves the address in Resend and tells the team, and
-`unsubscribe.js` takes it off again. They need no install either — no
-package.json, plain `fetch`. Nothing else talks to them, and every page still
-works without them. Send feedback is to follow (§9c is unchanged until then).
+illustrated journey page's two forms. For Subscribe, `subscribe.js` emails a
+confirm link, `confirm.js` saves the address in Resend and tells the team,
+and `unsubscribe.js` takes it off again. For Send feedback (since 2 Oct),
+`feedback.js` emails the report to the team (§9c). They need no install
+either — no package.json, plain `fetch`. Nothing else talks to them, and
+every page still works without them.
 
 ## 2. Repo map
 
@@ -35,7 +36,7 @@ works without them. Send feedback is to follow (§9c is unchanged until then).
 | `widget.html` | Embeddable one-row product tracker for partner sites (`?product=<id or name>`). Dependency-free; reads the same data file. |
 | `data/products.js` | The data contract: `window.LAUNCH_DATA = { …strict JSON… }`. The only file analysts touch; **feeds all three pages**. |
 | `assets/report-issue.js` | The **Send feedback** front end (DEV-04; called "Report an issue" until 30 Sep 2026): floating pill and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. No backend yet; see §9c. |
-| `api/` | Vercel functions for the illustrated journey page's forms, double opt-in: `subscribe.js` (emails a confirm link, saves nothing), `confirm.js` (the link's page → Resend contact, welcome email, team inbox), `unsubscribe.js` (the welcome's link and the mail app's one-click unsubscribe), and `_mail.js` (shared, and where the addresses are set; the underscore keeps it from being a route). The two secrets, `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET`, are env vars on the Vercel project. Decisions in [email-backend-notes.md](email-backend-notes.md). |
+| `api/` | Vercel functions for the illustrated journey page's forms. Subscribe, double opt-in: `subscribe.js` (emails a confirm link, saves nothing), `confirm.js` (the link's page → Resend contact, welcome email, team inbox), `unsubscribe.js` (the welcome's link and the mail app's one-click unsubscribe). Send feedback: `feedback.js` (the report → team inbox, Reply-To the visitor). And `_mail.js` (shared, and where the addresses are set; the underscore keeps it from being a route). The two secrets, `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET`, are env vars on the Vercel project. Decisions in [email-backend-notes.md](email-backend-notes.md). |
 | `data/world-map.js` | Generated geometry: `window.LAUNCH_MAP = { w, h, countries: { ISO3: { n, d } } }`. Natural Earth 110m, public domain. Committed output — regenerate with `scripts/build-map.js`, never hand-edit. |
 | `history/` | Dated snapshots of the data file, bot-committed by `publish.yml` on every data change. Append-only, one per date: a later change the same day replaces that day's snapshot, so it holds the day's final state. The raw material for future trend charts and playback. |
 | `feed.xml` | RSS 2.0 feed of changelog entries, bot-rebuilt by `publish.yml`. |
@@ -200,14 +201,17 @@ No test framework by design; two layers instead:
   snippets when they do.
 - No secrets exist anywhere in the repo or its history; the confirmation
   register lives outside the repo by policy.
-- **The Subscribe form needs `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET` on the
-  Vercel project**, never in the repo. The addresses it sends from and to are
-  not secret and are set in `api/_mail.js`. Without either secret, or with no
-  team inbox set, the form shows its failure message and the function log
-  says what is missing. Changing `UNSUBSCRIBE_SECRET` breaks every confirm and
-  unsubscribe link already emailed. The
-  function exists only on Vercel, so on any static host the form fails the
-  same way. Setup: [email-backend-notes.md](email-backend-notes.md) §1.
+- **The two forms (Subscribe, and Send feedback on the illustrated journey)
+  need `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET` on the Vercel project**,
+  never in the repo. The addresses they send from and to are not secret and
+  are set in `api/_mail.js`. Without either secret, or with no team inbox
+  set, each form shows its failure message and the function log says what
+  is missing. Changing `UNSUBSCRIBE_SECRET` breaks every confirm and
+  unsubscribe link already emailed. The functions exist only on Vercel, so
+  on any static host the forms fail the same way. That is why RBM's copies
+  of the page hide Subscribe and leave Send feedback unconnected
+  (`scripts/build-rbm-pages.js`). Setup and the rate-limit rule:
+  [email-backend-notes.md](email-backend-notes.md) §1.
 
 ## 9. Extension notes
 
@@ -298,33 +302,37 @@ only the keys given change (see the `COPY` block for the strings, and `types` fo
 the four dropdown labels, whose *values* are fixed because a backend keys on
 them). Two keys are not wording: `view`, a short id such as `"pipeline"` that is
 sent as `page.view` so a report says which view it came from, and `connected`.
-Until `connected: true` is set (when `submitIssueReport()` posts to a real
-endpoint) the Send button is disabled and the dialog says "Mock only" in red.
-The illustrated journey, Pipeline and Story each set `view`, an intro and an
-example message in their own terms.
+Without `connected: true` the Send button is disabled and the dialog says
+"Mock only" in red. The illustrated journey, Pipeline and Story each set
+`view`, an intro and an example message in their own terms.
 
-**There is no backend.** The static-site architecture (§1) has nowhere to POST
-to, so the form validates, then reports success from the browser: the report is
-kept in `LAUNCH_REPORT_ISSUE.submitted` and logged to the console, and a
-reference id is shown to the reporter. **Nothing is sent anywhere** — say so to
-anyone demoing the prototype to real country teams.
+**Only the illustrated journey sends (since 2 Oct 2026).** It sets
+`connected: true`. Then `submitIssueReport()` POSTs the report to
+`/api/feedback` (`api/feedback.js`, §1), which emails it to the team inbox
+and answers with the reference the dialog shows. The note and done screen
+switch to wording that says the report was sent. The `/fr/` and `/pt/`
+editions are built from that page, so they send too. Every other page is a
+mock: Send is blocked, and **nothing is sent anywhere** — say so to anyone
+demoing those pages to real country teams. RBM's copies of the illustrated
+journey are hosted without `api/`, so `scripts/build-rbm-pages.js` turns
+`connected` off there. Switching another page on is that one key, on a page
+the LAUNCH Vercel project serves. Why it was built this way:
+[email-backend-notes.md](email-backend-notes.md) §2.12.
 
-Wiring a real endpoint (DEV-04b) is a one-function change: replace the body of
-`submitIssueReport()` at the top of the file with a `fetch()` (or override
-`LAUNCH_REPORT_ISSUE.submit` at runtime). It receives
+The payload, which `LAUNCH_REPORT_ISSUE.submit` can still be swapped for at
+runtime:
 
 ```js
 { type, productId, productName, message, name, email, organisation,
-  page: { url, path, title },
+  page: { url, path, title, view },
   data: { lastUpdated, dataStatus },   // which data version the reporter saw
   submittedAt, userAgent }
 ```
 
-and must resolve to `{ ok: true, ref: "<reference>" }` or throw — the dialog
-already renders the pending, success and failure states around it. Candidate
-back ends, cheapest first: a form-relay service (Formspree/Basin), a GitHub
-issue via a small serverless function, or RBM's own intake once the site moves
-off Pages. Whichever is chosen, keep the reference id: reporters quote it.
+The endpoint must answer `{ ok: true, ref: "<reference>" }`; anything else
+shows the dialog's failure message, with the report kept for a retry. Keep
+the reference: reporters quote it, and it is in the subject line of the
+team's copy.
 
 The `unitaid/` edition picks the form up automatically — the builder rewrites
 `src="assets/` to `src="../assets/`, and the component is themed entirely

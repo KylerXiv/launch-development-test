@@ -377,9 +377,14 @@ build.
 > Resend contact list plus a note to the team, made double opt-in the same
 > day: a confirm email first, then a welcome email with an unsubscribe link.
 > Item 4 stands for the secrets alone (`RESEND_API_KEY`,
-> `UNSUBSCRIBE_SECRET`); the addresses are set in `api/_mail.js`. Send
-> feedback follows as its own change, so the 13-page question below is still
-> open. All of it is in [email-backend-notes.md](../email-backend-notes.md).
+> `UNSUBSCRIBE_SECRET`); the addresses are set in `api/_mail.js`.
+>
+> **Send feedback built 2 Oct 2026** on `email-feedback`: `api/feedback.js`
+> emails the team inbox, Reply-To the visitor. The 13-page question below was
+> answered by the owner: **the illustrated journey only** (with its `/fr/`
+> and `/pt/` editions). Every other page stays a mock, and so do RBM's copies,
+> which are hosted without `api/`. All of it is in
+> [email-backend-notes.md](../email-backend-notes.md) (§2.12 for feedback).
 
 **Both buttons already have exactly one seam each**, left deliberately by the
 work that built them: `subscribeEmail()` at
