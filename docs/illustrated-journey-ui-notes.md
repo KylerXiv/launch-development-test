@@ -1287,6 +1287,16 @@ screens and hid its summary, so a laptop reader could not close it.
   runs, `/fr` and `/pt` show "Hide the sources" in English.
 - **Printing hides the summary** (`beforeprint` already opens the list), so a printout does not
   say "Hide the sources".
+- **More room around the toggle (option B).** With the toggle visible on desktop, the old
+  spacing looked cramped: box padding 10 × 18 px, and 10 px from the toggle to the intro.
+  The owner picked option B from an options page of five: the same box, a toggle row at least
+  48 px tall (12 px above and below), side padding 20 px, a chevron after the count instead of
+  the browser's ▸ (it turns over when open; no turning when the reader prefers reduced motion),
+  a rule under the toggle when open, then 14 px to the intro, and 8 px bottom padding so the
+  list's last margin stays inside the box. *Not chosen:* A, today's spacing; C, a tinted
+  header bar with a round chevron button on the right; D, an accent button with no box; E, the
+  "Sources" heading row as the toggle, with no box. **Sources only:** the Definitions and Recent
+  dashboard updates panels keep the old box for now.
 
 Checked in headless Chrome at 1280 px and 390 px, real time over CDP (swiftshader flags),
 0 script errors: open with "Hide the sources" on a laptop, closed with "Show the sources" on a
