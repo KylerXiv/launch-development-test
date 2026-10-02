@@ -298,6 +298,20 @@ change (not in the verify block; not investigated).
 - `docs/translation-notes.md` and `docs/jackson/DEV-31.md` describe three
   buckets. This document supersedes that part.
 
+## 9a. After the merge into main (PR #52, 2 Oct 2026)
+
+PR #52 was merged with main's #48 to #50 through GitHub's conflict editor. The result
+matched the intended resolution. Two gaps were fixed afterwards, on `fix/post-merge-i18n`:
+
+- `shortDate()`, new in #50, formatted dates as `en-GB` on every page; it now uses
+  `DATE_LANG`, like the page's other date helpers.
+- "Please reload the page to try again." (new error banner in #50) follows a `</b>`
+  inside a literal, so the text-node pattern cannot see it; it is now a reviewed entry.
+
+"Drug" (also new) is a schema.org `@type` in the page's JSON-LD and stays English.
+
+After the bot's run (`dac539f`) the locale build reports 621 translated strings for French and 622 for Portuguese (100% coverage). The one new string from this follow-up waits for the next bot run.
+
 ## 10. Status
 
 | | |
