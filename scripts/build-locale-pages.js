@@ -13,7 +13,7 @@
  * Output, ready for build-public-site.sh to copy:
  *
  *   dist/locale/fr/illustrated-journey-dashboard.html
- *   dist/locale/fr/data/{products,resistance,molecular-markers}.js
+ *   dist/locale/fr/data/products.js
  *   dist/locale/pt/...
  *
  * Why per-locale copies of the data files: the page loads data/*.js with
@@ -51,16 +51,14 @@ const HTML_LANG = { fr: "fr", pt: "pt-PT" };
 
 const GLOBALS = {
   "data/products.js": "window.LAUNCH_DATA",
-  "data/resistance.js": "window.LAUNCH_RESISTANCE",
-  "data/molecular-markers.js": "window.LAUNCH_MOLECULAR_MARKERS",
 };
 
 
-// Drug, marker and species names are LOOKUP KEYS. The build never translates an
-// object key, so translating the same string anywhere else — a dict column, a
-// page constant like PRODUCT_DRUG — breaks the match and empties the threat map
-// with no error at all. Enforced here as well as in the extractor, so a stale
-// memory entry from an earlier run can never be substituted back in.
+// Strings that are LOOKUP KEYS (see scripts/i18n-identifiers.js — empty at
+// present). The build never translates an object key, so translating the same
+// string anywhere else breaks the match with no error at all. Enforced here as
+// well as in the extractor, so a stale memory entry from an earlier run can
+// never be substituted back in.
 const IDENT = identifiers(ROOT);
 
 const isCodeChars = (t) => /[!=&|{}\\]/.test(t) || /=>/.test(t) ||
@@ -133,28 +131,6 @@ function localiseProducts(D, loc) {
   return D;
 }
 
-function localiseSurveillance(D, loc) {
-  const T = (v) => (typeof v === "string" && v.trim() ? tr(loc, v) : v);
-  const m = D.meta || {};
-  ["metric", "rule", "derivation"].forEach((k) => { if (m[k]) m[k] = T(m[k]); });
-  if (m.metrics) for (const k of Object.keys(m.metrics)) {
-    if (m.metrics[k].short) m.metrics[k].short = T(m.metrics[k].short);
-    if (m.metrics[k].full) m.metrics[k].full = T(m.metrics[k].full);
-  }
-  if (m.markerDrug) for (const k of Object.keys(m.markerDrug)) m.markerDrug[k] = T(m.markerDrug[k]);
-  // dict.source and dict.citation are provenance — deliberately untouched.
-  //
-  // dict.drug and dict.marker are JOIN KEYS and must stay English. The page does
-  //     dict[field].indexOf(value)
-  // against keys of the untranslated pivot object, so a translated dictionary
-  // silently matches nothing and the threat map renders empty. dict.country is
-  // display-only (the location filter matches iso3) and is safe to translate.
-  for (const col of ["country"]) {
-    if (Array.isArray((D.dict || {})[col])) D.dict[col] = D.dict[col].map(T);
-  }
-  return D;
-}
-
 // ---------------------------------------------------------------------------
 // the page
 // ---------------------------------------------------------------------------
@@ -208,7 +184,7 @@ function localisePage(html, loc) {
   jsPart = jsPart.replace(LIT, (whole, q, body) => {
     const t = body.trim();
     if (!t) return whole;
-    if (IDENT.has(t)) return whole;             // PRODUCT_DRUG and friends are lookup keys
+    if (IDENT.has(t)) return whole;             // lookup keys are never translated
     const e = entryOf(t);
     if (!e || !e[loc]) return whole;
     const out = e[loc];
@@ -246,97 +222,44 @@ function localisePage(html, loc) {
 // ---------------------------------------------------------------------------
 // Post-build self-check.
 //
-// Both failures on 23 September were SILENT: a translated lookup key made the
-// threat map draw nothing while the page rendered perfectly and logged nothing.
-// A build that can fail without saying so will fail again, so the build now
-// proves the locale output still resolves the same rows as the English does,
+// A translated lookup key fails SILENTLY: the page renders and logs nothing, but
+// whatever was keyed on it draws nothing. The 23 September failures were of this
+// kind, on the drug and marker keys of the WHO study-result layers. Those layers
+// have since been removed (docs/handoff-remove-study-layers.md); the lookup keys
+// that remain are the product ids shared by products.js, the page and
+// treatment-policy.js. So the build proves each locale copy still carries the
+// same product ids, in the same order, and the same number of stages as English,
 // and exits non-zero when it does not.
 // ---------------------------------------------------------------------------
 function readGlobal(file, marker) {
   const src = fs.readFileSync(file, "utf8");
   const at = src.indexOf(marker + " =");
   if (at === -1) throw new Error(`${file}: marker "${marker} =" not found`);
-  return JSON.parse(src.slice(at + marker.length + 2).trim().replace(/;\s*$/, ""));
-}
-
-// the page's own lookup constants, read out of whichever copy we are checking
-function pageKeys(html) {
-  const grab = (re) => { const m = re.exec(html); return m ? m[1] : ""; };
-  const strs = (t) => [...t.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
-  return {
-    drugs:   strs(grab(/const PRODUCT_DRUG = \{([^}]*)\}/)),
-    markers: strs(grab(/const PRODUCT_MARKER = \{([^}]*)\}/)),
-    species: grab(/const FALLBACK_SPECIES = "([^"]+)"/),
-  };
-}
-
-// how many study rows and sites the page would draw for one drug and species
-function drawn(R, drug, species) {
-  const AT = {}; R.fields.forEach((f, i) => { AT[f] = i; });
-  const di = R.dict.drug.indexOf(drug), si = R.dict.species.indexOf(species);
-  if (di < 0 || si < 0) return { rows: 0, sites: 0, resolved: false };
-  const sites = new Set(); let rows = 0;
-  for (const r of R.studies) {
-    if (r[AT.drug] !== di || r[AT.species] !== si) continue;
-    if (typeof r[AT.v] !== "number") continue;
-    rows++; sites.add(r[AT.iso3] + "|" + r[AT.site]);
-  }
-  return { rows, sites: sites.size, resolved: true };
+  return JSON.parse(src.slice(at + marker.length + 2).trim().replace(/;s*$/, ""));
 }
 
 function profile(dir) {
-  const html = fs.readFileSync(path.join(dir, PAGE), "utf8");
-  const R = readGlobal(path.join(dir, "data", "resistance.js"), GLOBALS["data/resistance.js"]);
-  const M = readGlobal(path.join(dir, "data", "molecular-markers.js"), GLOBALS["data/molecular-markers.js"]);
-  const k = pageKeys(html);
-  const out = { keys: k, drugs: {}, markers: {}, speciesOk: R.dict.species.indexOf(k.species) >= 0 };
-  for (const d of k.drugs) {
-    out.drugs[d] = {
-      pivot: !!(R.treatmentFailure || {})[d],
-      dict: R.dict.drug.indexOf(d) >= 0,
-      ...drawn(R, d, k.species),
-    };
-  }
-  for (const mk of k.markers) {
-    out.markers[mk] = {
-      pivot: !!(M.molecularMarkers || {})[mk],
-      dict: M.dict.marker.indexOf(mk) >= 0,
-    };
-  }
-  return out;
+  const D = readGlobal(path.join(dir, "data", "products.js"), GLOBALS["data/products.js"]);
+  return { ids: (D.products || []).map((p) => p.id), stages: (D.stages || []).length };
 }
 
 function verify() {
   const en = profile(ROOT);
   let failures = 0;
-  const say = (ok, msg) => { console.log(`       ${ok ? "\u2713" : "\u2717"} ${msg}`); if (!ok) failures++; };
+  const say = (ok, msg) => { console.log(`       ${ok ? "✓" : "✗"} ${msg}`); if (!ok) failures++; };
 
-  console.log("\n  Self-check \u2014 locale output must resolve the same rows as English:");
+  console.log("\n  Self-check — locale output must keep the same lookup keys as English:");
   for (const loc of LOCALES) {
     const lc = profile(path.join(OUT, loc));
     console.log(`\n    ${loc}`);
-
-    say(lc.keys.species === en.keys.species && lc.speciesOk,
-        `FALLBACK_SPECIES "${lc.keys.species}" resolves in dict.species`);
-
-    for (const d of en.keys.drugs) {
-      const a = en.drugs[d], b = lc.drugs[d];
-      if (!b) { say(false, `PRODUCT_DRUG "${d}" was rewritten to "${lc.keys.drugs.join('", "')}"`); continue; }
-      say(b.pivot && b.dict, `PRODUCT_DRUG "${d}" resolves in the pivot and dict.drug`);
-      say(b.rows === a.rows && b.sites === a.sites,
-          `"${d}" draws ${b.rows} rows / ${b.sites} sites  (English: ${a.rows} / ${a.sites})`);
-    }
-    for (const mk of en.keys.markers) {
-      const b = lc.markers[mk];
-      if (!b) { say(false, `PRODUCT_MARKER "${mk}" was rewritten`); continue; }
-      say(b.pivot && b.dict, `PRODUCT_MARKER "${mk}" resolves in the pivot and dict.marker`);
-    }
+    say(JSON.stringify(lc.ids) === JSON.stringify(en.ids), `product ids unchanged (${en.ids.join(", ")})`);
+    say(lc.stages === en.stages, `${lc.stages} stages  (English: ${en.stages})`);
   }
 
   if (failures) {
-    console.error(`\n  BUILD FAILED \u2014 ${failures} check(s) did not pass.`);
+    console.error(`\n  BUILD FAILED — ${failures} check(s) did not pass.`);
     console.error("  A lookup key has been translated. The page would render fine and the");
-    console.error("  threat map would be EMPTY. See docs/jackson/DEV-31.md (rule 1b)");
+    console.error("  data keyed on it would silently not match. See docs/jackson/DEV-31.md (rule 1b)");
     console.error("  and scripts/i18n-identifiers.js.\n");
     process.exit(1);
   }
@@ -355,8 +278,6 @@ function main() {
 
     const page = localisePage(html, loc);
     const products = localiseProducts(readData("data/products.js"), loc);
-    const resistance = localiseSurveillance(readData("data/resistance.js"), loc);
-    const markers = localiseSurveillance(readData("data/molecular-markers.js"), loc);
 
     const s = stat[loc];
     const pct = s.hit + s.miss ? Math.round((s.hit / (s.hit + s.miss)) * 100) : 0;
@@ -368,8 +289,6 @@ function main() {
       const write = (name, global, obj) =>
         fs.writeFileSync(path.join(dataDir, name), `${global} = ${JSON.stringify(obj)};\n`, "utf8");
       write("products.js", GLOBALS["data/products.js"], products);
-      write("resistance.js", GLOBALS["data/resistance.js"], resistance);
-      write("molecular-markers.js", GLOBALS["data/molecular-markers.js"], markers);
       // the page also loads these, unchanged
       for (const f of ["world-map.js", "world-map-geo.js"]) {
         fs.copyFileSync(path.join(ROOT, "data", f), path.join(dataDir, f));

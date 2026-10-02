@@ -199,56 +199,15 @@ No test framework by design; two layers instead:
   CDN — **except `illustrated-journey-dashboard.html`**, which loads MapLibre
   GL JS from a CDN for its own map rendering only (see below); the other 11 pages sharing
   `data/world-map.js` are unaffected and remain fully self-contained.
-- **Resistance overlay** (implemented, `illustrated-journey-dashboard.html`
-  only): WHO Malaria Threat Map treatment-failure results drawn as graduated,
-  clustered, pan/zoomable dots on top of the access choropleth, rendered with
-  MapLibre GL JS against a page-only 50m GeoJSON basemap
-  (`data/world-map-geo.js`/`scripts/build-map-geo.js` — a sibling to
-  `build-map.js`, not a replacement for it). The fill describes the *product*,
-  the dots describe the *parasite*, so the two never compete for one visual
-  channel. Data is the committed `data/resistance.js`
-  (`scripts/normalize-resistance.js`; manual export step in
-  `sourcing/README.md`), validated by a `validate-data.js` pass that runs only
-  on the default invocation, unchanged by the rendering engine. The MapLibre
-  dependency deliberately overrides this repo's otherwise strict
-  no-runtime-dependency rule, for this one page only, because a pan/zoom map
-  with per-site dots could not be built on the hand-rolled SVG renderer it
-  replaced; the reasoning is kept in the page's own `---- MapLibre init`
-  comment block. The bullets below describe the *feature*, not the current
-  renderer, and predate that migration.
-  - **Nothing is filtered.** All five *Plasmodium* species and studies of every
-    size are shipped. Only rows WHO publishes with no usable value (a literal
-    `NaN`) or no coordinates are dropped, and the normalizer counts them aloud.
-  - **One dot per study site**, clustered where sites sit too close to draw
-    apart at the current zoom (country-scoped — a cluster never crosses a
-    border). A site's own dot is its most recent study; a cluster is its
-    members' most recent studies, **patient-weighted** so one small study
-    cannot decide the colour. (Superseded from an earlier one-dot-per-country
-    model, which let a country's most recent year be decided by a handful of
-    patients — Kenya read 0% off 44 patients while ignoring 883 including
-    Siaya at 11.5%.)
-  - **Click a dot** for every study behind it — a sortable panel below the map
-    (site, region, year, patients, failure %, linked source). That is where the
-    site-level detail lives instead of zoom.
-  - **Species and drug are not independent**: chloroquine has no falciparum
-    studies at all, so pairings with no data are *disabled* in the species
-    select with their country counts shown. An empty map must never be
-    readable as "no resistance here".
-  - **The drug select is one flat A–Z list**, each option labelled with the
-    number of countries it will actually paint — 17 of the 26 drugs cover fewer
-    than five countries and 11 cover exactly one, and alphabetical order
-    scatters those through the list rather than sinking them.
-  - `studies[]` is stored as rows against `fields[]` with the repetitive
-    columns held as indices into `dict[]` — that halves the committed file
-    (373 KB → 183 KB), which matters because it is regenerated whole on every
-    WHO extract.
-  - **The two layers keep separate tooltips and separate provenance lines on
-    purpose**: the access layer is illustrative for most countries while the
-    resistance values are published WHO results, so the page must not invite a
-    reader to combine them until the country survey is verified. The
-    aggregation rule in `meta.rule` is printed under the map — if the rule
-    changes, the sentence on the page changes with it. `index.html`,
-    `option-b.html` and `story.html` are deliberately untouched.
+- **Resistance overlay** (removed, 1 Oct 2026): the three WHO study-result layers
+  (treatment failure, delayed parasite clearance, molecular markers) and their
+  data, normalizers, validator checks and click-through panel are gone from
+  `illustrated-journey-dashboard.html`; the page points readers to the WHO
+  Malaria Threats Map instead. What was removed, what else it touched and what a
+  merging repo must do is in
+  [docs/handoff-remove-study-layers.md](handoff-remove-study-layers.md). The
+  MapLibre dependency above is still in place; its original justification (the
+  per-site dots) no longer applies — see that document's "Deferred" list.
 - **History snapshots + RSS feed** (implemented): `.github/workflows/publish.yml`
   runs only on `data/products.js` changes, commits `history/products-<date>.js`
   and a rebuilt `feed.xml` as a bot. It cannot retrigger itself (path filter).
