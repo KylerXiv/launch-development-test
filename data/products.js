@@ -32,7 +32,7 @@
 window.LAUNCH_DATA =
 {
   "meta": {
-    "lastUpdated": "2026-10-02",
+    "lastUpdated": "2026-10-06",
     "dataStatus": "draft",
     "host": "RBM Partnership to End Malaria"
   },
@@ -81,6 +81,7 @@ window.LAUNCH_DATA =
     "GMP": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites."
   },
   "changelog": [
+    { "date": "2026-10-06", "product": "All", "change": "Country access map: the illustrative country lists for ASPY and DHA–PPQ are replaced with verified ones. A country is shown only when a national medicines regulator's register, a WHO publication or a peer-reviewed paper supports its stage; every other country shows No data. ASPY: 13 countries (Nigeria, Rwanda, Burkina Faso and Kenya in MFT plans; Ghana, Viet Nam, DR Congo, Cameroon, Thailand, Republic of Korea and South Sudan in national guidelines; Tanzania and Zambia registered). DHA–PPQ: 15 countries (Nigeria, Rwanda, Burkina Faso and Kenya in MFT plans; Tanzania, Viet Nam, Thailand, Indonesia, Ghana, Angola, Cameroon, Gabon and Papua New Guinea in national guidelines; Zambia and Zimbabwe registered). Removed for lack of such a source: Cambodia, Côte d'Ivoire, Uganda, Mozambique, Senegal, Mali and Myanmar (ASPY); Cambodia, Mozambique, Senegal, Myanmar, Lao PDR, China and India (DHA–PPQ). Each entry now cites its sources and the date checked. New sources: the Zambia, Zimbabwe, Viet Nam and Rwanda registers (fetched monthly), the WHO national drug policy table, the WHO MFT implementation guide, and three peer-reviewed MFT papers (Rwanda, Burkina Faso, Kenya).", "plain": "The country access map now shows only countries we can back with an official or peer-reviewed source. Some countries moved stage, some were added, and those we could not confirm now show No data. New sources include four national medicine registers and WHO's guide to using several first-line treatments." },
     { "date": "2026-10-02", "product": "All", "change": "Illustrated journey dashboard, wording changes from reviewer feedback. Price: the per-medicine price card is removed (the price field stays in the data for the other pages). Procurement: the step is now \"Procurement (public channels)\" and says it covers Global Fund-financed procurement only. Regulatory approval: the step and the page footer say health-authority review status is generally not public. GanLum: manufacturer and research lead now read \"Novartis\", the line \"Co-developed with MMV under access-oriented partnership\" is removed, and the required acknowledgement (new `acknowledgement` field) is shown in the medicine's details. A disclaimer is added to the footer and linked from the draft banner.", "plain": "We changed some wording after reviewer feedback. The price card is gone, the procurement step is labelled as public channels only, and the page now says that health-authority review progress is usually not public. GanLum now credits Novartis as its developer, with the required acknowledgement of its funders, and the page has a disclaimer." },
     { "date": "2026-10-01", "product": "All", "change": "Illustrated journey dashboard: the three WHO study-result layers (treatment failure, delayed parasite clearance, molecular markers of drug resistance) were removed from the country access map, together with their data files and sourcing. Drug-resistance results are no longer reproduced here; the page links to the WHO Malaria Threats Map instead. The map's controls were also reorganised: access stages and MFT policy groups are now tickable filters in the left rail, replacing the MFT switch, and the legend under the map lists only what is ticked. The Detail panel is now an overview dashboard with a country finder, and every country on the map opens its own page for the selected medicine. The 5 Sep 2026 entry below records when the layers were added.", "plain": "We removed the drug-resistance results from the map. For that information, the page now points to the WHO Malaria Threats Map. The map's filters and legend have been tidied up, and you can now click any country to see its page." },
     { "date": "2026-09-10", "product": "All", "change": "Terminology: the two product `flag` sentences now say \"access barrier\" rather than \"bottleneck\", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed.", "plain": "We now call a blocked step an \"access barrier\" instead of a \"bottleneck\". Only the wording changed — no figures or dates were altered." },
@@ -230,25 +231,22 @@ window.LAUNCH_DATA =
         "research": { "lead": "MMV and partners", "geographies": "Ghana, Vietnam, Burkina Faso and others (efficacy studies)", "timeline": "Ongoing", "question": "MFT deployment models with pyronaridine–artesunate" },
         "country": { "registered": 25, "inGuidelines": "TBC", "inMft": "TBC", "forecastDemand": "TBC" },
         "countries": {
-          "status": "illustrative",
-          "note": "Illustrative subset for design review — not actual country status, except: the NGA and TZA registered-level entries are verified against the national registers (NAFDAC Greenbook and TMDA IMIS2, extracts 23 Aug 2026). Replace the rest with the verified country survey.",
+          "status": "verified",
+          "note": "Every country listed is cited to a national medicines regulator's own register, a WHO publication or a peer-reviewed paper. Each entry's \"sources\" are ids in data/sources.js and \"checked\" is the date they were verified; \"mft\" says whether an MFT plan is a pilot, planned or national. Countries without such a source are left out and show No data. MMV's product map, meeting slides and news reports are not used. Rule agreed 5 Oct 2026; replaces the illustrative subset.",
           "list": [
-            { "iso3": "GHA", "level": "mft" },
-            { "iso3": "BFA", "level": "mft" },
-            { "iso3": "KEN", "level": "mft" },
-            { "iso3": "KHM", "level": "mft" },
-            { "iso3": "VNM", "level": "guidelines" },
-            { "iso3": "CIV", "level": "guidelines" },
-            { "iso3": "RWA", "level": "guidelines" },
-            { "iso3": "UGA", "level": "guidelines" },
-            { "iso3": "NGA", "level": "registered" },
-            { "iso3": "COD", "level": "registered" },
-            { "iso3": "TZA", "level": "registered" },
-            { "iso3": "MOZ", "level": "registered" },
-            { "iso3": "SEN", "level": "registered" },
-            { "iso3": "CMR", "level": "registered" },
-            { "iso3": "MLI", "level": "registered" },
-            { "iso3": "MMR", "level": "registered" }
+            { "iso3": "NGA", "level": "mft", "mft": "planned", "sources": ["who-mft-guide", "nafdac", "who-wmr-annex-4b"], "checked": "2026-10-05", "note": "WHO MFT guide: planned pilot, 40% ASPY in the SMC states" },
+            { "iso3": "RWA", "level": "mft", "mft": "national", "sources": ["bmjgh-rwanda-mft", "who-mft-guide", "rwanda-fda"], "checked": "2026-10-05", "note": "ASPY assigned to the western region" },
+            { "iso3": "BFA", "level": "mft", "mft": "pilot", "sources": ["malariaj-burkina-mft", "who-wmr-annex-4b"], "checked": "2026-10-05", "note": "Kaya district pilot with ASPY, DHA-PPQ and AL; first-line in national policy" },
+            { "iso3": "KEN", "level": "mft", "mft": "pilot", "sources": ["malariaj-kenya-mft"], "checked": "2026-10-05", "note": "Homa Bay pilot, June 2020 to June 2022" },
+            { "iso3": "GHA", "level": "guidelines", "sources": ["frontiers-ghana-tes"], "checked": "2026-10-05", "note": "First-line since 2022, alongside AS-AQ and AL; not yet in the WHO 2024 policy table" },
+            { "iso3": "VNM", "level": "guidelines", "sources": ["who-wmr-annex-4b", "dav"], "checked": "2026-10-05", "note": "Listed for unconfirmed (untested) P. falciparum" },
+            { "iso3": "COD", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05" },
+            { "iso3": "CMR", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05" },
+            { "iso3": "THA", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05" },
+            { "iso3": "KOR", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05", "note": "WHO writes \"PY\"; read as pyronaridine-artesunate" },
+            { "iso3": "SSD", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05", "note": "P. vivax treatment only" },
+            { "iso3": "TZA", "level": "registered", "sources": ["tmda"], "checked": "2026-10-05" },
+            { "iso3": "ZMB", "level": "registered", "sources": ["zamra"], "checked": "2026-10-05" }
           ]
         },
         "journey": [
@@ -313,25 +311,24 @@ window.LAUNCH_DATA =
         "research": { "lead": "Multiple academic consortia", "geographies": "Ghana, Mozambique, SE Asia (efficacy and MFT studies)", "timeline": "Ongoing", "question": "MFT rotation sequencing and resistance impact" },
         "country": { "registered": "TBC", "inGuidelines": "TBC", "inMft": "TBC", "forecastDemand": "TBC" },
         "countries": {
-          "status": "illustrative",
-          "note": "Illustrative subset for design review — not actual country status, except: NGA at registered level is verified (NAFDAC Greenbook), and TZA's registration is verified (TMDA IMIS2) though its MFT level shown here remains illustrative. Extracts 23 Aug 2026; replace the rest with the verified country survey.",
+          "status": "verified",
+          "note": "Every country listed is cited to a national medicines regulator's own register, a WHO publication or a peer-reviewed paper. Each entry's \"sources\" are ids in data/sources.js and \"checked\" is the date they were verified; \"mft\" says whether an MFT plan is a pilot, planned or national. Countries without such a source are left out and show No data. MMV's product map, meeting slides and news reports are not used. Rule agreed 5 Oct 2026; replaces the illustrative subset.",
           "list": [
-            { "iso3": "KHM", "level": "mft" },
-            { "iso3": "VNM", "level": "mft" },
-            { "iso3": "MOZ", "level": "mft" },
-            { "iso3": "TZA", "level": "mft" },
-            { "iso3": "SEN", "level": "mft" },
-            { "iso3": "THA", "level": "guidelines" },
-            { "iso3": "MMR", "level": "guidelines" },
-            { "iso3": "LAO", "level": "guidelines" },
-            { "iso3": "IDN", "level": "guidelines" },
-            { "iso3": "GHA", "level": "guidelines" },
-            { "iso3": "ZMB", "level": "guidelines" },
-            { "iso3": "CHN", "level": "registered" },
-            { "iso3": "IND", "level": "registered" },
-            { "iso3": "NGA", "level": "registered" },
-            { "iso3": "BFA", "level": "registered" },
-            { "iso3": "KEN", "level": "registered" }
+            { "iso3": "NGA", "level": "mft", "mft": "planned", "sources": ["who-mft-guide", "nafdac", "who-wmr-annex-4b"], "checked": "2026-10-05", "note": "WHO MFT guide: planned pilot, 40% DHA-PPQ in the SMC states" },
+            { "iso3": "RWA", "level": "mft", "mft": "national", "sources": ["bmjgh-rwanda-mft", "who-mft-guide", "rwanda-fda"], "checked": "2026-10-05", "note": "DHA-PPQ assigned to the eastern and central regions" },
+            { "iso3": "BFA", "level": "mft", "mft": "pilot", "sources": ["malariaj-burkina-mft", "who-wmr-annex-4b"], "checked": "2026-10-05", "note": "Kaya district pilot with ASPY, DHA-PPQ and AL; first-line in national policy" },
+            { "iso3": "KEN", "level": "mft", "mft": "pilot", "sources": ["malariaj-kenya-mft"], "checked": "2026-10-05", "note": "Homa Bay pilot, June 2020 to June 2022" },
+            { "iso3": "TZA", "level": "guidelines", "sources": ["tmda", "who-wmr-annex-4b"], "checked": "2026-10-05", "note": "Mainland policy; Zanzibar's own row does not list it" },
+            { "iso3": "VNM", "level": "guidelines", "sources": ["who-wmr-annex-4b", "dav"], "checked": "2026-10-05" },
+            { "iso3": "THA", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05" },
+            { "iso3": "IDN", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05" },
+            { "iso3": "GHA", "level": "guidelines", "sources": ["who-wmr-annex-4b", "frontiers-ghana-tes"], "checked": "2026-10-05", "note": "Listed for untested P. falciparum and P. vivax; second-line nationally" },
+            { "iso3": "AGO", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05" },
+            { "iso3": "CMR", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05" },
+            { "iso3": "GAB", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05" },
+            { "iso3": "PNG", "level": "guidelines", "sources": ["who-wmr-annex-4b"], "checked": "2026-10-05", "note": "Severe malaria only" },
+            { "iso3": "ZMB", "level": "registered", "sources": ["zamra"], "checked": "2026-10-05" },
+            { "iso3": "ZWE", "level": "registered", "sources": ["mcaz"], "checked": "2026-10-05" }
           ]
         },
         "journey": [

@@ -252,6 +252,24 @@
               seenIso.add(e.iso3);
               if (!["registered", "guidelines", "mft"].includes(e.level))
                 err(`${tag}: countries.list[${ei}].level must be registered/guidelines/mft`);
+              // Citation fields. Optional on illustrative/draft lists; a verified
+              // list must cite every entry, because "verified" is what removes the
+              // map warning. Source ids are checked against data/sources.js by
+              // scripts/validate-data.js, which has both files.
+              const at = `${tag}: countries.list[${ei}] (${e.iso3})`;
+              if (e.sources !== undefined && (!Array.isArray(e.sources) || !e.sources.length
+                  || e.sources.some((s) => !/^[a-z0-9][a-z0-9-]*$/.test(s || ""))))
+                err(`${at}: "sources" must be a non-empty array of data/sources.js ids`);
+              if (e.checked !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(e.checked))
+                err(`${at}: "checked" must be YYYY-MM-DD`);
+              if (e.mft !== undefined && (e.level !== "mft" || !["pilot", "planned", "national"].includes(e.mft)))
+                err(`${at}: "mft" is pilot/planned/national, and only on level "mft"`);
+              if (c.status === "verified") {
+                if (e.sources === undefined || e.checked === undefined)
+                  err(`${at}: a verified list needs "sources" and "checked" on every entry`);
+                if (e.level === "mft" && e.mft === undefined)
+                  err(`${at}: a verified MFT entry needs "mft" (pilot/planned/national)`);
+              }
             });
           }
         }
