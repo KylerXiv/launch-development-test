@@ -200,6 +200,12 @@ first real send tests the broadcast.
 
 **Open**
 
+- **GitHub Actions is blocked by billing on the test repository.** Since at
+  least 3 Oct 2026, every job is refused before it starts: "recent account
+  payments have failed or your spending limit needs to be increased". That
+  includes the monthly source fetch and the source watcher on 3 Oct, and CI
+  on this pull request. The daily email runs on Actions too, so nothing sends
+  until the account owner fixes it under Settings → Billing & plans.
 - **Page-wide lines go to subscribers** (§2). Owner to confirm, or filter out
   `product: "All"`.
 - **`SITE` in the script is the test deployment**,
@@ -228,8 +234,10 @@ first real send tests the broadcast.
 | | |
 | --- | --- |
 | Branch | `subscriber-updates`, from `main` at `b91bac2` (5 Oct) |
-| Commits | 1 |
-| Pull request | opened against `main` with this commit; CI runs on it |
+| Commits | 2: the feature; then this status, after CI could not start |
+| Push | pushed to `origin` |
+| Pull request | #54 against `main` |
+| CI | **did not run.** Every job was refused for billing (§4). The Vercel preview deployed. The same checks passed locally: the verify block as CLAUDE.md expects, 66 new tests, 153 mail tests |
 | New files | `scripts/notify-subscribers.js`, `scripts/test-notify-subscribers.js`, `.github/workflows/notify-subscribers.yml`, this document |
 | Changed | `api/_mail.js` (exports `resendRequest`), `.github/workflows/validate.yml` (runs the new tests), `docs/email-backend-notes.md` (§1 now points here), `docs/developer-guide.md` (workflow table) |
-| Waiting on | the `RESEND_API_KEY` repository secret, then merge (§1) |
+| Waiting on | GitHub billing (§4), the `RESEND_API_KEY` repository secret, then merge (§1) |
