@@ -60,10 +60,11 @@ every page still works without them.
 | `scripts/fetch-regulatory.js` | WHO PQ (medicines + vector control, CSV export) and EMA EU-M4all (nightly xlsx, zero-dep ZIP/xlsx reader) fetcher → `regulatory_events` staging CSV + listings watch report. |
 | `scripts/fetch-nafdac.js` | NAFDAC Greenbook (Nigeria) fetcher — server-side DataTables JSON endpoint, plain HTTP by necessity → `nafdac_registrations` staging CSV + registrations watch report. |
 | `scripts/fetch-tmda.js` | TMDA IMIS2 (Tanzania) fetcher — common-name lookup + paged public-search JSON backend → `tmda_registrations` staging CSV + registrations watch report. |
-| `scripts/register-lib.js` | Shared library for the ZAMRA, MCAZ and DAV fetchers: portfolio matching, one staging layout, snapshot and watch-report diff. Not run directly. |
+| `scripts/register-lib.js` | Shared library for the ZAMRA, MCAZ, DAV and Rwanda FDA fetchers: portfolio matching, one staging layout, snapshot and watch-report diff. Not run directly. |
 | `scripts/fetch-zamra.js` | ZAMRA (Zambia) fetcher — IMIS public-access JSON, whole register in one call; adds the intermediate certificate in `scripts/certs/` → `zamra_registrations` staging CSV + watch report. |
 | `scripts/fetch-mcaz.js` | MCAZ (Zimbabwe) fetcher — Kendo grid JSON, whole register in one POST → `mcaz_registrations` staging CSV + watch report. |
 | `scripts/fetch-dav.js` | DAV (Viet Nam) fetcher — JSON search per ingredient stem → `dav_registrations` staging CSV + watch report. |
+| `scripts/fetch-rwanda.js` | Rwanda FDA fetcher — one HTML page, rows read from their `data-*` attributes → `rwanda_registrations` staging CSV + watch report. |
 | `scripts/normalize-pqr.js` | Normalizes a **manually downloaded** Global Fund PQR Tableau crosstab (UTF-16/TSV tolerant) → `procurement_transactions` staging CSV + gzipped raw copy. Scripted PQR export is WAF-blocked — don't automate it. |
 | `.nojekyll` | Tells GitHub Pages to serve files verbatim. |
 | `streamlit-app/` | Parallel Python platform (analyst workbench): same data contract, flexible sources (file/URL/upload), runtime config, Plotly charts. Self-documented in its own README; `launch_data.py` is the pure-Python data layer, `app.py` the UI. Not part of the static deploy. See §11. |

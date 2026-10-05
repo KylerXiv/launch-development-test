@@ -102,10 +102,11 @@ controls the on-page banner.
 | `scripts/normalize-pqr.js` | Normalizes a manually downloaded Global Fund PQR crosstab into the procurement staging dataset (the download itself must stay manual — scripted export is WAF-blocked). |
 | `scripts/fetch-nafdac.js` | NAFDAC Greenbook pull — Nigeria's public register queried for portfolio products, with a new/lapsed-registrations watch report. First NRA register; the template for other countries. |
 | `scripts/fetch-tmda.js` | TMDA register pull — Tanzania's IMIS2 public register queried the same way (second NRA register). |
-| `scripts/register-lib.js` | Shared helpers (matching, CSV, snapshot, diff) for the ZAMRA, MCAZ and DAV register fetchers. |
+| `scripts/register-lib.js` | Shared helpers (matching, CSV, snapshot, diff) for the ZAMRA, MCAZ, DAV and Rwanda FDA register fetchers. |
 | `scripts/fetch-zamra.js` | ZAMRA register pull — Zambia's public register of human medicines, the whole register in one call. |
 | `scripts/fetch-mcaz.js` | MCAZ register pull — Zimbabwe's online register of medicines. |
 | `scripts/fetch-dav.js` | DAV register pull — Viet Nam's public register of marketing authorisations. |
+| `scripts/fetch-rwanda.js` | Rwanda FDA register pull — Rwanda's register of human medicines, one HTML page read from its rows' data attributes. |
 | `ontology/` | Semantic layer: `launch.ttl` (hand-authored OWL/SKOS ontology), `context.jsonld` (JSON-LD context), `launch-shapes.ttl` (SHACL governance shapes — the validator's rules, independently verifiable by any RDF consumer), `launch-data.jsonld` (**generated** linked-data projection of the dataset), `launch-history.jsonld` (**generated** temporal graph of status periods over the history snapshots), `index.html` (**generated** browsable rendering, live at [/ontology/](https://kochrisdev.github.io/launch-transparency-dashboard/ontology/)). See [docs/ontology.md](docs/ontology.md). |
 | `scripts/build-ontology.js` | Regenerates `ontology/launch-data.jsonld` from `data/products.js` — rerun after any data change. |
 | `scripts/build-history-graph.js` | Regenerates `ontology/launch-history.jsonld`, the temporal knowledge graph over the `history/` snapshots (status periods per product × stage) — bot-rebuilt by CI on data changes. |

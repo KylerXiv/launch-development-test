@@ -1,6 +1,6 @@
 // Shared helpers for the registration fetchers added after NAFDAC and TMDA:
-// fetch-zamra.js, fetch-mcaz.js, fetch-dav.js. A library, not a step: nothing
-// runs this file directly.
+// fetch-zamra.js, fetch-mcaz.js, fetch-dav.js, fetch-rwanda.js. A library, not
+// a step: nothing runs this file directly.
 //
 // Every fetcher here follows the NAFDAC/TMDA pattern (sourcing/README.md):
 //   sourcing/raw/<source>/<date>.json        dated snapshot, portfolio-relevant records only

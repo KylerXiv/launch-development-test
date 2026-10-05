@@ -10,6 +10,7 @@ name: Scheduled source fetch
 #                               scripts/fetch-zamra.js      (Zambia registrations)
 #                               scripts/fetch-mcaz.js       (Zimbabwe registrations)
 #                               scripts/fetch-dav.js        (Viet Nam registrations)
+#                               scripts/fetch-rwanda.js     (Rwanda registrations)
 # When the trial, regulatory or NRA-register watch detects changes, it opens an issue
 # carrying the what-changed report so an analyst reviews it — the fetchers
 # never touch data/products.js (the analyst + validator remain the only gate).
@@ -29,7 +30,7 @@ on:
       fetchers:
         description: "Which fetchers to run"
         type: choice
-        options: [all, trials, globalfund, regulatory, nafdac, tmda, zamra, mcaz, dav]
+        options: [all, trials, globalfund, regulatory, nafdac, tmda, zamra, mcaz, dav, rwanda]
         default: all
 
 permissions:
@@ -55,11 +56,11 @@ jobs:
         id: plan
         run: |
           RUN_TRIALS=false; RUN_GF=false; RUN_REG=false; RUN_NAFDAC=false; RUN_TMDA=false
-          RUN_ZAMRA=false; RUN_MCAZ=false; RUN_DAV=false
+          RUN_ZAMRA=false; RUN_MCAZ=false; RUN_DAV=false; RUN_RWANDA=false
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             case "${{ inputs.fetchers }}" in
               all)        RUN_TRIALS=true; RUN_GF=true; RUN_REG=true; RUN_NAFDAC=true; RUN_TMDA=true
-                          RUN_ZAMRA=true; RUN_MCAZ=true; RUN_DAV=true ;;
+                          RUN_ZAMRA=true; RUN_MCAZ=true; RUN_DAV=true; RUN_RWANDA=true ;;
               trials)     RUN_TRIALS=true ;;
               globalfund) RUN_GF=true ;;
               regulatory) RUN_REG=true ;;
@@ -68,12 +69,13 @@ jobs:
               zamra)      RUN_ZAMRA=true ;;
               mcaz)       RUN_MCAZ=true ;;
               dav)        RUN_DAV=true ;;
+              rwanda)     RUN_RWANDA=true ;;
             esac
           elif [ "${{ github.event.schedule }}" = "0 6 * * 1" ]; then
             RUN_TRIALS=true
           else
             RUN_GF=true; RUN_REG=true; RUN_NAFDAC=true; RUN_TMDA=true
-            RUN_ZAMRA=true; RUN_MCAZ=true; RUN_DAV=true
+            RUN_ZAMRA=true; RUN_MCAZ=true; RUN_DAV=true; RUN_RWANDA=true
           fi
           echo "trials=$RUN_TRIALS" >> "$GITHUB_OUTPUT"
           echo "globalfund=$RUN_GF" >> "$GITHUB_OUTPUT"
@@ -83,6 +85,7 @@ jobs:
           echo "zamra=$RUN_ZAMRA" >> "$GITHUB_OUTPUT"
           echo "mcaz=$RUN_MCAZ" >> "$GITHUB_OUTPUT"
           echo "dav=$RUN_DAV" >> "$GITHUB_OUTPUT"
+          echo "rwanda=$RUN_RWANDA" >> "$GITHUB_OUTPUT"
 
       - name: Fetch trials (ClinicalTrials.gov)
         if: steps.plan.outputs.trials == 'true'
@@ -116,6 +119,10 @@ jobs:
         if: steps.plan.outputs.dav == 'true'
         run: node scripts/fetch-dav.js
 
+      - name: Fetch Rwanda FDA register (Rwanda registrations)
+        if: steps.plan.outputs.rwanda == 'true'
+        run: node scripts/fetch-rwanda.js
+
       - name: Commit sourcing outputs
         # always(): if one fetcher fails, the outputs of the ones that
         # succeeded are still committed (the job stays red for triage).
@@ -125,7 +132,7 @@ jobs:
           git config user.email "actions@github.com"
           # Record which watch reports THIS run produced/changed, for the issue
           # step — done before committing, while they still show as dirty.
-          git status --porcelain sourcing/reports 2>/dev/null | grep -oE 'sourcing/reports/(trials|regulatory|nafdac|tmda|zamra|mcaz|dav)-watch-[0-9-]+\.md' > /tmp/new-reports.txt || true
+          git status --porcelain sourcing/reports 2>/dev/null | grep -oE 'sourcing/reports/(trials|regulatory|nafdac|tmda|zamra|mcaz|dav|rwanda)-watch-[0-9-]+\.md' > /tmp/new-reports.txt || true
           git add sourcing
           if git diff --cached --quiet; then
             echo "Nothing new to commit."
@@ -155,6 +162,7 @@ jobs:
                 zamra)      TITLE="ZAMRA watch" ;;
                 mcaz)       TITLE="MCAZ watch" ;;
                 dav)        TITLE="DAV watch" ;;
+                rwanda)     TITLE="Rwanda FDA watch" ;;
               esac
               gh issue create --repo "$GITHUB_REPOSITORY" \
                 --title "$TITLE: changes detected — $DATE" \

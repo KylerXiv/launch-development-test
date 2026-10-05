@@ -232,9 +232,9 @@ window.LAUNCH_SOURCES =
       "year": "Continuous",
       "products": ["dhappq", "pyramax"],
       "plain": "The national register of every medicine approved for sale in Rwanda.",
-      "collection": "manual",
+      "collection": "automated",
       "public": true,
-      "findings": "Moved by 5 Oct 2026: the old address (rwandafda.gov.rw/register/monitoring_preview_register) now redirects to www.rwandafda.gov.rw and returns 404; the register is linked as \"Medicine Registers\" from www.rwandafda.gov.rw/registers/products-repositories. 2,619 products on one page (7.4 MB, about 10 s); each row carries its fields as data attributes (data-regno, data-brand, data-generic, data-strength, data-mfr), so a fetcher is now simple to build, and is not yet built. Dates are DD/MM/YYYY. Portfolio matches on 2026-10-05: DHA-PPQ x3 — DIARTEM IG ADULT 120/960mg (Rwanda FDA-HMP-MA-2273, Bliss GVS, 12 May 2025 to 11 May 2030, valid), P-ALAXIN dispersible 40/320 (MA-0903, Bliss GVS), RIDMAL 40/320 (MA-0377, Ajanta Pharma); ASPY x2 — Pyramax granules 60/20mg (MA-0182) and Pyramax tablets 180/60mg (MA-0183), both Shin Poong, 17 Aug 2024 to 16 Aug 2029. No ALAQ or GanLum, as expected.",
+      "findings": "Fetched monthly by scripts/fetch-rwanda.js. Moved by 5 Oct 2026: the old address (rwandafda.gov.rw/register/monitoring_preview_register) now redirects to www.rwandafda.gov.rw and returns 404; the register is linked as \"Medicine Registers\" from www.rwandafda.gov.rw/registers/products-repositories. 2,619 products on one page (7.4 MB, about 10 s); each row carries its fields as data attributes (data-regno, data-brand, data-generic, data-strength, data-mfr), which the fetcher reads. Dates are DD/MM/YYYY. Portfolio matches on 2026-10-05: DHA-PPQ x3 — DIARTEM IG ADULT 120/960mg (Rwanda FDA-HMP-MA-2273, Bliss GVS, 12 May 2025 to 11 May 2030, valid), P-ALAXIN dispersible 40/320 (MA-0903, Bliss GVS), RIDMAL 40/320 (MA-0377, Ajanta Pharma); ASPY x2 — Pyramax granules 60/20mg (MA-0182) and Pyramax tablets 180/60mg (MA-0183), both Shin Poong, 17 Aug 2024 to 16 Aug 2029. No ALAQ or GanLum, as expected.",
       "relevance": "Confirms national market authorisation and commercial availability in East Africa, informing country-level procurement and deployment strategies.",
       "checked": "2026-10-05"
     },
