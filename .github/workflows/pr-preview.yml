@@ -52,6 +52,12 @@ jobs:
     # Pull requests from forks get no secrets, so there is nothing to deploy with.
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    # A good run takes under 1.5 minutes. Without a limit, GitHub's default is
+    # six hours: on 1-2 Oct 2026 five runs hung that long at the deploy step and
+    # used about 1,810 of the account's 2,000 free minutes for the month. The
+    # deploy step has its own, shorter limit below; this one catches a hang
+    # anywhere else. See docs/pr-preview-notes.md.
+    timeout-minutes: 10
     steps:
       - name: Find the commit under review
         id: pr
@@ -100,8 +106,15 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: vercel build
 
+      # Vercel holds a deployment it has blocked and never finishes it: on the
+      # Hobby plan, a commit whose author has no access to the Vercel project.
+      # vercel deploy then waits forever. Five minutes, so the step FAILS and
+      # the comment below still says the preview failed. A job that hits its
+      # own limit is cancelled instead, which skips that comment and leaves the
+      # previous link on the pull request.
       - name: Deploy it as a preview
         id: deploy
+        timeout-minutes: 5
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -121,6 +134,7 @@ jobs:
           SHA: ${{ steps.pr.outputs.sha }}
           URL: ${{ steps.deploy.outputs.url }}
           STATUS: ${{ job.status }}
+          DEPLOY: ${{ steps.deploy.outcome }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           MARK='<!-- proposal-preview -->'
@@ -137,6 +151,11 @@ jobs:
               "### Public dashboard preview — failed" "" \
               "No preview could be built for \`${SHA:0:7}\`. **Do not approve on an earlier preview link** — it shows an older commit." "" \
               "What went wrong is in [the run]($RUN). If it is the validator, the proposal breaks the data rules as it stands.")
+            # The deploy step's own limit: almost always Vercel blocking the commit.
+            if [ "$DEPLOY" = "failure" ]; then
+              BODY=$(printf '%s\n' "$BODY" "" \
+                "The deploy step failed or ran out of time. Vercel holds a deployment when the commit's author has no access to the Vercel project; a commit by someone who has access, on top of this branch, deploys it.")
+            fi
           fi
           ID=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
             --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$MARK\"))) | .id" | head -n 1)
