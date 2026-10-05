@@ -58,7 +58,9 @@ log.data.decisions.push({
   by: DECIDER || null,
   on: today,
   target: p ? p.target : null,
-  proposed: p ? (p.changes || p.now) : null,
+  // A register watcher's proposal also draws countries on the map; those are
+  // part of what was decided. Every other shape is recorded as before.
+  proposed: p ? (p.countries ? { changes: p.changes || [], countries: p.countries } : (p.changes || p.now)) : null,
   fingerprint: p ? p.fingerprint : null,
   ...(PR ? { pr: Number(PR) } : {}),
   ...(COMMIT ? { commit: COMMIT } : {}),

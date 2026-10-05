@@ -127,10 +127,11 @@ remove that day's history snapshot.
 
 ## Deferred, and left alone
 
-- **Other sources.** NAFDAC and TMDA (country registration). EMA (SRA approval)
-  was added on 29 Sep and ClinicalTrials.gov on 5 Oct, below. The same pattern
-  applies — one watcher per source — each with its own question of what the
-  source states outright.
+- **Other sources.** EMA (SRA approval) was added on 29 Sep, and
+  ClinicalTrials.gov, NAFDAC and TMDA on 5 Oct, below. Rwanda's register is
+  read by hand and Uganda's refuses automated requests, so neither has a
+  watcher. The same pattern applies to any new source — one watcher per
+  source — each with its own question of what the source states outright.
 - **A further presentation of a medicine already listed** — DHA–PPQ's "Nine
   PQ'd presentations" count, say — is not proposed. Recounting is mechanical,
   but the sentence is not. It stays in the watch report.
@@ -434,13 +435,155 @@ from the previews.
   `make-preview.js` 154 KB; `test-import.js` 127/127; `test-serializer.js`
   0 failures. No NUL bytes.
 
+## Register watchers, 5 Oct
+
+Branch `source-watchers`, commit 2. `scripts/propose-registers.js` watches
+Nigeria's NAFDAC Green Book and Tanzania's TMDA register, as a table of two
+registers in one script. When a register lists a portfolio medicine as
+currently registered, and the medicine's country map does not show that
+country, it files a proposal.
+
+### The design decision: how a proposal changes the country map
+
+Registrations show on the map, which reads `detail.countries.list`, and in the
+detail panel's "Registered" count, `detail.country.registered`. No proposal
+could change either. On 29 Sep it was agreed to settle this in writing before
+building a register watcher; this is that decision.
+
+**Chosen: a watcher proposal may carry a "Country map" section.** One line per
+country, `NGA: registered`, inside the several-field proposal only the bot can
+file. One register event is one proposal, as with WHO PQ and EMA:
+- the country is drawn on the map as `registered`;
+- the "Registered" count rises to at least the number of countries drawn;
+- if the medicine's "Country registration" stage has not started, it is
+  marked in progress, with the first registration's date and a factual
+  sentence.
+
+| Rejected | Because |
+| --- | --- |
+| Opening the map to the issue form people use | It widens a form everyone uses, for a change only the registers make today. The map's other levels, guidelines and MFT, need policy evidence of a different kind. That is its own decision |
+| Changing only the stage's sentence | The map is where registration shows. GanLum's map would stay empty while its sentence said "registered in Nigeria" |
+| Writing the map straight from the staged register | It skips approval. Every change to the data goes through one person's approval |
+| The count as a separate proposal | Approving one and not the other leaves "Registered: 0" beside a country on the map. Both GanLum and ALAQ show 0 today |
+
+**What the change does, and does not:**
+- **Only `registered` is proposed.** A register says a medicine is
+  registered. Guidelines and MFT come from policy documents.
+- **Only a country the map does not show.** A country already drawn, at any
+  level, is left alone: Tanzania is MFT for DHA–PPQ.
+- **A medicine with no map gets one, as a draft.** The validator requires a
+  warning on any map that is not verified, so the map's note says only
+  register-verified countries are shown.
+- **The count is raised, never lowered, and a "TBC" is left alone.** ASPY's
+  25 stays 25: it comes from MMV, and the map draws 16. The count is worked
+  out when the proposal is applied, from the map as it then stands. Two
+  proposals for one medicine can then be approved in either order, and the
+  second still counts both countries. The snapshot's figure is what the
+  reviewer was shown.
+- **A proposal that only draws a country keeps the stage's citation.** It
+  changes none of the stage's wording, so DHA–PPQ's "NAFDAC Greenbook + TMDA
+  IMIS2 registers (extracts 23 Aug 2026)" would survive. The changelog line
+  carries the register.
+- **Only one proposal per medicine starts the stage**: the register with the
+  earlier first registration. If both registers started it, approving the
+  second would overwrite the first's sentence.
+- **The title names the country**, "Proposal: GanLum · Country registration ·
+  Nigeria". Two registers' proposals are then two open issues, not one
+  blocking the other.
+- **Fingerprints of every other proposal are unchanged.** Countries are added
+  to the fingerprint only when a proposal has them. Checked before and after
+  the change: the self-test's several-field proposal (`sha1:e732ca131d4ebf04`),
+  a single-field one (`sha1:2ec5e7a29920c331`), and the recorded EMA rejection
+  (`sha1:ae1ec5d6c4cb475c`), which the watcher still recognises.
+- `record-decision.js` records the countries with the decision.
+
+### What the watcher reads
+
+| Register | Currently registered means | Reference | Date |
+| --- | --- | --- | --- |
+| NAFDAC | status `Active` | `nafdacNo` | `approvalDate` |
+| TMDA | status starting `Registered` | `certificateNo` | `issueDate` |
+
+A row the register calls current, but whose own expiry date has passed by the
+day it was read, is not counted. It is left for a person.
+
+**Left for a person, in the run summary:**
+- a country the map shows as registered, where the register now lists nothing
+  current. Lapsed registrations are a story: DHA–PPQ has 22 inactive rows in
+  Nigeria beside its 25 active ones;
+- registrations past their expiry date that the register still calls active.
+
+**Guard.** Per register: if its rows for its country fell by more than a fifth
+since the last fetch, nothing is proposed from it and the run fails at the
+end. The other register still proposes.
+
+**What it yields.** With the real registers, nothing. ASPY and DHA–PPQ are the
+only portfolio medicines either register lists, and both countries are
+already on their maps.
+
+### Public wording of proposal changelog lines
+
+Every approved proposal adds a public changelog line. The template
+lower-cased the stage's name and put "the" before the source's label:
+
+| Before | After |
+| --- | --- |
+| GanLum — who pq listing was updated from the WHO prequalification list. | GanLum — WHO PQ listing updated (source: WHO prequalification list). |
+| ALAQ — r&d & clinical was updated from the ClinicalTrials.gov. | ALAQ — R&D & clinical updated (source: ClinicalTrials.gov). |
+| — | GanLum — Nigeria added to the country map (source: Nigeria: NAFDAC Green Book). |
+
+These lines now also reach subscribers by email. None of the 23 live
+changelog lines used the template, so nothing already published changes.
+
+### Not covered
+
+- **A person's open proposal no longer blocks the watcher's** for the same
+  medicine's Country registration stage, because the titles differ. If both
+  change the stage, whichever is approved second is rebuilt on `main` first,
+  and its preview shows the result, as for any proposal when `main` moves.
+- **One register per country.** Rwanda's is read by hand; Uganda's refuses
+  automated requests.
+
+### Verification
+
+- `scripts/test-source-watchers.js`: 61 checks, 19 of them for the registers.
+  They cover the real registers, each fixture through intake's library, both
+  fixtures together, approval making a re-run propose nothing, lapsed and
+  expired registrations, the shrink guard with the other register still
+  proposing, and a stage already under way.
+- `proposal-lib.js selftest`: 56 checks, 20 of them new. They cover a
+  country-only proposal, a first registration, refusals (a person, a bad line,
+  a country already drawn), the new map and its warning, the count in either
+  approval order, the title, the fingerprint and the changelog line.
+- **Mutation check: thirteen deliberate breaks, each caught.** Six were in the
+  watcher: no expiry check, a drawn country proposed, every register starting
+  the stage, no shrink guard, inactive rows counted, and starting a stage
+  already under way. Seven were in the library: people allowed several fields,
+  the citation overwritten by a map-only proposal, no draft map, the count
+  taken from the snapshot, countries left out of the fingerprint, no country in
+  the title, and the map ignored by the "changes nothing" check.
+- **End to end on the real data file.** The ALAQ trial proposal and both
+  GanLum register proposals were applied with `proposal-lib.js apply`, as the
+  approval does. Then the validator (0 errors, 1 warning),
+  `assemble-content.js`, `build-dataset.js` and its 28 tests, the French and
+  Portuguese pages, and the preview were run on the result. The data file was
+  restored afterwards.
+- The workflow step, run locally from the YAML, for: every source (three
+  watchers, nothing proposed), each register fixture (one proposal each), and
+  a trial fixture.
+
 ## Status, `source-watchers` (5 Oct)
 
-- Branch `source-watchers`, off `main` at `b91bac2`. Commit 1: the trial
-  watcher. Not pushed yet when this was written.
-- CI cannot run while GitHub Actions is blocked by billing.
-- Files: `scripts/propose-trials.js`, `scripts/test-source-watchers.js` and
-  `test-data/trials/` (new); `scripts/fetch-trials.js`,
-  `sourcing/staging/trials.csv` (restaged),
+- Branch `source-watchers`, off `main` at `b91bac2`, 2 commits: the trial
+  watcher, then the register watchers with the country-map change.
+- CI cannot run while GitHub Actions is blocked by billing. The checks CI
+  would run passed locally, as listed in each section's verification.
+- Files, commit 1: `scripts/propose-trials.js`,
+  `scripts/test-source-watchers.js` and `test-data/trials/` (new);
+  `scripts/fetch-trials.js`, `sourcing/staging/trials.csv` (restaged),
   `.github/workflows/source-proposals.yml`, `.github/workflows/validate.yml`,
+  `sourcing/README.md`, this document.
+- Files, commit 2: `scripts/propose-registers.js` and `test-data/registers/`
+  (new); `scripts/proposal-lib.js`, `scripts/record-decision.js`,
+  `scripts/test-source-watchers.js`, `.github/workflows/source-proposals.yml`,
   `sourcing/README.md`, this document.

@@ -66,6 +66,31 @@ const SHORT = { note: "sentence", status: "status", date: "date", next: "next st
 // no next step. An empty form section cannot say that: it reads as "not given".
 const CLEAR = "(clear)";
 
+// A register watcher (scripts/propose-registers.js) also puts the country on
+// the medicine's country map, under this section of a several-field proposal,
+// one line per country: "NGA: registered". The source watcher only: a person's
+// form has no such section. See docs/source-proposals-notes.md.
+const COUNTRY_SECTION = "country map";
+const LEVELS = ["registered", "guidelines", "mft"];
+// The map warning written when a watcher draws the first country on a
+// medicine that had no map at all.
+const NEW_MAP_NOTE =
+  "Only countries whose national register lists this medicine are shown, added from the registers the LAUNCH team reads " +
+  "(Nigeria's NAFDAC Green Book and Tanzania's TMDA register). Other countries have not been checked.";
+
+// English country names, from the CLDR table the translated pages use.
+let NAMES = null;
+function countryName(iso3) {
+  if (!NAMES) {
+    NAMES = {};
+    try {
+      const t = JSON.parse(fs.readFileSync(path.join(ROOT, "i18n", "country-names.json"), "utf8"));
+      for (const [name, v] of Object.entries(t.names || {})) if (v && v.iso3 && !NAMES[v.iso3]) NAMES[v.iso3] = name;
+    } catch (e) { /* names are a nicety: the code is shown instead */ }
+  }
+  return NAMES[iso3] || iso3;
+}
+
 // ---- reading the repo ----------------------------------------------------
 
 function readData(file) {
@@ -146,6 +171,7 @@ function buildProposal(fields, ctx) {
   };
 
   let key = null, now = null, several = null;
+  const mapLines = [];
   if (norm(fields["what changes"]) === SEVERAL) {
     if (!issue || issue.user !== BOT) {
       say("Only the source watcher can change several fields in one proposal. File one proposal per field.");
@@ -163,7 +189,13 @@ function buildProposal(fields, ctx) {
         if (field === "status") v = statusCode(v);
         if (v) several.push({ field, now: v });
       }
-      if (!several.length) say("The source watcher proposed no fields.");
+      for (const l of String(fields[COUNTRY_SECTION] || "").split("\n").map((x) => x.trim()).filter(Boolean)) {
+        const m = /^([A-Z]{3})\s*:\s*([a-z]+)$/.exec(l);
+        if (!m || !LEVELS.includes(m[2])) say("“" + l + "” is not a country-map line: a three-letter ISO code, a colon, and registered / guidelines / mft.");
+        else if (mapLines.some((c) => c.iso3 === m[1])) say(m[1] + " is on the country map twice.");
+        else mapLines.push({ iso3: m[1], now: m[2] });
+      }
+      if (!several.length && !mapLines.length) say("The source watcher proposed no fields.");
     }
   } else {
     key = FIELD_BY_LABEL[norm(fields["what changes"])];
@@ -196,6 +228,21 @@ function buildProposal(fields, ctx) {
 
   const stage = product.stages[stageIdx];
   const wasOf = (f) => (stage[f] === undefined ? "" : stage[f]);
+  // What each country now shows on the map, and the count the detail panel
+  // shows beside it. A count below the countries the map draws would
+  // contradict it ("Registered: 0" beside Nigeria), so it is raised to that
+  // many — never lowered, and a "TBC" is left alone.
+  const map = (product.detail && product.detail.countries) || null;
+  const countries = mapLines.map((c) => {
+    const cur = map && (map.list || []).find((e) => e.iso3 === c.iso3);
+    return { iso3: c.iso3, name: countryName(c.iso3), was: cur ? cur.level : "", now: c.now };
+  });
+  let registeredCount = null;
+  if (countries.length) {
+    const drawn = new Set(((map && map.list) || []).map((e) => e.iso3).concat(countries.map((c) => c.iso3))).size;
+    const reg = product.detail && product.detail.country && product.detail.country.registered;
+    if (Number.isInteger(reg) && reg < drawn) registeredCount = { was: reg, now: drawn };
+  }
   const proposal = {
     id: issue && issue.number ? "p-" + issue.number : "p-" + Date.now(),
     issue: (issue && issue.number) || null,
@@ -205,6 +252,8 @@ function buildProposal(fields, ctx) {
     ...(several
       ? { changes: several.map((c) => ({ field: c.field, was: wasOf(c.field), now: c.now })) }
       : { was: wasOf(key), now }),
+    ...(countries.length ? { countries } : {}),
+    ...(registeredCount ? { registeredCount } : {}),
     evidence: {
       src,
       srcLabel: (sources.find((s) => s.id === src) || {}).label || srcLabel,
@@ -220,9 +269,11 @@ function buildProposal(fields, ctx) {
   // Nothing at all would change — not the value, not the citation. Merging it
   // would only add a changelog line claiming an update. Re-confirming a value
   // against a newer source changes the citation, so that still counts.
-  const after = applyProposal(data, proposal, data.meta.lastUpdated).products
-    .find((x) => x.id === product.id).stages[stageIdx];
-  if (JSON.stringify(after) === JSON.stringify(stage))
+  const afterP = applyProposal(data, proposal, data.meta.lastUpdated).products.find((x) => x.id === product.id);
+  const after = afterP.stages[stageIdx];
+  if (JSON.stringify(after) === JSON.stringify(stage) &&
+      JSON.stringify(afterP.detail.countries) === JSON.stringify(product.detail.countries) &&
+      JSON.stringify(afterP.detail.country) === JSON.stringify(product.detail.country))
     return { ok: false, errors: ["This would change nothing: the dashboard already says exactly this, with the same source and date."] };
 
   return { ok: true, proposal };
@@ -236,6 +287,9 @@ function fingerprint(p) {
   const parts = p.changes
     ? [p.target.product, p.target.stage].concat(p.changes.map((c) => c.field + "=" + String(c.now).trim()).sort())
     : [p.target.product, p.target.stage, p.target.field, String(p.now).trim()];
+  // Only a proposal with countries has these, so every other fingerprint,
+  // and every recorded decision, is unchanged.
+  if (p.countries) parts.push(...p.countries.map((c) => "country:" + c.iso3 + "=" + c.now).sort());
   return "sha1:" + crypto.createHash("sha1").update(parts.join("|")).digest("hex").slice(0, 16);
 }
 
@@ -251,21 +305,45 @@ function applyProposal(data, proposal, today) {
   const stage = p.stages[proposal.target.stage];
   if (!stage) throw new Error("no stage " + proposal.target.stage + " on " + p.id);
 
-  for (const c of changesOf(proposal)) stage[c.field] = c.now;
+  const fields = changesOf(proposal);
+  for (const c of fields) stage[c.field] = c.now;
   // The citation travels with the value. This overwrites the previous one on
   // purpose: a figure cites where its CURRENT wording came from, and the
-  // reviewer sees the swap in the summary before approving it.
-  stage.source = proposal.evidence.srcLabel + (proposal.evidence.ref ? " (" + proposal.evidence.ref + ")" : "");
-  stage.asOf = proposal.evidence.asOf;
+  // reviewer sees the swap in the summary before approving it. A proposal
+  // that only draws a country on the map changes none of the stage's wording,
+  // so the stage keeps its own citation; the changelog line carries this one.
+  if (fields.length) {
+    stage.source = proposal.evidence.srcLabel + (proposal.evidence.ref ? " (" + proposal.evidence.ref + ")" : "");
+    stage.asOf = proposal.evidence.asOf;
+  }
+  if (proposal.countries) {
+    if (!p.detail.countries) p.detail.countries = { status: "draft", note: NEW_MAP_NOTE, list: [] };
+    for (const c of proposal.countries) {
+      const e = p.detail.countries.list.find((x) => x.iso3 === c.iso3);
+      if (e) e.level = c.now;
+      else p.detail.countries.list.push({ iso3: c.iso3, level: c.now });
+    }
+    // Worked out here, from the map as it now stands, not taken from the
+    // snapshot: two proposals for one medicine can be approved in either
+    // order, and the second must count the first's country too. The
+    // snapshot's registeredCount is what the reviewer was shown.
+    const reg = p.detail.country && p.detail.country.registered;
+    if (Number.isInteger(reg) && reg < p.detail.countries.list.length) p.detail.country.registered = p.detail.countries.list.length;
+  }
 
   const date = today || new Date().toISOString().slice(0, 10);
   // publish.yml refuses a data change that did not bump this.
   next.meta.lastUpdated = date;
 
   const label = Object.keys(FIELD_BY_LABEL).find((k) => FIELD_BY_LABEL[k] === proposal.target.field);
-  const what = proposal.changes
-    ? proposal.changes.map((c) => SHORT[c.field] + (c.now === "" ? " cleared" : " set to “" + c.now + "”")).join("; ")
-    : label + " updated to “" + proposal.now + "”";
+  const drawn = (proposal.countries || []).map((c) => c.name + " (" + c.iso3 + ")" +
+    (c.was ? " on the country map: " + c.was + " → " + c.now : " added to the country map as " + c.now));
+  if (proposal.registeredCount) drawn.push("countries registered: " + proposal.registeredCount.was + " → " + proposal.registeredCount.now);
+  const what = (proposal.changes
+    ? proposal.changes.map((c) => SHORT[c.field] + (c.now === "" ? " cleared" : " set to “" + c.now + "”"))
+    : [label + " updated to “" + proposal.now + "”"]).concat(drawn).join("; ");
+  const names = (proposal.countries || []).map((c) => c.name).join(" and ");
+  const staged = changesOf(proposal).length > 0;
   const by = proposal.decision && proposal.decision.by ? proposal.decision.by : "review";
   next.changelog.unshift({
     date,
@@ -274,9 +352,13 @@ function applyProposal(data, proposal, today) {
       proposal.stageName + ": " + what + ". Source: " +
       proposal.evidence.srcLabel + ", " + proposal.evidence.asOf +
       ". Proposed in issue #" + proposal.issue + ", approved by " + by + ".",
+    // Public, so it keeps the stage's own capitals ("WHO PQ listing", not
+    // "who pq listing") and names the source the way the Sources list does.
     plain:
-      proposal.productName + " — " + proposal.stageName.toLowerCase() +
-      " was updated from the " + proposal.evidence.srcLabel + ".",
+      proposal.productName + " — " +
+      (names && !staged ? names + " added to the country map"
+        : proposal.stageName + " updated" + (names ? ", and " + names + " added to the country map" : "")) +
+      " (source: " + proposal.evidence.srcLabel + ").",
   });
   return next;
 }
@@ -284,7 +366,10 @@ function applyProposal(data, proposal, today) {
 // ---- what the bot says ---------------------------------------------------
 
 function titleFor(p) {
-  return "Proposal: " + p.productName + " · " + p.stageName;
+  // A country in the title too, so two registers' proposals for one medicine
+  // are two open issues, not one blocking the other.
+  return "Proposal: " + p.productName + " · " + p.stageName +
+    (p.countries && p.countries.length ? " · " + p.countries.map((c) => c.name).join(", ") : "");
 }
 
 // A replacement that drops a third or more of the existing wording is far
@@ -309,6 +394,8 @@ function summaryMarkdown(p, findings) {
     L.push("| | Now says | Would say |");
     L.push("| --- | --- | --- |");
     p.changes.forEach((c) => L.push("| **" + SHORT[c.field] + "** | " + bar(c.was || "_(empty)_") + " | " + (c.now === "" ? "_(cleared)_" : bar(c.now)) + " |"));
+    (p.countries || []).forEach((c) => L.push("| **country map** | " + bar(c.name) + ": " + (c.was || "_(not on the map)_") + " | " + bar(c.name) + ": " + c.now + " |"));
+    if (p.registeredCount) L.push("| **countries registered** | " + p.registeredCount.was + " | " + p.registeredCount.now + " |");
     L.push("");
     L.push("| | |");
     L.push("| --- | --- |");
@@ -540,6 +627,61 @@ function selftest() {
     }
   }
 
+  // A register watcher's proposal: countries on the map, with or without the
+  // stage. Built for the bot only, like any several-field proposal.
+  const mapOnly = {
+    "medicine": "dhappq",
+    "which stage": "Country registration",
+    "what changes": "Several fields at once (filed by the source watcher)",
+    "country map": "UGA: registered",
+    "source": "Tanzania: TMDA register",
+    "date of the source": "2026-09-21",
+  };
+  const mo = buildProposal(mapOnly, { data, sources, issue: { number: 50, user: BOT } });
+  ok("builds a country-only proposal for the watcher", mo.ok && mo.proposal.changes.length === 0 && mo.proposal.countries.length === 1, mo.ok ? "" : mo.errors.join("; "));
+  ok("refuses a country line from a person", !buildProposal(mapOnly, { data, sources, issue: { number: 51, user: "KylerXiv" } }).ok);
+  ok("refuses a line that is not ISO code: level",
+    !buildProposal(Object.assign({}, mapOnly, { "country map": "Uganda: approved" }), { data, sources, issue: { number: 52, user: BOT } }).ok);
+  ok("refuses a country that is already drawn at that level",
+    /change nothing/.test((buildProposal(Object.assign({}, mapOnly, { "country map": "NGA: registered" }), { data, sources, issue: { number: 53, user: BOT } }).errors || []).join(" ")));
+  if (mo.ok) {
+    const mp = mo.proposal;
+    ok("names the country, and records it was not on the map", mp.countries[0].name === "Uganda" && mp.countries[0].was === "");
+    ok("puts the country in the title", titleFor(mp) === "Proposal: DHA–PPQ · Country registration · Uganda", titleFor(mp));
+    const mres = checkApplied(data, mp, "2026-09-22");
+    const md = mres.applied.products.find((x) => x.id === "dhappq");
+    const was = data.products.find((x) => x.id === "dhappq");
+    ok("draws the country at that level", md.detail.countries.list.some((e) => e.iso3 === "UGA" && e.level === "registered"));
+    ok("keeps the stage, and its citation, as they were", JSON.stringify(md.stages[4]) === JSON.stringify(was.stages[4]));
+    ok("leaves a TBC count alone", md.detail.country.registered === "TBC");
+    ok("the country-only result passes the rules", mres.errors.length === 0, mres.errors.join("; "));
+    ok("the public changelog line names the country and the source",
+      mres.applied.changelog[0].plain === "DHA–PPQ — Uganda added to the country map (source: Tanzania: TMDA register).", mres.applied.changelog[0].plain);
+    ok("the summary shows the map row", /\| \*\*country map\*\* \| Uganda: _\(not on the map\)_ \| Uganda: registered \|/.test(summaryMarkdown(mp, mres)));
+    ok("countries are part of the fingerprint", mp.fingerprint !== buildProposal(Object.assign({}, mapOnly, { "country map": "KEN: guidelines" }), { data, sources, issue: { number: 54, user: BOT } }).proposal.fingerprint);
+  }
+  const first = buildProposal(Object.assign({}, mapOnly, {
+    "medicine": "ganlum", "country map": "NGA: registered",
+    "the status of this stage": "in progress", "the date this stage was reached": "First registered 12 Mar 2027 (Nigeria)",
+    "the sentence shown under this stage": "Registered in Nigeria: 1 presentation (NAFDAC A4-0001, Novartis), on 12 Mar 2027.",
+  }), { data, sources, issue: { number: 55, user: BOT } });
+  ok("builds a first registration: the stage and the map together", first.ok && first.proposal.changes.length === 3 && first.proposal.countries.length === 1, first.ok ? "" : first.errors.join("; "));
+  if (first.ok) {
+    const fres = checkApplied(data, first.proposal, "2026-09-22");
+    const g = fres.applied.products.find((x) => x.id === "ganlum");
+    ok("a medicine with no map gets one, as a draft with its warning", g.detail.countries.status === "draft" && g.detail.countries.note === NEW_MAP_NOTE && g.detail.countries.list.length === 1);
+    ok("its registered count rises from 0 to 1", g.detail.country.registered === 1 && first.proposal.registeredCount.was === 0);
+    ok("the stage carries the register's citation", g.stages[4].status === "prog" && /^Tanzania: TMDA register/.test(g.stages[4].source));
+    ok("the first-registration result passes the rules", fres.errors.length === 0, fres.errors.join("; "));
+    // Approved after another register's proposal drew a country first, it
+    // counts both, whatever its snapshot said.
+    const tza = buildProposal(Object.assign({}, mapOnly, { "medicine": "ganlum", "country map": "TZA: registered" }), { data, sources, issue: { number: 56, user: BOT } });
+    const afterTza = checkApplied(data, tza.proposal, "2026-09-22").applied;
+    const both = checkApplied(afterTza, first.proposal, "2026-09-23").applied.products.find((x) => x.id === "ganlum");
+    ok("in either order, the count is the countries drawn", both.detail.country.registered === 2 && both.detail.countries.list.length === 2, both.detail.country.registered);
+    ok("its changelog line says both", fres.applied.changelog[0].plain === "GanLum — Country registration updated, and Nigeria added to the country map (source: Tanzania: TMDA register).", fres.applied.changelog[0].plain);
+  }
+
   // Nothing at all would change: refused. Only the citation changing: fine.
   // The fixture's proposal, filed again against the data it already produced.
   const noop = buildProposal(fields, { data: res.applied, sources, issue: { number: 40, user: "someone" } });
@@ -569,6 +711,10 @@ module.exports = {
   BOT,
   SEVERAL_LABEL: "Several fields at once (filed by the source watcher)",
   CLEAR,
+  COUNTRY_LABEL: "Country map",
+  LEVELS,
+  NEW_MAP_NOTE,
+  countryName,
   FIELD_BY_LABEL,
   parseIssueBody,
   buildProposal,

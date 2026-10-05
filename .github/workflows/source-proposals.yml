@@ -9,6 +9,9 @@ name: Propose changes from public sources
 #   scripts/propose-trials.js      ClinicalTrials.gov: the trial a medicine in
 #                                  development is waiting on reaching primary
 #                                  completion, or its estimate moving
+#   scripts/propose-registers.js   Nigeria's NAFDAC and Tanzania's TMDA
+#                                  registers: a medicine currently registered
+#                                  in a country its map does not show
 # Anything that needs judgement stays in the watch report and the run summary
 # for a person.
 #
@@ -24,8 +27,9 @@ name: Propose changes from public sources
 # Pick a test file to run only that source's watcher, on that file. The files
 # add invented rows — a WHO listing for GanLum (TEST-0001), an EMA opinion for
 # GanLum (TEST-EMA-0001), ALAQ's FD-TACT trial completing or slipping
-# (FD-TACT-TEST) — so the whole route can be seen working; see the README in
-# each test-data/ folder.
+# (FD-TACT-TEST), GanLum registered in Nigeria or Tanzania (TEST-A4-0001,
+# TEST-TAN …) — so the whole route can be seen working; see the README in each
+# test-data/ folder.
 
 on:
   workflow_run:
@@ -42,6 +46,8 @@ on:
           - test-data/regulatory/ema-ganlum-opinion.csv
           - test-data/trials/alaq-primary-completion.csv
           - test-data/trials/alaq-estimate-moved.csv
+          - test-data/registers/nafdac-ganlum-registered.csv
+          - test-data/registers/tmda-ganlum-registered.csv
         default: every source, as fetched
 
 permissions:
@@ -111,9 +117,14 @@ jobs:
               watch regulatory scripts/propose-regulatory.js ${P:+--previous "$P"}
               P=$(previous sourcing/staging/trials.csv)
               watch trials scripts/propose-trials.js ${P:+--previous "$P"}
+              P=$(previous sourcing/staging/nafdac_registrations.csv)
+              Q=$(previous sourcing/staging/tmda_registrations.csv)
+              watch registers scripts/propose-registers.js ${P:+--previous-nafdac "$P"} ${Q:+--previous-tmda "$Q"}
               ;;
             test-data/regulatory/*.csv) watch regulatory scripts/propose-regulatory.js --staging "$STAGING" ;;
             test-data/trials/*.csv)     watch trials scripts/propose-trials.js --staging "$STAGING" ;;
+            test-data/registers/nafdac-*.csv) watch registers scripts/propose-registers.js --only NAFDAC --nafdac "$STAGING" ;;
+            test-data/registers/tmda-*.csv)   watch registers scripts/propose-registers.js --only TMDA --tmda "$STAGING" ;;
             *) echo "::error::Not a list this workflow knows: $STAGING"; exit 1 ;;
           esac
           # One list for the filing step, whichever watchers ran.

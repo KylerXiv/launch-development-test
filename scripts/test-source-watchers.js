@@ -141,5 +141,64 @@ const done = dataWith((d) => { d.products.find((p) => p.id === "alaq").stages[0]
 const dn = watcher("propose-trials.js", ["--staging", "test-data/trials/alaq-primary-completion.csv", "--today", today, "--data", done]);
 ok("a medicine shown as developed follows no trial", dn.manifest.length === 0 && /ALAQ: development already shown as done/.test(dn.stdout), dn.stdout);
 
+// ---- national registers ------------------------------------------------------
+
+group("Registers: the real NAFDAC and TMDA lists");
+const regs = watcher("propose-registers.js", []);
+ok("exits 0 and proposes nothing", regs.code === 0 && regs.manifest && regs.manifest.length === 0, regs.stdout);
+ok("Nigeria and Tanzania are already on the map for ASPY and DHA–PPQ",
+  (regs.stdout.match(/already on the map/g) || []).length === 4, regs.stdout);
+
+group("Registers: test-data/registers/nafdac-ganlum-registered.csv");
+const nf = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", "test-data/registers/nafdac-ganlum-registered.csv"]);
+ok("exits 0 with one proposal, GanLum in Nigeria", nf.code === 0 && nf.manifest.length === 1 && nf.manifest[0].title === "Proposal: GanLum · Country registration · Nigeria", nf.stdout);
+ok("the lapsed ALAQ row is not proposed", !/ALAQ: PROPOSED/.test(nf.stdout));
+{
+  const { built, res } = intake(nf.bodies[0] || "");
+  ok("intake reads it, from the watcher", built.ok && /^watcher:/.test(built.proposal.origin), built.errors);
+  if (built.ok) {
+    const g = res.applied.products.find((p) => p.id === "ganlum");
+    ok("it draws Nigeria, on a new draft map with its warning", JSON.stringify(g.detail.countries.list) === JSON.stringify([{ iso3: "NGA", level: "registered" }]) && g.detail.countries.status === "draft" && g.detail.countries.note === lib.NEW_MAP_NOTE);
+    ok("it starts the stage: in progress, dated, with the references", g.stages[4].status === "prog" && g.stages[4].date === "First registered 20 Sep 2026 (Nigeria)" && /NAFDAC TEST-A4-0001/.test(g.stages[4].note), g.stages[4]);
+    ok("it raises the registered count from 0 to 1", g.detail.country.registered === 1);
+    ok("the applied data passes the rules", res.errors.length === 0, res.errors);
+    ok("the reviewer is told it is test data", /\*\*Test data\*\*/.test(nf.bodies[0]));
+    const after = dataWith((d) => { const x = d.products.find((p) => p.id === "ganlum"); x.detail.countries = g.detail.countries; x.stages[4] = g.stages[4]; x.detail.country = g.detail.country; });
+    const again = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", "test-data/registers/nafdac-ganlum-registered.csv", "--data", after]);
+    ok("after approval, the same register proposes nothing", again.code === 0 && again.manifest.length === 0 && /GanLum: Nigeria already on the map/.test(again.stdout), again.stdout);
+  }
+}
+
+group("Registers: both test registers in one run");
+const both = watcher("propose-registers.js", ["--nafdac", "test-data/registers/nafdac-ganlum-registered.csv", "--tmda", "test-data/registers/tmda-ganlum-registered.csv"]);
+ok("one proposal per country", both.code === 0 && both.manifest.map((m) => m.title).join(" | ") === "Proposal: GanLum · Country registration · Nigeria | Proposal: GanLum · Country registration · Tanzania", both.manifest && both.manifest.map((m) => m.title));
+const [ngaBody, tzaBody] = both.bodies;
+ok("only the earlier registration (Nigeria, 20 Sep) starts the stage", /### The status of this stage/.test(ngaBody || "") && !/### The status of this stage/.test(tzaBody || ""));
+{
+  const t = intake(tzaBody || "");
+  ok("Tanzania's only draws its country, keeping the stage's own citation", t.built.ok && t.built.proposal.changes.length === 0 &&
+    JSON.stringify(t.res.applied.products.find((p) => p.id === "ganlum").stages[4]) === JSON.stringify(lib.readData().data.products.find((p) => p.id === "ganlum").stages[4]));
+}
+const tz = watcher("propose-registers.js", ["--only", "TMDA", "--tmda", "test-data/registers/tmda-ganlum-registered.csv"]);
+ok("run alone, Tanzania's starts the stage itself", tz.manifest.length === 1 && /### The status of this stage/.test(tz.bodies[0]), tz.stdout);
+
+group("Registers: guards and what is left for a person");
+const lapsed = csvWith("sourcing/staging/nafdac_registrations.csv", (rows) => { rows.filter((r) => r.productId === "pyramax").forEach((r) => { r.status = "Inactive"; }); });
+const lp = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", lapsed]);
+ok("a country the map shows as registered, with nothing current in the register, is left for a person",
+  lp.manifest.length === 0 && /ASPY: left for a person — the map shows Nigeria as registered, but the register lists no current registration \(1 lapsed or inactive\)/.test(lp.stdout), lp.stdout);
+const expiredRow = csvWith("test-data/registers/nafdac-ganlum-registered.csv", (rows) => { rows.find((r) => r.nafdacNo === "TEST-A4-0001").expiryDate = "2026-09-29"; });
+const st = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", expiredRow]);
+ok("a registration still called active after its expiry is left for a person, not proposed",
+  st.manifest.length === 0 && /GanLum: left for a person — 1 registration\(s\) the register calls current past their expiry date \(TEST-A4-0001\)/.test(st.stdout), st.stdout);
+const cut = csvWith("sourcing/staging/nafdac_registrations.csv", (rows) => rows.slice(0, 10));
+const sh = watcher("propose-registers.js", ["--nafdac", cut, "--previous-nafdac", "sourcing/staging/nafdac_registrations.csv", "--tmda", "test-data/registers/tmda-ganlum-registered.csv"]);
+ok("a register whose rows fell by more than a fifth is blocked, the other still proposes, and the run fails",
+  sh.code === 1 && /BLOCKED NAFDAC: rows fell from 48 to 10/.test(sh.stdout) && sh.manifest.length === 1 && /Tanzania/.test(sh.manifest[0].title), sh.stdout);
+const started = dataWith((d) => { const x = d.products.find((p) => p.id === "ganlum"); x.stages[4].status = "prog"; x.stages[4].note = "Filed in several countries"; x.stages[4].asOf = "2026-09-01"; });
+const sp = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", "test-data/registers/nafdac-ganlum-registered.csv", "--data", started]);
+ok("a stage already under way keeps its wording: the proposal only draws the country",
+  sp.manifest.length === 1 && !/### The status of this stage/.test(sp.bodies[0]) && /### Country map\n\nNGA: registered/.test(sp.bodies[0]), sp.stdout);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail) { console.log("Failed:\n  " + failures.join("\n  ")); process.exit(1); }

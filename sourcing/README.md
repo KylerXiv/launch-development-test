@@ -11,8 +11,10 @@ what a source states outright, the **source watchers** file them, run by
 `scripts/propose-regulatory.js` (WHO PQ listing a portfolio medicine, and EMA
 giving one a positive EU-M4all / Article 58 opinion) and
 `scripts/propose-trials.js` (the trial a medicine in development is waiting on
-reaching primary completion, or its estimate moving). Either way a person
-approves it.
+reaching primary completion, or its estimate moving) and
+`scripts/propose-registers.js` (NAFDAC or TMDA listing a medicine as currently
+registered in a country its map does not show). Either way a person approves
+it.
 
 ## Layout
 
