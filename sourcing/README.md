@@ -28,8 +28,17 @@ one a positive EU-M4all / Article 58 opinion). Either way a person approves it.
 | `node scripts/fetch-regulatory.js` | WHO PQ medicines + vector-control lists (CSV export; WHO terms) and EMA EU-M4all/Art. 58 opinions table (xlsx, regenerated nightly; attribute EMA) | Monthly | `staging/regulatory_events.csv` (malaria FPPs, all VC products, all EU-M4all opinions — portfolio products matched to `productId`) and `reports/regulatory-watch-<date>.md` diffing new listings, delistings and opinion changes. |
 | `node scripts/fetch-nafdac.js` | **NAFDAC Greenbook** — Nigeria's public medicines register (Laravel/DataTables JSON endpoint; plain HTTP by necessity — the host's HTTPS hangs after handshake, checked 2026-08-23) | Monthly | `staging/nafdac_registrations.csv` (portfolio registrations, `iso3=NGA`: reg. no., composition, form, applicant, approval/expiry dates, Active/Inactive status) and `reports/nafdac-watch-<date>.md` diffing new registrations and status/expiry changes. The template for other NRA registers. |
 | `node scripts/fetch-tmda.js` | **TMDA IMIS2** — Tanzania's public register of medicines (Angular SPA's JSON backend: common-name lookup → paged search per candidate ingredient) | Monthly | `staging/tmda_registrations.csv` (portfolio registrations, `iso3=TZA`: certificate no., brand, active ingredient, manufacturer, issue/expiry dates, status) and `reports/tmda-watch-<date>.md`. Second NRA register, same pattern as NAFDAC. |
+| `node scripts/fetch-zamra.js` | **ZAMRA** — Zambia's public register of human medicines (the same IMIS backend as TMDA; the whole register in one call). Its server omits an intermediate certificate, supplied from `scripts/certs/` with verification left on | Monthly | `staging/zamra_registrations.csv` (`iso3=ZMB`) and `reports/zamra-watch-<date>.md`. The snapshot keeps only portfolio-family records, not the 12 MB register. |
+| `node scripts/fetch-mcaz.js` | **MCAZ** — Zimbabwe's online register of medicines (Kendo grid JSON; the whole register in one POST; MCAZ updates it daily) | Monthly | `staging/mcaz_registrations.csv` (`iso3=ZWE`) and `reports/mcaz-watch-<date>.md`. |
+| `node scripts/fetch-dav.js` | **DAV** — Viet Nam's public register of marketing authorisations (JSON search per ingredient stem; Vietnamese drops the final "e": "Pyronaridin", "Piperaquin") | Monthly | `staging/dav_registrations.csv` (`iso3=VNM`, status `valid`/`expired` as the register flags it) and `reports/dav-watch-<date>.md`. |
 | `node scripts/normalize-treatment-policy.js [file]` | **WHO World Malaria Report, Annex 4B** — national antimalarial drug policy per country; input is a **manually downloaded** annex workbook (see below) | Yearly, on each World Malaria Report (usually December) | `staging/treatment_policy.csv` (one row per country × dashboard product, a 0/1 column per patient group) and `data/treatment-policy.js` — `window.LAUNCH_TREATMENT_POLICY`. Only the four dashboard products are kept (GanLum, ALAQ, ASPY, DHA–PPQ); every other drug in the annex is dropped and never written. Read by the **Show MFT policy** switch on `illustrated-journey-dashboard.html`. Policy is what a country lists, not what it uses. Raw workbook and its CSV export kept under `raw/wmr/`. |
 | `node scripts/normalize-pqr.js <file>` | Global Fund **PQR** Transaction Summary — input is a **manually downloaded** Tableau crosstab (see below) | Quarterly | `staging/procurement_transactions.csv` — scoped to the malaria-relevant market (anti-malaria medicine + vector-control categories, plus any portfolio match; the ~99k-row full crosstab is mostly ARV/TB), all columns passed through, headers camelCased, portfolio `productId` prepended. Full crosstab kept gzipped under `raw/pqr/`. |
+
+The ZAMRA, MCAZ and DAV fetchers share `scripts/register-lib.js` and one
+staging layout: `productId, iso3, registrationNo, brandName, ingredients,
+form, strength, holder, manufacturer, issueDate, expiryDate, status,
+sourceUrl, retrievedDate`. Like NAFDAC and TMDA, they are national
+regulators' own registers.
 
 **The PQR manual step** (~2 minutes; scripted export is confirmed blocked by
 the server's WAF — do not attempt to automate it, see the plan's Category E):
@@ -98,8 +107,8 @@ history-snapshot bot):
 | When (UTC) | What runs |
 | --- | --- |
 | Mondays 06:00 | `fetch-trials.js` — and if the watch report contains changes, the workflow **opens a GitHub issue** carrying the report for analyst review. |
-| 3rd of each month 06:30 | `fetch-globalfund.js`, `fetch-regulatory.js`, `fetch-nafdac.js` and `fetch-tmda.js` — the regulatory and NRA-register watches open issues on changes too (new PQ listings/delistings, EMA opinion changes, new/lapsed country registrations). |
-| On demand | *Actions tab → "Scheduled source fetch" → Run workflow* — choose `all`, `trials`, `globalfund`, `regulatory`, `nafdac`, or `tmda`. |
+| 3rd of each month 06:30 | `fetch-globalfund.js`, `fetch-regulatory.js`, `fetch-nafdac.js`, `fetch-tmda.js`, `fetch-zamra.js`, `fetch-mcaz.js` and `fetch-dav.js` — the regulatory and NRA-register watches open issues on changes too (new PQ listings/delistings, EMA opinion changes, new/lapsed country registrations). |
+| On demand | *Actions tab → "Scheduled source fetch" → Run workflow* — choose `all`, `trials`, `globalfund`, `regulatory`, `nafdac`, `tmda`, `zamra`, `mcaz`, or `dav`. |
 
 Notes:
 
