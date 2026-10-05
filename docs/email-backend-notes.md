@@ -117,11 +117,15 @@ missing.
    to 10 min (Vercel's docs, read 2 Oct). Both forms already show their
    failure message on a 429.
 
-**Sending updates to subscribers** is a Resend broadcast to the segment. It is
-written and sent from the Resend dashboard, not from this repo. Include
-`{{{RESEND_UNSUBSCRIBE_URL}}}` in it. That link sets the same `unsubscribed`
-flag as this repo's own unsubscribe page, and the page and the welcome email
-both promise every email has one.
+**Sending updates to subscribers** is a Resend broadcast to the segment. Since
+5 Oct 2026 it is automatic: `notify-subscribers.yml` sends one a day, at 15:00
+UTC, on days when the changelog in `data/products.js` gained lines. It needs a
+`RESEND_API_KEY` repository secret on GitHub as well as the one on Vercel. See
+[subscriber-updates-notes.md](subscriber-updates-notes.md). A broadcast written
+by hand in the Resend dashboard still works, and must include
+`{{{RESEND_UNSUBSCRIBE_URL}}}`. That link sets the same `unsubscribed` flag as
+this repo's own unsubscribe page, and the page and the welcome email both
+promise every email has one.
 
 ---
 

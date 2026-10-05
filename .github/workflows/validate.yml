@@ -36,6 +36,10 @@ jobs:
         run: |
           node scripts/test-build-rbm-pages.js
           node scripts/build-rbm-pages.js --allow-stale
+      # The daily update email to subscribers: what counts as new, what the
+      # email says, and that a re-run never sends twice. No network, no key.
+      - name: Subscriber update email
+        run: node scripts/test-notify-subscribers.js
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
