@@ -574,8 +574,9 @@ changelog lines used the template, so nothing already published changes.
 
 ## Status, `source-watchers` (5 Oct)
 
-- Branch `source-watchers`, off `main` at `b91bac2`, 2 commits: the trial
-  watcher, then the register watchers with the country-map change.
+- Branch `source-watchers`, off `main` at `b91bac2`, 3 commits: the trial
+  watcher, the register watchers with the country-map change, then this
+  status. Pushed; pull request #55 against `main`.
 - CI cannot run while GitHub Actions is blocked by billing. The checks CI
   would run passed locally, as listed in each section's verification.
 - Files, commit 1: `scripts/propose-trials.js`,
