@@ -4,6 +4,12 @@
 // previous snapshot so slipped dates / status changes surface early:
 //   node scripts/fetch-trials.js
 //
+//   node scripts/fetch-trials.js --restage
+//                rebuilds sourcing/staging/trials.csv from the latest raw
+//                snapshot, with no network: the staging file is generated, so
+//                it must come back byte-identical from the snapshot it was
+//                written from
+//
 // Outputs (see docs/data-sourcing-plan.md §4 — collection pipeline rules):
 //   sourcing/raw/clinicaltrials/<date>.json   append-only dated snapshot
 //   sourcing/staging/trials.csv               regenerated staging dataset
@@ -64,7 +70,7 @@ async function fetchStudies(product) {
 }
 
 // flatten one API study into the staging row shape
-function toRow(productId, study) {
+function toRow(productId, study, retrieved = today) {
   const p = study.protocolSection || {};
   const idm = p.identificationModule || {};
   const st = p.statusModule || {};
@@ -74,6 +80,7 @@ function toRow(productId, study) {
   return {
     productId,
     nctId,
+    acronym: idm.acronym || "",
     briefTitle: idm.briefTitle || "",
     phase: (dsg.phases || []).join("|"),
     studyType: dsg.studyType || "",
@@ -82,11 +89,15 @@ function toRow(productId, study) {
     enrollment: (dsg.enrollmentInfo || {}).count ?? "",
     startDate: (st.startDateStruct || {}).date || "",
     primaryCompletionDate: (st.primaryCompletionDateStruct || {}).date || "",
+    // ACTUAL or ESTIMATED. The source watcher (scripts/propose-trials.js)
+    // proposes a completion only when the registry says it happened.
+    primaryCompletionType: (st.primaryCompletionDateStruct || {}).type || "",
     completionDate: (st.completionDateStruct || {}).date || "",
+    completionType: (st.completionDateStruct || {}).type || "",
     lastUpdatePostDate: (st.lastUpdatePostDateStruct || {}).date || "",
     hasResults: study.hasResults === true,
     sourceUrl: nctId ? `https://clinicaltrials.gov/study/${nctId}` : "",
-    retrievedDate: today,
+    retrievedDate: retrieved,
   };
 }
 
@@ -136,6 +147,30 @@ function diffRows(prevRows, rows) {
   return changes;
 }
 
+// The staging file's columns, in order. New columns go at the end, so a
+// reader that knows only the old ones is not shifted.
+const COLUMNS = ["productId", "nctId", "briefTitle", "phase", "studyType", "overallStatus",
+  "leadSponsor", "enrollment", "startDate", "primaryCompletionDate", "completionDate",
+  "lastUpdatePostDate", "hasResults", "sourceUrl", "retrievedDate",
+  "acronym", "primaryCompletionType", "completionType"];
+
+function stagingRows(products, retrieved) {
+  const rows = [];
+  for (const [productId, studies] of Object.entries(products || {}))
+    for (const s of studies) rows.push(toRow(productId, s, retrieved));
+  return rows.sort((a, b) => a.productId.localeCompare(b.productId) || a.nctId.localeCompare(b.nctId));
+}
+
+if (process.argv.includes("--restage")) {
+  const latest = fs.readdirSync(RAW_DIR).filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort().pop();
+  if (!latest) { console.error("No raw snapshot in " + RAW_DIR); process.exit(1); }
+  const snap = JSON.parse(fs.readFileSync(path.join(RAW_DIR, latest), "utf8"));
+  const rows = stagingRows(snap.products, snap.retrieved || latest.slice(0, 10));
+  fs.writeFileSync(path.join(STAGING_DIR, "trials.csv"), toCsv(rows, COLUMNS));
+  console.log(`${rows.length} rows → sourcing/staging/trials.csv, rebuilt from ${latest}`);
+  process.exit(0);
+}
+
 (async () => {
   fs.mkdirSync(RAW_DIR, { recursive: true });
   fs.mkdirSync(STAGING_DIR, { recursive: true });
@@ -144,24 +179,19 @@ function diffRows(prevRows, rows) {
   const previous = loadPrevious();
 
   const byProduct = {};
-  const rows = [];
   for (const product of PRODUCTS) {
     const studies = await fetchStudies(product);
     byProduct[product.id] = studies;
-    for (const s of studies) rows.push(toRow(product.id, s));
     console.log(`${product.id}: ${studies.length} trials`);
   }
-  rows.sort((a, b) => a.productId.localeCompare(b.productId) || a.nctId.localeCompare(b.nctId));
+  const rows = stagingRows(byProduct, today);
 
   // raw snapshot (append-only; same-day rerun overwrites today's file only)
   const rawPath = path.join(RAW_DIR, `${today}.json`);
   fs.writeFileSync(rawPath, JSON.stringify({ retrieved: today, source: API, products: byProduct }, null, 1));
 
   // staging CSV
-  const columns = ["productId", "nctId", "briefTitle", "phase", "studyType", "overallStatus",
-    "leadSponsor", "enrollment", "startDate", "primaryCompletionDate", "completionDate",
-    "lastUpdatePostDate", "hasResults", "sourceUrl", "retrievedDate"];
-  fs.writeFileSync(path.join(STAGING_DIR, "trials.csv"), toCsv(rows, columns));
+  fs.writeFileSync(path.join(STAGING_DIR, "trials.csv"), toCsv(rows, COLUMNS));
 
   // watch report vs previous snapshot
   let reportBody;

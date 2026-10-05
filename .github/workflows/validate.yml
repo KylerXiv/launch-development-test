@@ -16,6 +16,10 @@ jobs:
         run: node scripts/validate-data.js
       - name: Validate synthetic dataset
         run: node scripts/validate-data.js data/products.synthetic.js
+      # The source watchers on the staged lists and the test files: what each
+      # proposes, what it leaves for a person, and its guards. No network.
+      - name: Source watchers
+        run: node scripts/test-source-watchers.js
       - name: Build single-file preview (smoke test)
         run: node scripts/make-preview.js
       # The same build the public site runs: new text stays English, but a

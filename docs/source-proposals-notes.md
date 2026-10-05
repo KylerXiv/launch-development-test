@@ -127,9 +127,10 @@ remove that day's history snapshot.
 
 ## Deferred, and left alone
 
-- **Other sources.** NAFDAC and TMDA (country registration), EMA (SRA approval),
-  ClinicalTrials.gov. The same pattern applies — one watcher per source — each
-  with its own question of what the source states outright.
+- **Other sources.** NAFDAC and TMDA (country registration). EMA (SRA approval)
+  was added on 29 Sep and ClinicalTrials.gov on 5 Oct, below. The same pattern
+  applies — one watcher per source — each with its own question of what the
+  source states outright.
 - **A further presentation of a medicine already listed** — DHA–PPQ's "Nine
   PQ'd presentations" count, say — is not proposed. Recounting is mechanical,
   but the sentence is not. It stays in the watch report.
@@ -298,6 +299,114 @@ application (`TEST-EMA-0002`), which must not be proposed.
   the summary, and "already shown as listed" became "…as done". Both were
   corrected to match.
 
+## Trial watcher, 5 Oct
+
+Branch `source-watchers`, off `main` at `b91bac2`. `scripts/propose-trials.js`
+is the ClinicalTrials.gov watcher. It runs in the same workflow, after every
+fetch, beside the regulatory one.
+
+**What it proposes: the date line of "R&D & clinical", and nothing else.**
+Two cases, both stated outright by the registry:
+
+| The registry says | The date line becomes |
+| --- | --- |
+| Primary completion happened (date marked `ACTUAL`) | "Phase III FD-TACT (NCT05951595) reached primary completion on 15 Sep 2026 (ClinicalTrials.gov)" |
+| The estimate moved, to a date still ahead (`ESTIMATED`, trial under way) | "Phase III FD-TACT (NCT05951595): primary completion expected Jun 2027 (ClinicalTrials.gov estimate)" |
+
+| Rejected | Because |
+| --- | --- |
+| Marking the stage done when the trial completes | Completing is not succeeding. GanLum's stage became done on the results announcement, not on the registry's completion date |
+| Marking the stage delayed when an estimate slips | Whether a slip is a delay is judgement. The new estimate is proposed; the status is a person's call |
+| Rewriting the sentence | It is curated: ALAQ's describes the formulation and the dose-optimization paper as well as the trial |
+| Proposing from every staged trial | The search is broad. ALAQ's returns 58 trials, mostly artesunate-amodiaquine and artemether-lumefantrine trials from 2004 to 2015. Only the trial the stage is waiting on says anything about the stage |
+
+**Which trials are followed.** Only for a medicine whose R&D stage is not done
+(today only ALAQ), and only:
+- any NCT number the stage cites in its own words; and
+- the trial in `PIVOTAL` in the script, for a stage that cites none. Today
+  that is ALAQ's FD-TACT, NCT05951595, which the stage names but does not
+  number.
+
+Rejected: matching a trial's acronym against the sentence. ALAQ's sentence
+says "triple ACT", so any trial whose acronym is "ACT" would have matched.
+
+**Left for a person, in the run summary:**
+- **An estimate that has already passed** while the registry still says the
+  trial is under way. That is the real case today: FD-TACT's estimated primary
+  completion, 31 Jul 2026, has passed, and the record still says recruiting,
+  last updated 18 Nov 2025. Proposing it would put a date already in the past
+  on the dashboard as "expected".
+- A trial terminated, withdrawn, suspended or of unknown status.
+- Results posted.
+- A followed trial missing from the staged list, which means the search no
+  longer finds it.
+
+New trials are not proposed at all. They are news, not a stage change, and the
+weekly trial watch issue already lists them (GanLum's NCT07811908, 28 Sep).
+
+**Repeats.** The same three stops as the regulatory watcher: an open proposal
+for the same medicine and stage, a rejected fingerprint, and one more of its
+own. If the date line already says exactly this, nothing is proposed. Without
+that last check, every weekly run would re-propose an approved line against a
+newer fetch date, because a newer source date counts as a change.
+
+**Guard.** Per medicine: if its staged trials fell by more than a fifth since
+the last fetch, nothing is proposed for it and the run fails at the end.
+
+**The fetcher now records what the watcher needs.** `fetch-trials.js` writes
+three more staging columns, at the end so no reader shifts: `acronym`,
+`primaryCompletionType` and `completionType`. The last two say `ACTUAL` or
+`ESTIMATED`. The raw snapshots always had them. `--restage` rebuilds the
+staging file from the latest snapshot without the network. Rebuilt from the
+28 Sep snapshot, the 15 old columns come back byte-identical to the committed
+file (72,853 bytes both), so the committed staging was regenerated that way.
+With a staging file from before this change, a `COMPLETED` trial is taken to
+have an actual date and no estimate is proposed.
+
+**The workflow now runs every watcher.**
+- After a fetch, each watcher reads its own staged list, and its shrink guard
+  compares that list with its previous committed version.
+- A manual run takes "every source, as fetched" or one test file. A test file
+  runs only its own source's watcher.
+- A watcher that fails, or is blocked, no longer stops the others. Their
+  proposals are filed, and the run fails at the end.
+- The weekly trials fetch re-runs the regulatory watcher on an unchanged list.
+  It proposes nothing new, because of the same repeat stops.
+
+**Fixtures:** `test-data/trials/`. ALAQ's FD-TACT row is changed to "reached
+primary completion" in one file and "estimate moved to Jun 2027" in the
+other. Its acronym reads `FD-TACT-TEST`, so a proposal filed from them says
+so in the line it would publish.
+
+**Found in passing:**
+- **The EMA fixture now proposes nothing.** Its proposal was rejected in an
+  earlier test run, and the watcher skips a rejected fingerprint, test data
+  included. To show the EMA route again, change the invented date in a copy.
+  The trial fixtures will go the same way once a test proposal from them is
+  rejected. The rule is right; the fixtures are single-use.
+- **The local workflow simulation is gone.** It lived outside the repository
+  and no longer exists. This change was tested with the script tests below
+  and by running the workflow step's own shell script locally.
+- **GitHub Actions is blocked by billing on the test repository** since at
+  least 3 Oct. Nothing here has run on GitHub yet.
+
+**Verification:**
+- `scripts/test-source-watchers.js`: 42 checks, added to `validate.yml`. They
+  cover reading one record, which trials are followed, the real list, both
+  fixtures through intake's own library, approval making a re-run propose
+  nothing, and the guards.
+- **Mutation check: eight deliberate breaks, each caught.** They were: no
+  past-estimate guard, stopped trials not refused, an estimate taken without
+  its type, no "already says this" check, following done stages, no shrink
+  guard, no `PIVOTAL` table, and no test-data marker.
+- The workflow's "Work out what the sources now say" step, run locally from the
+  YAML with its real shell script, for: every source (proposes nothing), a
+  trial fixture (one ALAQ proposal), a regulatory fixture (one GanLum
+  proposal), and an unknown file (fails). macOS's bash 3.2 has no `mapfile`,
+  so the step does not use it.
+- On the real list: nothing proposed, and FD-TACT's passed estimate left for a
+  person, in those words.
+
 ## Setup
 
 None new. The watcher uses `GITHUB_TOKEN`, and the labels and Vercel secrets
@@ -324,3 +433,14 @@ from the previews.
   0 errors / 5 warnings (3 resistance + 2 molecular markers); synthetic 0 / 0;
   `make-preview.js` 154 KB; `test-import.js` 127/127; `test-serializer.js`
   0 failures. No NUL bytes.
+
+## Status, `source-watchers` (5 Oct)
+
+- Branch `source-watchers`, off `main` at `b91bac2`. Commit 1: the trial
+  watcher. Not pushed yet when this was written.
+- CI cannot run while GitHub Actions is blocked by billing.
+- Files: `scripts/propose-trials.js`, `scripts/test-source-watchers.js` and
+  `test-data/trials/` (new); `scripts/fetch-trials.js`,
+  `sourcing/staging/trials.csv` (restaged),
+  `.github/workflows/source-proposals.yml`, `.github/workflows/validate.yml`,
+  `sourcing/README.md`, this document.

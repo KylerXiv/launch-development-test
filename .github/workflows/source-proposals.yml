@@ -2,11 +2,15 @@ name: Propose changes from public sources
 
 # After every scheduled fetch, turns what a public source now states outright
 # into proposals — the same issues, pull requests, previews and approvals as a
-# person's proposal. Today, from the regulatory list
-# (scripts/propose-regulatory.js): WHO Prequalification listing a portfolio
-# medicine, and EMA giving one a positive EU-M4all / Article 58 opinion, where
-# the dashboard does not yet show that stage as done. Anything that needs
-# judgement stays in the watch report for a person.
+# person's proposal. One watcher per source:
+#   scripts/propose-regulatory.js  WHO Prequalification listing a portfolio
+#                                  medicine; EMA giving one a positive
+#                                  EU-M4all / Article 58 opinion
+#   scripts/propose-trials.js      ClinicalTrials.gov: the trial a medicine in
+#                                  development is waiting on reaching primary
+#                                  completion, or its estimate moving
+# Anything that needs judgement stays in the watch report and the run summary
+# for a person.
 #
 # Nothing here writes data/products.js, or anything under data/: it files
 # issues, and intake, the PR, the preview and a person's approval do the rest.
@@ -17,9 +21,11 @@ name: Propose changes from public sources
 # the first.
 #
 # Manual run: Actions → "Propose changes from public sources" → Run workflow.
-# The test fixtures add invented rows — a WHO listing for GanLum (TEST-0001),
-# or an EMA opinion for GanLum (TEST-EMA-0001) — so the whole route can be seen
-# working; see test-data/regulatory/README.md.
+# Pick a test file to run only that source's watcher, on that file. The files
+# add invented rows — a WHO listing for GanLum (TEST-0001), an EMA opinion for
+# GanLum (TEST-EMA-0001), ALAQ's FD-TACT trial completing or slipping
+# (FD-TACT-TEST) — so the whole route can be seen working; see the README in
+# each test-data/ folder.
 
 on:
   workflow_run:
@@ -28,13 +34,15 @@ on:
   workflow_dispatch:
     inputs:
       staging:
-        description: "WHO PQ list to read"
+        description: "Every source as fetched, or one test file in place of its source"
         type: choice
         options:
-          - sourcing/staging/regulatory_events.csv
+          - every source, as fetched
           - test-data/regulatory/who-pq-ganlum-listed.csv
           - test-data/regulatory/ema-ganlum-opinion.csv
-        default: sourcing/staging/regulatory_events.csv
+          - test-data/trials/alaq-primary-completion.csv
+          - test-data/trials/alaq-estimate-moved.csv
+        default: every source, as fetched
 
 permissions:
   contents: read
@@ -47,44 +55,70 @@ concurrency:
 
 jobs:
   propose:
-    # Even after a partly failed fetch: the staged WHO list is only ever
-    # replaced whole, by a regulatory fetch that succeeded.
+    # Even after a partly failed fetch: each staged list is only ever replaced
+    # whole, by a fetch of that source that succeeded.
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion != 'cancelled'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0   # the previous staged list, for the shrink guard
+          fetch-depth: 0   # the previous staged lists, for the shrink guards
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      # A source whose list shrank sharply is blocked (exit 1), but the other
-      # source's proposals are still written — so file those, then fail the
-      # run at the end rather than here.
+      # A source whose list shrank sharply is blocked (exit 1), and so is a
+      # watcher that failed outright, but the other sources' proposals are
+      # still written — so file those, then fail the run at the end rather
+      # than here.
       - name: Work out what the sources now say
         id: work
         env:
-          STAGING: ${{ inputs.staging || 'sourcing/staging/regulatory_events.csv' }}
+          STAGING: ${{ inputs.staging || 'every source, as fetched' }}
         run: |
-          PREVIOUS=()
-          if [ "$STAGING" = "sourcing/staging/regulatory_events.csv" ]; then
-            BEFORE=$(git log -2 --format=%H -- "$STAGING" | sed -n 2p)
-            if [ -n "$BEFORE" ]; then
-              git show "$BEFORE:$STAGING" > "$RUNNER_TEMP/previous.csv"
-              PREVIOUS=(--previous "$RUNNER_TEMP/previous.csv")
+          OUT="$RUNNER_TEMP/proposals"
+          mkdir -p "$OUT"
+          STATUS=0
+          # The staged file as it was before its latest fetch, for the shrink
+          # guard: prints a copy's path, or nothing on a first fetch.
+          previous() {
+            local f="$1" before
+            before=$(git log -2 --format=%H -- "$f" | sed -n 2p)
+            [ -n "$before" ] || return 0
+            git show "$before:$f" > "$RUNNER_TEMP/previous-$(basename "$f")"
+            echo "$RUNNER_TEMP/previous-$(basename "$f")"
+          }
+          # One watcher, into its own folder. Its exit code is kept, not acted on.
+          watch() {
+            local name="$1"
+            shift
+            set +e
+            node "$@" --out "$OUT/$name" | tee -a "$GITHUB_STEP_SUMMARY"
+            local s=${PIPESTATUS[0]}
+            set -e
+            if [ ! -f "$OUT/$name/manifest.json" ]; then
+              echo "::error::The $name watcher failed before writing anything."
+              STATUS=1
+            elif [ "$s" != 0 ]; then
+              STATUS=1
             fi
-          fi
-          set +e
-          node scripts/propose-regulatory.js --staging "$STAGING" "${PREVIOUS[@]}" --out "$RUNNER_TEMP/proposals" \
-            | tee -a "$GITHUB_STEP_SUMMARY"
-          STATUS=${PIPESTATUS[0]}
-          set -e
+          }
+          case "$STAGING" in
+            "every source, as fetched")
+              P=$(previous sourcing/staging/regulatory_events.csv)
+              watch regulatory scripts/propose-regulatory.js ${P:+--previous "$P"}
+              P=$(previous sourcing/staging/trials.csv)
+              watch trials scripts/propose-trials.js ${P:+--previous "$P"}
+              ;;
+            test-data/regulatory/*.csv) watch regulatory scripts/propose-regulatory.js --staging "$STAGING" ;;
+            test-data/trials/*.csv)     watch trials scripts/propose-trials.js --staging "$STAGING" ;;
+            *) echo "::error::Not a list this workflow knows: $STAGING"; exit 1 ;;
+          esac
+          # One list for the filing step, whichever watchers ran.
+          jq -s 'add // []' "$OUT"/*/manifest.json > "$OUT/manifest.json" 2>/dev/null || echo '[]' > "$OUT/manifest.json"
           echo "status=$STATUS" >> "$GITHUB_OUTPUT"
-          # No manifest means it failed before writing anything: stop here.
-          [ -f "$RUNNER_TEMP/proposals/manifest.json" ] || exit "$STATUS"
 
       - name: File each one, and put it through intake
         env:
@@ -118,5 +152,5 @@ jobs:
       - name: Fail the run if a source was blocked
         if: steps.work.outputs.status != '0'
         run: |
-          echo "::error::A source was blocked by the shrink guard or another check — see the summary above. Proposals from the other sources were still filed."
+          echo "::error::A source was blocked by its shrink guard, or a watcher failed — see the summary above. Proposals from the other sources were still filed."
           exit 1
