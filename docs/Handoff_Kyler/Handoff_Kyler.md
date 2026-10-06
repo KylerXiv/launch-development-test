@@ -1,5 +1,122 @@
 # Handoff — RBM staging dashboard
 
+> **Read §0 first.** It is the state of the project on 6 October 2026. Everything
+> after it is the history of September's work, kept for its decisions. Where the
+> two disagree, §0 is current.
+
+## 0. Current state — 6 October 2026
+
+### Where things are
+
+| | |
+| --- | --- |
+| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. **Public since 6 Oct 2026.** Work on `main`; every branch from 5–6 Oct is merged |
+| Other remotes | `keith` is `Keith-paradox/launch-development`. Do not push to it, or to `kochrisdev/launch-transparency-dashboard` |
+| Production | Vercel project `launch-development-test`: <https://launch-development-test.vercel.app/illustrated-journey-dashboard.html>, also under `/fr/` and `/pt/`. Every push to `main` deploys |
+| Who can deploy | Vercel's Hobby plan refuses any commit whose Git author has no access to the Vercel project. Jackson (`codebyjackson`) has none, so his commits deploy only once a commit by Kyler sits on top, such as a merge commit. Check production after he pushes to `main` |
+| GitHub Actions | Runs again, free, since the repo went public (first good runs 09:42 UTC, 6 Oct). From 3 to 6 Oct every job was refused for billing ([developer-guide.md](../developer-guide.md) §8b) |
+| Repository secrets | `RESEND_API_KEY` (added 6 Oct), `GOOGLE_API_KEY`, `DATA_REPO_DEPLOY_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `VERCEL_DEPLOY_HOOK_URL`. Variable: `RBM_DATA_REPO` = `codebyjackson/launch-data-test` |
+| Email | Sent through Resend from `updates@tamarind.tech` to the team inbox `kyler@oqtiva.ai`, both set in `api/_mail.js`. Vercel holds `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET` for the forms; GitHub holds its own Resend key for the daily email |
+| Collaborators | `KylerXiv` (owner) and `codebyjackson` (write) |
+
+The verify block and its expected results are in [CLAUDE.md](../../CLAUDE.md).
+The one at the top of the history below is out of date.
+
+### What landed on 5–6 October
+
+| PR | What it does | Notes |
+| --- | --- | --- |
+| #54 | Subscribers get one email a day, at 15:00 UTC, on days the changelog gains lines (`notify-subscribers.yml`). Manual run: `preview` (team inbox only) or `send` | [subscriber-updates-notes.md](../subscriber-updates-notes.md) |
+| #55 | Source watchers for ClinicalTrials.gov (`propose-trials.js`), and for the NAFDAC and TMDA registers (`propose-registers.js`). Proposals can now add a country to the map, citing its register | [source-proposals-notes.md](../source-proposals-notes.md) |
+| #56 | The preview workflow's deploy step stops after 5 minutes and the job after 10, so a blocked deploy cannot burn hours | [pr-preview-notes.md](../pr-preview-notes.md) |
+| #57 | Disclaimer: "Unitaid does not accept legal responsibility…" instead of "We do not…" (Unitaid's request) | [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.35 |
+| #58 | Developer guide brought up to date: Vercel hosting, every workflow, Actions minutes and billing (§8b) | [developer-guide.md](../developer-guide.md) |
+| #59 | Proposal intake starts by itself only for issues from the owner, members or collaborators. On a public repo anyone else could otherwise make the bot commit to `main` and deploy a preview | [pr-preview-notes.md](../pr-preview-notes.md) |
+| #60 | Jackson: verified country lists, where every entry cites `sources` and `checked`, and register fetchers for Rwanda, Zambia, Zimbabwe and Viet Nam | his commits |
+
+**Checked working on 6 Oct, on GitHub and on the live site:**
+- Every workflow run since the merges passed, including the new test steps in
+  `validate.yml`.
+- Two `preview` runs of the subscriber email reached the team inbox.
+- The source watchers' first run, on real data: no proposals, as expected.
+  FD-TACT's passed registry estimate was left for a person.
+- The English, French and Portuguese pages load. Both form endpoints answer.
+
+### What runs by itself next
+
+| When | What |
+| --- | --- |
+| Daily, 15:00 UTC | Subscriber email. The first run, 6 Oct, sends nothing and only marks the starting point |
+| Mondays, 06:00 UTC | Trials fetch, then the source watchers |
+| 1st of the month | Data review reminder issue |
+| 3rd of the month, 06:30 UTC | Global Fund, regulatory and the six national registers, then the source watchers |
+
+**October's monthly fetch never ran**: it was refused for billing on 3 Oct.
+Start "Scheduled source fetch" by hand, or wait for 3 November. A fetch can
+open watch issues and file proposals, which are public now.
+
+### Still open
+
+**Waiting on Unitaid:**
+1. Whether pricing data is included. They are checking.
+2. Permission to show the Unitaid mark and the WHO emblem, including on RBM's
+   embedded copy.
+3. Who the data controller is for the subscribe and feedback emails.
+4. A shared Unitaid inbox, and a Unitaid sending domain, to replace the test
+   addresses in `api/_mail.js`.
+5. Which Essential Medicines List to cite: the 2023 list the page links, or
+   the 2025 one.
+6. Whether Uganda's register stays listed under Sources while it feeds no data.
+
+**Unitaid's feedback of 5 Oct.** Kyler chose to act only on the disclaimer
+(#57). Do not start the others unprompted:
+- **Coartem Baby:** Unitaid will not include it. It is not in the data.
+- **Pricing:** waiting on item 1 above.
+- **"Status" and "On pathway":** for that week's meeting. Facts, if it comes
+  back:
+  - "Delayed" is stage status `late`: an analyst marked that step as the
+    access barrier. It is measured against no date, and the page does not
+    define it.
+  - "On pathway" is the years since the first dated milestone, with no end.
+  - The reviewer suggests ending "market access" at WHO prequalification plus
+    recommendation, which gives 2022 for ASPY and 2015 for DHA–PPQ; GanLum
+    and ALAQ have not reached it.
+
+**Waiting on Kyler's go-ahead: four corrections to `data/sources.js`,** found
+on 5 Oct by checking the sheet of "new public sources". All seven sheet rows
+were already in the registry.
+- WHO malaria guidelines: version 10.0, 10 Sep 2026, not 13 Aug 2025. The
+  guideline's MAGICapp record id changes with each version; the stable key is
+  the short code `LwRMXj`.
+- WHO comparator list: the 30 June 2026 edition, which names the comparators
+  for ASPY and DHA–PPQ.
+- "MESA malaria medicines landscape": the file is Unitaid's own 2015 report,
+  which MESA only hosts.
+- Essential Medicines List edition: decided by Unitaid's item 5.
+
+**Not built:**
+- A confirmation email to people who send feedback. The suggested design is a
+  fixed text that never repeats their message, sent only when they gave an
+  address, with the reference number.
+- Watchers for #60's four new registers: one row each in `REGISTERS`, in
+  `propose-registers.js`.
+- A WHO guideline version watcher, and a comparator-list watcher.
+
+**Housekeeping:**
+- **Branch protection is now available,** because the repo is public, and not
+  switched on. §5's "Blocked on GitHub Pro" no longer applies to this
+  repository.
+- **Jackson needs a Vercel seat,** or his commits keep needing one by Kyler on
+  top before they deploy.
+- **Test fixtures work once.** A rejected test proposal is never proposed
+  again; the EMA fixture is already used up. See each `test-data/*/README.md`.
+- **Responsive testing** on devices and browsers is with Kyler, 6 Oct.
+
+---
+
+## History (September 2026)
+
+
 **Branch:** `data-editor` · **13 commits** · **not pushed** · CI not yet run
 **Last worked:** 17 September 2026
 **Working tree:** clean apart from two untracked `.DS_Store` files
@@ -26,6 +143,10 @@ plan, setup phases).
 ---
 
 ## Start here
+
+> *17 September 2026, `data-editor`. Out of date: `normalize-resistance.js` and
+> `normalize-molecular-markers.js` were removed on 1 Oct, and the validator
+> now expects 1 warning. Use the verify block in CLAUDE.md.*
 
 ```bash
 git checkout data-editor
@@ -311,6 +432,10 @@ protection exists. Point the editor at a scratch branch while building.
 
 ### Blocked on GitHub Pro — $4/month
 
+> *No longer blocked on `KylerXiv/launch-development-test`: it is public since
+> 6 Oct 2026, and public repositories get branch protection free. Not switched
+> on yet. The account list below is Keith's repository's, not this one's.*
+
 Branch protection is not available on the current plan. GitHub says so
 directly:
 
@@ -437,6 +562,11 @@ submissions can be tagged or dropped, but somebody has to decide which.
   is a privacy setting to choose deliberately, not inherit.
 
 #### Blocked on — all Unitaid's, none technical
+
+> *6 Oct 2026: items 3 and 4 are done for testing, on a Resend account with
+> `tamarind.tech` as the verified sending domain. Item 5 was settled as a real,
+> double opt-in list, built 1 Oct. Items 1, 2 and 6 are still Unitaid's; see
+> §0.*
 
 1. A destination inbox. A shared mailbox, not a person: these outlive whoever
    is on the project.
