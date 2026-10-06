@@ -368,5 +368,7 @@ module.exports = {
   ADDRESSES, EMAIL_RE, DASHBOARD, CONFIRM_DAYS,
   config, reply, readRequest, notConfigured, logNotConfigured,
   line, block, esc, newRef, siteUrl, makeToken, readToken, readLink, page,
-  render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure
+  render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure,
+  // For scripts/notify-subscribers.js, which sends the update emails as broadcasts.
+  resendRequest
 };

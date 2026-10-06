@@ -1,0 +1,82 @@
+name: Email subscribers about updates
+
+# Once a day, emails everyone subscribed on the illustrated journey page about
+# what changed on the dashboard since the last update email: the changelog
+# lines in data/products.js added since then, as one Resend broadcast. A day
+# with no new lines sends nothing. See docs/subscriber-updates-notes.md.
+#
+# Where "since the last update email" comes from: every run that could send is
+# titled "(send)", and records the commit it ran on. This run compares the data
+# now with the data at the newest such run that succeeded. A run that fails
+# (Resend down, key missing) is not a success, so the next one picks up its
+# lines. The very first run has nothing to compare with: it sends nothing and
+# becomes the starting point.
+#
+# Manual run: Actions → "Email subscribers about updates" → Run workflow.
+#   preview  emails the team inbox (ADDRESSES.to in api/_mail.js) what
+#            subscribers would get. Sends nothing to them, and moves nothing.
+#   send     emails every subscriber now, instead of waiting for 15:00 UTC.
+#
+# Needs the repository secret RESEND_API_KEY, a Resend key with Full access.
+
+on:
+  schedule:
+    - cron: "0 15 * * *"   # daily, 15:00 UTC: after a working day of approvals in Geneva
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "preview = the team inbox only; send = every subscriber, now"
+        type: choice
+        options: [preview, send]
+        default: preview
+
+run-name: "Email subscribers (${{ inputs.mode || 'send' }})"
+
+permissions:
+  contents: read
+  actions: read   # to find the last run that sent
+
+concurrency:
+  group: notify-subscribers
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      # Exactly the commit this run is recorded against (not main as it is
+      # when the step runs), so the next run starts where this one ended.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0   # the commit the last update email was built from
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Find the commit the last update email was built from
+        id: since
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHA=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow notify-subscribers.yml \
+                  --status success --limit 100 --json headSha,displayTitle \
+                  --jq '[.[] | select(.displayTitle | endswith("(send)"))][0].headSha // ""')
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Last update email built from: ${SHA:-none yet}"
+
+      # The last step, on purpose: a run that sent must end as a success, or
+      # the next one would send the same lines again. (A re-run finds its own
+      # broadcast by name and does not send twice either.)
+      - name: Email what changed
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SINCE: ${{ steps.since.outputs.sha }}
+          MODE: ${{ inputs.mode || 'send' }}
+        run: |
+          if [ -n "$SINCE" ]; then
+            node scripts/notify-subscribers.js --mode "$MODE" --since "$SINCE"
+          else
+            node scripts/notify-subscribers.js --mode "$MODE"
+          fi
