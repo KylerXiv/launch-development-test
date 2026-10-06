@@ -45,9 +45,17 @@ jobs:
     # otherwise anyone could rewrite a proposal and then approve it themselves,
     # and nobody could edit one the source watcher filed without that being
     # the only review it got.
+    #
+    # Only the team's own issues start it by themselves. The form adds the
+    # "proposal" label for whoever files it, and this job commits to main,
+    # opens a pull request and deploys a preview with the Vercel token. On a
+    # public repository that would be anyone on GitHub. An issue from outside
+    # the team is answered by the job below instead, and a team member who has
+    # read it can still start this one by hand (Run workflow, issue number).
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (contains(github.event.issue.labels.*.name, 'proposal') && github.event.issue.state == 'open' &&
+       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
        (github.event.action != 'edited' || github.event.sender.login == github.event.issue.user.login))
     runs-on: ubuntu-latest
     steps:
@@ -190,3 +198,21 @@ jobs:
           else
             gh issue edit "$ISSUE_NUMBER" --add-label needs-fixing --remove-label waiting || true
           fi
+
+  # A proposal filed from outside the team: nothing runs on it, and it says so
+  # once, so the person is not left waiting on a check that never comes.
+  outside:
+    if: >-
+      github.event_name == 'issues' && github.event.action == 'opened' &&
+      contains(github.event.issue.labels.*.name, 'proposal') &&
+      !contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Tell the person what happens next
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body "Thank you. Proposals from outside the LAUNCH team are read by a person before any check runs on them, and nothing on the dashboard changes until the team has reviewed and approved it. Someone from the team will pick this up here."
+          gh issue edit "$ISSUE" --repo "$GITHUB_REPOSITORY" --remove-label waiting || true

@@ -246,3 +246,51 @@ and returns. A limit on each would still be cheap insurance.
   - a failed deploy posts "failed" with the Vercel line;
   - a failed validator, with the deploy skipped, posts "failed" without it.
 - Verify block as CLAUDE.md expects. No NUL bytes.
+
+## Intake only for the team's own issues, 6 Oct
+
+Branch `fix/intake-team-only`, off `main` at `5bdc042`. Found while checking
+whether the repository could be made public.
+
+**The problem.** The proposal form adds the `proposal` label for whoever files
+it (`labels: ["proposal", "waiting"]`), and `proposal-intake.yml` starts on any
+open issue with that label. Intake then:
+- commits the snapshot to `data/proposals.js` on `main`;
+- pushes a `proposal/<n>` branch and opens a pull request;
+- dispatches `pr-preview.yml`, which deploys a Vercel preview with the
+  project's token, carrying the issue's text on a Unitaid-branded page.
+
+On a private repository only collaborators can file issues, so this was safe.
+On a public one, anyone with a GitHub account could do all three. Approval
+still needs a team member's label, so nothing could reach production; but the
+commits, branches and previews would be theirs to create.
+
+**The fix.** Intake's `issues` path now also requires the issue's
+`author_association` to be `OWNER`, `MEMBER` or `COLLABORATOR`. A proposal
+from anyone else gets one comment instead, from a new job, `outside`: a person
+reads it first, and nothing changes until the team approves it. The `waiting`
+label the form added is removed. A team member who has read it can still
+start intake for it by hand: Run workflow, with the issue number. That path
+skips the check, as before.
+
+**Not affected.**
+- The source watchers' issues. They are filed with `GITHUB_TOKEN`, which
+  starts no workflows, so `source-proposals.yml` always starts intake by
+  dispatch. All 12 proposal issues so far were filed that way
+  (`author_association` `NONE`, author `github-actions[bot]`).
+- The repository owner (`OWNER`) and Jackson (`codebyjackson`, a collaborator
+  with write access).
+- `proposal-decision.yml`: it starts on a label, and only people with write
+  access can label.
+- `pr-preview.yml` on a pull request from a fork: it already skips those,
+  and forks get no secrets.
+
+**Rejected:** dropping the form's automatic label. People on the team would then
+have to label their own proposals, and the label alone was never the problem:
+who filed the issue is.
+
+**Verified:** the workflow parses with both jobs. The association values were
+checked against this repository's real issues: the owner's show `OWNER`, the
+bot's show `NONE`, and Jackson is listed as a collaborator with write access.
+The expression form `contains(fromJSON('[…]'), value)` is GitHub's documented
+one; it has not run on GitHub, because Actions is blocked by billing.
