@@ -35,7 +35,7 @@ every page still works without them.
 | `story.html` | Scroll-driven data story. Steps (left) drive a sticky layered visual (right) via IntersectionObserver (guarded — no IO means step 0 stays active). Every figure is derived from the data at render time — the hero product is `pyramax` falling back to the first `market` product, the headline gap is computed from its `journey`, so the narrative self-updates. Count-up respects `prefers-reduced-motion`. |
 | `widget.html` | Embeddable one-row product tracker for partner sites (`?product=<id or name>`). Dependency-free; reads the same data file. |
 | `data/products.js` | The data contract: `window.LAUNCH_DATA = { …strict JSON… }`. The only file analysts touch; **feeds all three pages**. |
-| `assets/report-issue.js` | The **Send feedback** front end (DEV-04; called "Report an issue" until 30 Sep 2026): floating pill and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. No backend yet; see §9c. |
+| `assets/report-issue.js` | The **Send feedback** front end (DEV-04; called "Report an issue" until 30 Sep 2026): floating pill and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. Connected on the illustrated journey page only, where it posts to `api/feedback.js`; on every other page Send is blocked. See §9c. |
 | `api/` | Vercel functions for the illustrated journey page's forms. Subscribe, double opt-in: `subscribe.js` (emails a confirm link, saves nothing), `confirm.js` (the link's page → Resend contact, welcome email, team inbox), `unsubscribe.js` (the welcome's link and the mail app's one-click unsubscribe). Send feedback: `feedback.js` (the report → team inbox, Reply-To the visitor). And `_mail.js` (shared, and where the addresses are set; the underscore keeps it from being a route). The two secrets, `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET`, are env vars on the Vercel project. Decisions in [email-backend-notes.md](email-backend-notes.md). |
 | `data/world-map.js` | Generated geometry: `window.LAUNCH_MAP = { w, h, countries: { ISO3: { n, d } } }`. Natural Earth 110m, public domain. Committed output — regenerate with `scripts/build-map.js`, never hand-edit. |
 | `history/` | Dated snapshots of the data file, bot-committed by `publish.yml` on every data change. Append-only, one per date: a later change the same day replaces that day's snapshot, so it holds the day's final state. The raw material for future trend charts and playback. |
@@ -54,6 +54,11 @@ every page still works without them.
 | `.github/workflows/publish-dataset.yml` | **Publish to RBM data repo.** Builds `dashboard.json` (`scripts/build-dataset.js`, contract `public-data/v1/schema.json`) from `main` and pushes it, with a timestamped archive copy and a `CHANGELOG.md` entry, to the public repo named by the `RBM_DATA_REPO` variable (deploy key: `DATA_REPO_DEPLOY_KEY`). Starts by itself at the end of every approval (`translate.yml`, `after_approval`), or by hand ("Publish now", with a reason and a dry-run box). Refuses to publish over a hand change to the published file (drift check). See `docs/public-data-layer-notes.md`. |
 | `.github/workflows/reminder.yml` | Monthly cron: opens the milestone-scan checklist issue. Also runnable manually (workflow_dispatch). |
 | `.github/workflows/sourcing.yml` | Scheduled source fetch: weekly trial watch (Mon), monthly Global Fund + regulatory pulls (3rd); bot-commits outputs under `sourcing/` only and opens watch issues on changes. Manually runnable with a fetcher picker. |
+| `.github/workflows/source-proposals.yml` | **The source watchers.** After every scheduled fetch, runs one script per source (`scripts/propose-*.js`) and files a proposal issue for anything a public source states outright, then starts intake for each. Anything that needs judgement stays in the run summary and the watch report. Manually runnable with a test file per source (`test-data/`). See [source-proposals-notes.md](source-proposals-notes.md). |
+| `.github/workflows/proposal-intake.yml` | When a proposal issue is filed or edited, by a person or a source watcher: checks it against the data rules with the change applied, snapshots it into `data/proposals.js`, opens it as a pull request and asks for a preview. |
+| `.github/workflows/proposal-decision.yml` | When a reviewer labels a proposal issue: `approved` merges its pull request, after checking it is exactly the snapshot applied to `main` as it is now, and translates it first; `rejected:…` records the reason and fingerprint in `data/decisions.js`. |
+| `.github/workflows/pr-preview.yml` | Builds the public site from a pull request's commit and deploys it as a Vercel **preview**, never production, keeping one comment on the pull request with the link. Time limits: 5 minutes on the deploy step and 10 on the job (§8b). See [pr-preview-notes.md](pr-preview-notes.md). |
+| `.github/workflows/vercel-deploy.yml` | On every push to `main`, calls the Vercel deploy hook. It also runs by dispatch, because a merge made by the approval bot starts no push workflows. |
 | `sourcing/` | Public-source data collection area: append-only raw snapshots, regenerated staging CSVs, generated watch reports. Upstream of analyst edits — **never feeds the pages directly**. Self-documented in its own README; design in [docs/data-sourcing-plan.md](data-sourcing-plan.md). |
 | `scripts/fetch-trials.js` | ClinicalTrials.gov v2 fetcher: portfolio trial snapshots + staging CSV + what-changed report (status, phase, completion-date, results diffs). |
 | `scripts/fetch-globalfund.js` | Global Fund Data Service (OData v4.2) fetcher: malaria grants + disbursement transactions → grant and grant-year staging CSVs. |
@@ -166,7 +171,13 @@ troubleshooting table.
 
 No test framework by design; two layers instead:
 
-- **CI**: the validator plus the preview build on every push.
+- **CI** (`validate.yml`, on every push and pull request). As of 6 Oct 2026 it
+  runs: the validator on both datasets; the single-file preview build; the
+  French and Portuguese pages and their self-check; the RBM `dashboard.json`
+  build and its tests (`test-build-dataset.js`, `test-dataset-diff.js`); the
+  RBM pages and their test; and the SHACL governance shapes. The workflow file
+  is the list. The proposal library has its own test,
+  `node scripts/proposal-lib.js selftest`, which CI does not run.
 - **Manual/agent smoke test** (jsdom, used during development):
 
   ```bash
@@ -186,24 +197,34 @@ No test framework by design; two layers instead:
 - **The form functions** (`api/`): `node scripts/test-mail-api.js`. It stubs
   `fetch`, so it needs no Resend key or network, and it checks what would be
   sent to Resend and what the visitor would be told. Run it after any change
-  under `api/`. It is not in CI, like the other `test-*.js` scripts.
+  under `api/`. It is not in CI.
 
 ## 8. Deployment and handover
 
-- **Now**: GitHub Pages from `main` root; every push is live in ~1–2 min.
-  CI gates data quality but does not gate the Pages deploy (branch-based Pages
-  deploys regardless) — treat a red CI run as a revert-now signal.
+- **Now**: Vercel. Production is the project's build of `main`
+  (`vercel.json` runs `scripts/build-public-site.sh` into `public-site/`),
+  served at `https://launch-development-test.vercel.app` while the work sits in
+  the test repository. Every push to `main` deploys, through Vercel's GitHub
+  connection and `vercel-deploy.yml`'s deploy hook. CI does not gate that
+  deploy, so treat a red CI run as a revert-now signal. Pull requests get
+  preview deployments (`pr-preview.yml`, §2).
+- **Vercel's Hobby plan refuses to deploy a commit whose Git author has no
+  access to the Vercel project.** That applies to previews and to production.
+  A commit by someone with access, on top, deploys it. Until the project moves
+  to a plan with a seat for each committer, check production after anyone
+  else pushes to `main`.
 - **Bot commits**: `publish.yml` pushes snapshot/feed commits to `main` after
   data changes, and `translate.yml` pushes `i18n/` commits after changes to the
   page or the data — always `git pull` before pushing local work, or a
   fast-forward rejection will greet you.
-- **RBM options**: (a) copy the static set — `index.html`, `pipeline.html`,
-  `story.html`, `widget.html`, `data/`, `feed.xml`, `.nojekyll` (plus
-  `option-b.html` while the design review runs) — to any path on their site; (b) iframe the Pages URL (snippet
-  in the README); (c) transfer the repo to an RBM GitHub org (history and CI
-  move; Pages URL changes). The `feed.xml` URL and widget embed URLs change
-  with the host — update the constants in `scripts/make-feed.js` and partner
-  snippets when they do.
+- **RBM**: decided 23 Sep 2026, RBM embeds the page in an iframe served from
+  this site's own origin, and receives the data as `dashboard.json` through
+  `publish-dataset.yml`. `scripts/build-rbm-pages.js` builds RBM's own copies
+  of the page. Unitaid owns the repository and the hosting after handover. See
+  [rbm-handover-notes.md](rbm-handover-notes.md) and
+  [Handoff_Kyler.md](Handoff_Kyler/Handoff_Kyler.md). The `feed.xml` URL
+  still points at the old GitHub Pages site: update `SITE` in
+  `scripts/make-feed.js` when the final domain is known.
 - No secrets exist anywhere in the repo or its history; the confirmation
   register lives outside the repo by policy.
 - **The two forms (Subscribe, and Send feedback on the illustrated journey)
@@ -217,6 +238,37 @@ No test framework by design; two layers instead:
   of the page hide Subscribe and leave Send feedback unconnected
   (`scripts/build-rbm-pages.js`). Setup and the rate-limit rule:
   [email-backend-notes.md](email-backend-notes.md) §1.
+
+## 8b. GitHub Actions: minutes, time limits and billing
+
+- **Who pays.** On a private repository, Actions minutes are billed to the
+  repository's owner: 2,000 free minutes a month on GitHub Free, reset on the
+  1st. Extra minutes cost $0.006 each, if a payment method and a budget are set.
+  On a public repository the standard runners are free.
+- **What a blocked account looks like.** Every job fails within two or three
+  seconds and shows no steps. The reason is only in the job's annotations:
+
+  ```bash
+  gh api repos/<owner>/<repo>/check-runs/<job id>/annotations --jq '.[].message'
+  # "The job was not started because recent account payments have failed or
+  #  your spending limit needs to be increased."
+  ```
+
+  Read this before blaming a workflow failure on code.
+- **What happened in October 2026.** On 1–2 Oct, five preview runs hung at the
+  Vercel deploy step for six hours each, GitHub's default job limit. All five
+  were commits Vercel refused to deploy (§8). Together they used about 1,810 of
+  the month's 2,000 minutes, and from 3 Oct every job was refused, including
+  the monthly source fetch.
+- **The time limits.** `pr-preview.yml` sets `timeout-minutes: 5` on its deploy
+  step and `timeout-minutes: 10` on its job. Both are needed. A step that runs
+  out of time fails and the job goes on, so the pull request still gets its
+  "preview failed" comment. A job that runs out of time is cancelled, which
+  skips that comment and leaves the previous preview link looking current. A
+  good run takes under 1.5 minutes.
+- **Every other workflow still has the six-hour default.** None of them waits
+  on Vercel, but a `timeout-minutes` on each would cap the cost of any future
+  hang.
 
 ## 9. Extension notes
 
