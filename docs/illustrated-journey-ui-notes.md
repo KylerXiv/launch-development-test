@@ -1548,6 +1548,37 @@ in email-backend-notes.md §3).
 Written as §3.27 on `email-feedback` and renumbered §3.34 when merged after
 §3.27–3.33.
 
+### 3.35 The disclaimer names Unitaid, not "we" (5 Oct 2026)
+
+Branch `fix/disclaimer-unitaid`. Unitaid's feedback on the §3.29 disclaimer:
+the second paragraph should say who does not accept responsibility. It now
+reads "Unitaid does not accept legal responsibility for the accuracy of the
+data. In particular, Unitaid does not guarantee that it is complete, up to
+date or fit for a specific purpose." The rest of that paragraph and the other
+two are unchanged; neither used "we".
+
+Unitaid commented on this sentence only. That is not a sign-off of the whole
+disclaimer, which §3.29 records as draft.
+
+**Translation.** A hand-made change, so the translate bot translates it after
+it reaches `main` (translation-notes.md). Until then `/fr/` and `/pt/` show this
+sentence in English; the rest of the disclaimer stays translated. The bot runs
+on GitHub Actions, which the test repository's billing has blocked since 3 Oct.
+
+Because the bot cannot run, this branch also carries `i18n/content.en.json`,
+rebuilt with `assemble-content.js`. Without it, `test-build-dataset.js` refuses
+the stale file, and `main` would stay stale until Actions works. The rebuild
+changes exactly one string, this sentence (key `54c37693dac92781` →
+`08b040196e4a9023`), and the content hash. `translations.json` is untouched:
+the bot adds the French and Portuguese when it next runs, and finds the content
+file already current.
+The old French and Portuguese ("Nous déclinons…", "Não nos
+responsabilizamos…") were engine translations, not reviewed ones, so no
+reviewed wording is lost.
+
+RBM's copies, built from this page by `build-rbm-pages.js`, carry the new
+wording from their next build.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)

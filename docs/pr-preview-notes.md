@@ -187,3 +187,62 @@ GitHub, for the test repository:
   synthetic 0 / 0; `make-preview.js` 154 KB; `proposal-lib.js selftest` 20/20,
   `test-import.js` 127/127, `test-serializer.js` 0 failures. No NUL bytes in any
   changed file.
+
+## Time limits, 5 Oct
+
+Branch `fix/preview-timeout`, off `main` at `b91bac2`. One commit, pushed,
+with its own pull request. CI cannot run while GitHub Actions is blocked by
+billing; the checks below were run locally.
+
+**What happened.** Five runs of this workflow hung at "Deploy it as a
+preview" until GitHub's default job limit of 360 minutes stopped them:
+
+| Run started (UTC) | Branch | Minutes |
+| --- | --- | --- |
+| 1 Oct, 15:40 | `feat/public-data-layer` | 370 |
+| 1 Oct, 17:36 | `feat/public-data-layer` | 361 |
+| 1 Oct, 17:36 | `feat/rbm-handover` | 361 |
+| 1 Oct, 18:30 | `fix/dataset-diff-lists` | 360 |
+| 2 Oct, 13:12 | `fix/post-merge-i18n` | 361 |
+
+Together about 1,810 minutes, out of the private repository's 2,000 free
+minutes a month. Everything else on those two days used about 100. Every job
+has been refused for billing since at least 3 Oct, including the monthly
+source fetch. The cause is the Vercel Hobby rule in "Found in passing": Vercel
+holds a deployment whose commit author has no access to the project, and
+`vercel deploy` waits for it forever. All five head commits were authored by
+Oakkar-Min (`codebyjackson`), who has no seat on the Vercel project.
+
+**Decision: two limits.**
+- **The deploy step: 5 minutes.** When a step runs out of time it fails, and
+  the job goes on. So the comment step still runs and replaces the link with
+  "Public dashboard preview — failed". That comment now adds a line naming
+  the likely cause whenever the deploy step itself failed.
+- **The job: 10 minutes**, for a hang anywhere else.
+
+A good run takes under 1.5 minutes: the median of 38 successful runs is 0.8,
+and the longest 1.4.
+
+| Rejected | Because |
+| --- | --- |
+| The job limit alone | A job that runs out of time is cancelled, and the comment step is skipped on cancellation. The pull request would keep its previous preview link, the one thing this workflow exists to prevent |
+| `vercel deploy --no-wait` | It returns a URL before Vercel decides. For a blocked commit that URL never serves the page, and the comment would call it the preview |
+| Shorter limits | Installing the Vercel CLI and building the site take most of a good run. A slow day on npm should not fail a preview |
+
+A blocked deploy now costs at most about 5 minutes instead of 6 hours. The
+cause itself is unchanged: a commit by someone without Vercel access still
+cannot be previewed until someone with access commits on top of it, or the
+project moves to a plan that gives them a seat.
+
+**Not changed:** the other workflows still have GitHub's default limit of six
+hours. None of them waits on Vercel: `vercel-deploy.yml` calls a deploy hook
+and returns. A limit on each would still be cheap insurance.
+
+**Verified:**
+- The workflow parses. The job limit is 10 and the deploy step's is 5.
+- The comment step's own shell script, run locally with a stand-in for `gh`,
+  for three cases:
+  - success posts the link;
+  - a failed deploy posts "failed" with the Vercel line;
+  - a failed validator, with the deploy skipped, posts "failed" without it.
+- Verify block as CLAUDE.md expects. No NUL bytes.
