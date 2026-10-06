@@ -2,9 +2,9 @@
 // and the mail app's own "Unsubscribe" button (List-Unsubscribe-Post, RFC
 // 8058), which POSTs here directly.
 //
-// GET shows a page with an "Unsubscribe" button, for the same reason as
-// api/confirm.js: link scanners open every link, and must not unsubscribe
-// anyone. The POST marks the Resend contact unsubscribed — the same flag
+// GET shows a page with an "Unsubscribe" button: many mail systems open every
+// link in an incoming email to scan it, and must not unsubscribe anyone by
+// doing so. The POST marks the Resend contact unsubscribed — the same flag
 // Resend's own broadcast unsubscribe link sets, so every later broadcast skips
 // the address. The contact itself is kept, as Resend does: deleting it would
 // lose the record that this address said no.

@@ -565,7 +565,9 @@ submissions can be tagged or dropped, but somebody has to decide which.
 
 > *6 Oct 2026: items 3 and 4 are done for testing, on a Resend account with
 > `tamarind.tech` as the verified sending domain. Item 5 was settled as a real,
-> double opt-in list, built 1 Oct. Items 1, 2 and 6 are still Unitaid's; see
+> double opt-in list, built 1 Oct; on 6 Oct the owner made it single opt-in
+> (no confirm email; the welcome carries the unsubscribe link, see
+> email-backend-notes.md §2.3). Items 1, 2 and 6 are still Unitaid's; see
 > §0.*
 
 1. A destination inbox. A shared mailbox, not a person: these outlive whoever
