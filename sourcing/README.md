@@ -6,10 +6,15 @@ the dashboards directly.** Collected data becomes a dashboard value only
 through an approved proposal — its own issue, pull request and preview — with
 `source` / `asOf` provenance carried over, and `scripts/validate-data.js`
 checking it on the way. An analyst files most proposals with the issue form. For
-what a source states outright, the **source watcher** files them
-(`scripts/propose-regulatory.js`, run by `.github/workflows/source-proposals.yml`
-after every fetch; today: WHO PQ listing a portfolio medicine, and EMA giving
-one a positive EU-M4all / Article 58 opinion). Either way a person approves it.
+what a source states outright, the **source watchers** file them, run by
+`.github/workflows/source-proposals.yml` after every fetch:
+`scripts/propose-regulatory.js` (WHO PQ listing a portfolio medicine, and EMA
+giving one a positive EU-M4all / Article 58 opinion) and
+`scripts/propose-trials.js` (the trial a medicine in development is waiting on
+reaching primary completion, or its estimate moving) and
+`scripts/propose-registers.js` (NAFDAC or TMDA listing a medicine as currently
+registered in a country its map does not show). Either way a person approves
+it.
 
 ## Layout
 
@@ -129,7 +134,11 @@ Notes:
 - **Trials**: `productId` maps to `data/products.js` ids. The search terms live
   at the top of `fetch-trials.js` — extend them when a product is added.
   Sponsor-reported statuses can lag; `lastUpdatePostDate` says how fresh a
-  record is.
+  record is. `primaryCompletionType` and `completionType` say whether a date is
+  `ACTUAL` or `ESTIMATED`, and `acronym` is the trial's short name (columns
+  added 5 Oct 2026, at the end). `node scripts/fetch-trials.js --restage`
+  rebuilds `staging/trials.csv` from the latest raw snapshot with no network;
+  it must come back byte-identical.
 - **Global Fund**: amounts are reference-rate USD. Negative disbursement years
   are real (refunds/adjustments) — pass them through, don't zero them.
   The Data Service has **no PQR entity**: transaction-level prices/volumes
