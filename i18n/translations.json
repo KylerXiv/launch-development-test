@@ -50,6 +50,13 @@
       "fr": "Organismes nationaux de réglementation des médicaments.",
       "pt": "Organismos reguladores nacionais de medicamentos."
     },
+    "03f667dfdf5c70c1": {
+      "en": "A study of an MFT pilot planned in Kaya district, Burkina Faso, using three treatments.",
+      "where": "sources.sources[26].plain",
+      "bucket": "data",
+      "fr": "Une étude d’un projet pilote MFT prévu dans le district de Kaya, au Burkina Faso, utilisant trois traitements.",
+      "pt": "Um estudo de um projeto piloto MFT planeado no distrito de Kaya, no Burkina Faso, utilizando três tratamentos."
+    },
     "0475614aed28ff3f": {
       "en": "940k packs (GF, to 2025)",
       "where": "products.products[2].detail.milestones[6].label",
@@ -91,6 +98,13 @@
       "bucket": "js",
       "fr": "appel hors délai (la ligne reflue)",
       "pt": "contacto fora de ordem (a linha cai para trás)"
+    },
+    "065553e462df7207": {
+      "en": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and on the country access map in 13 countries with a reliable source, but national guideline inclusion remains limited",
+      "where": "products.products[2].flag",
+      "bucket": "data",
+      "fr": "L'adoption constitue actuellement le principal obstacle à l'accès : fortement recommandée par l'OMS depuis 2022 et figurant sur la carte d'accès nationale dans 13 pays disposant d'une source fiable, son intégration dans les recommandations nationales demeure toutefois limitée.",
+      "pt": "A adoção é a atual barreira de acesso — fortemente recomendada pela OMS desde 2022 e presente no mapa de acesso nacional em 13 países com fonte fidedigna, mas a inclusão nas orientações nacionais continua limitada."
     },
     "0679e4172feafdfb": {
       "en": "Access-pathway status of new antimalarial medicines — stages, milestones, country access and procurement — with public-source provenance on every figure.",
@@ -147,6 +161,13 @@
       "bucket": "data",
       "fr": "Cameroun",
       "pt": "Camarões"
+    },
+    "08b040196e4a9023": {
+      "en": "Unitaid does not accept legal responsibility for the accuracy of the data. In particular, Unitaid does not guarantee that it is complete, up to date or fit for a specific purpose. Country stages in this version are illustrative and have not been verified, except for the Nigeria and Tanzania registrations. Users should carry out their own country-level checks before making any decision based on this data.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Unitaid décline toute responsabilité quant à l'exactitude des données. En particulier, Unitaid ne garantit ni leur exhaustivité, ni leur mise à jour, ni leur adéquation à un usage particulier. Les informations relatives aux pays dans cette version sont données à titre indicatif et n'ont pas été vérifiées, à l'exception des enregistrements du Nigéria et de la Tanzanie. Il est conseillé aux utilisateurs d'effectuer leurs propres vérifications au niveau national avant de prendre toute décision basée sur ces données.",
+      "pt": "Unitaid não assume qualquer responsabilidade legal pela exatidão dos dados. Em particular, o Unitaid não garante que os dados estejam completos, atualizados ou adequados a uma finalidade específica. Os estágios por país nesta versão são meramente ilustrativos e não foram verificados, com exceção dos registos da Nigéria e da Tanzânia. Os utilizadores devem realizar as suas próprias verificações a nível nacional antes de tomarem qualquer decisão com base nestes dados."
     },
     "090f98359da0692b": {
       "en": "Operational research",
@@ -442,6 +463,13 @@
       "fr": "Emplacement",
       "pt": "Localização"
     },
+    "15f461b8a348bcc6": {
+      "en": "Malaria Journal: Kenya MFT pilot, 2025",
+      "where": "sources.sources[27].label",
+      "bucket": "data",
+      "fr": "Malaria Journal : Projet pilote Kenya MFT, 2025",
+      "pt": "Malaria Journal: piloto do Quénia MFT, 2025"
+    },
     "15f7a1add6c40a33": {
       "en": "${esc(mftName(iso3))} among ${ids.length} ${esc(region)} countries · ${esc(p.name)}",
       "where": "illustrated-journey-dashboard.html",
@@ -561,6 +589,13 @@
       "fr": "${esc(p.name)} · Informations médicales",
       "pt": "${esc(p.name)} · factos sobre medicamentos"
     },
+    "1bafc0ff427204e2": {
+      "en": "WHO MFT implementation guide",
+      "where": "sources.sources[24].label",
+      "bucket": "data",
+      "fr": "Guide de mise en œuvre de l'OMS MFT",
+      "pt": "Guia de implementação da OMS MFT"
+    },
     "1c058867f2a2107b": {
       "en": "9 Oct 2015",
       "where": "products.products[3].detail.milestones[2].date",
@@ -645,6 +680,13 @@
       "fr": "Quels sont les besoins en matière d'adoption ?",
       "pt": "Quais as necessidades da adoção?"
     },
+    "22320648e3c99786": {
+      "en": "A pilot in western Kenya that rotated four first-line malaria treatments from 2020 to 2022.",
+      "where": "sources.sources[27].plain",
+      "bucket": "data",
+      "fr": "Un projet pilote dans l'ouest du Kenya a alterné quatre traitements antipaludiques de première intention de 2020 à 2022.",
+      "pt": "Um projecto-piloto no oeste do Quénia que alternou quatro tratamentos de primeira linha contra a malária de 2020 a 2022."
+    },
     "22b9653281793ae7": {
       "en": "Angola",
       "where": "resistance.dict.country[1]",
@@ -694,6 +736,13 @@
       "fr": "Ajout d'une vue d'ensemble montrant où en est chaque médicament dans son développement.",
       "pt": "Foi adicionada uma visualização em poster mostrando em que fase do desenvolvimento se encontra cada medicamento."
     },
+    "25751274f7ea236d": {
+      "en": "Zimbabwe: MCAZ register",
+      "where": "sources.sources[8].label",
+      "bucket": "data",
+      "fr": "Zimbabwe : Registre MCAZ",
+      "pt": "Zimbabué: Registo MCAZ"
+    },
     "270e4a3ea9a08308": {
       "en": "${nS} sites in ${nM} marks — zoom in to separate.",
       "where": "line 3193",
@@ -707,6 +756,13 @@
       "bucket": "markup",
       "fr": "MFT politique",
       "pt": "MFT política"
+    },
+    "28150031cffefcc2": {
+      "en": "WHO's guide to using several first-line malaria treatments at once, with country examples.",
+      "where": "sources.sources[24].plain",
+      "bucket": "data",
+      "fr": "Guide de l'OMS sur l'utilisation simultanée de plusieurs traitements antipaludiques de première intention, avec des exemples par pays.",
+      "pt": "Guia da OMS sobre a utilização simultânea de vários tratamentos de primeira linha contra a malária, com exemplos de países."
     },
     "298a9207a732a11d": {
       "en": "Next step",
@@ -939,6 +995,13 @@
       "fr": "Programme mondial de lutte contre le paludisme de l'OMS et son Groupe d'élaboration des directives.",
       "pt": "Programa Global de Malária da OMS e o seu Grupo de Desenvolvimento de Orientações."
     },
+    "35566cb65ef2f64e": {
+      "en": "The national register of every medicine approved for sale in Zambia.",
+      "where": "sources.sources[7].plain",
+      "bucket": "data",
+      "fr": "Le registre national de tous les médicaments autorisés à la vente en Zambie.",
+      "pt": "O registo nacional de todos os medicamentos aprovados para venda na Zâmbia."
+    },
     "35e121b15a0ef956": {
       "en": "Noted, but not sent: email alerts are not switched on yet. Nothing left your browser.",
       "where": "line 3614",
@@ -1086,6 +1149,13 @@
       "fr": "Où en sont arrivés tous les médicaments encore en développement, selon l'organisation à but non lucratif qui participe à leur développement.",
       "pt": "O estado atual de cada medicamento ainda em desenvolvimento, segundo a organização sem fins lucrativos que participa no desenvolvimento de muitos deles."
     },
+    "3ae5ed1d9933eedf": {
+      "en": "BMJ Global Health: Rwanda MFT, 2025",
+      "where": "sources.sources[25].label",
+      "bucket": "data",
+      "fr": "BMJ Global Health : Rwanda MFT, 2025",
+      "pt": "BMJ Global Health: Ruanda MFT, 2025"
+    },
     "3af18984450120e6": {
       "en": "Countries on this map, list form",
       "where": "line 2379",
@@ -1155,6 +1225,13 @@
       "bucket": "js",
       "fr": "Lisez l'avertissement",
       "pt": "Leia o aviso legal"
+    },
+    "3dfdc491ed42def5": {
+      "en": "WHO national drug policy table",
+      "where": "sources.sources[1].label",
+      "bucket": "data",
+      "fr": "Tableau des politiques nationales en matière de médicaments de l'OMS",
+      "pt": "Tabela da política nacional de medicamentos da OMS"
     },
     "3e049d78d958038a": {
       "en": "South Africa",
@@ -1268,6 +1345,13 @@
       "fr": "À partir de",
       "pt": "Até"
     },
+    "436425ed9cb212e4": {
+      "en": "5 countries register-confirmed",
+      "where": "products.products[2].detail.milestones[4].label",
+      "bucket": "data",
+      "fr": "5 pays enregistrés",
+      "pt": "5 países com registo confirmado"
+    },
     "44a14cedefb794e3": {
       "en": "Only 0.9–4.5% of Global Fund spend, 2022–24",
       "where": "products.products[3].barrier",
@@ -1359,6 +1443,13 @@
       "fr": "PLOS Medicine : L'ASPY en utilisation courante",
       "pt": "PLOS Medicine: ASPY em uso de rotina"
     },
+    "485ff3300d9a1179": {
+      "en": "Which malaria medicines each country's national treatment policy lists, and for which patients.",
+      "where": "sources.sources[1].plain",
+      "bucket": "data",
+      "fr": "Quels médicaments antipaludiques chaque pays répertorie-t-il dans sa politique nationale de traitement, et pour quels patients ?",
+      "pt": "Que medicamentos antimaláricos constam da lista das políticas nacionais de tratamento de cada país e para que doentes?"
+    },
     "487bc4d395b98be0": {
       "en": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); label updated 2025 to include treatment of pregnant women (EMA outcome 5 Jun 2025; announced 31 Jul 2025)",
       "where": "products.products[2].stages[1].note",
@@ -1379,6 +1470,13 @@
       "bucket": "data",
       "fr": "Les traitements combinés à base d'artémisinine constituent la classe standard de traitements contre le paludisme, associant un dérivé de l'artémisinine à un médicament partenaire à action prolongée.",
       "pt": "Terapia combinada à base de artemisinina — a classe padrão de tratamentos para a malária que combina um derivado da artemisinina com um medicamento parceiro de ação mais prolongada."
+    },
+    "49572d0f861b3d2f": {
+      "en": "The country access map now shows only countries we can back with an official or peer-reviewed source. Some countries moved stage, some were added, and those we could not confirm now show No data. New sources include four national medicine registers and WHO's guide to using several first-line treatments. The country counts in each medicine's details now match the map.",
+      "where": "products.changelog[0].plain",
+      "bucket": "data",
+      "fr": "La carte d'accès aux pays n'affiche désormais que les pays pour lesquels nous disposons d'une source officielle ou validée par des pairs. Certains pays ont changé de catégorie, d'autres ont été ajoutés, et ceux pour lesquels nous n'avons pas pu confirmer les données affichent désormais « Données indisponibles ». Parmi les nouvelles sources figurent quatre registres nationaux des médicaments et le guide de l'OMS sur l'utilisation de plusieurs traitements de première intention. Le nombre de pays indiqué dans les fiches descriptives de chaque médicament correspond maintenant à celui de la carte.",
+      "pt": "O mapa de acesso por país mostra agora apenas os países que podemos comprovar com uma fonte oficial ou revista por pares. Alguns países avançaram de etapa, outros foram adicionados e os que não conseguimos confirmar mostram agora \"Sem dados\". As novas fontes incluem quatro registos nacionais de medicamentos e o guia da OMS para a utilização de diversos tratamentos de primeira linha. A quantidade de países nos detalhes de cada medicamento corresponde agora ao mapa."
     },
     "496cb1217c4d24ad": {
       "en": "Sorry — your feedback could not be sent just now. Please try again in a moment.",
@@ -2772,6 +2870,13 @@
       "fr": "1 ? \" · \" + s.thisYear + \" études\" : \"\") + \"",
       "pt": "1 ? \" · \" + s.esteAno + \" estudos\" : \"\") + \""
     },
+    "893cfcee71d808e0": {
+      "en": "The national register of every medicine approved for sale in Viet Nam.",
+      "where": "sources.sources[9].plain",
+      "bucket": "data",
+      "fr": "Le registre national de tous les médicaments autorisés à la vente au Vietnam.",
+      "pt": "Registo nacional de todos os medicamentos aprovados para venda no Vietname."
+    },
     "893d538563bcd9ac": {
       "en": "Uganda",
       "where": "resistance.dict.country[62]",
@@ -2946,6 +3051,13 @@
       "bucket": "reviewed",
       "fr": "Pays",
       "pt": "Países"
+    },
+    "8fb19426c821904f": {
+      "en": "Malaria Journal: Burkina Faso MFT, 2022",
+      "where": "sources.sources[26].label",
+      "bucket": "data",
+      "fr": "Journal du paludisme : Burkina Faso MFT, 2022",
+      "pt": "Jornal da Malária: Burkina Faso MFT, 2022"
     },
     "8fe5a93113d728e6": {
       "en": "South Sudan",
@@ -3226,6 +3338,13 @@
       "fr": "Prochaine étape prévue",
       "pt": "Próximo passo esperado"
     },
+    "9d548d91a2f20a93": {
+      "en": "Registration confirmed in five national registers so far: Nigeria, Rwanda, Tanzania, Viet Nam and Zambia",
+      "where": "products.products[2].detail.access[1]",
+      "bucket": "data",
+      "fr": "L'inscription a été confirmée à ce jour dans cinq registres nationaux : au Nigéria, au Rwanda, en Tanzanie, au Viêt Nam et en Zambie.",
+      "pt": "O registo foi confirmado até ao momento em cinco registos nacionais: Nigéria, Ruanda, Tanzânia, Vietname e Zâmbia."
+    },
     "9d65ecbec8164f55": {
       "en": "Study years",
       "where": "line 3151",
@@ -3267,6 +3386,13 @@
       "bucket": "data",
       "fr": "OMS PQ produits comparateurs",
       "pt": "OMS PQ produtos comparadores"
+    },
+    "9fd4f86a39ff327b": {
+      "en": "Annex 4B spreadsheet",
+      "where": "sources.sources[1].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Feuille de calcul de l'annexe 4B",
+      "pt": "Ficha de trabalho do Anexo 4B"
     },
     "a045dcdc213ba391": {
       "en": "Actual timeline",
@@ -3485,6 +3611,13 @@
       "fr": "Diversification de première ligne / composant MFT ; granulés pédiatriques disponibles ; l'étiquette inclut les femmes enceintes (mise à jour 2025).",
       "pt": "Diversificação de primeira linha/componente MFT; grânulos pediátricos disponíveis; a bula inclui as grávidas (atualização de 2025)."
     },
+    "afc9f9b36a429f02": {
+      "en": "Rolling (VNM 2013, TZA 2022, NGA 2024, RWA 2024, ZMB 2025)",
+      "where": "products.products[2].detail.milestones[4].date",
+      "bucket": "data",
+      "fr": "Roulant (VNM 2013, TZA 2022, NGA 2024, RWA 2024, ZMB 2025)",
+      "pt": "Rolamento (VNM 2013, TZA 2022, NGA 2024, RWA 2024, ZMB 2025)"
+    },
     "b0eafdef30da146a": {
       "en": "Acknowledgement",
       "where": "illustrated-journey-dashboard.html",
@@ -3632,6 +3765,13 @@
       "fr": "Honduras",
       "pt": "Honduras"
     },
+    "b7e7a5cebf7ff6b7": {
+      "en": "Zambia: ZAMRA register",
+      "where": "sources.sources[7].label",
+      "bucket": "data",
+      "fr": "Zambie : registre de la ZAMRA",
+      "pt": "Zâmbia: Registo ZAMRA"
+    },
     "b818b88807ac1499": {
       "en": "MFT policy · ${esc(mftProductName())}",
       "where": "illustrated-journey-dashboard.html",
@@ -3687,6 +3827,13 @@
       "bucket": "reviewed",
       "fr": "Pays précédent",
       "pt": "País anterior"
+    },
+    "bc126cb273828bac": {
+      "en": "Viet Nam: DAV register",
+      "where": "sources.sources[9].label",
+      "bucket": "data",
+      "fr": "Vietnam : Registre DAV",
+      "pt": "Vietname: Registo DAV"
     },
     "bc7b631a689b45ca": {
       "en": "Zoom out",
@@ -3925,6 +4072,13 @@
       "bucket": "data",
       "fr": "Burundi",
       "pt": "Burundi"
+    },
+    "c8daeaa5678fffce": {
+      "en": "How Rwanda uses several first-line malaria treatments, by region, to slow drug resistance.",
+      "where": "sources.sources[25].plain",
+      "bucket": "data",
+      "fr": "Comment le Rwanda utilise, région par région, différents traitements de première intention contre le paludisme pour ralentir la résistance aux médicaments.",
+      "pt": "Como o Ruanda utiliza vários tratamentos de primeira linha contra a malária, por região, para retardar a resistência aos medicamentos."
     },
     "c9054826f71c23b8": {
       "en": "Mozambique",
@@ -4738,6 +4892,13 @@
       "fr": "[data-group=\"${t.dataset.group}\"]",
       "pt": "[data-group=\"${t.dataset.group}\"]"
     },
+    "eb34370d3b43d8be": {
+      "en": "Confirmed in five national registers so far: Tanzania — 2 registrations (TMDA, issued 8 Mar 2022, Registered/Compliant); Nigeria — granules B4-9425 (NAFDAC Greenbook, approved 28 Feb 2024, Active); Rwanda — tablets and granules (Rwanda FDA, 17 Aug 2024, valid); Zambia — tablets ZAMRA-HM-25-239 (11 Jul 2025, Registered/Compliant); Viet Nam — 2 registrations (DAV, first 27 Dec 2013, valid)",
+      "where": "products.products[2].stages[4].note",
+      "bucket": "data",
+      "fr": "Confirmé à ce jour dans cinq registres nationaux : Tanzanie — 2 enregistrements (TMDA, délivré le 8 mars 2022, Enregistré/Conforme) ; Nigéria — granulés B4-9425 (NAFDAC Livre vert, approuvé le 28 février 2024, Actif) ; Rwanda — comprimés et granulés (Agence rwandaise des produits alimentaires et médicamenteux, 17 août 2024, valide) ; Zambie — comprimés ZAMRA-HM-25-239 (11 juillet 2025, Enregistré/Conforme) ; Vietnam — 2 enregistrements (DAV, premier 27 décembre 2013, valide).",
+      "pt": "Confirmado em cinco registos nacionais até à data: Tanzânia — 2 registos (TMDA, emitido em 8 de março de 2022, Registado/Em conformidade); Nigéria — grânulos B4-9425 (NAFDAC Greenbook, aprovado em 28 de fevereiro de 2024, Ativo); Ruanda — comprimidos e grânulos (FDA do Ruanda, 17 de agosto de 2024, válido); Zâmbia — comprimidos ZAMRA-HM-25-239 (11 de julho de 2025, Registado/Em conformidade); Vietname — 2 registos (DAV, primeiro a 27 de dezembro de 2013, válido)"
+    },
     "eb6213d7c037b126": {
       "en": "Source: WHO Malaria Threat Maps, updated ${prettyDate(m.whoLastDataUpdate)}. Values are WHO's; site-merging is ours.",
       "where": "line 3199",
@@ -4974,6 +5135,13 @@
       "bucket": "data",
       "fr": "Triple ACT pour protéger les médicaments partenaires de l'artémisinine — composant MFT et option de première ligne lorsque la résistance partielle à l'artémisinine est confirmée.",
       "pt": "Tripla ACT para proteger os medicamentos parceiros da artemisinina — componente MFT e opção de primeira linha onde se confirma a resistência parcial à artemisinina."
+    },
+    "f8361a4ef3e957b1": {
+      "en": "The national register of every medicine approved for sale in Zimbabwe.",
+      "where": "sources.sources[8].plain",
+      "bucket": "data",
+      "fr": "Le registre national de tous les médicaments autorisés à la vente au Zimbabwe.",
+      "pt": "O registo nacional de todos os medicamentos aprovados para venda no Zimbabué."
     },
     "f872759ca5fe18a7": {
       "en": "Established API supply chains",
