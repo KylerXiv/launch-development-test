@@ -4,7 +4,7 @@
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#dataset",
       "@type": "Dataset",
-      "lastUpdated": "2026-10-02",
+      "lastUpdated": "2026-10-06",
       "dataStatus": "launch:datastatus-draft",
       "tracksProduct": [
         "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
@@ -192,22 +192,15 @@
       "definition": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites."
     },
     {
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-AGO",
+      "@type": "Country",
+      "iso3": "AGO"
+    },
+    {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-BFA",
       "@type": "Country",
       "iso3": "BFA",
       "sameAs": "http://www.wikidata.org/entity/Q965"
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-CHN",
-      "@type": "Country",
-      "iso3": "CHN",
-      "sameAs": "http://www.wikidata.org/entity/Q148"
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-CIV",
-      "@type": "Country",
-      "iso3": "CIV",
-      "sameAs": "http://www.wikidata.org/entity/Q1008"
     },
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-CMR",
@@ -222,6 +215,11 @@
       "sameAs": "http://www.wikidata.org/entity/Q974"
     },
     {
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-GAB",
+      "@type": "Country",
+      "iso3": "GAB"
+    },
+    {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-GHA",
       "@type": "Country",
       "iso3": "GHA",
@@ -234,46 +232,15 @@
       "sameAs": "http://www.wikidata.org/entity/Q252"
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-IND",
-      "@type": "Country",
-      "iso3": "IND",
-      "sameAs": "http://www.wikidata.org/entity/Q668"
-    },
-    {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-KEN",
       "@type": "Country",
       "iso3": "KEN",
       "sameAs": "http://www.wikidata.org/entity/Q114"
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-KHM",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-KOR",
       "@type": "Country",
-      "iso3": "KHM",
-      "sameAs": "http://www.wikidata.org/entity/Q424"
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-LAO",
-      "@type": "Country",
-      "iso3": "LAO",
-      "sameAs": "http://www.wikidata.org/entity/Q819"
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-MLI",
-      "@type": "Country",
-      "iso3": "MLI",
-      "sameAs": "http://www.wikidata.org/entity/Q912"
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-MMR",
-      "@type": "Country",
-      "iso3": "MMR",
-      "sameAs": "http://www.wikidata.org/entity/Q836"
-    },
-    {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-MOZ",
-      "@type": "Country",
-      "iso3": "MOZ",
-      "sameAs": "http://www.wikidata.org/entity/Q1029"
+      "iso3": "KOR"
     },
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-NGA",
@@ -282,16 +249,20 @@
       "sameAs": "http://www.wikidata.org/entity/Q1033"
     },
     {
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-PNG",
+      "@type": "Country",
+      "iso3": "PNG"
+    },
+    {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-RWA",
       "@type": "Country",
       "iso3": "RWA",
       "sameAs": "http://www.wikidata.org/entity/Q1037"
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-SEN",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-SSD",
       "@type": "Country",
-      "iso3": "SEN",
-      "sameAs": "http://www.wikidata.org/entity/Q1041"
+      "iso3": "SSD"
     },
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-THA",
@@ -306,12 +277,6 @@
       "sameAs": "http://www.wikidata.org/entity/Q924"
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-UGA",
-      "@type": "Country",
-      "iso3": "UGA",
-      "sameAs": "http://www.wikidata.org/entity/Q1036"
-    },
-    {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-VNM",
       "@type": "Country",
       "iso3": "VNM",
@@ -322,6 +287,11 @@
       "@type": "Country",
       "iso3": "ZMB",
       "sameAs": "http://www.wikidata.org/entity/Q953"
+    },
+    {
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-ZWE",
+      "@type": "Country",
+      "iso3": "ZWE"
     },
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#org-alfasigma",
@@ -747,7 +717,7 @@
       "productClass": "launch:class-market",
       "currentStage": "launch:stage-5",
       "developmentPhase": "launch:phase-access",
-      "bottleneckFlag": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
+      "bottleneckFlag": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and on the country access map in 13 countries with a reliable source, but national guideline inclusion remains limited",
       "atcCode": {
         "@type": "schema:MedicalCode",
         "codeValue": "P01BF06",
@@ -802,12 +772,12 @@
           "@type": "StageEntry",
           "atStage": "launch:stage-4",
           "hasStatus": "launch:status-prog",
-          "note": "Registered in 25+ endemic countries since 2014; further submissions in Asia (Vietnam, Myanmar, Cambodia, Thailand). Register-verified so far: Tanzania — 2 registrations (TMDA, issued 8 Mar 2022, Registered/Compliant); Nigeria — 1 registration (Greenbook: granules B4-9425, approved 28 Feb 2024, Active)",
+          "note": "Confirmed in five national registers so far: Tanzania — 2 registrations (TMDA, issued 8 Mar 2022, Registered/Compliant); Nigeria — granules B4-9425 (NAFDAC Greenbook, approved 28 Feb 2024, Active); Rwanda — tablets and granules (Rwanda FDA, 17 Aug 2024, valid); Zambia — tablets ZAMRA-HM-25-239 (11 Jul 2025, Registered/Compliant); Viet Nam — 2 registrations (DAV, first 27 Dec 2013, valid)",
           "dateLabel": "Rolling",
-          "nextStep": "Pending registrations; verify remaining countries against national registers",
+          "nextStep": "Verify remaining countries against national registers",
           "nextDate": "TBC",
-          "source": "MMV; NAFDAC Greenbook + TMDA IMIS2 registers (extracts 23 Aug 2026)",
-          "asOf": "2026-08-23"
+          "source": "NAFDAC, TMDA, Rwanda FDA, ZAMRA and DAV registers",
+          "asOf": "2026-10-05"
         },
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-stage-5",
@@ -844,7 +814,7 @@
       "useCase": "First-line diversification / MFT component; paediatric granules available; label includes pregnant women (2025 update).",
       "accessCommitment": [
         "WHO PQ held for tablets and paediatric granules",
-        "Registration footprint: 25+ countries and expanding",
+        "Registration confirmed in five national registers so far: Nigeria, Rwanda, Tanzania, Viet Nam and Zambia",
         "Co-developed with MMV under access-oriented partnership"
       ],
       "adoptionRequirement": [
@@ -867,20 +837,26 @@
         "researchTimeline": "Ongoing",
         "researchQuestion": "MFT deployment models with pyronaridine–artesunate"
       },
-      "registeredCount": 25,
-      "inGuidelinesCount": "TBC",
-      "inMftCount": "TBC",
+      "registeredCount": 13,
+      "inGuidelinesCount": 11,
+      "inMftCount": 4,
       "forecastDemand": "TBC",
       "hasCountryMap": {
         "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-countrymap",
         "@type": "CountryMap",
-        "coverageStatus": "launch:coverage-illustrative",
-        "note": "Illustrative subset for design review — not actual country status, except: the NGA and TZA registered-level entries are verified against the national registers (NAFDAC Greenbook and TMDA IMIS2, extracts 23 Aug 2026). Replace the rest with the verified country survey.",
+        "coverageStatus": "launch:coverage-verified",
+        "note": "Every country listed is cited to a national medicines regulator's own register, a WHO publication or a peer-reviewed paper. Each entry's \"sources\" are ids in data/sources.js and \"checked\" is the date they were verified; \"mft\" says whether an MFT plan is a pilot, planned or national. Countries without such a source are left out and show No data. MMV's product map, meeting slides and news reports are not used. Rule agreed 5 Oct 2026; replaces the illustrative subset.",
         "hasCountryStatus": [
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-GHA",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-NGA",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-GHA",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-NGA",
+            "accessLevel": "launch:level-mft"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-RWA",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-RWA",
             "accessLevel": "launch:level-mft"
           },
           {
@@ -896,10 +872,10 @@
             "accessLevel": "launch:level-mft"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-KHM",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-GHA",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-KHM",
-            "accessLevel": "launch:level-mft"
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-GHA",
+            "accessLevel": "launch:level-guidelines"
           },
           {
             "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-VNM",
@@ -908,34 +884,34 @@
             "accessLevel": "launch:level-guidelines"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-CIV",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-CIV",
-            "accessLevel": "launch:level-guidelines"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-RWA",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-RWA",
-            "accessLevel": "launch:level-guidelines"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-UGA",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-UGA",
-            "accessLevel": "launch:level-guidelines"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-NGA",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-NGA",
-            "accessLevel": "launch:level-registered"
-          },
-          {
             "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-COD",
             "@type": "CountryAccessStatus",
             "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-COD",
-            "accessLevel": "launch:level-registered"
+            "accessLevel": "launch:level-guidelines"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-CMR",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-CMR",
+            "accessLevel": "launch:level-guidelines"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-THA",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-THA",
+            "accessLevel": "launch:level-guidelines"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-KOR",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-KOR",
+            "accessLevel": "launch:level-guidelines"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-SSD",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-SSD",
+            "accessLevel": "launch:level-guidelines"
           },
           {
             "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-TZA",
@@ -944,33 +920,9 @@
             "accessLevel": "launch:level-registered"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-MOZ",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-ZMB",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-MOZ",
-            "accessLevel": "launch:level-registered"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-SEN",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-SEN",
-            "accessLevel": "launch:level-registered"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-CMR",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-CMR",
-            "accessLevel": "launch:level-registered"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-MLI",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-MLI",
-            "accessLevel": "launch:level-registered"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-country-MMR",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-MMR",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-ZMB",
             "accessLevel": "launch:level-registered"
           }
         ]
@@ -1072,11 +1024,11 @@
           "@type": "Milestone",
           "milestoneName": "Country registrations",
           "hasStatus": "launch:status-prog",
-          "statusLabel": "25+ countries",
-          "dateLabel": "Rolling (TZA 2022, NGA 2024 register-verified)",
-          "nextStep": "Asia submissions",
+          "statusLabel": "5 countries register-confirmed",
+          "dateLabel": "Rolling (VNM 2013, TZA 2022, NGA 2024, RWA 2024, ZMB 2025)",
+          "nextStep": "Verify remaining countries against national registers",
           "anticipated": "TBC",
-          "source": "MMV; NAFDAC + TMDA registers (23 Aug 2026)"
+          "source": "NAFDAC, TMDA, Rwanda FDA, ZAMRA and DAV registers (5 Oct 2026)"
         },
         {
           "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-pyramax-milestone-5",
@@ -1234,62 +1186,56 @@
         "researchTimeline": "Ongoing",
         "researchQuestion": "MFT rotation sequencing and resistance impact"
       },
-      "registeredCount": "TBC",
-      "inGuidelinesCount": "TBC",
-      "inMftCount": "TBC",
+      "registeredCount": 15,
+      "inGuidelinesCount": 13,
+      "inMftCount": 4,
       "forecastDemand": "TBC",
       "hasCountryMap": {
         "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-countrymap",
         "@type": "CountryMap",
-        "coverageStatus": "launch:coverage-illustrative",
-        "note": "Illustrative subset for design review — not actual country status, except: NGA at registered level is verified (NAFDAC Greenbook), and TZA's registration is verified (TMDA IMIS2) though its MFT level shown here remains illustrative. Extracts 23 Aug 2026; replace the rest with the verified country survey.",
+        "coverageStatus": "launch:coverage-verified",
+        "note": "Every country listed is cited to a national medicines regulator's own register, a WHO publication or a peer-reviewed paper. Each entry's \"sources\" are ids in data/sources.js and \"checked\" is the date they were verified; \"mft\" says whether an MFT plan is a pilot, planned or national. Countries without such a source are left out and show No data. MMV's product map, meeting slides and news reports are not used. Rule agreed 5 Oct 2026; replaces the illustrative subset.",
         "hasCountryStatus": [
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-KHM",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-NGA",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-KHM",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-NGA",
             "accessLevel": "launch:level-mft"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-VNM",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-RWA",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-VNM",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-RWA",
             "accessLevel": "launch:level-mft"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-MOZ",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-BFA",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-MOZ",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-BFA",
+            "accessLevel": "launch:level-mft"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-KEN",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-KEN",
             "accessLevel": "launch:level-mft"
           },
           {
             "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-TZA",
             "@type": "CountryAccessStatus",
             "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-TZA",
-            "accessLevel": "launch:level-mft"
+            "accessLevel": "launch:level-guidelines"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-SEN",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-VNM",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-SEN",
-            "accessLevel": "launch:level-mft"
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-VNM",
+            "accessLevel": "launch:level-guidelines"
           },
           {
             "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-THA",
             "@type": "CountryAccessStatus",
             "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-THA",
-            "accessLevel": "launch:level-guidelines"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-MMR",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-MMR",
-            "accessLevel": "launch:level-guidelines"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-LAO",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-LAO",
             "accessLevel": "launch:level-guidelines"
           },
           {
@@ -1305,39 +1251,39 @@
             "accessLevel": "launch:level-guidelines"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-ZMB",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-AGO",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-ZMB",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-AGO",
             "accessLevel": "launch:level-guidelines"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-CHN",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-CMR",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-CHN",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-CMR",
+            "accessLevel": "launch:level-guidelines"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-GAB",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-GAB",
+            "accessLevel": "launch:level-guidelines"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-PNG",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-PNG",
+            "accessLevel": "launch:level-guidelines"
+          },
+          {
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-ZMB",
+            "@type": "CountryAccessStatus",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-ZMB",
             "accessLevel": "launch:level-registered"
           },
           {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-IND",
+            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-ZWE",
             "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-IND",
-            "accessLevel": "launch:level-registered"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-NGA",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-NGA",
-            "accessLevel": "launch:level-registered"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-BFA",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-BFA",
-            "accessLevel": "launch:level-registered"
-          },
-          {
-            "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-dhappq-country-KEN",
-            "@type": "CountryAccessStatus",
-            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-KEN",
+            "country": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#country-ZWE",
             "accessLevel": "launch:level-registered"
           }
         ]
@@ -1477,159 +1423,166 @@
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-0",
       "@type": "ChangelogEntry",
+      "changeDate": "2026-10-06",
+      "productDisplayName": "All",
+      "changeText": "Country access map: the illustrative country lists for ASPY and DHA–PPQ are replaced with verified ones. A country is shown only when a national medicines regulator's register, a WHO publication or a peer-reviewed paper supports its stage; every other country shows No data. ASPY: 13 countries (Nigeria, Rwanda, Burkina Faso and Kenya in MFT plans; Ghana, Viet Nam, DR Congo, Cameroon, Thailand, Republic of Korea and South Sudan in national guidelines; Tanzania and Zambia registered). DHA–PPQ: 15 countries (Nigeria, Rwanda, Burkina Faso and Kenya in MFT plans; Tanzania, Viet Nam, Thailand, Indonesia, Ghana, Angola, Cameroon, Gabon and Papua New Guinea in national guidelines; Zambia and Zimbabwe registered). Removed for lack of such a source: Cambodia, Côte d'Ivoire, Uganda, Mozambique, Senegal, Mali and Myanmar (ASPY); Cambodia, Mozambique, Senegal, Myanmar, Lao PDR, China and India (DHA–PPQ). Each entry now cites its sources and the date checked. New sources: the Zambia, Zimbabwe, Viet Nam and Rwanda registers (fetched monthly), the WHO national drug policy table, the WHO MFT implementation guide, and three peer-reviewed MFT papers (Rwanda, Burkina Faso, Kenya). The country access figures in each medicine's details now count the same lists, each stage including the later ones as the map does: ASPY 13 registered or further, 11 in national guidelines or further, 4 in MFT plans; DHA–PPQ 15, 13 and 4. ASPY's \"25+ countries\" registration claim, which came from MMV, is replaced by the five national registers that confirm it (Nigeria, Rwanda, Tanzania, Viet Nam, Zambia)."
+    },
+    {
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-1",
+      "@type": "ChangelogEntry",
       "changeDate": "2026-10-02",
       "productDisplayName": "All",
       "changeText": "Illustrated journey dashboard, wording changes from reviewer feedback. Price: the per-medicine price card is removed (the price field stays in the data for the other pages). Procurement: the step is now \"Procurement (public channels)\" and says it covers Global Fund-financed procurement only. Regulatory approval: the step and the page footer say health-authority review status is generally not public. GanLum: manufacturer and research lead now read \"Novartis\", the line \"Co-developed with MMV under access-oriented partnership\" is removed, and the required acknowledgement (new `acknowledgement` field) is shown in the medicine's details. A disclaimer is added to the footer and linked from the draft banner."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-1",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-2",
       "@type": "ChangelogEntry",
       "changeDate": "2026-10-01",
       "productDisplayName": "All",
       "changeText": "Illustrated journey dashboard: the three WHO study-result layers (treatment failure, delayed parasite clearance, molecular markers of drug resistance) were removed from the country access map, together with their data files and sourcing. Drug-resistance results are no longer reproduced here; the page links to the WHO Malaria Threats Map instead. The map's controls were also reorganised: access stages and MFT policy groups are now tickable filters in the left rail, replacing the MFT switch, and the legend under the map lists only what is ticked. The Detail panel is now an overview dashboard with a country finder, and every country on the map opens its own page for the selected medicine. The 5 Sep 2026 entry below records when the layers were added."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-2",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-3",
       "@type": "ChangelogEntry",
       "changeDate": "2026-09-10",
       "productDisplayName": "All",
       "changeText": "Terminology: the two product `flag` sentences now say \"access barrier\" rather than \"bottleneck\", matching the illustrated journey dashboard's summary strip and legend. Client request — the programme is about accelerating access, so the blocking stage is named as a barrier to overcome rather than as a bottleneck. Wording only; no status, date or figure changed."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-3",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-4",
       "@type": "ChangelogEntry",
       "changeDate": "2026-09-08",
       "productDisplayName": "ASPY",
       "changeText": "First confirmed national guideline adoption recorded: Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (alongside AS-AQ and AL), per a peer-reviewed therapeutic-efficacy study (Ghana 2023 fieldwork, published 2026). National policy adoption stage remains 'late' — Ghana is the only confirmed country so far against WHO's 2022 strong recommendation. Procurement stage dates for ASPY (since 2018) and DHA–PPQ (since 2008) added — both years were already cited in the Global Fund PQR figures elsewhere in this file but had not been carried into the stage `date` field."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-4",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-5",
       "@type": "ChangelogEntry",
       "changeDate": "2026-09-05",
       "productDisplayName": "All",
       "changeText": "Illustrated journey dashboard: the country access map gained a WHO drug-resistance overlay. Treatment-failure results from the WHO Malaria Threat Maps (therapeutic efficacy studies, extract 5 Sep 2026) are drawn as dots over the access shading, with their own provenance line and their own tooltip. All five Plasmodium species and studies of every size are included, selectable by drug and species; pairings WHO has no data for are disabled rather than shown empty. Each dot is the most recent study year for that country, averaged across that year's sites and weighted by patient numbers — click a dot for every underlying study. The access layer remains illustrative, so the two readings are presented separately and not combined."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-5",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-6",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-25",
       "productDisplayName": "All",
       "changeText": "Version 2 merged: the collected-data updates reviewed in the /v2/ preview (Global Fund PQR volumes, WHO PQ listings, EMA dates, trial-registry records, Nigeria + Tanzania register verification, sourced fact corrections) are now the live draft dataset. The preview edition is retired."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-6",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-7",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "Nigeria and Tanzania registrations verified against the national registers: TZA 10 presentations across four manufacturers (all compliant); NGA 47 presentations but only 26 Active — 22 lapsed, a registration-maintenance signal."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-7",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-8",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ASPY",
       "changeText": "Nigeria and Tanzania registrations verified against the national registers: TZA 2 (TMDA, 2022), NGA 1 (Greenbook granules, approved Feb 2024). The NGA/TZA registered-level map entries are now register-verified."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-8",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-9",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "WHO guideline recommendation year corrected to 2010 (second-edition treatment guidelines; reaffirmed 2015) — previously shown as 2015."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-9",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-10",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ALAQ",
       "changeText": "Co-formulated pivotal Phase III renamed to FD-TACT (successor to the DeTACT programme); unverified 'taste-masked' wording replaced with the sourced 'child-friendly dispersible'."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-10",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-11",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "GanLum",
       "changeText": "Use-case wording aligned with the sourced Novartis claim (first major innovation in malaria treatment since ACTs were introduced 25+ years ago)."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-11",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-12",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "All",
       "changeText": "Version 2 preview: first collected-data updates from the public-source staging layer (Global Fund PQR extract 23 Aug 2026, WHO PQ lists, EMA EU-M4all table, ClinicalTrials.gov)."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-12",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-13",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "DHA–PPQ",
       "changeText": "Global Fund volumes filled from PQR: 11.5m packs / US$41.5m since 2008; 0.9–4.5% of Global Fund antimalarial spend 2022–24 with a sharp 2025 uptick (US$15.3m). Nine PQ'd presentations across Alfasigma, Guilin and Beijing Holley (2015–2023) recorded."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-13",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-14",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "ASPY",
       "changeText": "Global Fund volumes filled from PQR: 940k packs / US$14.5m since 2018, with US$11.6m of it in 2025 (Uganda, Burkina Faso). EMA opinion outcome date 5 Jun 2025 recorded from the EU-M4all table."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-14",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-15",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-23",
       "productDisplayName": "GanLum",
       "changeText": "KALUMA registry record (NCT05842954) added: trial completed 25 Nov 2025, 1,720 participants (registry actual)."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-15",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-16",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-15",
       "productDisplayName": "All",
       "changeText": "Added MMV-style pipeline poster view (pipeline.html) placing each product in its development phase."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-16",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-17",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-15",
       "productDisplayName": "All",
       "changeText": "Added country access map (illustrative until verified), cross-product pathway timing chart, embeddable product widget, RSS update feed and automatic data-history snapshots."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-17",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-18",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "ASPY",
       "changeText": "Renamed from Pyramax to ASPY (pyronaridine–artesunate); trade name retained in the subtitle."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-18",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-19",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "All",
       "changeText": "Added glossary tooltips, CSV download, print view and pathway timing (time between gates) for marketed products."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-19",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-20",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "GanLum",
       "changeText": "Phase III (KALUMA) marked complete — primary endpoint met, announced 12 Nov 2025; regulatory submission preparation now in progress."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-20",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-21",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "ASPY",
       "changeText": "EMA Article 58 date corrected to 2012; July 2025 pregnancy label update added to milestones."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-21",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-22",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "DHA–PPQ",
       "changeText": "Eurartesim WHO PQ requalification (Jan 2025) recorded; unknown counts set to TBC pending verification."
     },
     {
-      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-22",
+      "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#change-23",
       "@type": "ChangelogEntry",
       "changeDate": "2026-08-14",
       "productDisplayName": "All",
