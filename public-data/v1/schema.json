@@ -108,7 +108,11 @@
                           "required": ["iso3", "level"],
                           "properties": {
                             "iso3": { "type": "string" },
-                            "level": { "enum": ["registered", "guidelines", "mft"] }
+                            "level": { "enum": ["registered", "guidelines", "mft"] },
+                            "mft": { "enum": ["pilot", "planned", "national"], "description": "Only on level mft: what kind of MFT plan the source describes." },
+                            "sources": { "type": "array", "items": { "type": "string" }, "description": "Ids of the sources (in data.sources) that support this entry." },
+                            "checked": { "type": "string", "description": "Date the sources were last verified, YYYY-MM-DD." },
+                            "note": { "type": "string", "description": "Internal remark, e.g. the patient group the policy covers. Not translated." }
                           }
                         }
                       }

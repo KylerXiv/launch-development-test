@@ -58,6 +58,18 @@ if (!process.argv[2]) {
     const srcFound = rules.checkSources(rawSrc.data, ids);
     errors.push(...srcFound.errors);
     warnings.push(...srcFound.warnings);
+
+    // Country access map citations must point at registry entries that the
+    // Sources footer shows, so every source the map uses is listed publicly.
+    const byId = new Map((rawSrc.data.sources || []).map((s) => [s.id, s]));
+    (extracted.data.products || []).forEach((p) => {
+      const list = ((p.detail || {}).countries || {}).list || [];
+      list.forEach((e) => (e.sources || []).forEach((sid) => {
+        const s = byId.get(sid);
+        if (!s) errors.push(`product ${p.id}: countries ${e.iso3} cites "${sid}", which is not in data/sources.js`);
+        else if (!s.public) errors.push(`product ${p.id}: countries ${e.iso3} cites "${sid}", which is not public in data/sources.js`);
+      }));
+    });
   }
 
   // ---- WHO national treatment policy (the "Show MFT policy" switch) --------

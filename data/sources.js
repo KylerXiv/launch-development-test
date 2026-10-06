@@ -35,8 +35,8 @@
 window.LAUNCH_SOURCES =
 {
   "meta": {
-    "lastUpdated": "2026-09-21",
-    "note": "Verified against each publisher 21 September 2026. 'findings' and 'relevance' are internal and are not rendered on the public page."
+    "lastUpdated": "2026-10-06",
+    "note": "Verified against each publisher 21 September 2026; entries re-checked since carry their own later 'checked' date. 'findings' and 'relevance' are internal and are not rendered on the public page."
   },
   "sources": [
     {
@@ -58,6 +58,26 @@ window.LAUNCH_SOURCES =
       "findings": "Living guideline, revised one to three times a year, so a fixed publication year goes stale silently. Current version confirmed 2026-09-21 via the MAGICapp API (guideline 10462): \"WHO guidelines for malaria - 13 August 2025\", last edited 2 September 2025. That API is free and needs no key, so a version watcher is buildable and is not yet built.",
       "relevance": "The gate every product passes at the WHO recommendation stage; DHA-PPQ is recommended first- and second-line for uncomplicated P. falciparum with long post-treatment prophylaxis.",
       "checked": "2026-09-21"
+    },
+    {
+      "id": "who-wmr-annex-4b",
+      "label": "WHO national drug policy table",
+      "title": "World Malaria Report 2025, Annex 4B: Antimalarial drug policy in malaria endemic countries and areas, 2024",
+      "org": "World Health Organization",
+      "category": "Policy / guidelines",
+      "group": "data",
+      "url": "https://www.who.int/publications/m/item/annexes-world-malaria-report-2025",
+      "alsoSee": [
+        { "label": "Annex 4B spreadsheet", "url": "https://cdn.who.int/media/docs/default-source/malaria/world-malaria-reports/wmr2025_annex_4b.xlsx" }
+      ],
+      "year": "2025 (policy as of 2024)",
+      "products": ["all"],
+      "plain": "Which malaria medicines each country's national treatment policy lists, and for which patients.",
+      "collection": "manual",
+      "public": true,
+      "findings": "Downloaded by hand once a year and normalised by scripts/normalize-treatment-policy.js into data/treatment-policy.js, which drives the Show MFT policy switch on the country access map. Re-checked 5 Oct 2026: all 15 countries listing ASPY or DHA-PPQ match the raw annex in sourcing/raw/wmr/. It describes 2024 and lags national changes: it lists no ASPY for Ghana (first-line since 2022, frontiers-ghana-tes), AL only for Rwanda (its 2024 guidelines list DHA-PPQ and ASPY), and neither medicine for Kenya.",
+      "relevance": "WHO's own country-by-country record of national treatment policy; the source for the map's national guidelines level.",
+      "checked": "2026-10-05"
     },
     {
       "id": "who-pq-fpp",
@@ -151,21 +171,72 @@ window.LAUNCH_SOURCES =
       "checked": "2026-09-21"
     },
     {
+      "id": "zamra",
+      "label": "Zambia: ZAMRA register",
+      "title": "ZAMRA register of human medicines",
+      "org": "Zambia Medicines Regulatory Authority",
+      "category": "National register",
+      "group": "data",
+      "url": "https://app.zamra.co.zm:42882/portal/publicaccess/onSearchPublicRegisteredproducts?section_id=2",
+      "year": "Continuous",
+      "products": ["all"],
+      "plain": "The national register of every medicine approved for sale in Zambia.",
+      "collection": "automated",
+      "public": true,
+      "findings": "Fetched monthly by scripts/fetch-zamra.js. The whole register in one call (3,519 medicines on 5 Oct 2026). Its server omits an intermediate certificate, which is supplied from scripts/certs/ with verification left on. Portfolio matches on 5 Oct 2026: ASPY x1 — Pyramax tablets, ZAMRA-HM-25-239, 11 Jul 2025 to 10 Jul 2030, Registered/Compliant; DHA-PPQ x7. Cited on the country access map since 6 Oct 2026.",
+      "relevance": "Ground truth for the country access map's registered level in Zambia.",
+      "checked": "2026-10-05"
+    },
+    {
+      "id": "mcaz",
+      "label": "Zimbabwe: MCAZ register",
+      "title": "MCAZ online register of medicines",
+      "org": "Medicines Control Authority of Zimbabwe",
+      "category": "National register",
+      "group": "data",
+      "url": "https://onlineservices.mcaz.co.zw/onlineregister/",
+      "year": "Continuous",
+      "products": ["all"],
+      "plain": "The national register of every medicine approved for sale in Zimbabwe.",
+      "collection": "automated",
+      "public": true,
+      "findings": "Fetched monthly by scripts/fetch-mcaz.js. The whole register in one request (3,154 medicines on 5 Oct 2026). Portfolio matches on 5 Oct 2026: DHA-PPQ x1 — DUO-COTECXIN 40/320mg, 2025/7.5/7111, 27 Oct 2025 to 26 Oct 2030. No ASPY. Cited on the country access map since 6 Oct 2026.",
+      "relevance": "Ground truth for the country access map's registered level in Zimbabwe.",
+      "checked": "2026-10-05"
+    },
+    {
+      "id": "dav",
+      "label": "Viet Nam: DAV register",
+      "title": "Drug Administration of Vietnam register of marketing authorisations",
+      "org": "Drug Administration of Vietnam",
+      "category": "National register",
+      "group": "data",
+      "url": "https://dichvucong.dav.gov.vn/congbothuoc/index",
+      "year": "Continuous",
+      "products": ["all"],
+      "plain": "The national register of every medicine approved for sale in Viet Nam.",
+      "collection": "automated",
+      "public": true,
+      "findings": "Fetched monthly by scripts/fetch-dav.js. Searched per ingredient stem; Vietnamese drops the final \"e\" (\"Pyronaridin\", \"Piperaquin\"). Portfolio matches on 5 Oct 2026: DHA-PPQ x10, 8 valid (including Eurartesim 20/160 and 40/320) and 2 expired; ASPY x2 — Shin Poong Pyramax. Cited on the country access map since 6 Oct 2026.",
+      "relevance": "Ground truth for the country access map's registered level in Viet Nam.",
+      "checked": "2026-10-05"
+    },
+    {
       "id": "rwanda-fda",
       "label": "Rwanda: Rwanda FDA register",
       "title": "Rwanda FDA register of registered pharmaceutical products",
       "org": "Rwanda Food and Drugs Authority",
       "category": "National register",
       "group": "data",
-      "url": "https://rwandafda.gov.rw/register/monitoring_preview_register",
+      "url": "https://monitoring.rwandafda.gov.rw/register/hmdr/",
       "year": "Continuous",
       "products": ["dhappq", "pyramax"],
       "plain": "The national register of every medicine approved for sale in Rwanda.",
-      "collection": "manual",
+      "collection": "automated",
       "public": true,
-      "findings": "2,482 products on one page (5.25 MB, ~200s to download; no pagination and no separate data endpoint). Columns include Reg. Date and Expiry Date; dates are DD/MM/YYYY, confirmed by rows such as 23/05/2026. Portfolio matches on 2026-09-21: DHA-PPQ x3 — DIARTEM IG ADULT 120/960mg (Bliss GVS, reg. 12 May 2025, exp. 11 May 2030), DHA/PPQ 40/320mg (Bliss GVS, 22 Feb 2024), DHA/PPQ 40/320mg (Ajanta Pharma, 8 Jul 2023); ASPY x2 — pyronaridine tetraphosphate/artesunate 60/20mg and 180/60mg, both Shin Poong, reg. 17 Aug 2024, exp. 16 Aug 2029. No ALAQ or GanLum, as expected. A fetcher is feasible and not yet built.",
+      "findings": "Fetched monthly by scripts/fetch-rwanda.js. Moved by 5 Oct 2026: the old address (rwandafda.gov.rw/register/monitoring_preview_register) now redirects to www.rwandafda.gov.rw and returns 404; the register is linked as \"Medicine Registers\" from www.rwandafda.gov.rw/registers/products-repositories. 2,619 products on one page (7.4 MB, about 10 s); each row carries its fields as data attributes (data-regno, data-brand, data-generic, data-strength, data-mfr), which the fetcher reads. Dates are DD/MM/YYYY. Portfolio matches on 2026-10-05: DHA-PPQ x3 — DIARTEM IG ADULT 120/960mg (Rwanda FDA-HMP-MA-2273, Bliss GVS, 12 May 2025 to 11 May 2030, valid), P-ALAXIN dispersible 40/320 (MA-0903, Bliss GVS), RIDMAL 40/320 (MA-0377, Ajanta Pharma); ASPY x2 — Pyramax granules 60/20mg (MA-0182) and Pyramax tablets 180/60mg (MA-0183), both Shin Poong, 17 Aug 2024 to 16 Aug 2029. No ALAQ or GanLum, as expected.",
       "relevance": "Confirms national market authorisation and commercial availability in East Africa, informing country-level procurement and deployment strategies.",
-      "checked": "2026-09-21"
+      "checked": "2026-10-05"
     },
     {
       "id": "uganda-nda",
@@ -390,6 +461,74 @@ window.LAUNCH_SOURCES =
       "findings": "Online 4 December 2025, issue date 5 January 2026. Reports that artesunate-pyronaridine is one of Ghana's first-line medicines since 2022, alongside AS-AQ and AL, with DHA-PPQ second-line. The WHO therapeutic efficacy extract behind data/resistance.js holds no Ghana rows after 2020, so this study is not represented on the resistance map; adding it would need a documented second input, since resistance.js must regenerate byte-identical from the WHO export.",
       "relevance": "Real-world clinical and policy adoption evidence for ASPY deployment and multi-first-line strategies.",
       "checked": "2026-09-21"
+    },
+    {
+      "id": "who-mft-guide",
+      "label": "WHO MFT implementation guide",
+      "title": "Multiple first-line therapies as part of the response to antimalarial drug resistance: an implementation guide",
+      "org": "World Health Organization, Global Malaria Programme",
+      "category": "MFT strategy",
+      "group": "document",
+      "url": "https://iris.who.int/server/api/core/bitstreams/3429ad55-4291-4b1a-bdd9-783495692d9b/content",
+      "year": "2024",
+      "products": ["pyramax", "dhappq"],
+      "plain": "WHO's guide to using several first-line malaria treatments at once, with country examples.",
+      "collection": "static",
+      "public": true,
+      "findings": "Annex 2 (pp. 21-22) gives country plans. Nigeria: a pilot is planned in two areas, with 20% AL, 40% DHA-PPQ and 40% ASPY where seasonal malaria chemoprevention runs, and 10% ASAQ, 20% AL, 35% DHA-PPQ and 35% ASPY elsewhere. Rwanda: AL, DHA-PPQ and ASPY in rotation in six pilot districts, 2024-2025. Uganda: rotation only \"being considered\". Tanzania: scope \"remains to be confirmed\"; the guide says ASPY was not yet registered there, which TMDA's own register contradicts (Pyramax since 2017). Cited on the country access map since 6 Oct 2026.",
+      "relevance": "Supports the In MFT plans level for Nigeria (planned) and Rwanda.",
+      "checked": "2026-10-05"
+    },
+    {
+      "id": "bmjgh-rwanda-mft",
+      "label": "BMJ Global Health: Rwanda MFT, 2025",
+      "title": "Strategies for mitigating emerging artemisinin-based antimalarial drug resistance in Rwanda: a promising approach for managing therapies in malaria-endemic countries",
+      "org": "BMJ Global Health",
+      "category": "MFT strategy",
+      "group": "document",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12496036/",
+      "year": "2025",
+      "products": ["pyramax", "dhappq"],
+      "plain": "How Rwanda uses several first-line malaria treatments, by region, to slow drug resistance.",
+      "collection": "static",
+      "public": true,
+      "findings": "Peer-reviewed; published 2 Oct 2025 (vol. 10, e020884; doi 10.1136/bmjgh-2025-020884). Rwanda's MFT approach assigns artesunate-pyronaridine to the western region, where kelch13 A675V is concentrated, and dihydroartemisinin-piperaquine to the eastern and central regions, where R561H predominates. Cited on the country access map since 6 Oct 2026.",
+      "relevance": "Supports the In MFT plans level (national) for Rwanda, both medicines.",
+      "checked": "2026-10-05"
+    },
+    {
+      "id": "malariaj-burkina-mft",
+      "label": "Malaria Journal: Burkina Faso MFT, 2022",
+      "title": "Stakeholder perceptions on the deployment of multiple first-line therapies for uncomplicated malaria: a qualitative study in the health district of Kaya, Burkina Faso",
+      "org": "Malaria Journal",
+      "category": "MFT strategy",
+      "group": "document",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9235275/",
+      "year": "2022",
+      "products": ["pyramax", "dhappq"],
+      "plain": "A study of an MFT pilot planned in Kaya district, Burkina Faso, using three treatments.",
+      "collection": "static",
+      "public": true,
+      "findings": "Peer-reviewed; published 27 Jun 2022 (vol. 21, 202; doi 10.1186/s12936-022-04225-3). Describes a pilot designed to make pyronaridine-artesunate, dihydroartemisinin-piperaquine and artemether-lumefantrine available in Kaya district's public health facilities. Cited on the country access map since 6 Oct 2026.",
+      "relevance": "Supports the In MFT plans level (pilot) for Burkina Faso, both medicines.",
+      "checked": "2026-10-05"
+    },
+    {
+      "id": "malariaj-kenya-mft",
+      "label": "Malaria Journal: Kenya MFT pilot, 2025",
+      "title": "Health system challenges and facilitators associated with adaptive cycling deployment of multiple first-line treatment for uncomplicated malaria: a pilot study in a malaria-endemic region of Kenya",
+      "org": "Malaria Journal",
+      "category": "MFT strategy",
+      "group": "document",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12512637/",
+      "year": "2025",
+      "products": ["pyramax", "dhappq"],
+      "plain": "A pilot in western Kenya that rotated four first-line malaria treatments from 2020 to 2022.",
+      "collection": "static",
+      "public": true,
+      "findings": "Peer-reviewed; published 10 Oct 2025 (vol. 24, 328; doi 10.1186/s12936-025-05580-7). The pilot (June 2020 to June 2022) cycled AL, DHA-PPQ, ASAQ and pyronaridine-artesunate in Homa Bay county, with Migori as control. A national 2026-2030 plan was reported only in the press and is not cited. Cited on the country access map since 6 Oct 2026.",
+      "relevance": "Supports the In MFT plans level (pilot, 2020-22) for Kenya, both medicines.",
+      "checked": "2026-10-05"
     },
     {
       "id": "pmi",
