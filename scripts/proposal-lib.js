@@ -75,8 +75,8 @@ const LEVELS = ["registered", "guidelines", "mft"];
 // The map warning written when a watcher draws the first country on a
 // medicine that had no map at all.
 const NEW_MAP_NOTE =
-  "Only countries whose national register lists this medicine are shown, added from the registers the LAUNCH team reads " +
-  "(Nigeria's NAFDAC Green Book and Tanzania's TMDA register). Other countries have not been checked.";
+  "Only countries whose national register lists this medicine are shown, each citing that register. " +
+  "Other countries have not been checked.";
 
 // English country names, from the CLDR table the translated pages use.
 let NAMES = null;
@@ -320,8 +320,11 @@ function applyProposal(data, proposal, today) {
     if (!p.detail.countries) p.detail.countries = { status: "draft", note: NEW_MAP_NOTE, list: [] };
     for (const c of proposal.countries) {
       const e = p.detail.countries.list.find((x) => x.iso3 === c.iso3);
-      if (e) e.level = c.now;
-      else p.detail.countries.list.push({ iso3: c.iso3, level: c.now });
+      // Each entry cites where it comes from, as every entry on a verified
+      // list must (data-rules.js): the proposal's own source and date.
+      const cite = { sources: [proposal.evidence.src], checked: proposal.evidence.asOf };
+      if (e) Object.assign(e, { level: c.now }, cite);
+      else p.detail.countries.list.push({ iso3: c.iso3, level: c.now, ...cite });
     }
     // Worked out here, from the map as it now stands, not taken from the
     // snapshot: two proposals for one medicine can be approved in either
@@ -642,8 +645,15 @@ function selftest() {
   ok("refuses a country line from a person", !buildProposal(mapOnly, { data, sources, issue: { number: 51, user: "KylerXiv" } }).ok);
   ok("refuses a line that is not ISO code: level",
     !buildProposal(Object.assign({}, mapOnly, { "country map": "Uganda: approved" }), { data, sources, issue: { number: 52, user: BOT } }).ok);
-  ok("refuses a country that is already drawn at that level",
-    /change nothing/.test((buildProposal(Object.assign({}, mapOnly, { "country map": "NGA: registered" }), { data, sources, issue: { number: 53, user: BOT } }).errors || []).join(" ")));
+  // A country DHA–PPQ's map already draws as registered, citing the same
+  // register and date the proposal would: nothing would change.
+  const same = JSON.parse(JSON.stringify(data));
+  const drawnReg = same.products.find((x) => x.id === "dhappq").detail.countries.list.find((e) => e.level === "registered");
+  Object.assign(drawnReg, { sources: ["tmda"], checked: "2026-09-21" });
+  const again2map = buildProposal(Object.assign({}, mapOnly, { "country map": drawnReg.iso3 + ": registered" }),
+    { data: same, sources, issue: { number: 53, user: BOT } });
+  ok("refuses a country already drawn at that level, citing the same source and date",
+    !again2map.ok && /change nothing/.test(again2map.errors.join(" ")), again2map.ok ? "accepted" : again2map.errors.join("; "));
   if (mo.ok) {
     const mp = mo.proposal;
     ok("names the country, and records it was not on the map", mp.countries[0].name === "Uganda" && mp.countries[0].was === "");
@@ -653,7 +663,13 @@ function selftest() {
     const was = data.products.find((x) => x.id === "dhappq");
     ok("draws the country at that level", md.detail.countries.list.some((e) => e.iso3 === "UGA" && e.level === "registered"));
     ok("keeps the stage, and its citation, as they were", JSON.stringify(md.stages[4]) === JSON.stringify(was.stages[4]));
-    ok("leaves a TBC count alone", md.detail.country.registered === "TBC");
+    const uga = md.detail.countries.list.find((e) => e.iso3 === "UGA");
+    ok("the new entry cites the register and the date it was read", uga && JSON.stringify(uga.sources) === JSON.stringify(["tmda"]) && uga.checked === "2026-09-21", uga);
+    const reg = was.detail.country.registered;
+    ok("the registered count is at least the countries drawn",
+      Number.isInteger(reg) ? md.detail.country.registered === Math.max(reg, md.detail.countries.list.length) : md.detail.country.registered === reg, md.detail.country.registered);
+    const tbc = JSON.parse(JSON.stringify(data)); tbc.products.find((x) => x.id === "dhappq").detail.country.registered = "TBC";
+    ok("leaves a TBC count alone", applyProposal(tbc, mp, "2026-09-22").products.find((x) => x.id === "dhappq").detail.country.registered === "TBC");
     ok("the country-only result passes the rules", mres.errors.length === 0, mres.errors.join("; "));
     ok("the public changelog line names the country and the source",
       mres.applied.changelog[0].plain === "DHA–PPQ — Uganda added to the country map (source: Tanzania: TMDA register).", mres.applied.changelog[0].plain);

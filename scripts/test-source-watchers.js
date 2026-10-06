@@ -158,7 +158,9 @@ ok("the lapsed ALAQ row is not proposed", !/ALAQ: PROPOSED/.test(nf.stdout));
   ok("intake reads it, from the watcher", built.ok && /^watcher:/.test(built.proposal.origin), built.errors);
   if (built.ok) {
     const g = res.applied.products.find((p) => p.id === "ganlum");
-    ok("it draws Nigeria, on a new draft map with its warning", JSON.stringify(g.detail.countries.list) === JSON.stringify([{ iso3: "NGA", level: "registered" }]) && g.detail.countries.status === "draft" && g.detail.countries.note === lib.NEW_MAP_NOTE);
+    ok("it draws Nigeria, citing the register and its date, on a new draft map with its warning",
+      JSON.stringify(g.detail.countries.list) === JSON.stringify([{ iso3: "NGA", level: "registered", sources: ["nafdac"], checked: "2026-09-30" }]) &&
+      g.detail.countries.status === "draft" && g.detail.countries.note === lib.NEW_MAP_NOTE, g.detail.countries);
     ok("it starts the stage: in progress, dated, with the references", g.stages[4].status === "prog" && g.stages[4].date === "First registered 20 Sep 2026 (Nigeria)" && /NAFDAC TEST-A4-0001/.test(g.stages[4].note), g.stages[4]);
     ok("it raises the registered count from 0 to 1", g.detail.country.registered === 1);
     ok("the applied data passes the rules", res.errors.length === 0, res.errors);
@@ -185,8 +187,8 @@ ok("run alone, Tanzania's starts the stage itself", tz.manifest.length === 1 && 
 group("Registers: guards and what is left for a person");
 const lapsed = csvWith("sourcing/staging/nafdac_registrations.csv", (rows) => { rows.filter((r) => r.productId === "pyramax").forEach((r) => { r.status = "Inactive"; }); });
 const lp = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", lapsed]);
-ok("a country the map shows as registered, with nothing current in the register, is left for a person",
-  lp.manifest.length === 0 && /ASPY: left for a person — the map shows Nigeria as registered, but the register lists no current registration \(1 lapsed or inactive\)/.test(lp.stdout), lp.stdout);
+ok("a country the map shows, with nothing current in the register, is left for a person",
+  lp.manifest.length === 0 && /ASPY: left for a person — the map shows Nigeria \((registered|guidelines|mft)\), but the register lists no current registration \(1 lapsed or inactive\)/.test(lp.stdout), lp.stdout);
 const expiredRow = csvWith("test-data/registers/nafdac-ganlum-registered.csv", (rows) => { rows.find((r) => r.nafdacNo === "TEST-A4-0001").expiryDate = "2026-09-29"; });
 const st = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", expiredRow]);
 ok("a registration still called active after its expiry is left for a person, not proposed",

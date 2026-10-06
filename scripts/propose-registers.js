@@ -23,10 +23,10 @@
 // register with the earlier first registration; the other only draws its
 // country. Otherwise approving both would let the second overwrite the first.
 //
-// Left for a person, in the run summary: a country the map shows as
-// registered where the register now lists nothing current (lapsed
-// registrations are a story), and registrations the register still calls
-// active after their expiry date.
+// Left for a person, in the run summary: a country the map shows, at any
+// level, where the register now lists nothing current (lapsed registrations
+// are a story), and registrations the register still calls active after
+// their expiry date.
 //
 // Nothing here writes under data/. Output: <out>/manifest.json plus one body
 // file per proposal, each already checked with the library and rules intake
@@ -124,8 +124,10 @@ function main(argv) {
       const map = product.detail && product.detail.countries;
       const drawn = map && (map.list || []).find((e) => e.iso3 === w.country);
       if (!current.length) {
-        if (drawn && drawn.level === "registered")
-          log.push(`${who}: left for a person — the map shows ${country} as registered, but the register lists ${theirs.length ? "no current registration (" + theirs.length + " lapsed or inactive)" : "nothing for it"}.`);
+        // At any level: guidelines or MFT without a current registration is
+        // just as much a story for a person.
+        if (drawn)
+          log.push(`${who}: left for a person — the map shows ${country} (${drawn.level}), but the register lists ${theirs.length ? "no current registration (" + theirs.length + " lapsed or inactive)" : "nothing for it"}.`);
         continue;
       }
       if (drawn) { log.push(`${who}: ${country} already on the map (${drawn.level}) — nothing to propose (${current.length} current).`); continue; }

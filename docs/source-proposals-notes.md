@@ -521,6 +521,36 @@ end. The other register still proposes.
 only portfolio medicines either register lists, and both countries are
 already on their maps.
 
+### Fitted to verified country lists, 6 Oct
+
+PR #60 (Jackson, merged 6 Oct) made ASPY's and DHA–PPQ's country lists
+`verified`. Every entry on a verified list must now carry `sources`
+(registry ids) and `checked` (YYYY-MM-DD). `validate-data.js` also checks that
+each cited id is public in `data/sources.js`. The register watcher's entries
+had neither, so a country-only proposal for either medicine would have broken
+the rules. Against the new `main`, 4 of the watcher's checks failed. Changes:
+- **A country the watcher draws cites its register and the date it was
+  read**: `{"iso3":"NGA","level":"registered","sources":["nafdac"],"checked":"2026-09-30"}`.
+  Both `nafdac` and `tmda` are public in the registry.
+- **The new-map warning names no registers**, because #60 added register
+  fetchers for Rwanda, Zambia, Zimbabwe and Vietnam. It now reads: "Only
+  countries whose national register lists this medicine are shown, each
+  citing that register. Other countries have not been checked."
+- **A country the map shows at any level**, not only `registered`, is left for
+  a person when its register lists nothing current. Under #60, Nigeria is
+  drawn at MFT level for both ASPY and DHA–PPQ.
+- **The registered count needed no change.** #60 set each count to the number
+  of countries listed, so raising it to at least that number keeps them equal.
+
+**Not done:** watchers for #60's four new registers. Each would be a row in
+`REGISTERS` in `propose-registers.js`, once its staging columns are known.
+
+Checks after the change: `proposal-lib.js selftest` 58/58 and
+`test-source-watchers.js` 61/61. The three test proposals were applied to the
+real data file on the new `main`. Then the validator (0 errors, 1 warning,
+including #60's citation check), `test-build-dataset.js` (28/28) and the
+French and Portuguese pages were run on the result.
+
 ### Public wording of proposal changelog lines
 
 Every approved proposal adds a public changelog line. The template
@@ -574,9 +604,10 @@ changelog lines used the template, so nothing already published changes.
 
 ## Status, `source-watchers` (5 Oct)
 
-- Branch `source-watchers`, off `main` at `b91bac2`, 3 commits: the trial
-  watcher, the register watchers with the country-map change, then this
-  status. Pushed; pull request #55 against `main`.
+- Branch `source-watchers`, off `main` at `b91bac2`. Commits: the trial
+  watcher; the register watchers with the country-map change; the status; a
+  merge of `main` after #60 (6 Oct); and the fit to verified country lists.
+  Pushed; pull request #55 against `main`.
 - CI cannot run while GitHub Actions is blocked by billing. The checks CI
   would run passed locally, as listed in each section's verification.
 - Files, commit 1: `scripts/propose-trials.js`,
