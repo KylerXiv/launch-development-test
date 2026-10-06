@@ -2,7 +2,7 @@
 
 This document covers `api/`, the Vercel functions behind
 `illustrated-journey-dashboard.html`'s two forms: **Subscribe for updates**
-(`subscribe.js`, `confirm.js`, `unsubscribe.js`) and, since 2 Oct, **Send
+(`subscribe.js`, `unsubscribe.js`) and, since 2 Oct, **Send
 feedback** (`feedback.js`), with shared code in `_mail.js`. Per
 [CLAUDE.md](../CLAUDE.md), this document is updated in the same commit as any
 change it describes. What the visitor sees is covered in
@@ -16,7 +16,10 @@ The code was first written on 29 Sep for both forms and left uncommitted. On
 `email-subscribe` (PR #30, merged 1 Oct) took the Subscribe half of it.
 Subscribe became double opt-in the same day (§2.3). On 2 Oct
 `email-feedback` took the feedback half, fitted to the widget as Keith had
-reworked it on 30 Sep (§2.12).
+reworked it on 30 Sep (§2.12). On 6 Oct, at the owner's request,
+`subscribe-single-opt-in` dropped the confirm email: subscribing now puts the
+address on the list at once, and the welcome's unsubscribe link is the way
+off (§2.3). `confirm.js` went with it.
 
 ---
 
@@ -30,11 +33,12 @@ missing.
    Without it, Resend sends only from its shared test sender,
    `onboarding@resend.dev`, and delivers only to the account's own address.
    Any other recipient gets `403 validation_error: You can only send testing
-   emails to your own email address`. Double opt-in emails the visitor, so
-   nothing works for real visitors until this is done.
-2. **Create an API key with Full access, not "Sending access".** Confirming
+   emails to your own email address`. The welcome email goes to the visitor,
+   so nothing works for real visitors until this is done.
+2. **Create an API key with Full access, not "Sending access".** Subscribing
    writes a contact, which a sending-only key cannot do. With a sending-only
-   key, the confirm page fails with `401 restricted_api_key` in the log.
+   key, the form shows its failure message and the log has
+   `401 restricted_api_key`.
 3. **Create a segment** (Resend → Audience → Segments), e.g. "LAUNCH dashboard
    updates". A broadcast has to name a segment, so this is what an update is
    later sent to.
@@ -59,19 +63,20 @@ missing.
    | Variable | Value |
    | --- | --- |
    | `RESEND_API_KEY` | the `re_…` key from step 2 |
-   | `UNSUBSCRIBE_SECRET` | 32 or more random characters, e.g. the output of `openssl rand -hex 32`. It encrypts the links in emails (§2.5). Changing it breaks every confirm and unsubscribe link already sent |
+   | `UNSUBSCRIBE_SECRET` | 32 or more random characters, e.g. the output of `openssl rand -hex 32`. It encrypts the links in emails (§2.5). Changing it breaks every unsubscribe link already sent |
 
    Then redeploy: env var changes reach new deployments only.
    `RESEND_API_KEY` was set on 1 Oct, for Production and Preview.
 6. **Test, on the page:**
-   1. Subscribe. The page says "Almost there — we've emailed you a link", and
-      a "Please confirm your subscription" email arrives.
-   2. Click its button. A page asks you to confirm. Nothing is saved yet.
-   3. Press **Confirm subscription**. The page says "You're subscribed", the
+   1. Subscribe. The page says "Thank you — you are on the list.", the
       contact appears in the segment, a welcome email arrives with an
-      unsubscribe link, and a "New subscriber" note arrives at `to`.
-   4. Use the welcome's unsubscribe link, then subscribe and confirm again.
-      The contact should come back as subscribed.
+      unsubscribe link, and a "New subscriber" note arrives at `to`. No
+      email asks you to confirm.
+   2. Subscribe again with the same address. The page says the same, and
+      nothing is sent.
+   3. Use the welcome's unsubscribe link, then subscribe again. The contact
+      comes back as subscribed, a new welcome arrives, and the team note says
+      "Returning: yes".
 
    From a terminal, without saving anything:
 
@@ -144,6 +149,7 @@ Checked on 1 Oct with `vercel build` from CLI **60.1.3**, the version
 It produced exactly three functions: `api/confirm`, `api/subscribe` and
 `api/unsubscribe`. `_mail.js` was bundled into each and not exposed as a
 route. The static output (96 files) contains nothing from `api/`.
+(`api/feedback` was added on 2 Oct, and `api/confirm` removed on 6 Oct.)
 
 | Rejected | Because |
 | --- | --- |
@@ -157,8 +163,8 @@ The handoff left this open (item 5). Three options were put on 1 Oct: email
 the team only, a Resend contact plus a note to the team, or both plus a
 confirmation email to the subscriber. The second was chosen first. The
 address becomes a global Resend contact, joins `ADDRESSES.segment` if set, and
-the team inbox gets a note. Since §2.3, all of that happens only on
-confirmation.
+the team inbox gets a note. From 1 to 6 Oct all of that waited for the
+confirm link; since 6 Oct it happens when the form is sent (§2.3).
 
 Notify-us alone was rejected. It leaves the list as a pile of emails in one
 inbox, with no unsubscribe handling, and the first update would be a
@@ -167,14 +173,95 @@ hand-built BCC. A Resend broadcast handles unsubscribes itself.
 This revisits the 23 Sep rejection of "a managed mailing-list platform". That
 rejection was about a second vendor and a second account for someone to own.
 Resend contacts live in the same account as the sender. Of that rejection's
-concerns, double opt-in is now answered (§2.3). Someone committed to actually
-sending the updates is still needed.
+concerns, double opt-in was answered on 1 Oct and dropped by the owner on
+6 Oct (§2.3). Someone committed to actually sending the updates is still
+needed.
 
 Resend renamed Audiences to **Segments** before this was built. Contacts are
 global, and `POST /broadcasts` requires a `segment_id`, so the segment is what
 makes "send an update to the subscribers" one action.
 
-### 2.3 Double opt-in: confirm first, then a welcome with an unsubscribe link
+### 2.3 Single opt-in: on the list at once, with an unsubscribe link in the welcome
+
+**Changed on 6 Oct, at the owner's request.** The owner did not want a
+"Please confirm your subscription" email: filling in the form on the
+dashboard should subscribe, and the subscriber should be given the way to
+unsubscribe. Double opt-in, built on 1 Oct and kept below as history, is what
+this replaces.
+
+| Option | |
+| --- | --- |
+| Keep double opt-in | **Rejected by the owner.** It was the one guard against anyone typing someone else's address onto the list (1 Oct, below). Its cost: a second step, in another app, before anyone is subscribed, and a subscriber who never clicks is never on the list |
+| **Single opt-in, with the unsubscribe link in the welcome** — chosen | One step on the page. The welcome says how to leave in the same breath as saying you are on the list |
+
+**What was accepted, with the numbers.** These are the risks the 1 Oct
+decision named, a likely spam complaint against `tamarind.tech` for every
+address typed by someone else:
+
+- **Anyone can put any address on the list.** Such an address gets the
+  welcome, then every update email until its owner unsubscribes. That is at
+  most one a day, on days the changelog gains lines
+  ([subscriber-updates-notes.md](subscriber-updates-notes.md) §2). Under
+  double opt-in it got one "Please confirm" email and was never stored.
+- **A new subscription costs 2 emails (welcome, team note) and 1 contact.**
+  Before, it was 3 emails (confirm, welcome, team note), but only after a
+  click; an address nobody clicked for cost 1 email and no contact. On
+  Resend's free plan as recorded on 29 Sep (100 emails a day, 1,000
+  contacts; not rechecked), **50 scripted addresses now use up a day's
+  emails** (100 before), and **the contact cap can now be filled without
+  anyone clicking anything**.
+- **The rate-limit rule bounds this, but loosely, and is not set yet**
+  (§1 step 8, §2.9). At 5 POSTs per IP per 10 minutes, one IP can still add
+  720 addresses a day (5 × 6 × 24). Until the rule is published there is no
+  limit at all.
+
+How it runs:
+
+1. **`POST /api/subscribe`** looks the address up in Resend. A new address
+   is created as a subscribed contact in `ADDRESSES.segment`; one that had
+   unsubscribed is re-subscribed and added to the segment. If saving fails,
+   the form shows its failure message and nothing else happens.
+2. **A welcome email** goes to the subscriber, with the dashboard link and,
+   beside "Didn't sign up, or don't want these emails?", an **Unsubscribe**
+   link. It carries `List-Unsubscribe` and `List-Unsubscribe-Post` as before,
+   so the mail app's own button works too.
+3. **The team inbox gets the note**, "Someone subscribed…", with the
+   address, the time, whether it is a returning subscriber, and the segment.
+4. **Unsubscribing is unchanged:** `/api/unsubscribe`, as in point 3 of the
+   history below, and the team is still not told about unsubscribes.
+
+A failure in 2 or 3 is logged, not shown: the person is on the list.
+**Someone already subscribed** gets the same answer as a new address, and
+nothing is sent. So the form still cannot be used to find out who is on the
+list, nor to send a subscriber the welcome over and over. The page's success
+line went back to the 1 Oct single opt-in wording, *"Thank you — you are on
+the list."*, which is true for both.
+
+Three choices made in building it:
+
+- **A returning address is re-subscribed and welcomed.** The rejected
+  alternatives were refusing it, which leaves someone who changed their mind
+  no way back and makes the form either lie or reveal that the address had
+  left, and emailing a confirm link for this case only, which brings back
+  what the owner asked to remove. The cost: a stranger can put back an
+  address that had said no. The team note's "Returning: yes" makes that
+  visible. **Flagged to the owner on 6 Oct** as the one choice they may want
+  the other way.
+- **The already-subscribed get no new welcome**, so someone who has lost
+  theirs cannot get an unsubscribe link from the form. Under double opt-in
+  the confirm page offered an Unsubscribe button for exactly this (added
+  after the owner's first test, below). Now every update email carries
+  Resend's own unsubscribe link, so the first update gives them a way off.
+  An unsubscribe button on the dashboard was not added: with no link to
+  prove the address, anyone could unsubscribe anyone.
+- **Confirm links already emailed stop working.** `api/confirm.js` is
+  deleted, so such a link gets Vercel's 404 page. They expired after 7 days
+  anyway, and double opt-in ran only on this test deployment, from 1 to
+  6 Oct. Whoever holds one subscribes again from the dashboard. A confirm
+  link cannot be used as an unsubscribe link: `readToken` still checks the
+  purpose (§2.5).
+
+#### Before 6 Oct: double opt-in (1 Oct)
 
 **Revised on 1 Oct.** The first build that day was single opt-in, with nothing
 ever sent to the subscriber. The owner then asked for subscribers to be told
@@ -224,29 +311,31 @@ per unsubscribe would be noise.
 
 ### 2.4 The link pages ask before they act
 
-Opening a confirm or unsubscribe link (GET) shows a page with a button. Only
-the button's POST changes anything. Many mail systems open every link in an
-incoming email to scan it. A GET that subscribed would be confirmed by the
-scanner before the person had read a word, which defeats double opt-in. A GET
-that unsubscribed would unsubscribe people at random. The one-click POST from
-mail apps (§2.3) is the exception, and is a POST by design.
+Opening an unsubscribe link (GET) shows a page with a button. Only the
+button's POST changes anything. Many mail systems open every link in an
+incoming email to scan it, and a GET that unsubscribed would unsubscribe
+people at random. (Until 6 Oct the confirm link worked the same way: a GET
+that subscribed would have been confirmed by the scanner before the person
+had read a word.) The one-click POST from mail apps (§2.3) is the exception,
+and is a POST by design.
 
 **Found by the browser run, not by the unit tests:** the button's POST arrived
 with `Origin: null`, and the same-origin check refused it. The pages send
 `Referrer-Policy: no-referrer`, so the token in the URL is never passed on.
 With that policy, a browser sends a null Origin even to its own site. The link
-endpoints now accept `Origin: null`. The encrypted token is what authorises
+endpoint (the confirm one too, until 6 Oct) accepts `Origin: null`. The encrypted token is what authorises
 the POST, and the check still refuses a request that names any other site.
 `/api/subscribe` still refuses `Origin: null`, since the dashboard's own
 `fetch` never sends one. Tests now cover both.
 
 ### 2.5 Links are encrypted, not merely signed
 
-A confirm or unsubscribe link carries the address inside an AES-256-GCM token.
-The key is derived (HKDF) from `UNSUBSCRIBE_SECRET`, and the token is bound to
-its purpose: a confirm link cannot unsubscribe, and the reverse. Confirm links
-expire after 7 days; unsubscribe links never expire, because they sit in
-emails people keep.
+An unsubscribe link carries the address inside an AES-256-GCM token. The key
+is derived (HKDF) from `UNSUBSCRIBE_SECRET`, and the token is bound to its
+purpose, so a confirm link emailed before 6 Oct cannot unsubscribe.
+Unsubscribe links never expire, because they sit in emails people keep. (Confirm links
+expired after 7 days; that rule went with them on 6 Oct. The token's format
+did not change, so every unsubscribe link already sent still works.)
 
 | Rejected | Because |
 | --- | --- |
@@ -339,10 +428,12 @@ rework already had one, so the 29 Sep switch was dropped in its favour
   allowance (§4).
 - **The link pages** are `no-store`, `noindex`, sent with no Referer, and have
   a CSP that allows no script, no framing and posting only to themselves.
-- **One confirm email per submission, to whatever address is typed.** That
-  is inherent in double opt-in. It is far less than a welcome-straight-away
-  design sends, but a script could still use the form to send someone
-  repeated "Please confirm" emails. Rate limiting is the answer (§4).
+- **One welcome email per new address, to whatever address is typed, and
+  the address stays on the list.** Accepted by the owner on 6 Oct (§2.3,
+  with the numbers). Until then this read "one confirm email per
+  submission", the cost of double opt-in. An address already on the list is
+  sent nothing, so the form cannot be used to send one person the welcome
+  repeatedly. Rate limiting is the remaining answer (§4).
 - **No honeypot.** The form is rendered by script, with no `action`, so the
   form-scraping bots a honeypot catches never see it. A scripted POST skips a
   honeypot anyway.
@@ -351,8 +442,9 @@ rework already had one, so the 29 Sep switch was dropped in its favour
   Vercel Firewall rate-limit rule on POSTs to `/api/*`. That is a dashboard
   setting, not repo code (§1 step 8).
 - **The rule's numbers: 5 POSTs per IP per 10 minutes.** A real subscriber
-  makes 2 (subscribe, then confirm), and someone sending feedback makes 1
-  per report, so 5 leaves room for a retry or a shared office connection.
+  makes 1 (2 under double opt-in: subscribe, then confirm), and someone
+  sending feedback makes 1 per report, so 5 leaves room for a retry or a
+  shared office connection.
   10 minutes is the longest window Vercel offers. Even at 1 per 10 minutes,
   one IP could still make 144 requests a day, above Resend's 100 emails a
   day. So the rule slows a script and stops a runaway loop, but it cannot
@@ -365,12 +457,13 @@ rework already had one, so the 29 Sep switch was dropped in its favour
 ### 2.10 Logs never carry the address
 
 Function logs are kept under whatever retention the Vercel project has (the
-handoff flagged this). Successes log `[subscribe] confirmation sent`,
-`[confirm] subscribed, team notified`, `[unsubscribe] unsubscribed` and
+handoff flagged this). Successes log `[subscribe] subscribed, team notified`,
+`[subscribe] already subscribed`, `[unsubscribe] unsubscribed` and
 `[feedback] sent LAUNCH-…` (the reference only), and nothing else. A failure
 logs the HTTP status plus Resend's error name and message. A test runs eight
-cases (success and failure for each function) and fails if any log names the
-address, or for feedback the message. Request logs carry the link URLs, which
+cases (subscribe: new, already subscribed, failing to save, failing to
+welcome; unsubscribe and feedback: each succeeding and failing) and fails if
+any log names the address, or for feedback the message. Request logs carry the link URLs, which
 is why the tokens are encrypted (§2.5).
 
 ### 2.11 Translation: nothing to do in `i18n/`
@@ -379,8 +472,13 @@ is why the tokens are encrypted (§2.5).
 page reaches `main`, and translates only the new strings: the "Almost there"
 message and the longer privacy line. Until then, `/fr` and `/pt` show them in
 English, as the translation design intends ("English does not wait for
-French"). **The emails and the confirm and unsubscribe pages are English
-only** (§4).
+French"). **The emails and the unsubscribe pages are English only** (§4).
+
+On 6 Oct the success line went back to *"Thank you — you are on the list."*
+That is the 1 Oct single opt-in wording, and its French and Portuguese are
+still in `i18n/translations.json`, so `/fr` and `/pt` show it translated at
+once, without waiting for `translate.yml`. The "Almost there" string is now
+unused.
 
 Send feedback's three new strings (the privacy note and the "sent" title and
 message) are translated like the rest of the widget. Since Jackson's
@@ -462,6 +560,55 @@ be answered.
 ---
 
 ## 3. How it was verified
+
+**6 Oct 2026, single opt-in**
+
+- **`node scripts/test-mail-api.js`: 139 checks, all passing** (153 before).
+  The confirm page's checks and the 7-day expiry went with `confirm.js`. Its
+  page checks (no cache, no index, no framing, no Referer, escaping, broken
+  and missing links, other methods) now run against the unsubscribe page,
+  which shares that code. New checks cover:
+  - a new address saved, welcomed and announced, with no confirm email;
+  - "Didn't sign up…" beside the unsubscribe link;
+  - the already-subscribed answered exactly like a new address, with nothing
+    sent;
+  - a confirm link from before 6 Oct refused as an unsubscribe link;
+  - the whole journey: subscribe, one-click unsubscribe, subscribe again.
+- **Mutation check: six deliberate breaks to `subscribe.js`, each caught.**
+  They were:
+  - the welcome without its unsubscribe link (6 checks failed);
+  - the already-subscribed welcomed again;
+  - a returning address not re-subscribed (crashed the run);
+  - the address logged;
+  - no `List-Unsubscribe` header;
+  - a failed create reported as success.
+- **Browser:** headless Chrome on the dashboard, served locally, with the
+  real `api/subscribe.js` behind it and Resend stubbed. The first subscribe
+  showed *"Thank you — you are on the list."*, cleared the field, and made
+  four calls: look up, create, the welcome to the subscriber, the note to
+  `kyler@oqtiva.ai`. No confirm email. The same address again showed the
+  same line, made only the lookup and the segment check, and sent nothing.
+  No JavaScript errors.
+- **`build-locale-pages.js --allow-stale`:** all checks passed. `/fr` shows
+  *"Merci — vous êtes sur la liste."* and `/pt` *"Obrigado — está na
+  lista."*, from the translation memory.
+- **Verify block from CLAUDE.md:**
+  - `normalize-treatment-policy.js` byte-identical;
+  - `0 errors, 1 warning` (French Guiana);
+  - synthetic 0/0;
+  - `make-preview.js` clean;
+  - `build-country-names.js --check` covers all 252.
+
+  `test-build-dataset.js` stops to report `content.en.json` out of date
+  (1 string added, 1 removed: the swapped success line). That is by design
+  (§2.11). Run with `--allow-stale`, as CI runs it: 28 passed. Also
+  `test-build-rbm-pages.js` 12 passed and the RBM build clean,
+  `test-notify-subscribers.js` 66 passed, `test-source-watchers.js` 61
+  passed. No NUL bytes in any touched file.
+- **Not checked:** real Resend, which is the owner's test on the PR preview
+  (§1 step 6); and `vercel build`, because the CLI is not installed here.
+  The preview's build is the check that `api/confirm` is no longer a
+  function.
 
 **2 Oct 2026, Send feedback**
 
@@ -591,7 +738,9 @@ documented there, and the rest of the preview test settles them:
   replies to the public go out from it. The handoff asks for a shared
   mailbox, because these outlive whoever is on the project. Changing it is
   one line in `ADDRESSES`.
-- **The rate-limit rule is not set yet** (§1 step 8, §2.9).
+- **The rate-limit rule is not set yet** (§1 step 8, §2.9). Since single
+  opt-in (6 Oct) it is the only limit on how many addresses a script can put
+  on the list.
 - **The sender is on `tamarind.tech`**, the developer's domain, not Unitaid's.
   The handoff expects a Unitaid sending domain (item 2). Changing it means
   verifying that domain in Resend, then changing one line. The emails now go
@@ -612,7 +761,7 @@ documented there, and the rest of the preview test settles them:
 **Still open**
 
 - **PR previews and the secrets.** `pr-preview.yml` builds the functions into
-  every preview. With both secrets set for Preview, a confirmed subscribe on a
+  every preview. With both secrets set for Preview, a subscribe on a
   preview saves a real contact into the real segment and mails the real inbox
   (§2.6). So does a feedback report sent from a preview. Without them, the preview's form shows the failure message. For
   testing this change they go on Preview. Whether they stay there after merge
@@ -622,12 +771,12 @@ documented there, and the rest of the preview test settles them:
   weekly canary that alerts when its test submission does not arrive is still
   the fix, and still not built.
 - **Resend's free plan limits** were recorded on 29 Sep as 100 emails a day,
-  3,000 a month and 1,000 contacts, and not rechecked. Each confirmed
-  subscription is now three emails (confirm, welcome, team note) plus one
-  contact. An unconfirmed attempt is one email, and so is each feedback
-  report. Both forms share the allowance, so a spam run on either one blocks
-  both for the rest of the day. The rate-limit rule cannot prevent that on
-  its own (§2.9).
+  3,000 a month and 1,000 contacts, and not rechecked. Since 6 Oct each new
+  subscription is two emails (welcome, team note) plus one contact, whoever
+  typed the address (§2.3); each feedback report is one email. Both forms
+  share the allowance, so a spam run on either one blocks both for the rest
+  of the day, and a run on Subscribe now also fills the contact list. The
+  rate-limit rule cannot prevent that on its own (§2.9).
 - **Who receives submissions.** The privacy line says "the LAUNCH team" and
   deliberately names no organisation. Handoff item 6, the data controller, is
   still Unitaid's to answer. It is more pressing now that the project emails
@@ -665,11 +814,12 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `email-feedback`, from `main` at `2d3d8cb` (2 Oct) |
-| Commits | 2: Send feedback on the illustrated journey; then `main` merged in (2 Oct, after #48, #50 and #52), resolving `build-rbm-pages.js` (both changes kept) and the UI notes (this work's section is now §3.34), and putting the three new widget strings on `i18n/reviewed-strings.json` |
-| Pull request | #40 against `main` |
-| CI | runs on that pull request |
-| New files | `api/feedback.js` |
-| Changed | `api/_mail.js` (`block`, `newRef`), `assets/report-issue.js` (the seam, connected wording), `illustrated-journey-dashboard.html` (`connected: true`, comments), `scripts/build-rbm-pages.js` and its test, `scripts/test-mail-api.js`, `rbm/README.md`, this document, `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, `docs/Handoff_Kyler/Handoff_Kyler.md` |
-| Waiting on | the owner's test on the preview (§1 step 7), then merge; the rate-limit rule (§1 step 8) |
-| Before this | `email-subscribe`, PR #30, 5 commits, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has now been used in full, and can be deleted |
+| Branch | `subscribe-single-opt-in`, from `main` at `4521d33` (6 Oct) |
+| Commits | 1: single opt-in, with these notes in the same commit |
+| Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
+| CI | runs on that pull request. `validate.yml` does not run `test-mail-api.js`, so the 139 checks above are the local run |
+| Removed | `api/confirm.js` |
+| Changed | `api/subscribe.js` (saves, welcomes, tells the team), `api/_mail.js` (`CONFIRM_DAYS` and the confirm expiry removed, comments), `api/unsubscribe.js` (comment), `illustrated-journey-dashboard.html` (success line, comments), `scripts/test-mail-api.js`, this document, `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, `docs/subscriber-updates-notes.md`, `docs/Handoff_Kyler/Handoff_Kyler.md` |
+| Not touched | `i18n/` (§2.11); RBM's copies, which hide Subscribe: built from this branch, their pages differ from the live ones only in Subscribe's hidden code (the success line and two comments), so pushing them is optional |
+| Waiting on | the owner's test on the preview (§1 step 6), then merge; the owner's call on re-subscribing returning addresses (§2.3); the rate-limit rule (§1 step 8), which now matters more |
+| Before this | `email-feedback`, PR #40, 2 commits, merged 2 Oct. `email-subscribe`, PR #30, 5 commits, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has been used in full, and can be deleted |

@@ -3315,11 +3315,11 @@
   // CSV download — stages and milestones for every tracked product
   function csvCell(v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
   // ---- subscribe for more information ---------------------------------------
-  // One seam: subscribeEmail() posts to api/subscribe.js, which emails the
-  // address a link to confirm (double opt-in, 1 Oct 2026); api/confirm.js
-  // adds it to the list once that link is used. It resolves on success and
-  // throws on anything else; the panel below renders the pending, success and
-  // failure states around it.
+  // One seam: subscribeEmail() posts to api/subscribe.js, which puts the
+  // address on the list straight away and emails it a welcome with an
+  // unsubscribe link (single opt-in since 6 Oct 2026). It resolves on success
+  // and throws on anything else; the panel below renders the pending, success
+  // and failure states around it.
   async function subscribeEmail(email) {
     const res = await fetch("/api/subscribe", {
       method: "POST",
@@ -3393,12 +3393,12 @@
     subGo.disabled = true;
     subGo.textContent = "Sending…";
     subSay("");
-    // Says what actually happened: nobody is on the list until they have
-    // clicked the link in the email, so success says to go and do that. On
-    // failure the address stays in the field, so trying again is one click.
+    // Says what actually happened: success shows only once the server has the
+    // address on the list, and is true whether it was new or already there.
+    // On failure the address stays in the field, so trying again is one click.
     try {
       await subscribeEmail(email);
-      subSay("Almost there — we've emailed you a link. Click it to confirm your subscription.", "ok");
+      subSay("Thank you — you are on the list.", "ok");
       subForm.reset();
     } catch (err) {
       subSay("Sorry — we could not add you just now. Please try again in a moment.", "bad");

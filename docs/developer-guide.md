@@ -18,9 +18,9 @@ The reason: the dataset is tiny (a handful of products ×
 upgrade, or break.
 
 **One exception, since 1 Oct 2026:** `api/` holds Vercel functions behind the
-illustrated journey page's two forms. For Subscribe, `subscribe.js` emails a
-confirm link, `confirm.js` saves the address in Resend and tells the team,
-and `unsubscribe.js` takes it off again. For Send feedback (since 2 Oct),
+illustrated journey page's two forms. For Subscribe, `subscribe.js` saves the
+address in Resend, emails it a welcome with an unsubscribe link and tells the
+team (single opt-in since 6 Oct), and `unsubscribe.js` takes it off again. For Send feedback (since 2 Oct),
 `feedback.js` emails the report to the team (§9c). They need no install
 either — no package.json, plain `fetch`. Nothing else talks to them, and
 every page still works without them.
@@ -36,7 +36,7 @@ every page still works without them.
 | `widget.html` | Embeddable one-row product tracker for partner sites (`?product=<id or name>`). Dependency-free; reads the same data file. |
 | `data/products.js` | The data contract: `window.LAUNCH_DATA = { …strict JSON… }`. The only file analysts touch; **feeds all three pages**. |
 | `assets/report-issue.js` | The **Send feedback** front end (DEV-04; called "Report an issue" until 30 Sep 2026): floating pill and modal, self-injecting styles. Shared by every dashboard page — one `<script src="assets/report-issue.js" defer>` include each. Connected on the illustrated journey page only, where it posts to `api/feedback.js`; on every other page Send is blocked. See §9c. |
-| `api/` | Vercel functions for the illustrated journey page's forms. Subscribe, double opt-in: `subscribe.js` (emails a confirm link, saves nothing), `confirm.js` (the link's page → Resend contact, welcome email, team inbox), `unsubscribe.js` (the welcome's link and the mail app's one-click unsubscribe). Send feedback: `feedback.js` (the report → team inbox, Reply-To the visitor). And `_mail.js` (shared, and where the addresses are set; the underscore keeps it from being a route). The two secrets, `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET`, are env vars on the Vercel project. Decisions in [email-backend-notes.md](email-backend-notes.md). |
+| `api/` | Vercel functions for the illustrated journey page's forms. Subscribe, single opt-in since 6 Oct: `subscribe.js` (the form → Resend contact, welcome email with an unsubscribe link, team inbox), `unsubscribe.js` (the welcome's link and the mail app's one-click unsubscribe). Send feedback: `feedback.js` (the report → team inbox, Reply-To the visitor). And `_mail.js` (shared, and where the addresses are set; the underscore keeps it from being a route). The two secrets, `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET`, are env vars on the Vercel project. Decisions in [email-backend-notes.md](email-backend-notes.md). |
 | `data/world-map.js` | Generated geometry: `window.LAUNCH_MAP = { w, h, countries: { ISO3: { n, d } } }`. Natural Earth 110m, public domain. Committed output — regenerate with `scripts/build-map.js`, never hand-edit. |
 | `history/` | Dated snapshots of the data file, bot-committed by `publish.yml` on every data change. Append-only, one per date: a later change the same day replaces that day's snapshot, so it holds the day's final state. The raw material for future trend charts and playback. |
 | `feed.xml` | RSS 2.0 feed of changelog entries, bot-rebuilt by `publish.yml`. |
@@ -233,8 +233,8 @@ No test framework by design; two layers instead:
   never in the repo. The addresses they send from and to are not secret and
   are set in `api/_mail.js`. Without either secret, or with no team inbox
   set, each form shows its failure message and the function log says what
-  is missing. Changing `UNSUBSCRIBE_SECRET` breaks every confirm and
-  unsubscribe link already emailed. The functions exist only on Vercel, so
+  is missing. Changing `UNSUBSCRIBE_SECRET` breaks every unsubscribe link
+  already emailed. The functions exist only on Vercel, so
   on any static host the forms fail the same way. That is why RBM's copies
   of the page hide Subscribe and leave Send feedback unconnected
   (`scripts/build-rbm-pages.js`). Setup and the rate-limit rule:

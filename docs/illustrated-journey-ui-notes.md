@@ -295,6 +295,15 @@ part of this page; they are served by `api/confirm.js` and
 `api/unsubscribe.js`, and described in
 [email-backend-notes.md](email-backend-notes.md) §2.3–2.5.
 
+**Revised again on 6 Oct: single opt-in, at the owner's request.** Submitting
+puts the address on the list at once, and the welcome email carries the
+unsubscribe link. So the success line is back to *"Thank you — you are on the
+list."*, which is now true whether the address was new or already there. Its
+French and Portuguese were still in the translation memory, so `/fr` and
+`/pt` show it translated straight away. The privacy line is unchanged.
+`api/confirm.js` is gone. Why, and what was accepted:
+[email-backend-notes.md](email-backend-notes.md) §2.3.
+
 ### 3.11 The draft warning is amber, and leads with the caveat
 
 It was `--accent-soft` blue — the same treatment as every other note on the

@@ -1,6 +1,6 @@
 // Shared code for the Vercel functions behind the illustrated journey page's
-// forms: the three of "Subscribe for updates" (api/subscribe.js,
-// api/confirm.js, api/unsubscribe.js) and "Send feedback" (api/feedback.js).
+// forms: the two of "Subscribe for updates" (api/subscribe.js,
+// api/unsubscribe.js) and "Send feedback" (api/feedback.js).
 // The leading underscore keeps Vercel from deploying this file as a route of
 // its own.
 //
@@ -9,10 +9,10 @@
 // requests do not justify starting one.
 //
 // Two secrets, set on the Vercel project and never in the repo:
-//   RESEND_API_KEY      Full access, not "Sending access" — confirming writes a
-//                       contact, which a sending-only key may not do
-//   UNSUBSCRIBE_SECRET  32+ random characters. Encrypts the confirm and
-//                       unsubscribe links, so none can be forged or read
+//   RESEND_API_KEY      Full access, not "Sending access" — subscribing writes
+//                       a contact, which a sending-only key may not do
+//   UNSUBSCRIBE_SECRET  32+ random characters. Encrypts the unsubscribe
+//                       links, so none can be forged or read
 // The addresses below are not secret, so they live here, where a change to
 // them is reviewed like any other.
 //
@@ -38,12 +38,8 @@ const ADDRESSES = {
 };
 const DEFAULT_FROM = "LAUNCH dashboard <onboarding@resend.dev>";
 
-// The page every email and every confirm/unsubscribe page links back to.
+// The page every email and every unsubscribe page links back to.
 const DASHBOARD = "/illustrated-journey-dashboard.html";
-
-// How long a confirm link works. Unsubscribe links never expire: they sit in
-// emails people keep.
-const CONFIRM_DAYS = 7;
 
 // The same test both forms already run in the browser, so an address the page
 // accepts is never refused here.
@@ -160,7 +156,7 @@ function siteUrl(req) {
   return (proto === "http" ? "http" : "https") + "://" + host;
 }
 
-// A confirm or unsubscribe link carries its address ENCRYPTED (AES-256-GCM),
+// An unsubscribe link carries its address ENCRYPTED (AES-256-GCM),
 // not merely signed. Signing would stop forgery, but the address would still
 // be readable in the URL — and URLs land in Vercel's request logs, which must
 // never carry an address. The key is derived from UNSUBSCRIBE_SECRET.
@@ -176,9 +172,11 @@ function makeToken(secret, purpose, email, now = Date.now()) {
   return Buffer.concat([iv, body, c.getAuthTag()]).toString("base64url");
 }
 
-// → { email } for a good link, { expired: true } for a confirm link past its
-// days, or null for anything else: tampered, wrong purpose, wrong key, junk.
-function readToken(secret, purpose, token, now = Date.now()) {
+// → { email } for a good link, or null for anything else: tampered, wrong key,
+// junk, or the wrong purpose — such as a confirm link emailed before 6 Oct
+// 2026, when subscribing still needed one. Unsubscribe links never expire:
+// they sit in emails people keep.
+function readToken(secret, purpose, token) {
   if (typeof token !== "string" || token.length > 1000 || !/^[A-Za-z0-9_-]+$/.test(token)) return null;
   const raw = Buffer.from(token, "base64url");
   if (raw.length < 12 + 16 + 2) return null;
@@ -191,12 +189,11 @@ function readToken(secret, purpose, token, now = Date.now()) {
     return null;
   }
   if (!v || v.p !== purpose || typeof v.e !== "string" || !EMAIL_RE.test(v.e) || !Number.isInteger(v.t)) return null;
-  if (purpose === "confirm" && now / 1000 - v.t > CONFIRM_DAYS * 86400) return { expired: true };
   return { email: v.e };
 }
 
-// For the two link endpoints (confirm, unsubscribe): GET shows a page with a
-// button, POST does the thing. Returns { method, token }, or sends the error
+// For the link endpoint (unsubscribe): GET shows a page with a button, POST
+// does the thing. Returns { method, token }, or sends the error
 // page and returns null. The token comes from the query string (the link in
 // the email, and a mail provider's one-click POST) or the posted form.
 function readLink(req, res) {
@@ -227,7 +224,7 @@ function readLink(req, res) {
 
 // ---- pages -------------------------------------------------------------------
 
-// The small pages a confirm or unsubscribe link opens. Not indexed, not
+// The small pages an unsubscribe link opens. Not indexed, not
 // framed, and no Referer: the URL carries the token, and "Back to the
 // dashboard" must not hand it to anyone.
 function page(res, status, { title, paras = [], form = null, back = true }) {
@@ -365,7 +362,7 @@ function addToSegment(cfg, email) {
 }
 
 module.exports = {
-  ADDRESSES, EMAIL_RE, DASHBOARD, CONFIRM_DAYS,
+  ADDRESSES, EMAIL_RE, DASHBOARD,
   config, reply, readRequest, notConfigured, logNotConfigured,
   line, block, esc, newRef, siteUrl, makeToken, readToken, readLink, page,
   render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure,

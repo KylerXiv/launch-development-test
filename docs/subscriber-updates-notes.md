@@ -5,8 +5,8 @@
 This branch's working-notes document, per [CLAUDE.md](../CLAUDE.md). It covers
 the daily email that tells subscribers what changed on the dashboard:
 `scripts/notify-subscribers.js`, its tests, and
-`.github/workflows/notify-subscribers.yml`. Subscribing itself (double opt-in,
-welcome email, unsubscribe) is in
+`.github/workflows/notify-subscribers.yml`. Subscribing itself (single opt-in
+since 6 Oct, welcome email, unsubscribe) is in
 [email-backend-notes.md](email-backend-notes.md) and is unchanged.
 
 ---
