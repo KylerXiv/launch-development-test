@@ -1588,6 +1588,73 @@ reviewed wording is lost.
 RBM's copies, built from this page by `build-rbm-pages.js`, carry the new
 wording from their next build.
 
+### 3.36 The two forms on phones (7 Oct 2026)
+
+Branch `mobile-forms`. The owner's iPhone screenshots of RBM's test page,
+inside the mock platform, showed two faults.
+
+**1. Opening Send feedback popped the "What is your feedback about?" list
+open by itself.** The widget's `open()` put focus on that `<select>`
+(`selType.focus()`), and iOS opens the picker of a select that receives focus.
+The same happened after "Send more feedback". Now `focusStart()` sends focus to
+the first field only with a mouse or keyboard. On a touch screen
+(`(pointer: coarse)`), it goes to the dialog's title (`tabindex="-1"`), which
+opens nothing and still tells a screen reader where it is. **Subscribe** had
+the same habit: `openSub()` focused the email field, which on a phone opened
+the keyboard at once and made iOS scroll the page under it. It now follows the
+same rule, with its own title.
+
+**2. The Subscribe panel looked misaligned.** Measured at 390px, three things
+were wrong:
+
+- **The panel's pointer** sat at x 43, under *Download CSV*. The phone rule
+  had it at `left: 24px`, but on phones Subscribe is the right-hand of the two
+  equal buttons, at x 199–376. Now it is at `left: calc(75% - 3px)`, the right
+  button's centre (x 286).
+- **The floating Send feedback button covered the panel** on a short screen:
+  "Notify me" at 375×667, and the end of the privacy line in the owner's
+  screenshot ("…the LAUNCH team and is"). On phones it now hides while the
+  panel is open (`html.sub-open`), and comes back when the panel closes.
+- **The feedback form's six fields were 14px.** iOS zooms the whole page into
+  any field under 16px when it gets the cursor, and does not zoom back out.
+  That is the likeliest cause of the zoomed, cut-off look. They are now 16px up
+  to 760px wide, as this page's own fields already were. No other field on
+  the page was under 16px (all checked).
+
+**A translation trap avoided on the way.** The translation collector
+(`assemble-content.js`) takes any quoted string with spaces and punctuation
+for prose. It would have collected `"(pointer: coarse)"` for translation, and
+a translated query silently answers "no" on `/fr` and `/pt`. That is the bug
+of 2 Oct (jackson/translation-coverage.md), where a French `(largeur minimale :
+721 px)` kept Sources closed. `isMediaQuery` now also covers `pointer`,
+`hover` and `orientation` queries. With it, `content.en.json` is unchanged
+(same hash), and the French copies keep the query as written.
+
+| Rejected | Because |
+| --- | --- |
+| Never focusing anything on open | Keyboard and screen-reader users would have to find the dialog themselves; a desktop keyboard user loses the ready-to-type field |
+| Detecting iPhones by user agent | `pointer: coarse` describes the input, which is what matters, and covers Android, which opens its keyboard the same way |
+| Raising the panel above the floating button | The button would still show where they do not overlap, half-hidden; stepping aside is cleaner |
+
+**Checked** in headless Chrome, with RBM's copies built from this branch
+inside the mock platform, served locally:
+
+- **Touch screen, 390×844:** both forms' fields are 16px. Opening Send
+  feedback focuses `#ri-title`, and Subscribe `#sub-title`. The pointer is
+  under Subscribe.
+- **Desktop, 1440×900:** unchanged. Focus goes into `#ri-type` and
+  `#sub-email`, and the pointer is under Subscribe.
+- **375×667 and 390×844, in the mock:** nothing sticks out sideways (outside
+  or inside the frame), the page itself does not scroll, and the dialog fits
+  on screen. The floating button is hidden while Subscribe is open, and back
+  after.
+- **Screenshots at 375×667:** first view, the menu drawer, Subscribe open,
+  and feedback open. No JavaScript errors.
+
+**Not checked:** a real iPhone. Chrome cannot reproduce the picker or the
+zoom, so the fix removes their known causes, and each cause was measured gone.
+The owner's retest on the phone is the proof.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
