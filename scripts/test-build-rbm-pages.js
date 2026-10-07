@@ -33,6 +33,8 @@ ok(out.indexOf("var DATA_URL") < out.indexOf('<script type="text/x-launch-app">'
 ok(/s\.public = true/.test(out), "sources are marked public for the page's filter");
 // the RBM look: after the page's own stylesheet, so its tokens win
 ok(out.indexOf('<style id="rbm-skin">') > out.indexOf("</style>") && /--accent: #2563EB/.test(out), "the RBM skin comes after the page's CSS, with RBM Blue as the accent");
+{ const skin = out.slice(out.indexOf('<style id="rbm-skin">'), out.indexOf("</style>", out.indexOf('<style id="rbm-skin">')));
+  ok(skin.length > 0 && !/--map/.test(skin), "the country access map keeps LAUNCH's own colours"); }
 ok(/fonts\.googleapis\.com\/css2\?family=Poppins[^"]*Roboto/.test(out), "Roboto and Poppins load");
 ok(!/#14657E/.test(out) && /const shades = \["#033FAF"/.test(out), "no teal left in the script colours");
 

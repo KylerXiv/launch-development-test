@@ -13,8 +13,9 @@
 //   slate-200 border          → --line; gray-900/700/600 text → --ink/-2/-3
 //   emerald / amber / red     → --good / --warn / --crit (trend-badge pairs; red
 //                               is RBM's Gap #CB1C1C)
-//   map ramp #E0DDDD → #033FAF → --map1..3 at 50 / 75 / 100 %; land white with
-//                               #4884CC borders
+//   The country access map keeps LAUNCH's own colours (--map*, untouched):
+//   the guidelines' map ramps are for maps of numbers (funding, need, counts)
+//   and say nothing about a map of access stages (user's choice, 7 Oct 2026).
 //   Roboto (UI), Poppins (title, KPI figures); rounded-md / rounded-lg corners;
 //   shadow-md cards; gray-200 table head; neutral-100 modal head.
 // Light only: RBM has no dark mode (the page is light-only already).
@@ -22,7 +23,7 @@
 // Contrast, checked 7 Oct 2026: every text token clears 4.5:1 on white, the
 // canvas, --surface-2, --accent-soft and the table head (the lowest is
 // --warn-text on the canvas, 4.46:1 — it never sits there; on white and its own
-// soft fill it is 5.0 / 4.8:1). Map levels against white land: 3.3 / 5.5 / 9.0:1.
+// soft fill it is 5.0 / 4.8:1).
 "use strict";
 
 const FONTS =
@@ -38,8 +39,6 @@ const TOKENS = `
     --warn: #D97706; --warn-text: #B45309; --warn-soft: #FFFBEB;
     --crit: #CB1C1C; --crit-soft: #FEF2F2;
     --idle: #6B7280; --idle-soft: #F3F4F6;
-    --map1: #728EC6; --map2: #3A67BB; --map3: #033FAF;
-    --map-nodata: #FFFFFF; --map-border: #4884CC;
     --shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -2px rgba(0,0,0,.1);`;
 
 const CSS = `
@@ -64,7 +63,6 @@ const CSS = `
   .jcell.on { box-shadow: inset 1px 0 0 #BFDBFE, inset -1px 0 0 #BFDBFE; }
   .more { border-top-color: #BFDBFE; }
   .more:hover { background: #DBEAFE; }
-  .det-pill.registered { color: #111827; }
   .mft-pchip { background: #F3F4F6; }
 
   /* buttons: rounded-md, RBM Blue primary (blue-700 on hover), no gradients */
