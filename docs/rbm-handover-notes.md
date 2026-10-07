@@ -99,7 +99,11 @@ inside an iframe on another domain.
 - Translating the 43 / 42 new strings: the translate bot, after the merge.
 - Review of the two hand-written fr/pt error messages.
 - Hosting the RBM pages and the `frame-ancestors` header (RBM's call).
-- Subscribe for updates on RBM: needs a decision on where its backend lives.
+- ~~Subscribe for updates on RBM: needs a decision on where its backend
+  lives.~~ **Decided 7 Oct** (`rbm-forms`): Subscribe and Send feedback on
+  RBM's copies post to the LAUNCH Vercel project, which lists RBM's host as a
+  partner. Why, and what it costs: email-backend-notes.md §2.13. Adding
+  RBM's real host: §1 step 9 there.
 
 ## Status
 

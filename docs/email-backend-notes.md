@@ -120,7 +120,29 @@ missing.
 
    A Hobby project gets exactly one rate-limit rule, with a window of 10 s
    to 10 min (Vercel's docs, read 2 Oct). Both forms already show their
-   failure message on a 429.
+   failure message on a 429. The rule counts POSTs only, so the CORS
+   preflights of RBM's pages (§2.13) do not use it up.
+9. **Let RBM's pages post here** (§2.13). Two steps, in this order:
+   1. Add the host they are served from to `PARTNERS` in `api/_mail.js`:
+      `origin` is scheme and domain only (`https://dashboards.endmalaria.org`,
+      no path, no trailing slash), `dashboard` the English page there. Merge,
+      so production has it.
+   2. Then rebuild their pages with `node scripts/build-rbm-pages.js` (its
+      `--api-url` defaults to production) and push `dist/rbm/` to their
+      repository.
+
+   The other order works too, but until step 1 is live their forms show
+   "could not send". Today `PARTNERS` holds the test copy,
+   `https://codebyjackson.github.io`. To check from a terminal, without
+   sending anything:
+
+   ```bash
+   curl -si -X OPTIONS https://<host>/api/subscribe \
+     -H 'Origin: https://codebyjackson.github.io' \
+     -H 'Access-Control-Request-Method: POST' | head -5
+   # → 204 with access-control-allow-origin: https://codebyjackson.github.io
+   #   405 with no access-control-* header means that origin is not a partner
+   ```
 
 **Sending updates to subscribers** is a Resend broadcast to the segment. Since
 5 Oct 2026 it is automatic: `notify-subscribers.yml` sends one a day, at 15:00
@@ -409,8 +431,10 @@ rework already had one, so the 29 Sep switch was dropped in its favour
 
 ### 2.9 Abuse guards, and what was left out
 
-- **Same-origin only** on `/api/subscribe` and `/api/feedback`. A request
-  whose `Origin` does not match its own host (`Host` or `x-forwarded-host`) gets a 403. A request with
+- **Same-origin only** on `/api/subscribe` and `/api/feedback`, **plus the
+  partner sites in `PARTNERS`** since 7 Oct (§2.13). A request
+  whose `Origin` does not match its own host (`Host` or `x-forwarded-host`)
+  or a partner exactly gets a 403. A request with
   no `Origin` is allowed through: that is curl or a server, which could forge
   the header anyway. This guard is against other *websites* using the
   endpoint. The link endpoints apply the same check to POSTs, plus the null
@@ -499,7 +523,7 @@ only. `assets/report-issue.js` is loaded by 13 pages:
 | The illustrated journey, and its `/fr/` and `/pt/` editions, built from it and served from the same Vercel project | **sends** |
 | `index`, `option-b`, `pipeline` and `story`, and the same four under `unitaid/` | mock, as before: Send blocked, red note |
 | The four under `synthetic/` (fabricated data) | no widget at all: a broken path, found in passing (§4) |
-| RBM's copies of the illustrated journey (`dist/rbm/`) | mock: switched off by the build (below) |
+| RBM's copies of the illustrated journey (`dist/rbm/`) | **sends since 7 Oct**, across origins to this project (§2.13); mock until then, switched off by the build (below) |
 
 **One switch: `connected`.** Keith's 30 Sep rework (`3b121d0`) gave the
 widget a `connected` key, which until now only unblocked Send. The 29 Sep
@@ -525,7 +549,9 @@ overrides still win. The note now names the browser as well as the page and
 the data version. The payload has always carried `userAgent`, but the 29 Sep
 note left it out.
 
-**RBM's copies are switched off explicitly.** `build-rbm-pages.js` rewrites
+**RBM's copies were switched off explicitly** (until 7 Oct; now only with
+`--api-url none`, and §2.13 takes the second rejection below back, as the
+owner's decision). `build-rbm-pages.js` rewrites
 `connected: true` to `connected: false`, and its test checks for that. RBM
 hosts those files without `api/`, so a connected copy would fail every report
 against an `/api/feedback` that is not there. Two alternatives were rejected:
@@ -557,9 +583,157 @@ four labels of its own, whatever a page calls them. The subject is
 visitor, through Reply-To. If no address was given, the email says it cannot
 be answered.
 
+### 2.13 RBM's copies post to these functions, from their own site
+
+**Decided on 7 Oct by the owner**, on `rbm-forms`. RBM's copies are static
+files on another host (today `codebyjackson.github.io`, GitHub Pages), which
+can neither run code nor keep the Resend key. Until now the build hid
+Subscribe there and kept Send feedback a mock (§2.12). The owner wanted both
+working.
+
+| Option | |
+| --- | --- |
+| **RBM's pages post to this project's `api/`, which lists their host** — chosen | One key, one subscriber list, one inbox. RBM runs nothing |
+| RBM runs its own email backend | A second provider account and key, and a second subscriber list that the daily update email (subscriber-updates-notes.md) never reaches. Work on RBM's side for a feature that is ours |
+| Put the Resend key in the pages | Rejected outright: the pages are public files, so anyone could read the key and send mail as `updates@tamarind.tech` |
+| A form-relay service | Rejected on 23 Sep (handoff), for the same reasons |
+
+**How the browser is let through: CORS, for named sites only.** A page on one
+site may call another site's server only if that server says, in its answer,
+which site may read it. For a JSON POST the browser first asks with a
+**preflight** (an `OPTIONS` request). `readRequest` in `_mail.js` now:
+
+1. finds the request's `Origin` in **`PARTNERS`**, by exact match;
+2. for a partner, answers the preflight with `204` and
+   `Access-Control-Allow-Origin` set to that origin, `-Allow-Methods: POST`,
+   `-Allow-Headers: Content-Type` and `-Max-Age: 600`, and puts the same
+   `Allow-Origin` on the real answer, failures included, so the page can show
+   its failure message;
+3. for anyone else, does what it did before: the preflight gets `405` and no
+   CORS headers, so the browser never sends the POST; a POST that arrives
+   anyway gets `403`.
+
+Every answer carries `Vary: Origin`, so no cache can hand one site's answer
+to another.
+
+| Rejected | Because |
+| --- | --- |
+| `Access-Control-Allow-Origin: *` | Any website could then use the forms as a mail relay, the thing §2.9 guards against |
+| A prefix or wildcard match (`*.github.io`) | `codebyjackson.github.io.evil.example`, or any GitHub user's Pages site, would pass. The tests try a look-alike host, plain `http`, a path, and `null` |
+| The list as an env var on Vercel | Like the addresses (§2.6), it is not secret, and a change to who may post belongs in review and in git |
+
+**Accepted with the test host:** an origin carries no path, so listing
+`https://codebyjackson.github.io` admits every GitHub Pages site under that
+account, not only `launch-rbm-test`. That is acceptable for a teammate's test
+copy. RBM's real host replaces it once known (§1 step 9).
+
+**Where the welcome sends a partner's subscriber.** Each partner has a
+`dashboard` page in `PARTNERS`. Its welcome's "Open the dashboard" goes there
+and not to this site, and the team note says which page they signed up on
+(`On:`). The link comes from the list, never from the request: no link in any
+email is built from anything a visitor sent (§2.5). The unsubscribe link stays
+on this site, because the function lives here.
+
+**The build: `--api-url`.** `build-rbm-pages.js` now:
+
+- points the page's `fetch("/api/subscribe")` and the widget's
+  `var ENDPOINT = "/api/feedback"` at `<api-url>/api/…`;
+- stops hiding Subscribe, and leaves `connected: true`.
+
+The default is the production origin, `https://launch-development-test.vercel.app`.
+**Never a PR preview**, whose address expires. `--api-url none` builds the
+forms off, as before. The address changes when the project moves to
+Unitaid's hosting; RBM's pages are then rebuilt with the new one, and nothing
+else changes. The build stops if the page no longer has exactly one
+`fetch("/api/subscribe")`, or the widget no longer has that `ENDPOINT` line,
+rather than ship a form that posts nowhere.
+
+**Found while building: the widget never saw its settings in RBM's copies**
+(the §4 item from 2 Oct). The build deferred *every* inline script until
+`dashboard.json` had loaded, including the one that sets
+`window.LAUNCH_FEEDBACK_COPY`. But the widget runs as soon as the page is
+parsed, so it always read no settings: `connected` unset (so Send stayed
+blocked whatever the build did), the default wording, and `page.view` null.
+Removing the `connected: false` rewrite alone would have changed nothing. The
+build now leaves that one script undeferred (it reads no data) and stops if
+it cannot find exactly one. With `--api-url none` the settings now arrive
+too, with `connected` rewritten to `false` as before.
+
+**What this costs or leaves open:**
+
+- **Partners share the Resend allowance**: 100 emails a day on the free plan
+  (§2.3, §4). RBM's readers and the LAUNCH site's draw on the same count.
+- **Whose data.** RBM's readers' addresses and feedback go to the LAUNCH team
+  and its Resend account. RBM should agree, and Unitaid's data-controller
+  question (handoff item 6) covers this too.
+- **The feedback dialog inside RBM's tall iframe** can open centred out of
+  view (handoff, §4). It was not looked at in RBM's real frame.
+- **The emails stay English**, as on `/fr` and `/pt` (§4).
+
 ---
 
 ## 3. How it was verified
+
+**7 Oct 2026, RBM's copies post here (§2.13)**
+
+- **`node scripts/test-mail-api.js`: 157 checks, all passing** (139 before).
+  New checks cover:
+  - the shipped `PARTNERS` shape: `https://host` with no path, and a
+    dashboard on the same origin;
+  - a partner's preflight (`204` and the four headers, nothing sent);
+  - a partner's subscribe and feedback, readable by its page, including a
+    failure;
+  - the welcome linking to the partner's page while unsubscribe stays here;
+  - the team note's `On:`;
+  - five non-partners refused with no CORS header and nothing sent: another
+    site, a look-alike host, plain `http`, a path, and `null`;
+  - this site's own page getting no CORS header.
+- **Mutation check: seven deliberate breaks, each caught.** They were:
+  - any Origin echoed back (15 checks failed);
+  - a prefix match;
+  - no `Allow-Origin` on the answer;
+  - the preflight not answered;
+  - no `Vary: Origin`;
+  - a partner switching the guard off for everyone;
+  - the welcome linking to this site instead of the partner's page.
+- **`node scripts/test-build-rbm-pages.js`: 25 passed.** Both modes are
+  covered: forms on (Subscribe shown and posting to the API, `connected`
+  kept, the widget's settings undeferred and before the widget, the widget's
+  endpoint) and `--api-url none` (as before). The build also stops on a page
+  without `fetch("/api/subscribe")` and on a widget without its `ENDPOINT`.
+- **Browser, cross-origin and framed.** Headless Chrome, with three local
+  origins standing in for RBM's platform (`localhost:8803`), RBM's host
+  (`127.0.0.1:8801`, serving `dist/rbm/` built with
+  `--api-url http://localhost:8802`) and Vercel (`localhost:8802`, the real
+  `subscribe.js` and `feedback.js`, Resend stubbed). The RBM page was loaded
+  inside the platform's iframe.
+  - **With its host a partner:** 4 medicine rows drawn, Subscribe visible.
+    Subscribe showed "Thank you — you are on the list."; Send feedback showed
+    "Thanks — your feedback has been sent." with a server reference
+    (`LAUNCH-85D3428E`). The API saw `OPTIONS` → `204` and `POST` → `200` for
+    each, with `Allow-Origin` set. The welcome's dashboard link was the
+    partner's page. No JavaScript errors.
+  - **With its host not a partner:** both preflights got `405` with no CORS
+    header, the browser never sent either POST, and nothing reached Resend.
+    Both forms showed their "could not … just now" message.
+
+  Chrome ran with site isolation off, so the test could reach into the
+  cross-origin frame. CORS is enforced in the network layer either way.
+- **Verify block from CLAUDE.md:**
+  - `normalize-treatment-policy.js` byte-identical;
+  - `0 errors, 1 warning`;
+  - synthetic 0/0;
+  - `make-preview.js` clean;
+  - `test-build-dataset.js` 28 passed, with no `--allow-stale` needed now
+    that the translate bot has run;
+  - `build-country-names.js --check` covers all 252.
+
+  Also `build-locale-pages.js --allow-stale` all checks passed,
+  `test-notify-subscribers.js` 66, `test-source-watchers.js` 61,
+  `test-dataset-diff.js` 8. No NUL bytes in any touched file.
+- **Not checked:** real Resend from a partner page, which is the test on
+  `codebyjackson.github.io` after merge (§1 step 9); RBM's real frame,
+  including where the feedback dialog opens; and `vercel build` (no CLI).
 
 **6 Oct 2026, single opt-in**
 
@@ -752,8 +926,8 @@ documented there, and the rest of the preview test settles them:
   journey only (§2.12). Switching another page on is one key,
   `connected: true`, in its `LAUNCH_FEEDBACK_COPY`. The fabricated-data
   pages should stay off.
-- **Send feedback in RBM's copies** (§2.12). This needs cross-origin posting
-  to the LAUNCH project, or RBM's own intake.
+- ~~**Send feedback in RBM's copies**~~ **Done 7 Oct**, with Subscribe:
+  cross-origin posting to this project (§2.13).
 - **The emails and link pages in French and Portuguese.** A visitor on `/fr`
   gets English emails. The page they came from is known, but the email text
   would need a reviewed translation, not the engine's.
@@ -776,16 +950,20 @@ documented there, and the rest of the preview test settles them:
   typed the address (§2.3); each feedback report is one email. Both forms
   share the allowance, so a spam run on either one blocks both for the rest
   of the day, and a run on Subscribe now also fills the contact list. The
-  rate-limit rule cannot prevent that on its own (§2.9).
+  rate-limit rule cannot prevent that on its own (§2.9). Since 7 Oct RBM's
+  copies draw on the same allowance (§2.13). Rechecked on 6 Oct on Resend's
+  site: 100 a day (reset at midnight UTC), 3,000 a month, 1,000 contacts, and
+  an API limit of 10 requests a second per team.
 - **Who receives submissions.** The privacy line says "the LAUNCH team" and
   deliberately names no organisation. Handoff item 6, the data controller, is
   still Unitaid's to answer. It is more pressing now that the project emails
   members of the public.
 - **`frame-ancestors`, and panel positioning inside a tall iframe** (handoff).
   The Subscribe panel floats against the iframe's viewport, and the feedback
-  dialog is centred in it. Test against RBM's staging frame. In RBM's own
-  copies, Send feedback is a mock (§2.12), so this matters only if the LAUNCH
-  site itself is framed.
+  dialog is centred in it. Test against RBM's staging frame. Since 7 Oct
+  RBM's own copies send (§2.13), so this now matters there too.
+- **RBM's agreement** that its readers' addresses and feedback go to the
+  LAUNCH team (§2.13).
 
 **Found in passing, left alone**
 
@@ -799,11 +977,8 @@ documented there, and the rest of the preview test settles them:
   uses `../assets/` and works. This predates the change and was left alone.
   Those pages are not to send, and whether to fix the path or drop the
   widget from fabricated data is a separate decision.
-- **RBM's copies never see the page's widget settings.** The inline script
-  that sets `LAUNCH_FEEDBACK_COPY` waits for `dashboard.json`, but the widget
-  has already run by then. So the dialog there shows the default wording,
-  and sends `page.view` as null. This was left alone. Since §2.12 switches
-  `connected` off explicitly, fixing it is now safe.
+- ~~**RBM's copies never see the page's widget settings.**~~ **Fixed 7 Oct**
+  (§2.13): the settings script is no longer deferred.
 - **Developer-guide §8 still says the site is served from GitHub Pages.**
   Production is on Vercel. Not corrected here; it needs someone who knows the
   current hosting arrangement to rewrite it.
@@ -814,12 +989,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `subscribe-single-opt-in`, from `main` at `4521d33` (6 Oct) |
-| Commits | 1: single opt-in, with these notes in the same commit |
+| Branch | `rbm-forms`, from `main` at `1eec9bd` (7 Oct) |
+| Commits | 1: RBM's copies post to these functions, with these notes in the same commit |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
-| CI | runs on that pull request. `validate.yml` does not run `test-mail-api.js`, so the 139 checks above are the local run |
-| Removed | `api/confirm.js` |
-| Changed | `api/subscribe.js` (saves, welcomes, tells the team), `api/_mail.js` (`CONFIRM_DAYS` and the confirm expiry removed, comments), `api/unsubscribe.js` (comment), `illustrated-journey-dashboard.html` (success line, comments), `scripts/test-mail-api.js`, this document, `docs/developer-guide.md`, `docs/illustrated-journey-ui-notes.md`, `docs/subscriber-updates-notes.md`, `docs/Handoff_Kyler/Handoff_Kyler.md` |
-| Not touched | `i18n/` (§2.11); RBM's copies, which hide Subscribe: built from this branch, their pages differ from the live ones only in Subscribe's hidden code (the success line and two comments), so pushing them is optional |
-| Waiting on | the owner's test on the preview (§1 step 6), then merge; the owner's call on re-subscribing returning addresses (§2.3); the rate-limit rule (§1 step 8), which now matters more |
-| Before this | `email-feedback`, PR #40, 2 commits, merged 2 Oct. `email-subscribe`, PR #30, 5 commits, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has been used in full, and can be deleted |
+| CI | runs on that pull request. `validate.yml` runs `test-build-rbm-pages.js` but not `test-mail-api.js`, so the 157 checks above are the local run |
+| Changed | `api/_mail.js` (`PARTNERS`, `partnerOf`, CORS in `readRequest`), `api/subscribe.js` (welcome and team note name the partner's page), `scripts/build-rbm-pages.js` (`--api-url`, the undeferred widget settings, `widget()`), `scripts/test-build-rbm-pages.js`, `scripts/test-mail-api.js`, `rbm/README.md` (the forms, and the content-security-policy paragraph corrected), this document, `docs/rbm-handover-notes.md`, `docs/developer-guide.md` |
+| After merge | rebuild RBM's pages and push them to `codebyjackson/launch-rbm-test` (the owner now has push access), then try both forms there with a real address (§1 step 9) |
+| Waiting on | the owner's review, then merge; RBM's real host for `PARTNERS`; RBM's agreement on where its readers' data goes (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
+| Before this | `subscribe-single-opt-in`, PR #62, 1 commit, merged 6 Oct. `email-feedback`, PR #40, 2 commits, merged 2 Oct. `email-subscribe`, PR #30, 5 commits, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has been used in full, and can be deleted |
