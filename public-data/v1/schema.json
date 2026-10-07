@@ -58,6 +58,26 @@
             }
           }
         },
+        "yardstick": {
+          "type": "object",
+          "description": "Optional. How long each stage is expected to take, compared on the page with the stage dates. Numbers only, nothing to translate.",
+          "required": ["wholeYears", "expected"],
+          "properties": {
+            "wholeYears": { "type": "number", "exclusiveMinimum": 0, "description": "Expected years from the first milestone to routine use." },
+            "expected": {
+              "type": "array",
+              "description": "One entry per stage, same order as stages. null = the stage is not measured.",
+              "items": {
+                "type": ["object", "null"],
+                "required": ["years", "basis"],
+                "properties": {
+                  "years": { "type": "number", "exclusiveMinimum": 0 },
+                  "basis": { "enum": ["published", "estimate"], "description": "published = a timeline someone publishes; estimate = LAUNCH's own working estimate, still to be agreed." }
+                }
+              }
+            }
+          }
+        },
         "glossary": { "type": "object", "description": "Term → definition. Terms (keys) stay as written; definitions are text." },
         "changelog": {
           "type": "array",

@@ -229,6 +229,8 @@ function build() {
       stages: D.stages,
       stageColumns: D.stageColumns,
       stageInfo: (D.stageInfo || []).map((x) => ({ what: x.what, who: x.who, stall: x.stall, source: x.source })),
+      // numbers only (no text to localise); left out when the data has none
+      ...(D.yardstick ? { yardstick: { wholeYears: D.yardstick.wholeYears, expected: D.yardstick.expected } } : {}),
       glossary: D.glossary,
       changelog: (D.changelog || []).map((c) => ({ date: c.date, product: c.product, plain: c.plain === undefined ? null : c.plain })),
       products: (D.products || []).filter((p) => !p.placeholder),

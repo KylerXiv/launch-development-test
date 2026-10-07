@@ -51,7 +51,7 @@ const stageName = ds.data.stages[0][lang];           // every text is { en, fr, 
 | `data_status` | `draft` = compiled from public sources, pending verification. Show a notice unless `live`. |
 | `last_updated` | When the data itself last changed. |
 | `source_coverage` | Every public source the data draws on, with its link. |
-| `data` | The dataset: `stages`, `stageColumns`, `stageInfo`, `glossary`, `changelog`, `products`, `treatmentPolicy`, `sources`. |
+| `data` | The dataset: `stages`, `stageColumns`, `stageInfo`, `yardstick` (optional, expected years per stage), `glossary`, `changelog`, `products`, `treatmentPolicy`, `sources`. |
 
 **Text.** Every text a reader sees is an object `{ "en": …, "fr": …, "pt": … }`.
 Where no translation exists yet, `fr` and `pt` carry the English. Names, ids,
