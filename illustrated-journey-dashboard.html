@@ -1710,8 +1710,10 @@
   // docs/jackson/yardstick.md for the choices behind each.
   const YARD = DATA.yardstick || null;
   const lateText = n => yrsText(n) + " late";
+  // "Since 2018" is translated with the rest of the data ("Depuis 2018",
+  // "Desde 2018"), so the word is matched in all three page languages.
   function sinceYearOf(st) {
-    const m = String(st && st.date || "").match(/Since\s+((?:19|20)\d{2})/i);
+    const m = String(st && st.date || "").match(/(?:Since|Depuis|Desde)\s+((?:19|20)\d{2})/i);
     return m ? +m[1] : null;
   }
   function yardstick(p) {
