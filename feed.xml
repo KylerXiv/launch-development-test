@@ -5,7 +5,14 @@
     <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
     <description>Changes to tracked antimalarial product statuses on the LAUNCH dashboard (draft data).</description>
     <language>en</language>
-    <lastBuildDate>Tue, 06 Oct 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 08 Oct 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>All: Illustrated journey dashboard: a yardstick compares how long each stage is ex…</title>
+      <description>Illustrated journey dashboard: a yardstick compares how long each stage is expected to take with how long it has taken. New "yardstick" block in this file: expected years per stage (WHO recommendation 2, WHO PQ listing 1.5, country registration 2, national policy adoption 2, procurement 2, in-country delivery 3) and 8 for the whole journey. Country registration follows a published timeline; the others are LAUNCH working estimates, still to be agreed. Shown as a badge under On pathway (ASPY 6 yrs late, DHA–PPQ 8 yrs late, GanLum and ALAQ not approved yet), a box at the top of an open row, and a new Time taken view. No stage data changed.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-10-08:All:Illustrated journey dashboard: a yardsti</guid>
+      <pubDate>Thu, 08 Oct 2026 12:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>All: Country access map: the illustrative country lists for ASPY and DHA–PPQ are r…</title>
       <description>Country access map: the illustrative country lists for ASPY and DHA–PPQ are replaced with verified ones. A country is shown only when a national medicines regulator's register, a WHO publication or a peer-reviewed paper supports its stage; every other country shows No data. ASPY: 13 countries (Nigeria, Rwanda, Burkina Faso and Kenya in MFT plans; Ghana, Viet Nam, DR Congo, Cameroon, Thailand, Republic of Korea and South Sudan in national guidelines; Tanzania and Zambia registered). DHA–PPQ: 15 countries (Nigeria, Rwanda, Burkina Faso and Kenya in MFT plans; Tanzania, Viet Nam, Thailand, Indonesia, Ghana, Angola, Cameroon, Gabon and Papua New Guinea in national guidelines; Zambia and Zimbabwe registered). Removed for lack of such a source: Cambodia, Côte d'Ivoire, Uganda, Mozambique, Senegal, Mali and Myanmar (ASPY); Cambodia, Mozambique, Senegal, Myanmar, Lao PDR, China and India (DHA–PPQ). Each entry now cites its sources and the date checked. New sources: the Zambia, Zimbabwe, Viet Nam and Rwanda registers (fetched monthly), the WHO national drug policy table, the WHO MFT implementation guide, and three peer-reviewed MFT papers (Rwanda, Burkina Faso, Kenya). The country access figures in each medicine's details now count the same lists, each stage including the later ones as the map does: ASPY 13 registered or further, 11 in national guidelines or further, 4 in MFT plans; DHA–PPQ 15, 13 and 4. ASPY's "25+ countries" registration claim, which came from MMV, is replaced by the five national registers that confirm it (Nigeria, Rwanda, Tanzania, Viet Nam, Zambia).</description>
