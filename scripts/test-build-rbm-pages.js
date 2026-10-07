@@ -31,11 +31,18 @@ const plain = (html.match(/<script>/g) || []).length;
 ok(app === plain && app > 0, "every inline script of the page waits for the data");
 ok(out.indexOf("var DATA_URL") < out.indexOf('<script type="text/x-launch-app">'), "the loader comes before the page's scripts");
 ok(/s\.public = true/.test(out), "sources are marked public for the page's filter");
+// the RBM look: after the page's own stylesheet, so its tokens win
+ok(out.indexOf('<style id="rbm-skin">') > out.indexOf("</style>") && /--accent: #2563EB/.test(out), "the RBM skin comes after the page's CSS, with RBM Blue as the accent");
+ok(/fonts\.googleapis\.com\/css2\?family=Poppins[^"]*Roboto/.test(out), "Roboto and Poppins load");
+ok(!/#14657E/.test(out) && /const shades = \["#033FAF"/.test(out), "no teal left in the script colours");
 
 // a page that no longer loads products.js the expected way must stop the build
 let threw = false;
 try { transform(html.replace('<script src="data/products.js"></script>', ""), "en"); } catch (e) { threw = true; }
 ok(threw, "a page that changed how it loads its data stops the build");
+threw = false;
+try { transform(html.replace('const shades = ["#14657E"', 'const shades = ["#000000"'), "en"); } catch (e) { threw = true; }
+ok(threw, "a page whose script colours changed stops the build, so no teal is left in the RBM look");
 
 console.log(`\n  build-rbm-pages: ${passed} passed, ${failed} failed\n`);
 process.exit(failed ? 1 : 0);
