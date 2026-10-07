@@ -186,6 +186,18 @@ snapshot could be replaced — the change was not made that day.
 **For next time:** any change to `data/products.js` needs `meta.lastUpdated`
 set to the day it lands and a changelog entry for that day.
 
+## Follow-up: procurement start on /fr and /pt (8 Oct)
+
+Checking the rebuilt RBM pages, French showed ASPY's procurement as "En cours,
+sans date de début" where English shows "8 yrs so far, 6 yrs late". The
+procurement start is read from the stage date "Since 2018", and that date is
+translated with the rest of the data ("Depuis 2018", "Desde 2018"), so the
+English-only pattern found no year. `sinceYearOf()` now matches Since, Depuis
+or Desde. Branch `fix/yardstick-translated-since`. Rejected: storing a start
+year per stage in the data — a bigger change to the data model for one field.
+If a later translation words the date differently, that row falls back to
+"Ongoing, no start date" rather than showing a wrong number.
+
 ## Status
 
 Local branch `feat/yardstick`, one commit, not pushed. Notes moved to `docs/jackson/` at the owner's request, so they can revert or fix it themselves. Verify block: both
