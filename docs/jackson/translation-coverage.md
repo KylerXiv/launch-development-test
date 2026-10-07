@@ -329,6 +329,8 @@ attribute selector or a style declaration (`isCode2`). Exactly 11 js strings dro
 code; nothing else changed. The builder only substitutes collected strings, so those literals
 now stay as written, whatever the translation memory holds. Their old translations stay in
 `translations.json` as harmless orphans (owner: the memory is left alone).
+*7 Oct 2026:* `isMediaQuery` also covers `pointer`, `hover` and `orientation` queries, when
+the forms started asking `matchMedia("(pointer: coarse)")` (illustrated-journey-ui-notes.md §3.36).
 
 **Checked** with a real mouse click in headless Chrome (an `element.click()` from script does
 not reproduce it: the browser blocks the second, nested click): before the fix the French

@@ -218,7 +218,10 @@ function collect() {
   // .gloss" became "botão, um, . brilho", which throws, and "bouton, a, .gloss",
   // which silently matched nothing, so a row's own click closed it again), an
   // attribute selector, and a style declaration ("grid-column: 4 / -1").
-  const isMediaQuery = (t) => /^\(\s*(min-|max-|prefers-)[a-z-]+\s*:/.test(t);
+  // Media queries on the input device count too (7 Oct 2026): the forms ask
+  // matchMedia("(pointer: coarse)") whether to move focus into a field, and a
+  // translated query would quietly answer no on /fr and /pt.
+  const isMediaQuery = (t) => /^\(\s*((min-|max-|prefers-)[a-z-]+|(any-)?(pointer|hover)|orientation)\s*:/.test(t);
   const isSelectorList = (t) => /^[\w.#\[\]="'*:-]+(\s*,\s*[\w.#\[\]="'*:-]+)+$/.test(t) && /(^|,)\s*[.#\[*]/.test(t);
   const isAttrSelector = (t) => /^\[[a-z-]+/.test(t);
   const isStyleDecl  = (t) => /^[a-z-]+\s*:\s*[-\d.]+(px|%|em|rem)?(\s*\/\s*-?\d+)?\s*;?$/.test(t);
