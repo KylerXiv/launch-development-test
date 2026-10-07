@@ -2660,6 +2660,13 @@
       "fr": "Moins d'un an",
       "pt": "Menos de 1 ano"
     },
+    "7be8dabf4cc56494": {
+      "en": "Each approved medicine now shows how many years late it is against the time each step is expected to take, with a new Time taken table. The expected times are LAUNCH's working estimates, except country registration, and are still to be agreed.",
+      "where": "products.changelog[0].plain",
+      "bucket": "data",
+      "fr": "Chaque médicament approuvé indique désormais son retard en années par rapport au temps estimé pour chaque étape, grâce à un nouveau tableau des délais. Les délais estimés sont des estimations de travail de LAUNCH, à l'exception de l'enregistrement dans le pays, et restent à confirmer.",
+      "pt": "Agora, cada medicamento aprovado mostra quantos anos de atraso tem em relação ao tempo previsto para cada etapa, com uma nova tabela de Tempo Decorrido. Os tempos previstos são estimativas de trabalho da LAUNCH, exceto para o registo em cada país, e ainda estão sujeitos a aprovação."
+    },
     "7d3e67eafcb0ffb3": {
       "en": "Health-worker training (3-drug regimen)",
       "where": "products.products[1].detail.adoption[1]",
