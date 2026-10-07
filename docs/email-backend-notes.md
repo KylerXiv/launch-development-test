@@ -987,7 +987,12 @@ documented there, and the rest of the preview test settles them:
 - **`frame-ancestors`, and panel positioning inside a tall iframe** (handoff).
   The Subscribe panel floats against the iframe's viewport, and the feedback
   dialog is centred in it. Test against RBM's staging frame. Since 7 Oct
-  RBM's own copies send (§2.13), so this now matters there too.
+  RBM's own copies send (§2.13), so this now matters there too. **Answered
+  for a frame sized to the screen (7 Oct):** the button and dialog stay in
+  view, as measured on the mock platform. The README now asks RBM for that
+  sizing and warns against a fixed height taller than the screen, which is
+  what put them out of view (rbm-handover-notes.md §4). `frame-ancestors` is
+  still RBM's call.
 - **RBM's agreement** that its readers' addresses and feedback go to the
   LAUNCH team (§2.13).
 
@@ -1016,10 +1021,10 @@ documented there, and the rest of the preview test settles them:
 | | |
 | --- | --- |
 | Branch | `rbm-vercel-partner`, from `main` at `561a32b` (7 Oct) |
-| Commits | 1: the Vercel copy of RBM's test pages added to `PARTNERS`, with these notes in the same commit |
+| Commits | 2: the Vercel copy of RBM's test pages added to `PARTNERS`, with these notes in the same commit; then `main` merged in after #65, resolving this table |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
 | CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 157 passed, the shape check included |
 | Changed | `api/_mail.js` (one `PARTNERS` entry, comment), `rbm/README.md` (both hosts; every host needs an entry), this document |
 | After merge | production allows `https://launch-rbm-test.vercel.app` at once: those pages already post to production, so nothing is rebuilt. The README then goes to the test repository, with #65's |
-| Waiting on | the owner's merge; RBM's real host for `PARTNERS`; RBM's agreement on where its readers' data goes (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
-| Before this | `rbm-forms`, PR #64, 1 commit, merged 7 Oct; its after-merge steps done the same day (RBM pages pushed as `177c74e`, checked live). `subscribe-single-opt-in`, PR #62, merged 6 Oct. `email-feedback`, PR #40, merged 2 Oct. `email-subscribe`, PR #30, merged 1 Oct |
+| Waiting on | the owner's merge; the owner's try of both forms on RBM's copies with a real address (§1 step 9); RBM's real host for `PARTNERS`; RBM's agreement on where its readers' data goes (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
+| Before this | `rbm-embed-sizing`, PR #65, merged 7 Oct (README: size the frame to the screen; rbm-handover-notes.md §4). `rbm-forms`, PR #64, 1 commit, merged 7 Oct as `561a32b`; its after-merge steps done the same day (RBM pages pushed as `177c74e`, checked live: Subscribe shown, the widget connected, cross-origin answers readable, no email sent). `subscribe-single-opt-in`, PR #62, merged 6 Oct. `email-feedback`, PR #40, merged 2 Oct. `email-subscribe`, PR #30, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has been used in full, and can be deleted |

@@ -131,3 +131,60 @@ First publish (Publish now) → test proposal #35 approved → decision, history
 on `main` (also removing the test snapshot `history/products-2026-10-01.js`) →
 Publish now → GanLum back to `idle`, `TEST-0001` gone. The data repo keeps all
 three publishes and their archive copies.
+
+## 4. Embedding: the frame is sized to the screen, not the page (7 Oct 2026)
+
+*Branch `rbm-embed-sizing`. The README change is here; the mock that shows it,
+`iframe-test.html`, is Jackson's file in `codebyjackson/launch-rbm-test`, and
+was fixed there directly (`4f3437e`).*
+
+**The problem, measured.** The README told RBM to embed each page with
+`height:2400px`, and the mock platform did the same, under a ~210px hero in a
+scrolling page. The dashboard is 3,000–4,500px tall, so it scrolled twice:
+the page around the frame (1,762px on a 1440×900 screen), and the dashboard
+inside the frame (812px). The Send feedback button is `position: fixed`,
+which inside an iframe means fixed to the frame, not to the screen. So it sat
+at the frame's bottom edge, at y 2,581 on a 900px screen, and was on screen
+only once the page was scrolled to its end. Opened from the top of the page,
+its dialog appeared at y 1,095–1,780, out of view. A 390×844 phone showed the
+same (button at y 2,536, dialog at 981–1,778).
+
+**What RBM actually does.** On RBM's live home page, the WHO Malaria Threats
+Map is embedded as `<iframe class="w-full flex-1 min-h-0">`. It sits in a card
+whose height is `max(480px, calc(100vh - 480px) + 100px)`, so its height
+follows the screen, and the map's page scrolls inside the frame. In that
+arrangement, "fixed to the frame" and "fixed to the screen" are the same
+place.
+
+**Decision: size the frame to the screen.** In the README: fill the space
+below the platform's header, at least about 480px, with a warning against
+fixed heights taller than the screen. In the mock: the main column is one
+screen tall (`100dvh`, so a phone's browser bar does not cover the frame's
+bottom), and the frame fills what the hero leaves, at least 480px. On screens
+under 560px tall (a phone held sideways), the hero's title goes, so the frame
+keeps the screen.
+
+| Rejected | Because |
+| --- | --- |
+| Keep 2400px, and have the widget move its button into the visible part of the frame | A cross-origin frame cannot read the parent page's scroll position. `IntersectionObserver` can tell the frame how much of it is visible, but not where, once the visible band slides without changing size, which is exactly what scrolling a tall frame does |
+| A `postMessage` handshake: the platform reports its scroll to the frame, the frame resizes itself and moves the button (the handoff's "around 30 lines") | Needs a script on RBM's side, and moving the button after each message lags the scroll by a frame or two, so it jitters. Kept in reserve, if RBM ever needs the frame taller than the screen |
+| Auto-height (the frame grows to the dashboard's full height) | Makes the frame taller than the screen, which is the problem itself |
+
+**Checked** with headless Chrome against the mock, before pushing (served
+locally) and after (live), at 1440×900 and 390×844, and before pushing also
+at 1366×768 and 844×390. Four positions each: page top, page scrolled 400px,
+page scrolled to its end, and dashboard scrolled 1,500px inside the frame. At
+every size and position the button stayed in one place, fully on screen
+(1440×900: y 819–856). The dialog opened fully on screen (y 258–856). The
+page itself no longer scrolled, and there were no JavaScript errors.
+Screenshots at 1440×900 (scrolled, and with the dialog open) and 390×844
+confirmed the layout.
+
+**Still open.** Where RBM puts LAUNCH, and how tall its frame is there, is
+RBM's call. The README now says what works and why. Not checked: a real
+iPhone, where `dvh` matters most.
+
+**Status.** Branch `rbm-embed-sizing` from `main` at `561a32b`; 1 commit,
+README and these notes together; not pushed when this was written. After
+merge, the README goes to `codebyjackson/launch-rbm-test` (keeping its "Live
+test copy" links block).
