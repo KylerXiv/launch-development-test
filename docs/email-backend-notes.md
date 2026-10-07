@@ -698,7 +698,71 @@ too, with `connected` rewritten to `false` as before.
 
 ---
 
+### 2.14 The team's emails are laid out as a form
+
+**Changed on 7 Oct, at the owner's request.** The owner found the team's
+notes "not professional": a bold line, then grey labels with no borders, an
+ISO timestamp (`2026-10-07T15:48:57.440Z`), and the segment's id
+(`759df0a9-…`). Both team emails, the new-subscriber note and the feedback
+report, go through `render()` in `_mail.js`, so one change covers both. They
+now read like a submitted form, top to bottom:
+
+1. a brand bar ("LAUNCH Transparency Dashboard");
+2. a title ("New subscriber", "New feedback");
+3. one line saying what happened, or what to do. For a subscriber it is
+   "Nothing to do…", or "One thing to do: add them to the mailing list by
+   hand" when the segment call failed. For feedback it is the type and the
+   medicine;
+4. for feedback, the visitor's message in its own box;
+5. the details as a bordered two-column table, with the label on grey on the
+   left and the answer on the right;
+6. a footer. For feedback it says whether a reply reaches the visitor.
+
+| Was | Now |
+| --- | --- |
+| `Email`, `Subscribed`, `On`, `Returning`, `Segment` | `Email address`, `Signed up`, `Signed up on`, `Subscriber`, `Mailing list` |
+| `2026-10-07T15:48:57.440Z` | `7 Oct 2026, 15:48 UTC` (`when()`) |
+| the segment id | its name, `SEGMENT_NAME`. The id appears only when someone has to add the contact by hand |
+| the page as a bare address | for a subscriber, the site's name (`PARTNERS[].name`, or "LAUNCH dashboard") as a link to it |
+| `—` for a missing answer | `Not given` in grey, or in red when it matters ("Not given, so this cannot be answered") |
+| the browser string, full size | the same string, small and grey |
+
+**Rules kept.** Every value is escaped. Nothing a visitor typed becomes a link,
+including the page address a feedback report carries, which is shown as text.
+Only addresses this code built are links: the site's own page and a partner's
+page. The plain-text part keeps `Label: value` lines, for mail apps that show
+it.
+
+| Rejected | Because |
+| --- | --- |
+| A `<style>` block, flexbox or grid | The inbox is Outlook, whose Word-based renderer ignores most of it. Tables with inline styles render the same in Outlook, Gmail and Apple Mail |
+| Resend's hosted templates, or React Email | The first puts the wording in Resend's dashboard, out of review, as in §2.1. The second needs a `package.json`, which the repo does not have on purpose |
+| Local times | The team is spread out, and UTC, stated, is never ambiguous |
+| A browser name parsed out of the user agent ("Safari on iPhone") | A parser is guesswork that ages. The full string stays, de-emphasised |
+
+The email the subscriber gets, the welcome, is unchanged: it already had
+its own layout, `letter()`.
+
 ## 3. How it was verified
+
+**7 Oct 2026, the team's emails as a form (§2.14)**
+
+- **`node scripts/test-mail-api.js`: 171 checks, all passing** (157 before).
+  Six old checks read the old wording, and were moved to the new labels
+  with the same intent. Fourteen new checks cover:
+  - `when()`, with and without leading zeros;
+  - each note's brand bar, title, intro and footer;
+  - the five-row table;
+  - no ISO stamp and no segment id when nothing failed;
+  - the warning colour when the segment call failed, or when there is no
+    address to reply to;
+  - the subscriber's page as a link, and the address they typed, and the page
+    a feedback report claims, never as one.
+- **Rendered and photographed** in headless Chrome, with sample details: both
+  notes at 700px wide, and the subscriber note at 390px (a phone). Labels and
+  answers line up, and nothing overflows.
+- **Not checked:** a real Outlook inbox. The first real subscription or
+  feedback after merge shows it.
 
 **7 Oct 2026, RBM's copies post here (§2.13)**
 
@@ -1020,11 +1084,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `rbm-vercel-partner`, from `main` at `561a32b` (7 Oct) |
-| Commits | 2: the Vercel copy of RBM's test pages added to `PARTNERS`, with these notes in the same commit; then `main` merged in after #65, resolving this table |
+| Branch | `team-email-form`, from `main` at `285afaa` (7 Oct) |
+| Commits | 1: the team's emails as a form, with these notes in the same commit |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
-| CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 157 passed, the shape check included |
-| Changed | `api/_mail.js` (one `PARTNERS` entry, comment), `rbm/README.md` (both hosts; every host needs an entry), this document |
-| After merge | production allows `https://launch-rbm-test.vercel.app` at once: those pages already post to production, so nothing is rebuilt. The README then goes to the test repository, with #65's |
-| Waiting on | the owner's merge; the owner's try of both forms on RBM's copies with a real address (§1 step 9); RBM's real host for `PARTNERS`; RBM's agreement on where its readers' data goes (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
-| Before this | `rbm-embed-sizing`, PR #65, merged 7 Oct (README: size the frame to the screen; rbm-handover-notes.md §4). `rbm-forms`, PR #64, 1 commit, merged 7 Oct as `561a32b`; its after-merge steps done the same day (RBM pages pushed as `177c74e`, checked live: Subscribe shown, the widget connected, cross-origin answers readable, no email sent). `subscribe-single-opt-in`, PR #62, merged 6 Oct. `email-feedback`, PR #40, merged 2 Oct. `email-subscribe`, PR #30, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has been used in full, and can be deleted |
+| CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 171 passed |
+| Changed | `api/_mail.js` (`render()` rebuilt, `when()`, `SEGMENT_NAME`, `PARTNERS[].name`), `api/subscribe.js` and `api/feedback.js` (their team notes), `scripts/test-mail-api.js`, this document |
+| After merge | live at once for the LAUNCH site and both RBM copies, which post to this API. Nothing to rebuild |
+| Waiting on | the owner's merge, then a look at the first real note in Outlook; the owner's iPhone retest of the forms (illustrated-journey-ui-notes.md §3.36); RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
+| Before this | `mobile-forms`, PR #67, merged 7 Oct; RBM pages pushed as `62e9936`. `rbm-vercel-partner`, PR #66, merged 7 Oct, verified live. `rbm-embed-sizing`, PR #65, merged 7 Oct. `rbm-forms`, PR #64, merged 7 Oct. `subscribe-single-opt-in`, PR #62, merged 6 Oct. `email-feedback`, PR #40, merged 2 Oct. `email-subscribe`, PR #30, merged 1 Oct |

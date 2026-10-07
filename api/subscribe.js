@@ -104,16 +104,26 @@ module.exports = async function subscribe(req, res) {
   if (!welcome.ok) mail.logFailure("subscribe", "send welcome", welcome);
 
   // ---- 3. tell the team ------------------------------------------------------------
+  // Laid out as a form (mail.render): plain labels, a readable time, the list's
+  // name rather than its id, and what (if anything) the team has to do.
+  const where = partner ? (partner.name || partner.dashboard) : "LAUNCH dashboard";
   const rows = [
-    ["Email", email],
-    ["Subscribed", new Date().toISOString()],
-    ["On", home],
-    ["Returning", state === "returning" ? "yes — had unsubscribed before" : "no"],
-    ["Segment", !cfg.segment ? "none set" : segmentOk ? cfg.segment : `NOT ADDED to ${cfg.segment} — add by hand in Resend`]
+    ["Email address", email],
+    ["Signed up", mail.when()],
+    ["Signed up on", where, { href: home }],
+    ["Subscriber", state === "returning" ? "Returning: had unsubscribed before" : "New"],
+    !cfg.segment ? ["Mailing list", "None set: saved as a plain contact", { tone: "muted" }]
+      : segmentOk ? ["Mailing list", mail.SEGMENT_NAME]
+      : ["Mailing list", `Not added. Add them to "${mail.SEGMENT_NAME}" by hand in Resend (segment ${cfg.segment}).`, { tone: "warn" }]
   ];
   const note = await mail.sendEmail(cfg, {
     subject: "[LAUNCH] New subscriber for dashboard updates",
-    ...mail.render("Someone subscribed to updates from the LAUNCH dashboard", "", rows),
+    ...mail.render("New subscriber", "", rows, {
+      intro: segmentOk
+        ? "Someone subscribed to updates from the LAUNCH dashboard. Nothing to do: they are on the mailing list, and every update email carries their unsubscribe link."
+        : "Someone subscribed to updates from the LAUNCH dashboard. One thing to do: add them to the mailing list by hand (below).",
+      footer: "Sent automatically when someone subscribes on the dashboard. Their address is used only for the update emails."
+    }),
     form: "subscribe-team"
   });
   if (!note.ok) mail.logFailure("subscribe", "notify team", note);

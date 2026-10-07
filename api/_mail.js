@@ -37,6 +37,8 @@ const ADDRESSES = {
   segment: "759df0a9-0fe5-4b96-ac7a-581fb77a5edc"
 };
 const DEFAULT_FROM = "LAUNCH dashboard <onboarding@resend.dev>";
+// What the team's emails call the segment, rather than its id.
+const SEGMENT_NAME = "LAUNCH dashboard updates";
 
 // The page every email and every unsubscribe page links back to.
 const DASHBOARD = "/illustrated-journey-dashboard.html";
@@ -50,11 +52,12 @@ const DASHBOARD = "/illustrated-journey-dashboard.html";
 // is known. Every host that serves a copy needs its own entry: a copy served
 // from a host missing here shows "could not add you" on every Subscribe and
 // Send feedback (found 7 Oct, when the test repo was also deployed to Vercel).
+// `name` is what the team's emails call the site.
 const PARTNERS = [
   // the test copy, codebyjackson/launch-rbm-test, on GitHub Pages
-  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/" },
+  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/", name: "RBM test copy (GitHub Pages)" },
   // the same repository, also deployed to Vercel
-  { origin: "https://launch-rbm-test.vercel.app", dashboard: "https://launch-rbm-test.vercel.app/en/" }
+  { origin: "https://launch-rbm-test.vercel.app", dashboard: "https://launch-rbm-test.vercel.app/en/", name: "RBM test copy (Vercel)" }
 ];
 
 // The same test both forms already run in the browser, so an address the page
@@ -311,24 +314,82 @@ ${back ? `<p class="back"><a href="${DASHBOARD}">Back to the dashboard</a></p>` 
 
 // ---- emails ------------------------------------------------------------------
 
-// Plain-text and HTML bodies from the same parts. Every visitor-supplied value
-// is escaped, and none is ever made into a link: the inbox reading these is
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const pad2 = (n) => String(n).padStart(2, "0");
+// "7 Oct 2026, 15:48 UTC": what the team's emails show for a time, rather
+// than 2026-10-07T15:48:57.440Z.
+function when(d = new Date()) {
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())} UTC`;
+}
+
+// A note to the team inbox, laid out like a submitted form (7 Oct 2026): a
+// brand bar, a title, one line on what happened or what to do, the visitor's
+// message in a box when there is one, then the details as a bordered
+// two-column table (label left on grey, answer right), and a footer.
+// Table-based with inline styles only, because the inbox is Outlook, whose
+// Word-based renderer ignores most modern CSS.
+//
+// Each row is [label, value] or [label, value, { href, tone }]: `tone` is
+// "warn" (something to do) or "muted" (detail). Every value is escaped, and
+// none a visitor typed ever becomes a link, because the inbox reading these is
 // the team's, and a form is an easy way to put a phishing URL in front of it.
-function render(heading, message, rows) {
-  const text = [heading, "", message, "", ...rows.map(([k, v]) => `${k}: ${v}`)]
-    .filter((l, i, a) => !(l === "" && a[i - 1] === ""))
-    .join("\n");
-  const cell = "padding:3px 14px 3px 0;vertical-align:top";
+// `href` is only ever an address this code built (the site's own page, or a
+// PARTNERS page).
+function render(heading, message, rows, { intro = "", footer = "" } = {}) {
+  const text = [heading, intro, "", message, "",
+    ...rows.map(([k, v, o]) => `${k}: ${v}` + (o && o.href && o.href !== v ? ` (${o.href})` : "")),
+    "", footer]
+    .filter((l, i, a) => !(l === "" && (i === 0 || a[i - 1] === "")))
+    .join("\n").replace(/\n+$/, "") + "\n";
+
+  const font = "font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
+  const line = "border-bottom:1px solid #e3e9ec";
+  const cell = (v, o) => {
+    const shown = esc(v);
+    const style = o && o.tone === "warn" ? "color:#b42318;font-weight:700"
+      : o && o.tone === "muted" ? "color:#6b7780;font-size:12px" : "color:#1a1a1a";
+    const body = o && o.href
+      ? `<a href="${esc(o.href)}" style="color:#0E5A73;text-decoration:underline">${shown}</a>`
+      : shown;
+    return `<span style="${style}">${body}</span>`;
+  };
+  const tableRows = rows.map(([k, v, o], i) => {
+    const last = i === rows.length - 1 ? "" : line;
+    return `<tr>` +
+      `<td width="34%" valign="top" style="padding:11px 14px;background:#f5f8f9;${last};border-right:1px solid #e3e9ec;` +
+        `${font};font-size:13px;line-height:20px;font-weight:600;color:#4a5761">${esc(k)}</td>` +
+      `<td valign="top" style="padding:11px 14px;${last};${font};font-size:14px;line-height:20px;word-break:break-word">${cell(v, o)}</td>` +
+      `</tr>`;
+  }).join("");
+
   const html =
-    `<div style="font:14px/1.5 -apple-system,Segoe UI,Arial,sans-serif;color:#1a1a1a">` +
-    `<p style="margin:0 0 12px;font-weight:600">${esc(heading)}</p>` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#eef3f5" style="background:#eef3f5">` +
+    `<tr><td align="center" style="padding:24px 12px">` +
+    `<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" ` +
+      `style="width:100%;max-width:600px;background:#ffffff;border:1px solid #dde5e8;border-radius:10px">` +
+    // brand bar
+    `<tr><td bgcolor="#0E5A73" style="background:#0E5A73;padding:13px 24px;border-radius:10px 10px 0 0;${font};` +
+      `font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff">LAUNCH Transparency Dashboard</td></tr>` +
+    // title and what happened
+    `<tr><td style="padding:22px 24px 4px;${font}">` +
+      `<div style="margin:0 0 6px;font-size:20px;line-height:1.3;font-weight:700;color:#1a1a1a">${esc(heading)}</div>` +
+      (intro ? `<div style="margin:0;font-size:14px;line-height:1.5;color:#4a5761">${esc(intro)}</div>` : "") +
+    `</td></tr>` +
+    // the visitor's message
     (message
-      ? `<div style="margin:0 0 16px;padding:12px 14px;border-left:3px solid #0E5A73;background:#f4f7f8;white-space:pre-wrap">${esc(message)}</div>`
+      ? `<tr><td style="padding:14px 24px 0">` +
+        `<div style="padding:12px 14px;border-left:3px solid #0E5A73;background:#f5f8f9;${font};font-size:14px;line-height:1.5;` +
+        `color:#1a1a1a;white-space:pre-wrap;word-break:break-word">${esc(message)}</div></td></tr>`
       : "") +
-    `<table style="border-collapse:collapse;font-size:13px">` +
-    rows.map(([k, v]) =>
-      `<tr><td style="${cell};color:#666">${esc(k)}</td><td style="${cell}">${esc(v)}</td></tr>`).join("") +
-    `</table></div>`;
+    // the details, as a form
+    `<tr><td style="padding:16px 24px 22px">` +
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ` +
+        `style="border:1px solid #e3e9ec;border-radius:8px;border-collapse:separate">${tableRows}</table>` +
+    `</td></tr>` +
+    (footer
+      ? `<tr><td style="padding:0 24px 20px;${font};font-size:12px;line-height:1.5;color:#6b7780">${esc(footer)}</td></tr>`
+      : "") +
+    `</table></td></tr></table>`;
   return { text, html };
 }
 
@@ -405,10 +466,10 @@ function addToSegment(cfg, email) {
 }
 
 module.exports = {
-  ADDRESSES, PARTNERS, EMAIL_RE, DASHBOARD,
+  ADDRESSES, SEGMENT_NAME, PARTNERS, EMAIL_RE, DASHBOARD,
   config, reply, readRequest, partnerOf, notConfigured, logNotConfigured,
   line, block, esc, newRef, siteUrl, makeToken, readToken, readLink, page,
-  render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure,
+  when, render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure,
   // For scripts/notify-subscribers.js, which sends the update emails as broadcasts.
   resendRequest
 };
