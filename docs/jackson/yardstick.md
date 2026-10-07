@@ -164,6 +164,28 @@ byte-for-byte as committed.
 - The "On pathway" column, and so the badge, is hidden below 1040px. The box
   in the open row carries the same headline there.
 
+## Follow-up: history snapshot failed after the merge (8 Oct)
+
+PR #69 merged as `52114d4`. The translate bot ran by itself (`ce094d2`), and
+validate and the Vercel deploy passed, but **Snapshot history and rebuild feed**
+(`publish.yml`) failed: `history/products-2026-10-06.js already exists with
+different content`. My mistake: `data/products.js` changed (the `yardstick`
+block) without moving `meta.lastUpdated` on, and history keeps one snapshot per
+date, append-only. Because that step failed, the feed, the linked-data export
+and the history graph were not rebuilt for this change either.
+
+Fixed on branch `fix/yardstick-history`: `meta.lastUpdated` 2026-10-06 →
+2026-10-08, and a changelog entry for 2026-10-08 describing the yardstick (its
+`plain` line is new text for the translate bot). On the next push the snapshot
+step writes a new `history/products-2026-10-08.js` instead of refusing. Checked
+locally: validator 0 / 1, serializer byte-identical, `make-feed.js`,
+`build-ontology.js` and `build-history-graph.js` all run (outputs left to the
+workflow to commit). Rejected: a changelog entry dated 2026-10-06 so the old
+snapshot could be replaced — the change was not made that day.
+
+**For next time:** any change to `data/products.js` needs `meta.lastUpdated`
+set to the day it lands and a changelog entry for that day.
+
 ## Status
 
 Local branch `feat/yardstick`, one commit, not pushed. Notes moved to `docs/jackson/` at the owner's request, so they can revert or fix it themselves. Verify block: both
