@@ -80,10 +80,13 @@ iframe scrolling inside it is the simplest option.
   `https://launch-development-test.vercel.app/api/` rather than to this host,
   which has none. That service accepts them only from hosts on its list
   (`PARTNERS` in the LAUNCH repository's `api/_mail.js`). Today the list holds
-  `https://codebyjackson.github.io`, the test copy. **When RBM serves these
-  pages from its own host, tell the LAUNCH team the host's address** (scheme
-  and domain, e.g. `https://dashboards.endmalaria.org`) so it can be added;
-  until then both forms show their "could not send" message there.
+  the two copies of the test repository: `https://codebyjackson.github.io`
+  (GitHub Pages) and `https://launch-rbm-test.vercel.app` (Vercel). **Every
+  host that serves these pages needs its own entry, test and staging
+  included: tell the LAUNCH team each host's address** (scheme and domain,
+  e.g. `https://dashboards.endmalaria.org`) before readers use it. On a host
+  that is not listed, both forms show their "could not send" message to
+  every reader.
   Subscribers' addresses and feedback go to the LAUNCH team, and the emails
   are in English.
 

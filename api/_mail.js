@@ -47,9 +47,14 @@ const DASHBOARD = "/illustrated-journey-dashboard.html";
 // slash), so it admits every page on that host, plus the page a subscriber
 // from there is sent back to. Like the addresses above, not secret, so it
 // lives here where a change to it is reviewed. RBM's own host goes in once it
-// is known; codebyjackson.github.io is the test copy.
+// is known. Every host that serves a copy needs its own entry: a copy served
+// from a host missing here shows "could not add you" on every Subscribe and
+// Send feedback (found 7 Oct, when the test repo was also deployed to Vercel).
 const PARTNERS = [
-  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/" }
+  // the test copy, codebyjackson/launch-rbm-test, on GitHub Pages
+  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/" },
+  // the same repository, also deployed to Vercel
+  { origin: "https://launch-rbm-test.vercel.app", dashboard: "https://launch-rbm-test.vercel.app/en/" }
 ];
 
 // The same test both forms already run in the browser, so an address the page
