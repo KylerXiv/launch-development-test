@@ -132,9 +132,12 @@ missing.
       repository.
 
    The other order works too, but until step 1 is live their forms show
-   "could not send". Today `PARTNERS` holds the test copy,
-   `https://codebyjackson.github.io`. To check from a terminal, without
-   sending anything:
+   "could not send". **Every host that serves a copy needs its own entry**,
+   test and staging deployments included: on 7 Oct a second copy of the test
+   repo, deployed to Vercel, failed for everyone who used it (§2.13). Today
+   `PARTNERS` holds the test copy twice: `https://codebyjackson.github.io`
+   (GitHub Pages) and `https://launch-rbm-test.vercel.app` (Vercel). To check
+   a host from a terminal, without sending anything:
 
    ```bash
    curl -si -X OPTIONS https://<host>/api/subscribe \
@@ -627,6 +630,29 @@ to another.
 account, not only `launch-rbm-test`. That is acceptable for a teammate's test
 copy. RBM's real host replaces it once known (§1 step 9).
 
+**Found 7 Oct, the same evening: a second host, not on the list.** The owner
+reported Subscribe "sometimes" failing, with a phone screenshot of "Sorry — we
+could not add you just now". The address bar read `…bm-test.vercel.app`: the
+test repository was also being deployed to Vercel, at
+`https://launch-rbm-test.vercel.app`, three times that day, and its pages post
+to this API like the GitHub Pages copy. The permission check (preflight) from
+each, against production:
+
+| Page served from | Preflight answer | What readers saw |
+| --- | --- | --- |
+| `https://codebyjackson.github.io` | `204`, `Allow-Origin` set | Subscribe works |
+| `https://launch-rbm-test.vercel.app` | `405`, no CORS header | the browser never sends the POST: "could not add you" |
+
+So "sometimes" was "which copy". Nothing in this project's logs showed it,
+because a refused preflight sends nothing. The Vercel host was added to
+`PARTNERS` (`rbm-vercel-partner`). Its previews (`…-git-….vercel.app`) stay
+off the list, so forms fail there by design.
+
+| Rejected | Because |
+| --- | --- |
+| `*.vercel.app` | Any Vercel user's site could then use the forms as a relay (above) |
+| Removing the Vercel deployment | It is the RBM repo owner's choice, and both copies are in use |
+
 **Where the welcome sends a partner's subscriber.** Each partner has a
 `dashboard` page in `PARTNERS`. Its welcome's "Open the dashboard" goes there
 and not to this site, and the team note says which page they signed up on
@@ -994,11 +1020,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `rbm-forms`, from `main` at `1eec9bd` (7 Oct) |
-| Commits | 1: RBM's copies post to these functions, with these notes in the same commit |
+| Branch | `rbm-vercel-partner`, from `main` at `561a32b` (7 Oct) |
+| Commits | 2: the Vercel copy of RBM's test pages added to `PARTNERS`, with these notes in the same commit; then `main` merged in after #65, resolving this table |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
-| CI | runs on that pull request. `validate.yml` runs `test-build-rbm-pages.js` but not `test-mail-api.js`, so the 157 checks above are the local run |
-| Changed | `api/_mail.js` (`PARTNERS`, `partnerOf`, CORS in `readRequest`), `api/subscribe.js` (welcome and team note name the partner's page), `scripts/build-rbm-pages.js` (`--api-url`, the undeferred widget settings, `widget()`), `scripts/test-build-rbm-pages.js`, `scripts/test-mail-api.js`, `rbm/README.md` (the forms, and the content-security-policy paragraph corrected), this document, `docs/rbm-handover-notes.md`, `docs/developer-guide.md` |
-| After merge | **Done 7 Oct:** merged as `561a32b`; RBM's pages rebuilt from it and pushed to `codebyjackson/launch-rbm-test` as `177c74e`; checked live in headless Chrome (Subscribe shown, the widget connected, cross-origin answers readable from the real page, no email sent). Still to do: the owner's try of both forms there with a real address (§1 step 9) |
-| Waiting on | the owner's review, then merge; RBM's real host for `PARTNERS`; RBM's agreement on where its readers' data goes (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
-| Before this | `subscribe-single-opt-in`, PR #62, 1 commit, merged 6 Oct. `email-feedback`, PR #40, 2 commits, merged 2 Oct. `email-subscribe`, PR #30, 5 commits, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has been used in full, and can be deleted |
+| CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 157 passed, the shape check included |
+| Changed | `api/_mail.js` (one `PARTNERS` entry, comment), `rbm/README.md` (both hosts; every host needs an entry), this document |
+| After merge | production allows `https://launch-rbm-test.vercel.app` at once: those pages already post to production, so nothing is rebuilt. The README then goes to the test repository, with #65's |
+| Waiting on | the owner's merge; the owner's try of both forms on RBM's copies with a real address (§1 step 9); RBM's real host for `PARTNERS`; RBM's agreement on where its readers' data goes (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
+| Before this | `rbm-embed-sizing`, PR #65, merged 7 Oct (README: size the frame to the screen; rbm-handover-notes.md §4). `rbm-forms`, PR #64, 1 commit, merged 7 Oct as `561a32b`; its after-merge steps done the same day (RBM pages pushed as `177c74e`, checked live: Subscribe shown, the widget connected, cross-origin answers readable, no email sent). `subscribe-single-opt-in`, PR #62, merged 6 Oct. `email-feedback`, PR #40, merged 2 Oct. `email-subscribe`, PR #30, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has been used in full, and can be deleted |
