@@ -17,6 +17,7 @@ const feedback = require("../api/feedback.js");
 
 // The addresses as committed, copied before any test below swaps in its own.
 const SHIPPED = JSON.parse(JSON.stringify(mail.ADDRESSES));
+const SHIPPED_PARTNERS = JSON.parse(JSON.stringify(mail.PARTNERS));
 
 let pass = 0, fail = 0, only = process.argv[2];
 const failures = [];
@@ -198,6 +199,10 @@ group("the addresses as committed", async () => {
   ok("  and its address passes the email check", !from || mail.EMAIL_RE.test(from[1]));
   ok("ADDRESSES.segment is empty or a Resend segment id", SHIPPED.segment === "" ||
      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(SHIPPED.segment), SHIPPED.segment);
+  ok("every PARTNERS origin is https://host, with no path and no trailing slash",
+     SHIPPED_PARTNERS.every(p => /^https:\/\/[a-z0-9.-]+(:\d{1,5})?$/i.test(p.origin)), JSON.stringify(SHIPPED_PARTNERS));
+  ok("  and its dashboard is a page on that same origin",
+     SHIPPED_PARTNERS.every(p => typeof p.dashboard === "string" && p.dashboard.startsWith(p.origin + "/")), JSON.stringify(SHIPPED_PARTNERS));
 });
 
 group("links in emails", async () => {
@@ -311,6 +316,49 @@ group("unsubscribe — the page the link opens", async () => {
 
   r = await call(unsubscribe, { method: "PUT", url: "/api/unsubscribe?t=" + t });
   is("other methods are refused", [r.status, r.headers.allow], [405, "GET, POST"]);
+});
+
+group("partners — RBM's pages, on another site (CORS)", async () => {
+  const PARTNER = { origin: "https://rbm.example.org", dashboard: "https://rbm.example.org/launch/en/" };
+  mail.PARTNERS.splice(0, mail.PARTNERS.length, PARTNER);
+  const from = (origin, extra) => Object.assign({ origin }, extra);
+  const PREFLIGHT = { "access-control-request-method": "POST", "access-control-request-headers": "content-type" };
+  try {
+    let r = await call(subscribe, { method: "OPTIONS", headers: from(PARTNER.origin, PREFLIGHT) });
+    is("a partner's preflight: 204, allowing POST with Content-Type, for that origin only",
+       [r.status, r.headers["access-control-allow-origin"], r.headers["access-control-allow-methods"], r.headers["access-control-allow-headers"]],
+       [204, PARTNER.origin, "POST", "Content-Type"]);
+    is("  and nothing reaches Resend", r.calls.length, 0);
+
+    r = await call(subscribe, { method: "OPTIONS", headers: from("https://evil.example", PREFLIGHT) });
+    is("anyone else's preflight: 405, and no CORS headers, so the browser blocks the post",
+       [r.status, r.headers["access-control-allow-origin"]], [405, undefined]);
+
+    r = await call(subscribe, { headers: from(PARTNER.origin), body: SUB, addr: SEG, answer: [NO_CONTACT] });
+    is("a partner's subscribe goes through, and the page may read the answer",
+       [r.status, r.json, r.headers["access-control-allow-origin"], r.headers.vary], [200, { ok: true }, PARTNER.origin, "Origin"]);
+    const welcome = r.calls[2].body, team = r.calls[3].body;
+    ok("  the welcome's dashboard link goes back to the partner's page", welcome.html.includes(`href="${PARTNER.dashboard}"`) && welcome.text.includes(PARTNER.dashboard));
+    ok("  its unsubscribe link stays on this site, where the function is", welcome.text.includes(`https://${HOST}/api/unsubscribe?t=`) && !welcome.text.includes(PARTNER.origin + "/api/"));
+    ok("  and the team hears which site it came from", team.text.includes("On: " + PARTNER.dashboard));
+
+    r = await call(subscribe, { headers: from(PARTNER.origin), body: { email: "nope" } });
+    is("a partner's failed request is readable too, so its page can show the failure", [r.status, r.headers["access-control-allow-origin"]], [400, PARTNER.origin]);
+
+    r = await call(feedback, { headers: from(PARTNER.origin), body: REPORT });
+    is("a partner's feedback goes through, readable by its page", [r.status, r.json && r.json.ok, r.headers["access-control-allow-origin"]], [200, true, PARTNER.origin]);
+
+    for (const other of ["https://evil.example", "https://rbm.example.org.evil.example", "http://rbm.example.org", "https://rbm.example.org/launch", "null"]) {
+      r = await call(subscribe, { headers: from(other), body: SUB });
+      is(`not a partner: ${other} → 403, no CORS header, nothing sent`, [r.status, r.headers["access-control-allow-origin"], r.calls.length], [403, undefined, 0]);
+    }
+
+    r = await call(subscribe, { headers: from("https://" + HOST), body: SUB, answer: [NO_CONTACT] });
+    is("the LAUNCH site's own page needs no CORS header", [r.status, r.headers["access-control-allow-origin"]], [200, undefined]);
+    ok("  and its welcome links to this site's page", r.calls[2].body.html.includes(`href="https://${HOST}/illustrated-journey-dashboard.html"`));
+  } finally {
+    mail.PARTNERS.splice(0, mail.PARTNERS.length, ...SHIPPED_PARTNERS);
+  }
 });
 
 group("feedback — request guard and configuration", async () => {

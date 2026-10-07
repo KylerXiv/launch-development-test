@@ -236,8 +236,10 @@ No test framework by design; two layers instead:
   is missing. Changing `UNSUBSCRIBE_SECRET` breaks every unsubscribe link
   already emailed. The functions exist only on Vercel, so
   on any static host the forms fail the same way. That is why RBM's copies
-  of the page hide Subscribe and leave Send feedback unconnected
-  (`scripts/build-rbm-pages.js`). Setup and the rate-limit rule:
+  of the page post both forms to the LAUNCH Vercel project instead
+  (`scripts/build-rbm-pages.js --api-url`, since 7 Oct), which accepts them
+  only from the hosts listed in `PARTNERS` in `api/_mail.js`. Setup, adding a
+  partner, and the rate-limit rule:
   [email-backend-notes.md](email-backend-notes.md) §1.
 
 ## 8b. GitHub Actions: minutes, time limits and billing
@@ -372,9 +374,10 @@ switch to wording that says the report was sent. The `/fr/` and `/pt/`
 editions are built from that page, so they send too. Every other page is a
 mock: Send is blocked, and **nothing is sent anywhere** — say so to anyone
 demoing those pages to real country teams. RBM's copies of the illustrated
-journey are hosted without `api/`, so `scripts/build-rbm-pages.js` turns
-`connected` off there. Switching another page on is that one key, on a page
-the LAUNCH Vercel project serves. Why it was built this way:
+journey are hosted without `api/`, so since 7 Oct they send across origins
+to the LAUNCH Vercel project (`--api-url`; `--api-url none` turns
+`connected` off there instead). Switching another page on is that one key, on
+a page the LAUNCH Vercel project serves, or on a partner host. Why it was built this way:
 [email-backend-notes.md](email-backend-notes.md) §2.12.
 
 The payload, which `LAUNCH_REPORT_ISSUE.submit` can still be swapped for at

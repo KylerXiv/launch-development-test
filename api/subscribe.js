@@ -77,6 +77,10 @@ module.exports = async function subscribe(req, res) {
   }
 
   const unsubscribe = `${site}/api/unsubscribe?t=${mail.makeToken(cfg.secret, "unsubscribe", email)}`;
+  // Back to the page they subscribed on: RBM's copy for a partner (its address
+  // from PARTNERS, never from the request), this site's page otherwise.
+  const partner = mail.partnerOf(req);
+  const home = partner ? partner.dashboard : site + mail.DASHBOARD;
 
   // ---- 2. welcome ----------------------------------------------------------------
   // Anyone can type any address into the form, so the welcome says how to get
@@ -89,7 +93,7 @@ module.exports = async function subscribe(req, res) {
       paras: [
         "Thanks for subscribing. We'll email you when the data on the LAUNCH Transparency Dashboard is updated: new milestones, corrected figures and newly verified country registrations."
       ],
-      button: { label: "Open the dashboard", href: site + mail.DASHBOARD },
+      button: { label: "Open the dashboard", href: home },
       small: [{ text: "Didn't sign up, or don't want these emails?", link: unsubscribe, linkLabel: "Unsubscribe" }]
     }),
     // RFC 2369 + RFC 8058: the mail app's own "Unsubscribe" button, which
@@ -103,6 +107,7 @@ module.exports = async function subscribe(req, res) {
   const rows = [
     ["Email", email],
     ["Subscribed", new Date().toISOString()],
+    ["On", home],
     ["Returning", state === "returning" ? "yes — had unsubscribed before" : "no"],
     ["Segment", !cfg.segment ? "none set" : segmentOk ? cfg.segment : `NOT ADDED to ${cfg.segment} — add by hand in Resend`]
   ];

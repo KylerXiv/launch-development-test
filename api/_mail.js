@@ -41,6 +41,17 @@ const DEFAULT_FROM = "LAUNCH dashboard <onboarding@resend.dev>";
 // The page every email and every unsubscribe page links back to.
 const DASHBOARD = "/illustrated-journey-dashboard.html";
 
+// Other sites whose copies of the illustrated journey may post to these
+// functions: RBM's pages, built by scripts/build-rbm-pages.js with --api-url
+// pointing here. Each is an origin (scheme and host, no path, no trailing
+// slash), so it admits every page on that host, plus the page a subscriber
+// from there is sent back to. Like the addresses above, not secret, so it
+// lives here where a change to it is reviewed. RBM's own host goes in once it
+// is known; codebyjackson.github.io is the test copy.
+const PARTNERS = [
+  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/" }
+];
+
 // The same test both forms already run in the browser, so an address the page
 // accepts is never refused here.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -66,11 +77,11 @@ function reply(res, status, body) {
   res.end(JSON.stringify(body));
 }
 
-// Same-origin only. The page posts from its own origin even inside RBM's
-// iframe, so any other Origin is a different site trying to use this as a
-// mail relay. A request with no Origin is curl or a server, which could forge
-// the header anyway — this guards browsers, not scripts. It is also how a mail
-// provider's one-click unsubscribe arrives, so that has to stay allowed.
+// Same-origin, or one of PARTNERS (partnerOf, below). Any other Origin is a
+// different site trying to use this as a mail relay. A request with no Origin
+// is curl or a server, which could forge the header anyway — this guards
+// browsers, not scripts. It is also how a mail provider's one-click
+// unsubscribe arrives, so that has to stay allowed.
 function sameOrigin(req) {
   const origin = req.headers.origin;
   if (!origin) return true;
@@ -80,22 +91,49 @@ function sameOrigin(req) {
   return !!host && own.includes(host);
 }
 
+// The PARTNERS entry for the request's Origin, or null. Exact match only: no
+// prefixes, no wildcards, so a look-alike host is not a partner.
+function partnerOf(req) {
+  const origin = req.headers.origin;
+  return PARTNERS.find(p => p.origin === origin) || null;
+}
+
 // Returns the parsed JSON body, or sends the error response and returns null.
 function readRequest(req, res) {
+  // The answer differs by Origin, so no cache may hand one site's to another.
+  res.setHeader("Vary", "Origin");
+  // A partner's page is on another site, so the browser checks with CORS
+  // first: it sends a preflight (OPTIONS) for the JSON POST, and lets the page
+  // read the answer only if it names the page's origin. Nobody else gets
+  // these headers, so for every other site the browser still blocks the call.
+  const partner = partnerOf(req);
+  if (partner) {
+    res.setHeader("Access-Control-Allow-Origin", partner.origin);
+    if (req.method === "OPTIONS") {
+      res.setHeader("Access-Control-Allow-Methods", "POST");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+      res.setHeader("Access-Control-Max-Age", "600");
+      res.statusCode = 204;
+      res.end();
+      return null;
+    }
+  }
+
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     reply(res, 405, { ok: false, error: "Use POST." });
     return null;
   }
 
-  if (!sameOrigin(req)) {
+  if (!partner && !sameOrigin(req)) {
     reply(res, 403, { ok: false, error: "Cross-origin requests are not accepted." });
     return null;
   }
 
   // JSON only. Besides being the only thing the forms send, it means a
-  // cross-origin browser request needs a CORS preflight, which this never
-  // answers — so the check above is not the only thing in the way.
+  // cross-origin browser request needs a CORS preflight, which only a
+  // partner's gets an answer to — so the check above is not the only thing in
+  // the way.
   if (!/^application\/json\b/i.test(req.headers["content-type"] || "")) {
     reply(res, 415, { ok: false, error: "Send JSON." });
     return null;
@@ -362,8 +400,8 @@ function addToSegment(cfg, email) {
 }
 
 module.exports = {
-  ADDRESSES, EMAIL_RE, DASHBOARD,
-  config, reply, readRequest, notConfigured, logNotConfigured,
+  ADDRESSES, PARTNERS, EMAIL_RE, DASHBOARD,
+  config, reply, readRequest, partnerOf, notConfigured, logNotConfigured,
   line, block, esc, newRef, siteUrl, makeToken, readToken, readLink, page,
   render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure,
   // For scripts/notify-subscribers.js, which sends the update emails as broadcasts.

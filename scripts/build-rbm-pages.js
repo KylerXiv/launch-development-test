@@ -6,6 +6,8 @@
 //
 //   node scripts/build-rbm-pages.js                      # → dist/rbm/
 //   node scripts/build-rbm-pages.js --data-url <url>     # read another dashboard.json
+//   node scripts/build-rbm-pages.js --api-url <origin>   # where the two forms post
+//   node scripts/build-rbm-pages.js --api-url none       # both forms off
 //   node scripts/build-rbm-pages.js --allow-stale        # as build-locale-pages.js
 //
 // Output (self-contained; host it as static files anywhere):
@@ -29,9 +31,10 @@
 //      per-language map files and feedback widget (PER_LANGUAGE);
 //   3. the site menu goes (its Pipeline and Story pages are not part of the
 //      handover; RBM's platform has its own navigation);
-//   4. Subscribe for updates goes, and Send feedback is not connected (their
-//      email backend, api/, runs on the LAUNCH Vercel project and does not come
-//      with these files).
+//   4. Subscribe for updates and Send feedback post to the LAUNCH Vercel
+//      project (--api-url), whose api/ lists RBM's host as a partner, since
+//      RBM's static host has no api/ of its own. With --api-url none,
+//      Subscribe is hidden and Send feedback is not connected instead.
 //   5. the RBM look goes on top (scripts/rbm-skin.js, from RBM's design
 //      guidelines): colours, fonts and components. The page's own CSS is
 //      unchanged, so the LAUNCH site keeps its look.
@@ -53,6 +56,16 @@ const args = process.argv.slice(2);
 const argOf = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };
 const DATA_URL = argOf("--data-url") || "https://codebyjackson.github.io/launch-data-test/v1/dashboard.json";
 const SCHEMA = 1;
+// Where the two forms post: the origin of the LAUNCH Vercel project, whose
+// api/_mail.js must list the host these pages are served from in PARTNERS, or
+// the browser blocks every post. Production, never a PR preview (those
+// addresses expire). "none" turns both forms off. The address changes when
+// the project moves to Unitaid's hosting: rebuild with the new one.
+const API_ARG = argOf("--api-url") || "https://launch-development-test.vercel.app";
+const API_URL = API_ARG === "none" ? null : API_ARG.replace(/\/+$/, "");
+if (API_URL && !/^https?:\/\/[^/\s]+$/.test(API_URL)) {
+  throw new Error(`--api-url must be an origin like https://example.org (no path), or "none"; got ${API_ARG}`);
+}
 
 // Data files the loader replaces. Anything else the page loads (the map shapes)
 // is copied as a static file.
@@ -74,9 +87,10 @@ const MSG = {
         schema: "<b>Este painel está a ser atualizado.</b> Volte a consultá-lo em breve." },
 };
 
-function loader(lang) {
-  return `<style>#sub-open, #subwrap { display: none !important; }</style>
-<script>
+function loader(lang, apiUrl = API_URL) {
+  // with no API to post to, Subscribe is hidden here (the page has no </head>
+  // to put it in), so the page's own code still finds the elements it wires up
+  return `${apiUrl ? "" : "<style>#sub-open, #subwrap { display: none !important; }</style>\n"}<script>
 /* Loads the LAUNCH dataset (scripts/build-rbm-pages.js). Generated; do not edit. */
 (function () {
   "use strict";
@@ -129,7 +143,11 @@ function loader(lang) {
 `;
 }
 
-function transform(html, lang) {
+// The page's inline script that only sets the feedback widget's settings (it
+// may open with a comment).
+const WIDGET_SETTINGS = /^\s*(\/\*[\s\S]*?\*\/\s*)?window\.LAUNCH_FEEDBACK_COPY\s*=/;
+
+function transform(html, lang, { apiUrl = API_URL } = {}) {
   let out = html;
   let removed = 0;
   for (const rel of REPLACED) {
@@ -138,21 +156,36 @@ function transform(html, lang) {
     out = out.replace(tag, "");
     removed++;
   }
-  // the page's own inline scripts wait for the data
-  let deferred = 0;
-  out = out.replace(/<script>(?=[\s\S]*?<\/script>)/g, () => { deferred++; return '<script type="text/x-launch-app">'; });
+  // the page's own inline scripts wait for the data, except the feedback
+  // widget's settings: they read no data, and the widget (a deferred <script
+  // src>) reads them as soon as it runs, before the data arrives. Deferred,
+  // the widget never saw them (found 2 Oct, fixed 7 Oct).
+  let deferred = 0, settings = 0;
+  out = out.replace(/<script>([\s\S]*?)<\/script>/g, (all, body) => {
+    if (WIDGET_SETTINGS.test(body)) { settings++; return all; }
+    deferred++;
+    return '<script type="text/x-launch-app">' + body + "</script>";
+  });
   if (!deferred) throw new Error(`${lang}: no inline <script> to defer`);
+  if (settings !== 1) throw new Error(`${lang}: expected one window.LAUNCH_FEEDBACK_COPY script, found ${settings} — the page changed; update build-rbm-pages.js`);
   // site menu out (its other pages are not handed over)
   const nav = /<script src="assets\/site-nav\.js"[^>]*><\/script>\r?\n?/;
   if (!nav.test(out)) throw new Error(`${lang}: site-nav.js tag not found`);
   out = out.replace(nav, "");
-  // Subscribe out (its backend is not handed over): hidden by CSS that comes
-  // with the loader (the page has no </head> to put it in), so the page's own
-  // code still finds the elements it wires up
-  // Send feedback not connected, for the same reason: on RBM's host
-  // /api/feedback does not exist, so the widget keeps Send blocked and its red
-  // note instead of failing every report
-  out = out.replace(/(\bconnected\s*:\s*)true\b/g, "$1false");
+  if (apiUrl) {
+    // Subscribe posts to the LAUNCH API: RBM's host has no /api/subscribe
+    const sub = /fetch\("\/api\/subscribe"/g;
+    const found = (out.match(sub) || []).length;
+    if (found !== 1) throw new Error(`${lang}: expected one fetch("/api/subscribe"), found ${found} — the page changed; update build-rbm-pages.js`);
+    out = out.replace(sub, `fetch(${JSON.stringify(apiUrl + "/api/subscribe")}`);
+    // Send feedback stays connected; its endpoint is set in the widget's own
+    // copy beside the page (widget(), below)
+  } else {
+    // No API: Subscribe is hidden (loader) and Send feedback is not connected,
+    // so the widget keeps Send blocked and its red note instead of failing
+    // every report
+    out = out.replace(/(\bconnected\s*:\s*)true\b/g, "$1false");
+  }
   // shared files one level up, except the ones each language has its own copy
   // of (PER_LANGUAGE): the map files carry the country names, the feedback
   // widget its wording
@@ -161,10 +194,20 @@ function transform(html, lang) {
   for (const rel of PER_LANGUAGE) out = out.split(`="../${rel}"`).join(`="${rel}"`);
   // the loader runs before the deferred scripts, right after the map/icon libraries
   const firstApp = out.indexOf('<script type="text/x-launch-app">');
-  out = out.slice(0, firstApp) + loader(lang) + out.slice(firstApp);
+  out = out.slice(0, firstApp) + loader(lang, apiUrl) + out.slice(firstApp);
   // the RBM look, after the page's own stylesheet
   out = applySkin(out, lang);
   return { html: out, removed, deferred };
+}
+
+// The feedback widget posts to a fixed "/api/feedback", which RBM's host does
+// not have, so the copy beside each page posts to the LAUNCH API instead.
+// Without an API it is left as it is: not connected, it never posts.
+function widget(js, apiUrl = API_URL) {
+  if (!apiUrl) return js;
+  const endpoint = /(var ENDPOINT = )"\/api\/feedback";/;
+  if (!endpoint.test(js)) throw new Error('report-issue.js: var ENDPOINT = "/api/feedback" not found — the widget changed; update build-rbm-pages.js');
+  return js.replace(endpoint, `$1${JSON.stringify(apiUrl + "/api/feedback")};`);
 }
 
 function main() {
@@ -182,7 +225,11 @@ function main() {
     const from = lang === "en" ? ROOT : path.join(ROOT, "dist", "locale", lang);
     for (const rel of PER_LANGUAGE) {
       fs.mkdirSync(path.dirname(path.join(OUT, lang, rel)), { recursive: true });
-      fs.copyFileSync(path.join(from, rel), path.join(OUT, lang, rel));
+      if (rel === "assets/report-issue.js") {
+        fs.writeFileSync(path.join(OUT, lang, rel), widget(fs.readFileSync(path.join(from, rel), "utf8")), "utf8");
+      } else {
+        fs.copyFileSync(path.join(from, rel), path.join(OUT, lang, rel));
+      }
     }
     console.log(`  ${lang}/index.html + ${PER_LANGUAGE.join(", ")}  (${removed} data files → dashboard.json, ${deferred} scripts deferred)`);
   }
@@ -190,8 +237,8 @@ function main() {
   fs.rmSync(path.join(OUT, "assets", "site-nav.js"), { force: true });
   fs.rmSync(path.join(OUT, "assets", "report-issue.js"), { force: true });   // per language now
   fs.copyFileSync(path.join(ROOT, "rbm", "README.md"), path.join(OUT, "README.md"));
-  console.log(`  assets/ (shared), README.md\n  data: ${DATA_URL}\n  → ${path.relative(ROOT, OUT)}/`);
+  console.log(`  assets/ (shared), README.md\n  data: ${DATA_URL}\n  forms: ${API_URL ? API_URL + "/api/{subscribe,feedback}" : "off (--api-url none)"}\n  → ${path.relative(ROOT, OUT)}/`);
 }
 
-module.exports = { transform, loader };
+module.exports = { transform, loader, widget };
 if (require.main === module) main();
