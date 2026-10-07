@@ -236,7 +236,7 @@ group("subscribe — a new address goes straight onto the list", async () => {
   ok("  and a link to the dashboard on this site", welcome.html.includes(`https://${HOST}/illustrated-journey-dashboard.html`));
   ok("  and never the page address the visitor sent", !JSON.stringify(r.calls).includes("/x\""));
   is("  the team is told", team.to, ["team@example.org"]);
-  ok("  who, and that it is not a returning subscriber", team.text.includes("Email: reader@example.org") && team.text.includes("Returning: no") && team.text.includes("Segment: seg_123"));
+  ok("  who, and that it is not a returning subscriber", team.text.includes("Email address: reader@example.org") && team.text.includes("Subscriber: New") && team.text.includes("Mailing list: " + mail.SEGMENT_NAME));
 
   r = await call(subscribe, { headers: { host: "internal", "x-forwarded-host": "preview-abc.vercel.app" }, body: SUB, answer: [NO_CONTACT] });
   ok("on a preview, the links point at that preview", r.calls[2].body.text.includes("https://preview-abc.vercel.app/api/unsubscribe?t="));
@@ -260,7 +260,7 @@ group("subscribe — returning, already subscribed, and failures", async () => {
   is("an address that had unsubscribed: re-subscribed, into the segment, welcomed", r.calls.map(pathOf),
      ["GET /contacts/reader%40example.org", "PATCH /contacts/reader%40example.org", "POST /contacts/reader%40example.org/segments/seg_123", "POST /emails", "POST /emails"]);
   is("  the update is just unsubscribed: false", r.calls[1].body, { unsubscribed: false });
-  ok("  and the team hears it is a returning subscriber", r.calls[4].body.text.includes("Returning: yes"));
+  ok("  and the team hears it is a returning subscriber", r.calls[4].body.text.includes("Subscriber: Returning"));
 
   const fresh = await call(subscribe, { body: SUB, addr: SEG, answer: [NO_CONTACT] });
   r = await call(subscribe, { body: SUB, addr: SEG, answer: [SUBSCRIBED] });
@@ -273,7 +273,7 @@ group("subscribe — returning, already subscribed, and failures", async () => {
   ok("  but it is logged", r.logs.some(l => l.includes("add to segment failed")));
 
   r = await call(subscribe, { body: SUB, addr: SEG, answer: [UNSUBSCRIBED, { status: 200, body: {} }, { status: 500, body: {} }] });
-  ok("a returning subscriber outside the segment: the team note says to add them by hand", r.calls[4] && r.calls[4].body.text.includes("NOT ADDED to seg_123"));
+  ok("a returning subscriber outside the segment: the team note says to add them by hand", r.calls[4] && r.calls[4].body.text.includes("Not added") && r.calls[4].body.text.includes("by hand in Resend (segment seg_123)") && r.calls[4].body.text.includes("One thing to do"));
 
   r = await call(subscribe, { body: SUB, answer: [{ status: 422, body: { name: "validation_error" } }] });
   is("a lookup answering some other 4xx is taken as 'no such contact'", r.calls.map(pathOf).slice(0, 2), ["GET /contacts/reader%40example.org", "POST /contacts"]);
@@ -340,7 +340,7 @@ group("partners — RBM's pages, on another site (CORS)", async () => {
     const welcome = r.calls[2].body, team = r.calls[3].body;
     ok("  the welcome's dashboard link goes back to the partner's page", welcome.html.includes(`href="${PARTNER.dashboard}"`) && welcome.text.includes(PARTNER.dashboard));
     ok("  its unsubscribe link stays on this site, where the function is", welcome.text.includes(`https://${HOST}/api/unsubscribe?t=`) && !welcome.text.includes(PARTNER.origin + "/api/"));
-    ok("  and the team hears which site it came from", team.text.includes("On: " + PARTNER.dashboard));
+    ok("  and the team hears which site it came from", team.text.includes("Signed up on: " + PARTNER.dashboard));
 
     r = await call(subscribe, { headers: from(PARTNER.origin), body: { email: "nope" } });
     is("a partner's failed request is readable too, so its page can show the failure", [r.status, r.headers["access-control-allow-origin"]], [400, PARTNER.origin]);
@@ -359,6 +359,32 @@ group("partners — RBM's pages, on another site (CORS)", async () => {
   } finally {
     mail.PARTNERS.splice(0, mail.PARTNERS.length, ...SHIPPED_PARTNERS);
   }
+});
+
+group("the team's emails, laid out as a form", async () => {
+  is("a time reads as a person would write it", mail.when(new Date(Date.UTC(2026, 9, 7, 15, 48, 57))), "7 Oct 2026, 15:48 UTC");
+  is("  with leading zeros where a clock has them", mail.when(new Date(Date.UTC(2026, 0, 3, 4, 5))), "3 Jan 2026, 04:05 UTC");
+
+  let r = await call(subscribe, { body: SUB, addr: SEG, answer: [NO_CONTACT] });
+  const team = r.calls[3].body;
+  ok("the subscriber note: a brand bar, a title, and what happened", team.html.includes("LAUNCH Transparency Dashboard") && team.html.includes(">New subscriber<") && team.html.includes("Nothing to do"));
+  ok("  the details as a two-column table, label on grey", (team.html.match(/<td width="34%"/g) || []).length === 5 && team.html.includes("background:#f5f8f9"));
+  ok("  a readable time, not an ISO stamp", /Signed up: \d{1,2} [A-Z][a-z]{2} \d{4}, \d\d:\d\d UTC/.test(team.text) && !/\d{4}-\d\d-\d\dT/.test(team.text + team.html));
+  ok("  the list by name, not by id", team.text.includes("Mailing list: " + mail.SEGMENT_NAME) && !team.html.includes("seg_123"));
+  ok("  the page they signed up on is a link, because this code built it", team.html.includes(`href="https://${HOST}/illustrated-journey-dashboard.html"`));
+  ok("  the address they typed is not a link", !/href="[^"]*reader@example\.org/.test(team.html));
+  ok("  and a footer", team.html.includes("Sent automatically when someone subscribes"));
+
+  r = await call(subscribe, { body: SUB, addr: SEG, answer: [UNSUBSCRIBED, { status: 200, body: {} }, { status: 500, body: {} }] });
+  ok("a list that failed shows as something to do, in the warning colour", r.calls[4].body.html.includes("color:#b42318;font-weight:700\">Not added."));
+
+  r = await call(feedback, { body: withReport({ page: { url: "https://phish.example/x" } }) });
+  const fb = r.calls[0].body;
+  ok("the feedback note: title, type and medicine, the message in its own box", fb.html.includes(">New feedback<") && fb.html.includes("A data point looks wrong · Coartem Baby") && fb.html.includes("border-left:3px solid #0E5A73") && fb.html.includes("Tanzania approved this"));
+  ok("  the page the visitor reports is shown, never linked", fb.html.includes("https://phish.example/x") && !fb.html.includes('href="https://phish.example'));
+  ok("  the footer says a reply reaches them", fb.text.includes("Reply to this email to answer them: the reply goes to amina@moh.example."));
+  r = await call(feedback, { body: withReport({ email: null, name: null }) });
+  ok("  with no address: says it cannot be answered, in the warning colour", r.calls[0].body.html.includes("color:#b42318;font-weight:700\">Not given, so this cannot be answered") && r.calls[0].body.text.includes("They left no email address"));
 });
 
 group("feedback — request guard and configuration", async () => {
@@ -406,14 +432,14 @@ group("feedback — the team's email", async () => {
 
   r = await call(feedback, { body: withReport({ email: null }) });
   is("no email given → no reply_to at all", "reply_to" in r.calls[0].body, false);
-  ok("  and the team is told it cannot be answered", r.calls[0].body.text.includes("none given"));
+  ok("  and the team is told it cannot be answered", r.calls[0].body.text.includes("cannot be answered"));
 
   r = await call(feedback, { body: withReport({ message: "too short" }) });
   is("a message under 10 characters is a 400", [r.status, r.calls.length], [400, 0]);
   r = await call(feedback, { body: withReport({ message: "          x         " }) });
   is("padding does not count towards the 10", r.status, 400);
   r = await call(feedback, { body: withReport({ message: "x".repeat(5000) }) });
-  is("a long message is capped at the widget's 2000", r.calls[0].body.text.split("\n")[2].length, 2000);
+  is("a long message is capped at the widget's 2000", (r.calls[0].body.text.split("\n").find(l => /^x+$/.test(l)) || "").length, 2000);
   r = await call(feedback, { body: withReport({ message: "Line one of it\r\nline two" }) });
   ok("line breaks in the message survive, as \\n", r.calls[0].body.text.includes("Line one of it\nline two"));
   r = await call(feedback, { body: withReport({ email: "not-an-address" }) });

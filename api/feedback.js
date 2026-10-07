@@ -47,24 +47,32 @@ module.exports = async function feedback(req, res) {
   const version = [mail.line(data.lastUpdated, 40), mail.line(data.dataStatus, 40)].filter(Boolean);
   const ref = mail.newRef();
 
+  // Laid out as a form (mail.render). The page address is the visitor's own
+  // report of where they were, so it is shown as text, never as a link.
+  const MUTED = { tone: "muted" };
   const rows = [
     ["Reference", ref],
     ["About", TYPES[type]],
     ["Medicine", product],
-    ["Name", name || "—"],
-    ["Email", email || "— (none given, so this cannot be answered)"],
-    ["Organisation", org || "—"],
-    ["Page", mail.line(page.url, 500) || "—"],
+    ["Name", name || "Not given", name ? null : MUTED],
+    ["Email address", email || "Not given, so this cannot be answered", email ? null : { tone: "warn" }],
+    ["Organisation", org || "Not given", org ? null : MUTED],
+    ["Page", mail.line(page.url, 500) || "Not recorded"],
     // Which data the visitor was looking at — a correction is only checkable
     // against the version it was made on.
-    ["Data version", version.length ? version.join(" · ") : "—"],
-    ["Received", new Date().toISOString()],
-    ["Browser", mail.line(body.userAgent, 300) || "—"]
+    ["Data version", version.length ? version.join(" · ") : "Not recorded"],
+    ["Received", mail.when()],
+    ["Browser", mail.line(body.userAgent, 300) || "Not recorded", MUTED]
   ];
 
   const sent = await mail.sendEmail(cfg, {
     subject: `[LAUNCH feedback] ${TYPES[type]} — ${product} (${ref})`,
-    ...mail.render("New feedback from the LAUNCH dashboard", message, rows),
+    ...mail.render("New feedback", message, rows, {
+      intro: `${TYPES[type]} · ${product}`,
+      footer: email
+        ? `Reference ${ref}. Reply to this email to answer them: the reply goes to ${email}.`
+        : `Reference ${ref}. They left no email address, so this cannot be answered.`
+    }),
     // Reply in the inbox goes straight to the visitor when they left an address.
     replyTo: email || null,
     form: "feedback"
