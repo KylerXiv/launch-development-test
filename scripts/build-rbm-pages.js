@@ -126,7 +126,7 @@ function loader(lang, apiUrl = API_URL) {
         var d = pick(ds.data);
         window.LAUNCH_DATA = {
           meta: { lastUpdated: ds.last_updated, dataStatus: ds.data_status, host: d.host },
-          stages: d.stages, stageColumns: d.stageColumns, stageInfo: d.stageInfo,
+          stages: d.stages, stageColumns: d.stageColumns, stageInfo: d.stageInfo, yardstick: d.yardstick,
           glossary: d.glossary, changelog: d.changelog, products: d.products
         };
         // everything published is public; the page lists only entries marked so

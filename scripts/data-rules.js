@@ -153,6 +153,31 @@
       }
     }
 
+    // ---- yardstick ---------------------------------------------------------
+    // Optional expected time per stage, same order as stages[], plus the whole
+    // journey. null means the stage is not measured. "basis" says whether the
+    // number is a published timeline or LAUNCH's own working estimate; the page
+    // says which in its footnote, so it must be one of the two.
+    if (data.yardstick !== undefined) {
+      const y = data.yardstick;
+      const isYears = (v) => typeof v === "number" && isFinite(v) && v > 0 && v <= 50;
+      if (!y || typeof y !== "object" || Array.isArray(y)) err("yardstick: must be an object");
+      else {
+        if (!isYears(y.wholeYears)) err(`yardstick.wholeYears: must be a number of years above 0, got ${JSON.stringify(y.wholeYears)}`);
+        if (!Array.isArray(y.expected) || y.expected.length !== nStages) {
+          err(`yardstick.expected: must be an array with one entry per stage (${nStages}), got ${Array.isArray(y.expected) ? y.expected.length : typeof y.expected}`);
+        } else {
+          y.expected.forEach((e, i) => {
+            if (e === null) return;
+            const t = `yardstick.expected[${i}] (${data.stages[i]})`;
+            if (!e || typeof e !== "object") { err(`${t}: must be null or { "years", "basis" }`); return; }
+            if (!isYears(e.years)) err(`${t}: "years" must be a number above 0, got ${JSON.stringify(e.years)}`);
+            if (!["published", "estimate"].includes(e.basis)) err(`${t}: "basis" must be "published" or "estimate", got ${JSON.stringify(e.basis)}`);
+          });
+        }
+      }
+    }
+
     // ---- products ----------------------------------------------------------
     if (!Array.isArray(data.products) || data.products.length === 0) {
       err("products: must be a non-empty array");

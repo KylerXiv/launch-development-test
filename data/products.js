@@ -29,6 +29,15 @@
   // Written from docs/domain-primer.md section 2; draft wording, needs LAUNCH
   // sign-off. Optional: without it the panel shows only where each medicine is.
   //
+  // yardstick: how long each stage is expected to take, in years, same order
+  // as "stages" (null = not measured), and "wholeYears" for the whole journey
+  // to routine use. "basis" is "published" for a timeline someone publishes
+  // (country registration) or "estimate" for LAUNCH's own working estimate,
+  // still to be agreed. The page compares these with the stage dates: the
+  // badge in the medicines table, the box at the top of an open row and the
+  // "Time taken" table. Optional: without it none of the three is shown.
+  // See docs/jackson/yardstick.md.
+  //
 window.LAUNCH_DATA =
 {
   "meta": {
@@ -65,6 +74,19 @@ window.LAUNCH_DATA =
     { "what": "Someone has to pay. Funders and governments run tenders, agree reference prices and forecast demand. A medicine can be recommended, registered and in the guidelines and still be barely bought. This step covers public channels only: the figures shown are Global Fund-financed procurement, and sales through private or other channels are not included.", "who": "The Global Fund, the US President's Malaria Initiative, UNICEF and national governments.", "stall": "Financing cycles. Global Fund grants, for example, run for three years.", "source": "Global Fund price and quality reporting, PMI" },
     { "what": "Getting the medicine from the port to the health facility, training health workers, and watching for side effects once it is in use.", "who": "Governments and implementing partners.", "stall": "Supply chain readiness and health-worker training.", "source": "Manufacturer and programme communications" }
   ],
+  "yardstick": {
+    "wholeYears": 8,
+    "expected": [
+      null,
+      null,
+      { "years": 2, "basis": "estimate" },
+      { "years": 1.5, "basis": "estimate" },
+      { "years": 2, "basis": "published" },
+      { "years": 2, "basis": "estimate" },
+      { "years": 2, "basis": "estimate" },
+      { "years": 3, "basis": "estimate" }
+    ]
+  },
   "glossary": {
     "ACT": "Artemisinin-based combination therapy — the standard class of malaria treatments pairing an artemisinin derivative with a longer-acting partner drug.",
     "SRA": "Stringent Regulatory Authority — an advanced regulator (e.g. EMA, US FDA) whose review anchors WHO prequalification and country registrations.",
