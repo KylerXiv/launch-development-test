@@ -162,6 +162,13 @@
       "fr": "Cameroun",
       "pt": "Camarões"
     },
+    "089001a35679a33e": {
+      "en": "late",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "en retard",
+      "pt": "tarde"
+    },
     "08b040196e4a9023": {
       "en": "Unitaid does not accept legal responsibility for the accuracy of the data. In particular, Unitaid does not guarantee that it is complete, up to date or fit for a specific purpose. Country stages in this version are illustrative and have not been verified, except for the Nigeria and Tanzania registrations. Users should carry out their own country-level checks before making any decision based on this data.",
       "where": "static text",
@@ -539,6 +546,13 @@
       "bucket": "data",
       "fr": "Nous avons corrigé l'année où l'Organisation mondiale de la santé a recommandé ce médicament pour la première fois. Il s'agissait de 2010 et non de 2015.",
       "pt": "Corrigimos o ano em que a Organização Mundial de Saúde recomendou este medicamento pela primeira vez. Foi em 2010, e não em 2015."
+    },
+    "183bc72a9d74abf2": {
+      "en": "Not approved yet.",
+      "where": "line 1797 (in markup)",
+      "bucket": "js",
+      "fr": "Pas encore approuvé.",
+      "pt": "Ainda não foi aprovado."
     },
     "1860db247c71a3e7": {
       "en": "Development complete (Shin Poong / MMV co-development)",
@@ -1415,6 +1429,13 @@
       "fr": "Djibouti",
       "pt": "Djibuti"
     },
+    "4722d06dafe89927": {
+      "en": "· still going",
+      "where": "line 1758 (in markup)",
+      "bucket": "js",
+      "fr": "· toujours en cours",
+      "pt": "• ainda em curso"
+    },
     "47d2f7b20b006500": {
       "en": "Health-worker training on new regimen",
       "where": "products.products[0].detail.adoption[1]",
@@ -1610,6 +1631,13 @@
       "bucket": "data",
       "fr": "Fonds mondial (enregistré par PQR)",
       "pt": "Fundo Global (registado pela PQR)"
+    },
+    "4e93f1dc7bd9bfba": {
+      "en": "so far",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "jusqu'à présent",
+      "pt": "até agora"
     },
     "4fa6e03ddfe2c3ba": {
       "en": "Off: the map shows access stages only.",
@@ -1891,6 +1919,13 @@
       "fr": "SRA approbation (EMA, Eurartesim)",
       "pt": "SRA aprovação (EMA, Eurartesim)"
     },
+    "59db5717140c1e49": {
+      "en": "We start comparing once the medicine has a dated regulatory approval.",
+      "where": "line 1797 (in markup)",
+      "bucket": "js",
+      "fr": "Nous commençons la comparaison une fois que le médicament a reçu une autorisation de mise sur le marché datée.",
+      "pt": "Começamos a comparar assim que o medicamento tem uma aprovação regulamentar com data de expiração."
+    },
     "5a2e3032ca42d712": {
       "en": "Manufacturer-confirmed in writing",
       "where": "line 1721",
@@ -2150,6 +2185,13 @@
       "fr": "Trouver un pays",
       "pt": "Encontre um país"
     },
+    "662280707b2da207": {
+      "en": "Expected in routine use by ${due}, ${y.whole.exp} years after its first milestone in ${y.start}.",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Son utilisation courante est prévue d'ici ${due}, ${y.whole.exp} ans après sa première étape importante en ${y.start}.",
+      "pt": "Prevê-se que entre em uso de rotina em ${due}, ${y.whole.exp} anos após o seu primeiro marco em ${y.start}."
+    },
     "664bfb3d9c3c4211": {
       "en": "Click for the full detail",
       "where": "line 2205 (in markup)",
@@ -2344,6 +2386,13 @@
       "bucket": "data",
       "fr": "Thaïlande",
       "pt": "Tailândia"
+    },
+    "6e7d50e84f4731ef": {
+      "en": "Result",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Résultat",
+      "pt": "Resultado"
     },
     "700afd3338233b24": {
       "en": "MFT policy groups · ${esc(p.name)}",
@@ -3241,6 +3290,13 @@
       "fr": "Liste de préqualification de l'OMS",
       "pt": "Lista de pré-qualificação da OMS"
     },
+    "96ca12677524cb17": {
+      "en": "Whole journey",
+      "where": "line 1803",
+      "bucket": "js",
+      "fr": "Tout le voyage",
+      "pt": "Toda a viagem"
+    },
     "96df53fc9e3f8391": {
       "en": "EMA registers",
       "where": "products.stageInfo[1].source",
@@ -3506,6 +3562,13 @@
       "fr": "Une étude menée au Ghana en 2023 sur l'efficacité de deux de ces médicaments pour soigner le paludisme dans ce pays.",
       "pt": "Um estudo realizado em 2023 no Gana avaliou a eficácia de dois destes medicamentos no tratamento da malária naquele país."
     },
+    "a6b48d9a9a3aabd2": {
+      "en": "On time",
+      "where": "line 1756",
+      "bucket": "js",
+      "fr": "À l'heure",
+      "pt": "No horário"
+    },
     "a7692387c3d3d29c": {
       "en": "Not started (stage glyph dimmed, no badge)",
       "where": "static text",
@@ -3603,6 +3666,13 @@
       "bucket": "js",
       "fr": "année d'études",
       "pt": "Ano letivo"
+    },
+    "ae27aa0f646c95eb": {
+      "en": "On track so far",
+      "where": "line 1756",
+      "bucket": "js",
+      "fr": "Tout se déroule comme prévu jusqu'à présent",
+      "pt": "Até agora, tudo dentro do esperado."
     },
     "afa2581b14b2108c": {
       "en": "First-line diversification / MFT component; paediatric granules available; label includes pregnant women (2025 update).",
@@ -3905,6 +3975,13 @@
       "fr": "Les annonces de l'entreprise et les chiffres que le fabricant nous a confirmés par écrit ne figurent pas dans un registre public.",
       "pt": "Comunicados da empresa e números que um fabricante nos confirmou por escrito. Não existe um registo público para esta informação."
     },
+    "c225fb6b0839181a": {
+      "en": "Biggest delay:",
+      "where": "line 1788 (in markup)",
+      "bucket": "js",
+      "fr": "Le plus gros retard :",
+      "pt": "Maior atraso:"
+    },
     "c23bc96d219666ad": {
       "en": "Unnamed site",
       "where": "line 3122",
@@ -3946,6 +4023,13 @@
       "bucket": "data",
       "fr": "Philippines",
       "pt": "Filipinas"
+    },
+    "c406421c2b35a533": {
+      "en": "Actual",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Réel",
+      "pt": "Real"
     },
     "c48a4e70808e5216": {
       "en": "A stringent regulator reviews the full evidence on quality, safety and effectiveness. For malaria medicines this is usually the European Medicines Agency (EMA) Article 58 procedure, which covers medicines meant for use outside Europe. Every later step builds on this opinion.",
@@ -4087,6 +4171,13 @@
       "fr": "Mozambique",
       "pt": "Moçambique"
     },
+    "c95b1c700f6f5c8f": {
+      "en": "Expected times: country registration follows a published timeline. The other steps use LAUNCH's working estimates, still to be agreed.",
+      "where": "line 1759 (in markup)",
+      "bucket": "js",
+      "fr": "Délais prévus : l’enregistrement du pays suit un calendrier publié. Les autres étapes reposent sur des estimations de LAUNCH, qui restent à confirmer.",
+      "pt": "Prazos previstos: o registo por país segue um cronograma publicado. As restantes etapas utilizam estimativas provisórias da LAUNCH, ainda por definir."
+    },
     "c9722a7a962a8435": {
       "en": "Hide details",
       "where": "line 1738 (in markup)",
@@ -4185,6 +4276,13 @@
       "fr": "[LAUNCH] Le fichier data/sources.js n'a pas été chargé.",
       "pt": "[LAUNCH] O ficheiro data/sources.js não foi carregado"
     },
+    "cced28c6dc3f99c2": {
+      "en": "start",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "commencer",
+      "pt": "iniciar"
+    },
     "ccf2814e960ed5e1": {
       "en": "Where malaria is becoming harder to treat. Its drug-resistance study results are not reproduced on this page — open the map to explore them.",
       "where": "sources.sources[2].plain",
@@ -4233,6 +4331,13 @@
       "bucket": "js",
       "fr": "Non testé uniquement P. falciparum",
       "pt": "Apenas não testado P. falciparum"
+    },
+    "cea23dd4b87e8b00": {
+      "en": "expected",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "attendu",
+      "pt": "esperado"
     },
     "cef5c1b1cfe97da7": {
       "en": "National guideline committees meet rarely and follow their own schedules.",
@@ -4402,6 +4507,13 @@
       "fr": "Données illustratives pour la revue de conception. Version en direct : chaque figure renvoie à sa source publique et à la date de publication confirmée par le fabricant.",
       "pt": "Dados ilustrativos para revisão de projeto. Versão online: cada figura contém um link para a sua fonte pública e a data de lançamento confirmada pelo fabricante."
     },
+    "d730225923ac3b29": {
+      "en": "Ongoing, no start date",
+      "where": "line 1754",
+      "bucket": "js",
+      "fr": "En cours, sans date de début",
+      "pt": "Em curso, sem data de início definida."
+    },
     "d73e57f401a43b55": {
       "en": "${esc(p.name)} is pre-launch, so there is no country-level status or policy yet.",
       "where": "illustrated-journey-dashboard.html",
@@ -4471,6 +4583,13 @@
       "bucket": "data",
       "fr": "Neuf présentations préqualifiées (PQ) auprès de trois fabricants — Alfasigma (2015, requalification janv. 2025), Guilin (2019–2020, dont une forme pédiatrique dispersible), Beijing Holley (2023) — une réelle sécurité d’approvisionnement",
       "pt": "Nove apresentações pré-qualificadas (PQ) de três fabricantes — Alfasigma (2015, requalificação jan. 2025), Guilin (2019–2020, incl. formulação pediátrica dispersível), Beijing Holley (2023) — verdadeira segurança do abastecimento"
+    },
+    "d9658fce74348b45": {
+      "en": "Still not in routine use in ${ASOF_YEAR}.",
+      "where": "line 1787",
+      "bucket": "js",
+      "fr": "Toujours pas d'usage courant dans ${ASOF_YEAR}.",
+      "pt": "Ainda não é de uso rotineiro em ${ASOF_YEAR}."
     },
     "d9caea730c505073": {
       "en": "Pregnancy",
@@ -4990,6 +5109,13 @@
       "fr": "complet",
       "pt": "concluir"
     },
+    "eeca5f8f5815c0d7": {
+      "en": "Done, no date recorded",
+      "where": "line 1753",
+      "bucket": "js",
+      "fr": "Terminé, aucune date enregistrée",
+      "pt": "Feito, sem data registada"
+    },
     "ef248b20da851532": {
       "en": "Border = the selected medicine is in the country's national treatment policy (solid: first-line for tested P. falciparum; dashed: a smaller patient group only). Fill = access stage, unchanged.",
       "where": "line 3807",
@@ -5093,6 +5219,13 @@
       "bucket": "reviewed",
       "fr": "L'équipe LAUNCH lit chaque message et, lorsque vous nous indiquez une source publique vérifiée, nous corrigeons les données lors de la prochaine mise à jour. Si vous avez laissé une adresse e-mail, toute réponse de notre part mentionnera la référence ci-dessous.",
       "pt": "A equipa LAUNCH lê todas as mensagens e, quando nos indica uma fonte pública fidedigna, corrigimos os dados na próxima atualização. Se deixou um endereço de e-mail, qualquer resposta nossa citará a referência abaixo."
+    },
+    "f5ce37ee7d826b21": {
+      "en": "Time taken",
+      "where": "line 2022 (in markup)",
+      "bucket": "js",
+      "fr": "Temps passé",
+      "pt": "Tempo gasto"
     },
     "f5ffe0e8f73d7857": {
       "en": "European Medicines Agency",
@@ -5198,6 +5331,13 @@
       "bucket": "markup",
       "fr": "Détail",
       "pt": "Detalhe"
+    },
+    "fb63a9606ecd27c9": {
+      "en": "Not approved yet",
+      "where": "line 1764 (in markup)",
+      "bucket": "js",
+      "fr": "Pas encore approuvé",
+      "pt": "Ainda não aprovado"
     },
     "fb8a7f0b7f5e0944": {
       "en": "On pathway",
