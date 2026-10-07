@@ -32,6 +32,9 @@
 //   4. Subscribe for updates goes, and Send feedback is not connected (their
 //      email backend, api/, runs on the LAUNCH Vercel project and does not come
 //      with these files).
+//   5. the RBM look goes on top (scripts/rbm-skin.js, from RBM's design
+//      guidelines): colours, fonts and components. The page's own CSS is
+//      unchanged, so the LAUNCH site keeps its look.
 // If dashboard.json cannot be fetched, or its schema_version is not 1, the page
 // says so in its banner and draws nothing, rather than a half-rendered chart.
 //
@@ -40,6 +43,7 @@
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
+const { applySkin } = require("./rbm-skin");
 
 const ROOT = path.resolve(__dirname, "..");
 const PAGE = "illustrated-journey-dashboard.html";
@@ -158,6 +162,8 @@ function transform(html, lang) {
   // the loader runs before the deferred scripts, right after the map/icon libraries
   const firstApp = out.indexOf('<script type="text/x-launch-app">');
   out = out.slice(0, firstApp) + loader(lang) + out.slice(firstApp);
+  // the RBM look, after the page's own stylesheet
+  out = applySkin(out, lang);
   return { html: out, removed, deferred };
 }
 
