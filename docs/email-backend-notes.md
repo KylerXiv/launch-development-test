@@ -961,7 +961,12 @@ documented there, and the rest of the preview test settles them:
 - **`frame-ancestors`, and panel positioning inside a tall iframe** (handoff).
   The Subscribe panel floats against the iframe's viewport, and the feedback
   dialog is centred in it. Test against RBM's staging frame. Since 7 Oct
-  RBM's own copies send (§2.13), so this now matters there too.
+  RBM's own copies send (§2.13), so this now matters there too. **Answered
+  for a frame sized to the screen (7 Oct):** the button and dialog stay in
+  view, as measured on the mock platform. The README now asks RBM for that
+  sizing and warns against a fixed height taller than the screen, which is
+  what put them out of view (rbm-handover-notes.md §4). `frame-ancestors` is
+  still RBM's call.
 - **RBM's agreement** that its readers' addresses and feedback go to the
   LAUNCH team (§2.13).
 
@@ -994,6 +999,6 @@ documented there, and the rest of the preview test settles them:
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
 | CI | runs on that pull request. `validate.yml` runs `test-build-rbm-pages.js` but not `test-mail-api.js`, so the 157 checks above are the local run |
 | Changed | `api/_mail.js` (`PARTNERS`, `partnerOf`, CORS in `readRequest`), `api/subscribe.js` (welcome and team note name the partner's page), `scripts/build-rbm-pages.js` (`--api-url`, the undeferred widget settings, `widget()`), `scripts/test-build-rbm-pages.js`, `scripts/test-mail-api.js`, `rbm/README.md` (the forms, and the content-security-policy paragraph corrected), this document, `docs/rbm-handover-notes.md`, `docs/developer-guide.md` |
-| After merge | rebuild RBM's pages and push them to `codebyjackson/launch-rbm-test` (the owner now has push access), then try both forms there with a real address (§1 step 9) |
+| After merge | **Done 7 Oct:** merged as `561a32b`; RBM's pages rebuilt from it and pushed to `codebyjackson/launch-rbm-test` as `177c74e`; checked live in headless Chrome (Subscribe shown, the widget connected, cross-origin answers readable from the real page, no email sent). Still to do: the owner's try of both forms there with a real address (§1 step 9) |
 | Waiting on | the owner's review, then merge; RBM's real host for `PARTNERS`; RBM's agreement on where its readers' data goes (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
 | Before this | `subscribe-single-opt-in`, PR #62, 1 commit, merged 6 Oct. `email-feedback`, PR #40, 2 commits, merged 2 Oct. `email-subscribe`, PR #30, 5 commits, merged 1 Oct. `email-feedback-wip` (`b39c3b0`) has been used in full, and can be deleted |
