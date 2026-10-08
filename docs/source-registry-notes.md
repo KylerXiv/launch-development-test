@@ -1033,3 +1033,117 @@ behind `data/resistance.js` holds no Ghana rows after 2020, so the study fills
 a real gap — but that file must regenerate byte-identical from the WHO export,
 so adding it needs a documented second input or a separate literature layer.
 Decide before promising it.
+
+---
+
+## 6. Alphabetical order (8 Oct 2026)
+
+**Branch:** `sources-alphabetical` (off `main` at `43da963`) · **1 commit** ·
+pushed to `origin` with a pull request · CI had not run when this was written.
+**Files:** `data/sources.js`, `illustrated-journey-dashboard.html`,
+`.github/ISSUE_TEMPLATE/propose-change.yml`, this document.
+
+Every list of sources is now A–Z: the registry file, both lists in the page's
+Sources footer (in English, French and Portuguese, and on RBM's copies), and
+the Source dropdown on the proposal form.
+
+### Sorted in two places, the file and the page
+
+The 30 entries in `data/sources.js` were moved, block by block and untouched,
+into A–Z order. Checked: the same 30 entries, the same 569 lines and the same
+`meta`; only the order and the trailing commas moved. The page then sorts each
+footer list again, by the name it shows, in the page's own language
+(`PAGE_LANG`).
+
+| Rejected | Because |
+| --- | --- |
+| Sort the file only | `/fr` and `/pt` show translated names. With the English order alone, **23 of 30** entries on `/fr` and **25 of 30** on `/pt` would sit out of place ("Agence européenne des médicaments" is EMA; "directives de l'OMS…" is the WHO guidelines). RBM's copies also render from the published `dashboard.json`, which keeps the old order until it is next published |
+| Sort on the page only | The proposal form and `dashboard.json` read the file's order, and the file is what a person edits. A sorted file also makes a missing or duplicate entry easy to spot |
+| One merged A–Z list | The footer's two lists (registers and feeds, then key documents) answer different questions; each is sorted on its own |
+
+### The sort key
+
+The name the reader sees: `label`, or `title` where there is no label, compared
+with `localeCompare(…, { sensitivity: "base", numeric: true })`.
+
+- **Not by `id`.** Readers never see ids (`pmi` is "US President's Malaria
+  Initiative").
+- **Not by code point** (plain `sort()`). That is case-sensitive: in English
+  "WHO Malaria Threats Map" lands before "WHO malaria guidelines". On `/fr`,
+  "directives de l'OMS sur le paludisme" (lower-case d) would drop to the very
+  end of the list.
+
+A consequence, accepted because A–Z was the request: the national registers
+no longer sit together. Each is filed under its country ("Nigeria: …",
+"Zambia: …"), and the WHO entries cluster under W.
+
+### The proposal form's dropdown is regenerated, not just reordered
+
+It was a hand-made copy of 22 sources, and it had drifted:
+
+- **8 sources** added to the registry since 22 Sep were never added to it:
+  BMJ Global Health (Rwanda MFT), the two Malaria Journal MFT papers, the WHO
+  MFT guide, the WHO national drug policy table, and the DAV, ZAMRA and MCAZ
+  registers.
+- **"WHO Malaria Threat Maps" could never be cited.** Intake matches the
+  chosen label against the registry's `label` or `title`, lower-cased
+  (`proposal-lib.js` `norm`), and the registry says "WHO Malaria Threats Map".
+  A proposal citing it was refused with "is not in data/sources.js".
+
+It now lists all 30 public sources, A–Z, with "Not in this list" kept last.
+Checked: every option resolves to a registry id the way intake does it, the
+YAML parses, and the options are unique. `proposal-lib.js selftest`: 58 passed,
+0 failed.
+
+To regenerate it after a source is added (run from the repository root):
+
+```bash
+node -e '
+const fs=require("fs"); global.window={}; require("./data/sources.js");
+const c=new Intl.Collator("en",{sensitivity:"base",numeric:true});
+const n=window.LAUNCH_SOURCES.sources.filter(s=>s.public).map(s=>s.label||s.title).sort(c.compare);
+const F=".github/ISSUE_TEMPLATE/propose-change.yml", y=fs.readFileSync(F,"utf8");
+const re=/(      label: Source\n[\s\S]*?      options:\n)((?:        - "[^"\n]*"\n)+)/;
+const last=y.match(re)[2].trim().split("\n").pop().trim();
+fs.writeFileSync(F,y.replace(re,(_,a)=>a+n.map(x=>"        - \""+x+"\"\n").join("")+"        "+last+"\n"));'
+```
+
+### Verified
+
+- Verify block: treatment policy byte-identical; validator 0 errors,
+  1 warning (the French Guiana one); synthetic 0 / 0; preview built;
+  `test-build-dataset.js` 28 passed, 0 failed; country names cover all 252.
+- The page's own `renderSources()` was run against the built English, French
+  and Portuguese `data/sources.js`. All six lists (19 registers and feeds, 11
+  documents, per language) come out A–Z in that language. Fed the **old** file
+  order, the new page code still produces A–Z, so RBM's copies sort before
+  their data is republished.
+- Headless Chrome, English page: the same 19 + 11 order, and the count badge
+  still reads 30. The French and Portuguese pages were not loaded in a
+  browser; the check above covers them.
+- `i18n/content.en.json`: the same 591 strings before and after, none new and
+  none gone. Only 66 position notes (`sources.sources[i]`) moved. It was not
+  committed: `translate.yml` regenerates it on `main`, as it does after every
+  change, and finds nothing new to translate.
+
+### Left alone, found in passing
+
+- **No drift check for the form exists.** Its header says the list is
+  "checked for drift in CI"; nothing does that, which is how it lost 8
+  sources. `proposal-lib.js selftest` is the natural home, but it does not run
+  in CI either.
+- **Several source names are poorly translated.** On `/fr`: "directives de
+  l'OMS…" (lower case), "Tanzanie : TMDA inscription" (should be *registre*),
+  "Journal du paludisme" for one Malaria Journal paper but not the other. On
+  `/pt`: "Tanzânia: TMDA registar" (a verb), "Fronteiras" for the publisher
+  Frontiers, "panorama dos medicamentos…" (lower case). Journal and publisher
+  names should stay as published. Fixing these is a hand correction in
+  `i18n/translations.json`.
+- **3 strings have no French or Portuguese** (Ghana/Mozambique/SE Asia
+  studies, "P. vivax", the map border legend). They predate this change.
+
+### After merge
+
+1. Wait for `translate.yml` to commit `i18n/content.en.json`.
+2. Rebuild the RBM pages (`node scripts/build-rbm-pages.js`) and push them to
+   `codebyjackson/launch-rbm-test`: their footer code changed.
