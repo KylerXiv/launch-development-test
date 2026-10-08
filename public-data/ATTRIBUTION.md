@@ -18,5 +18,7 @@ adapted from WHO material licensed CC BY-NC-SA 3.0 IGO, whose ShareAlike term
 applies to adaptations, and whose NonCommercial term limits reuse. The licence
 chosen for this repository has to be compatible with that.
 
-French and Portuguese text is machine-translated (Google Cloud Translation)
-from the English unless noted otherwise; the English is the reference.
+French, Portuguese and Spanish text is machine-translated (Google Cloud
+Translation) from the English unless noted otherwise; the English is the
+reference. Translated country names come from the Unicode CLDR, with the WHO
+form for a few (for example "Myanmar").

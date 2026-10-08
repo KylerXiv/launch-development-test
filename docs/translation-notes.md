@@ -1,5 +1,10 @@
 # Translation in the proposal workflow — working notes
 
+> **Oct 2026: Spanish (`es`) added as a third translated language.** Wherever
+> this document says "French and Portuguese", `fr`/`pt` or `/fr` and `/pt`,
+> the same now holds for Spanish and `/es`: same bot, same rules. What changed
+> and why: [docs/jackson/spanish.md](jackson/spanish.md).
+
 > **2 Oct 2026:** the pipeline now has a fourth bucket (`reviewed`), CLDR
 > country names and translated shared widgets. See
 > [docs/jackson/translation-coverage.md](jackson/translation-coverage.md).

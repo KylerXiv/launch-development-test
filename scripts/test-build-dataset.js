@@ -2,8 +2,8 @@
 // Tests for scripts/build-dataset.js — the RBM dashboard.json.
 //   node scripts/test-build-dataset.js [--allow-stale]
 // Builds in memory (writes nothing) and checks what RBM's pages depend on:
-// the schema, that nothing internal leaks, that every text carries en/fr/pt
-// identical to the /fr and /pt pages, and that the schema check and the
+// the schema, that nothing internal leaks, that every text carries en/fr/pt/es
+// identical to the /fr, /pt and /es pages, and that the schema check and the
 // TEXT_PATHS guard actually catch what they are meant to.
 "use strict";
 const fs = require("fs");
@@ -18,7 +18,7 @@ const ok = (cond, name, detail) => {
   if (cond) { passed++; return; }
   failed++; console.log(`  FAIL ${name}${detail ? " — " + detail : ""}`);
 };
-const isText = (v) => v && typeof v === "object" && ["en", "fr", "pt"].every((l) => typeof v[l] === "string");
+const isText = (v) => v && typeof v === "object" && ["en", "fr", "pt", "es"].every((l) => typeof v[l] === "string");
 
 // ---- the real build --------------------------------------------------------
 const { dataset: d, untracked } = build();
@@ -41,16 +41,21 @@ ok(!("features" in d.data) && !/"coordinates"/.test(json), "no map shapes (they 
 ok(d.data.stages.length === 8 && d.data.stages.every(isText), "the eight stage names are text");
 const frStages = locale.localiseProducts(locale.readData("data/products.js"), "fr").stages;
 ok(d.data.stages.every((s, i) => s.fr === frStages[i]), "stage names in fr are exactly those of the /fr page");
+const esStages = locale.localiseProducts(locale.readData("data/products.js"), "es").stages;
+ok(d.data.stages.every((s, i) => s.es === esStages[i]), "stage names in es are exactly those of the /es page");
+const esPolicy = locale.localiseTreatmentPolicy(JSON.parse(JSON.stringify(require("./data-rules").extractData(fs.readFileSync(path.join(ROOT, "data", "treatment-policy.js"), "utf8"), "LAUNCH_TREATMENT_POLICY").data)), "es");
+ok(Object.entries(d.data.treatmentPolicy.countries).every(([k, c]) => !c.name || c.name.es === esPolicy.countries[k].name) &&
+   Object.values(d.data.treatmentPolicy.countries).some((c) => c.name && c.name.es !== c.name.en), "country names in es come from the CLDR table, as on /es");
 const p = d.data.products.find((x) => x.stages && x.stages[0]);
 ok(p.stages.every((s) => s.note === null || s.note === undefined || isText(s.note)), "stage notes are text");
 ok(d.data.products.every((x) => x.barrier === null || x.barrier === undefined || isText(x.barrier)), "barriers are text or null");
 ok(d.data.sources.every((s) => isText(s.plain)), "every source's plain line is text");
 ok(d.data.products.every((x) => typeof x.id === "string" && typeof x.name === "string"), "ids and names stay plain strings");
 const c = coverage(d);
-ok(c.text > 100 && c.fr > 0 && c.pt > 0, "coverage counts something", JSON.stringify(c));
+ok(c.text > 100 && c.fr > 0 && c.pt > 0 && typeof c.es === "number", "coverage counts something, for every language", JSON.stringify(c));
 
 // envelope
-ok(d.locales.join() === "en,fr,pt", "locales are en, fr, pt");
+ok(d.locales.join() === "en,fr,pt,es", "locales are en, fr, pt, es");
 ok(/^[0-9a-f]{64}$/.test(d.content_hash), "content_hash is a sha256");
 ok(d.data_status === prodRaw.meta.dataStatus && d.last_updated === prodRaw.meta.lastUpdated, "data status and date come from meta");
 const illus = d.data.products.filter((x) => x.detail && x.detail.countries);
@@ -83,8 +88,8 @@ ok(!validate(schema, x).length, "a null barrier is allowed");
 
 // ---- the TEXT_PATHS guard -----------------------------------------------------
 const en = { a: "Hello", b: { c: "World" } };
-const r = mergeText(en, { en, fr: { a: "Bonjour", b: { c: "Monde" } }, pt: { a: "Olá", b: { c: "World" } } }, ["a"], "t");
-ok(r.merged.a.fr === "Bonjour" && r.merged.a.pt === "Olá", "listed fields get en/fr/pt");
+const r = mergeText(en, { en, fr: { a: "Bonjour", b: { c: "Monde" } }, pt: { a: "Olá", b: { c: "World" } }, es: { a: "Hola", b: { c: "World" } } }, ["a"], "t");
+ok(r.merged.a.fr === "Bonjour" && r.merged.a.pt === "Olá" && r.merged.a.es === "Hola", "listed fields get en/fr/pt/es");
 ok(r.merged.b.c === "World", "unlisted fields stay strings");
 ok(r.untracked.length === 1 && /b\.c/.test(r.untracked[0]), "a translated field missing from the list is reported", JSON.stringify(r.untracked));
 

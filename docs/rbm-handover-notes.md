@@ -1,5 +1,9 @@
 # RBM handover — working notes (feat/rbm-handover)
 
+> **Oct 2026:** the RBM build now also writes `es/`, every text in
+> `dashboard.json` is `{ en, fr, pt, es }`, and the loader no longer requires
+> exactly three languages. See [docs/jackson/spanish.md](jackson/spanish.md).
+
 *2 Oct 2026, Jackson (Oakkar-Min) with Claude Code. Branch `feat/rbm-handover`,
 stacked on `feat/public-data-layer` (PR #32, not merged yet). Two tasks, one
 commit each: the translation gaps, then the RBM pages.*
@@ -97,7 +101,7 @@ inside an iframe on another domain.
 ## Deferred
 
 - Translating the 43 / 42 new strings: the translate bot, after the merge.
-- Review of the two hand-written fr/pt error messages.
+- Review of the two hand-written fr/pt error messages (and the es ones, added Oct 2026).
 - Hosting the RBM pages and the `frame-ancestors` header (RBM's call).
 - ~~Subscribe for updates on RBM: needs a decision on where its backend
   lives.~~ **Decided 7 Oct** (`rbm-forms`): Subscribe and Send feedback on

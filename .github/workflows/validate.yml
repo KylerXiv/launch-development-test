@@ -25,7 +25,7 @@ jobs:
       # The same build the public site runs: new text stays English, but a
       # translated lookup key or a file the page loads and the build did not
       # write fails here, before it reaches a preview or production.
-      - name: French and Portuguese pages build and pass their self-check
+      - name: French, Portuguese and Spanish pages build and pass their self-check
         run: node scripts/build-locale-pages.js --allow-stale
       # The file RBM's pages fetch. A change that would break it fails here,
       # before anyone approves it. Builds to a temp file; publishes nothing.

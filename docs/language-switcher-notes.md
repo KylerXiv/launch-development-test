@@ -1,5 +1,8 @@
 # Language menu on the illustrated journey — working notes
 
+> **Oct 2026:** the menu now also lists Español (`es`), switched on by the same
+> build line. See [docs/jackson/spanish.md](jackson/spanish.md).
+
 Branch `feat/language-switcher`, 2 Oct 2026. Per [CLAUDE.md](../CLAUDE.md), this
 document is updated in the same commit as any change it describes.
 

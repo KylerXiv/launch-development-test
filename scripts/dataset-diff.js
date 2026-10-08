@@ -22,6 +22,14 @@ const before = read(oldFile);
 const after = read(newFile);
 
 const isText = (v) => v && typeof v === "object" && !Array.isArray(v) && typeof v.en === "string";
+
+// A language one file has and the other does not (Spanish, added Oct 2026) is
+// one line in the summary, not one per text, and is left out of the
+// text-by-text comparison. Files from before `locales` existed had en/fr/pt.
+const langsOf = (f) => (f && Array.isArray(f.locales) ? f.locales : ["en", "fr", "pt"]);
+const addedLangs = before ? langsOf(after).filter((l) => !langsOf(before).includes(l)) : [];
+const removedLangs = before ? langsOf(before).filter((l) => !langsOf(after).includes(l)) : [];
+const shared = (v) => (isText(v) ? Object.fromEntries(Object.entries(v).filter(([l]) => !addedLangs.includes(l) && !removedLangs.includes(l))) : v);
 const short = (v) => {
   // a whole entry (an added changelog line, a new product): its readable part
   if (v && typeof v === "object" && !Array.isArray(v) && !isText(v)) {
@@ -35,10 +43,10 @@ const short = (v) => {
 const label = (arr, i) => (arr[i] && arr[i].id ? arr[i].id : i);
 
 function diff(a, b, at, out) {
-  if (JSON.stringify(a) === JSON.stringify(b)) return;
+  if (JSON.stringify(a, (k, v) => shared(v)) === JSON.stringify(b, (k, v) => shared(v))) return;
   if (isText(a) && isText(b)) {
     if (a.en !== b.en) out.push({ at, was: a, now: b });
-    else for (const l of ["fr", "pt"]) if (a[l] !== b[l]) out.push({ at: `${at} (${l})`, was: a[l], now: b[l] });
+    else for (const l of Object.keys(shared(b))) if (l !== "en" && a[l] !== b[l]) out.push({ at: `${at} (${l})`, was: a[l], now: b[l] });
     return;
   }
   if (Array.isArray(a) && Array.isArray(b)) {
@@ -57,7 +65,7 @@ function diff(a, b, at, out) {
     // every approval): report the entries added and removed, by content —
     // comparing by position would show every entry below as changed
     if (a.length !== b.length) {
-      const key = (x) => JSON.stringify(x);
+      const key = (x) => JSON.stringify(x, (k, v) => shared(v));
       const left = new Map();
       a.forEach((x) => left.set(key(x), (left.get(key(x)) || 0) + 1));
       b.forEach((x) => {
@@ -83,6 +91,22 @@ function diff(a, b, at, out) {
 }
 
 const changes = [];
+// texts in the new file, and how many differ from the English, for one language
+function textsIn(data, l) {
+  let n = 0, own = 0;
+  const walk = (v) => {
+    if (isText(v)) { if (v.en.trim() && typeof v[l] === "string") { n++; if (v[l] !== v.en) own++; } return; }
+    if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v).forEach(walk);
+  };
+  walk(data);
+  return { n, own };
+}
+for (const l of addedLangs) {
+  const { n, own } = textsIn(after.data, l);
+  changes.push({ kind: "language", line: `language added: \`${l}\`, in all ${n} texts (${own} translated; the rest carry the English until they are)` });
+}
+for (const l of removedLangs) changes.push({ kind: "language", line: `language removed: \`${l}\`` });
 if (before) diff(before.data, after.data, "", changes);
 const changed = !before || changes.length > 0;
 
@@ -97,7 +121,8 @@ if (!before) {
 } else {
   lines.push(`${changes.length} change${changes.length === 1 ? "" : "s"} for RBM's readers (${who}):`, "");
   changes.slice(0, 40).forEach((c) => lines.push(
-    c.kind === "added" ? `- added \`${c.at.replace(/\[\+\]$/, "")}\`: ${short(c.now)}`
+    c.kind === "language" ? `- ${c.line}`
+    : c.kind === "added" ? `- added \`${c.at.replace(/\[\+\]$/, "")}\`: ${short(c.now)}`
     : c.kind === "removed" ? `- removed \`${c.at.replace(/\[−\]$/, "")}\`: ${short(c.was)}`
     : `- \`${c.at}\`: ${short(c.was)} → ${short(c.now)}`));
   if (changes.length > 40) lines.push(`- … and ${changes.length - 40} more`);

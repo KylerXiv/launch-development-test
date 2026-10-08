@@ -2,9 +2,13 @@ name: Translate new text
 
 # After a change made by hand reaches main — the illustrated page, a data file,
 # the source registry — this rebuilds i18n/content.en.json, translates only the
-# strings that are new into French and Portuguese, checks both pages, commits
-# the two i18n files and redeploys. Until it has run, /fr and /pt show the new
-# text in English: English does not wait for French.
+# strings that are new into French, Portuguese and Spanish, checks the three
+# pages, commits the two i18n files and redeploys. Until it has run, /fr, /pt
+# and /es show the new text in English: English does not wait for French.
+#
+# A new language starts with every string "new": its first run translates the
+# whole page (Spanish, Oct 2026: about 590 strings, 31,000 characters, well
+# inside Google's free monthly allowance).
 #
 # Proposals do not depend on it: proposal-decision.yml translates them before
 # it merges. publish.yml starts this after every approval anyway, as a safety
@@ -71,12 +75,12 @@ jobs:
           APPROVED_CONTENT_HASH=$(node -p 'require("./i18n/content.en.json").contentHash')
           export APPROVED_CONTENT_HASH
           FAILED=""
-          for loc in fr pt; do
+          for loc in fr pt es; do
             node scripts/translate-strings.js --locale="$loc" || FAILED="${FAILED:+$FAILED }$loc"
           done
           echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
 
-      - name: Check the French and Portuguese pages
+      - name: Check the French, Portuguese and Spanish pages
         run: node scripts/build-locale-pages.js
 
       # Commits what is ready even when the engine failed for a locale: the
@@ -99,7 +103,7 @@ jobs:
       # Only after an approval, and only when everything above passed — also
       # when there was nothing new to translate, the usual case. An engine
       # failure does not stop it: the step that reports it comes next, and
-      # untranslated text is published in English, as on /fr and /pt.
+      # untranslated text is published in English, as on /fr, /pt and /es.
       - name: Publish to RBM's data repo
         if: success() && inputs.after_approval
         env:

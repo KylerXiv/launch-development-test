@@ -1,5 +1,10 @@
 # Handover — translation in the proposal workflow
 
+> **Oct 2026: Spanish (`es`) added as a third translated language.** Wherever
+> this document says "French and Portuguese", `fr`/`pt` or `/fr` and `/pt`,
+> the same now holds for Spanish and `/es`: same bot, same rules. What changed
+> and why: [docs/jackson/spanish.md](jackson/spanish.md).
+
 *Written 30 September 2026 by Kyler (with Claude Code), for the developer who
 takes this over.*
 
