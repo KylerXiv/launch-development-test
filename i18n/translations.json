@@ -743,6 +743,13 @@
       "fr": "Un organisme de réglementation rigoureux examine l'ensemble des données probantes relatives à la qualité, à la sécurité et à l'efficacité des médicaments. Pour les médicaments antipaludiques, il s'agit généralement de la procédure prévue à l'article 58 de l'Agence européenne des médicaments (EMA), qui concerne les médicaments destinés à être utilisés hors d'Europe. Chaque étape ultérieure s'appuie sur cet avis. Le statut de l'évaluation par les autorités sanitaires n'est généralement pas public ; cette étape n'évolue donc que lorsqu'un organisme de réglementation ou le fabricant annonce une décision.",
       "pt": "Uma entidade reguladora rigorosa analisa todas as evidências sobre a qualidade, segurança e eficácia. No caso dos medicamentos contra a malária, trata-se geralmente do procedimento do artigo 58.º da Agência Europeia do Medicamento (EMA), que abrange os medicamentos destinados a serem utilizados fora da Europa. Cada etapa subsequente baseia-se nessa avaliação. O estado da análise da autoridade sanitária não é geralmente público, pelo que esta etapa só se altera quando uma entidade reguladora ou o fabricante anuncia um resultado."
     },
+    "244909ea695c11e1": {
+      "en": "Tracking new antimalarial medicines along the market access pathway",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Suivi des nouveaux médicaments antipaludiques tout au long de leur parcours d'accès au marché",
+      "pt": "Acompanhamento dos novos medicamentos antimaláricos ao longo do processo de acesso ao mercado."
+    },
     "25464f74dbb99fe6": {
       "en": "An independent overview of which malaria medicines exist and who makes them.",
       "where": "sources.sources[16].plain",
@@ -1765,6 +1772,13 @@
       "fr": "Nouvelle classe chimique — planification de la pharmacovigilance requise",
       "pt": "Nova classe química — planeamento de farmacovigilância necessário"
     },
+    "54374b9d04cd4eb1": {
+      "en": "Each country is shaded by the furthest stage it has reached.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Chaque pays est coloré en fonction du stade le plus avancé qu'il a atteint.",
+      "pt": "Cada país está sombreado de acordo com o estádio mais avançado que atingiu."
+    },
     "5439a38ba2863df7": {
       "en": "Everything we checked during the August review is now part of the main dataset. The separate preview version has been retired.",
       "where": "products.changelog[3].plain",
@@ -1827,6 +1841,13 @@
       "bucket": "markup",
       "fr": "Les outils de prévention figurent sur une liste séparée",
       "pt": "As ferramentas de prevenção estão numa lista separada."
+    },
+    "55e1ea9bbe0754e4": {
+      "en": "⚠ Draft figures — not yet verified.",
+      "where": "line 1541 (in markup)",
+      "bucket": "js",
+      "fr": "⚠ Chiffres provisoires — non encore vérifiés.",
+      "pt": "⚠ Números preliminares — ainda não verificados."
     },
     "5603c15fb844c45d": {
       "en": "Date achieved / submitted",
@@ -4485,6 +4506,13 @@
       "bucket": "data",
       "fr": "SRA approbation (EMA Art. 58)",
       "pt": "SRA aprovação (EMA Art.º 58.º)"
+    },
+    "d37cd564ee217ea5": {
+      "en": "LAUNCH Transparency Dashboard",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Tableau de bord de transparence LAUNCH",
+      "pt": "LAUNCH Painel de Transparência"
     },
     "d39448698cca0cdb": {
       "en": "Main barrier",
