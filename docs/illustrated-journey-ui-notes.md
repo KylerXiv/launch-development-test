@@ -1862,6 +1862,77 @@ them by hand in `i18n/translations.json` if needed.
 **After merge:** wait for `translate.yml` and check its "No. of countries";
 rebuild RBM's copies and push them.
 
+**Done after merge (8 Oct):** the bot gave "Nombre de pays" (fr) and "Número
+de países" (pt, es). "No." was read as "number" in all three; no hand
+correction. RBM's copies were rebuilt by Jackson's Spanish push (`61345d8`,
+from `41cd7af`), which includes this change.
+
+### 3.40 On phones the two header buttons are full width again (8 Oct 2026)
+
+Branch `phone-header-buttons`, off `main` at `41cd7af`. The owner's iPhone,
+on RBM's mock: in English and Portuguese, Download CSV and Subscribe did not
+fill the row; "the box is aligning the size with the words".
+
+**Measured, not guessed.** Chrome and Playwright's WebKit with an iPhone
+profile both laid the row out correctly (362px at 390px wide, two 177px
+buttons), alone and inside the mock across five language switches. The
+screenshot's row was about 290px. The buttons' own content width (the row's
+`max-content`) is **289px in English**, 354 in Portuguese, 486 in French and
+389 in Spanish. Forcing the row not to stretch (`align-self: flex-start`)
+reproduces the screenshot exactly: 289px, two 140px buttons, a 289px
+Subscribe panel, and "Subscribe for updates" on two lines. It also explains
+the languages: French and Spanish are wider than the screen, so they were
+capped at full width and looked right.
+
+So on that iPhone the row was sized to its content instead of stretched.
+Why that Safari does not stretch it was **not pinned down**: the WebKit
+available here does stretch it, and the phone's iOS version is not known.
+
+**The fix does not depend on stretching.** In the phone rules:
+
+- `.hd-bar` gets `flex-wrap: nowrap`. It had kept `wrap` from the desktop
+  rules, so it was a multi-line column whose line is first sized to its
+  content and only then stretched; a single-line column is the container's
+  width in every engine;
+- `.hd-bar .hdr-actions` gets `width: 100%`;
+- the buttons get `min-width: 0`, so a long word cannot make one wider than
+  the other.
+
+| Rejected | Because |
+| --- | --- |
+| Only `flex-wrap: nowrap` | Still relies on `align-items: stretch`, the step that failed on the phone |
+| Stacking the buttons, one per row | A different design from §3.36's two equal buttons; not asked for |
+| Hiding the icons to fit the words | Treats the symptom; the row still followed the words |
+
+**Checked in WebKit, with the row forced not to stretch (the iPhone
+condition), Subscribe open:**
+
+| Width | Before: row (buttons) | After: row (buttons) |
+| --- | --- | --- |
+| 375 | 289 (140 + 140) | 347 (170 + 170) |
+| 390 | 289 (140 + 140) | 362 (177 + 177) |
+| 430 | 289 (140 + 140) | 402 (197 + 197) |
+| 1440 | 321 (135 + 178), desktop | the same |
+
+The Subscribe panel is as wide as the row, and its pointer sits under
+Subscribe at every width. At 390px "Subscribe for updates" now fits on one
+line. All four languages give 362px under the forced condition. **Not
+checked on a real iPhone**; the owner's retest is the proof.
+
+**No new text** (`assemble-content.js --check`: up to date). The change is in
+the CSS only, so no translation is needed.
+
+**Checked:** verify block as expected (0 errors, 1 warning; 0 / 0; preview;
+`test-build-dataset.js` 30 / 0, two more since #82; country names all 252);
+`build-locale-pages.js` all checks passed; `test-build-rbm-pages.js` 31 / 0.
+RBM's repo differs from this branch's build only by this change, in all four
+languages.
+
+**After merge:** rebuild RBM's copies and push them. Then retest on the
+iPhone in a private window, because GitHub Pages lets a browser reuse a page
+for 10 minutes. The screenshot's mock banner still read "LAUNCH dashboard",
+which is the cached page from before `cb6efcb`.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
