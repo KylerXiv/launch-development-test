@@ -141,7 +141,9 @@ function compose(entries, { preview = false, sample = false } = {}) {
       { text: "You're getting this because you subscribed to updates from the LAUNCH Transparency Dashboard." },
       { text: "Don't want these emails?", link: preview ? SITE + mail.DASHBOARD : UNSUBSCRIBE, linkLabel: "Unsubscribe" }
     ],
-    site: SITE
+    // a broadcast takes no attachments, so its logo is loaded from the site
+    site: SITE,
+    logo: "hosted"
   });
   return { subject: (preview ? "[Preview] " : "") + subjectFor(entries), ...body };
 }

@@ -794,8 +794,41 @@ shell of all four emails: the welcome (`letter()`), both team notes
 | --- | --- |
 | The logo as a **PNG**, `assets/email/unitaid-logo.png`: `assets/unitaid-logo.svg` drawn at 240×84, shown at 120×42 | Gmail and Outlook do not show SVG |
 | On a **white** background, not transparent | A mail app that darkens emails would put the navy wordmark on near-black |
-| **Loaded from this site** (`LOGO_PATH`, copied by `build-public-site.sh`), from the host that sent the email | No attachment weight in every email. Outlook may ask the reader to "download pictures", as it does for any sender's images. The `alt="Unitaid"` text shows until then |
-| An inline (CID) attachment instead | Rejected: about 3 KB in every email, and a second path to test, for a logo most clients show anyway |
+| ~~Loaded from this site~~ for the welcome and team notes; **inline since 8 Oct** (below) | — |
+| Loaded from this site (`LOGO_PATH`, copied by `build-public-site.sh`) **for the daily update email only** | It is a Resend broadcast, and `POST /broadcasts` takes no attachments (its reference, read 8 Oct) |
+
+**8 Oct, later: the logo travels inside the email.** The first team note
+after the merge showed a broken image with the label "Unitaid" in the owner's
+inbox. The cause was narrowed down in three steps:
+
+1. **Not missing at send time.** The deployment with the logo went live at
+   11:49:05 UTC, and it was the one that wrote that 11:49 note.
+2. **Not refused to mail services.** The logo URL answered `200 image/png`
+   to plain requests and to Google's, Microsoft's and Yahoo's image-proxy
+   user agents.
+3. **What remains is the reader.** Outlook blocks images it would have to
+   fetch from the internet, for any sender not marked safe (and always in
+   Junk), and shows exactly that broken image with its alt text.
+
+So the welcome and both team notes now attach the PNG and show it with
+`src="cid:unitaid-logo"`. Nothing is fetched, so nothing is blocked. The
+bytes live in `api/_logo.js`, as base64, rather than being read from disk:
+a Vercel function bundles only the files its build detects, and a missing
+file would stop every form, not just the logo. A test fails if
+`api/_logo.js` and `assets/email/unitaid-logo.png` ever differ. To
+regenerate it, run
+`node -e 'require("fs").readFileSync("assets/email/unitaid-logo.png").toString("base64")'`
+and paste the result.
+
+| Rejected | Because |
+| --- | --- |
+| Keep it hosted, and ask readers to mark the sender safe | Every new reader meets the broken image first |
+| A `data:` URI image | Gmail and Outlook do not show them |
+| Reading the PNG from disk in the function | If the build missed the file, every form would fail (above) |
+
+What it costs: about 3 KB more per email. Resend's own dashboard preview does
+not show inline images (its documentation says so), so a broken logo **there**
+is expected; real mail apps show it.
 
 **Unitaid mark permission (open).** The handoff records the use of the
 Unitaid logo as an unconfirmed assumption that does not transfer to another
@@ -1144,11 +1177,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `email-brand`, from `main` at `4899006` (8 Oct) |
-| Commits | 1: one professional frame, with the Unitaid logo, for every email, with these notes in the same commit |
+| Branch | `email-logo-inline`, from `main` at `f906548` (8 Oct) |
+| Commits | 1: the logo inside the email for the welcome and team notes, with these notes in the same commit |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
-| CI | runs on that pull request; `validate.yml` runs `test-notify-subscribers.js` (67) but not `test-mail-api.js` (177, local) |
-| Changed | `api/_mail.js` (`frame()`, `LOGO_PATH`, `letter()` and `render()` inside it), `api/subscribe.js` and `api/feedback.js` (pass `site`), `scripts/notify-subscribers.js` (passes `SITE`), `scripts/build-public-site.sh` (publishes the PNG), `assets/email/unitaid-logo.png` (new), both test scripts, this document, `docs/subscriber-updates-notes.md` |
-| After merge | live at once: the next email from the LAUNCH site or either RBM copy uses it, since emails come from this API, not from the pages. Nothing to rebuild for RBM |
-| Waiting on | the owner's merge; **Unitaid's permission for its mark in emails**; the Outlook delivery report (8 Oct); the owner's iPhone retest; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8) |
-| Before this | `subscribe-status-and-team-look`, PR #73, merged 8 Oct; RBM pages pushed as `0e8a4ab`. `welcome-wording`, PR #72. `team-email-form`, PR #68. `mobile-forms`, PR #67. `rbm-vercel-partner`, PR #66. `rbm-embed-sizing`, PR #65. `rbm-forms`, PR #64. `subscribe-single-opt-in`, PR #62. `email-feedback`, PR #40. `email-subscribe`, PR #30 |
+| CI | runs on that pull request; `validate.yml` runs `test-notify-subscribers.js` (67) but not `test-mail-api.js` (179, local) |
+| Changed | `api/_mail.js` (`LOGO_ATTACHMENT`, `frame()`'s `logo`, `sendEmail()` passes `attachments`), `api/_logo.js` (new, the PNG as base64), `scripts/notify-subscribers.js` (`logo: "hosted"`), `scripts/test-mail-api.js`, this document |
+| After merge | live at once for every email sent through `/api/subscribe` and `/api/feedback`. Nothing to rebuild |
+| Waiting on | the owner's merge, then one real email in Outlook to confirm; **Unitaid's permission for its mark in emails**; the Outlook delivery report (8 Oct); the owner's iPhone retest; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8) |
+| Before this | `email-brand`, PR #74, merged 8 Oct. `subscribe-status-and-team-look`, PR #73, merged 8 Oct; RBM pages pushed as `0e8a4ab`. `welcome-wording`, PR #72. `team-email-form`, PR #68. `mobile-forms`, PR #67. `rbm-vercel-partner`, PR #66. `rbm-embed-sizing`, PR #65. `rbm-forms`, PR #64. `subscribe-single-opt-in`, PR #62. `email-feedback`, PR #40. `email-subscribe`, PR #30 |
