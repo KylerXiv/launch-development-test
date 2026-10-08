@@ -1933,6 +1933,14 @@ iPhone in a private window, because GitHub Pages lets a browser reuse a page
 for 10 minutes. The screenshot's mock banner still read "LAUNCH dashboard",
 which is the cached page from before `cb6efcb`.
 
+**Done after merge (8 Oct):** the owner first retested before RBM's copy was
+rebuilt, and saw the bug again inside the iframe, while production already
+had the fix. RBM was pushed as `145065c` (from `88fc717`, all four
+languages), live on both hosts at 15:38 UTC. Then in WebKit with an iPhone
+profile, inside the live mock, switching en → pt → es → fr → en on both
+hosts: 362px row and two 177px buttons every time, also with the row forced
+not to stretch. Still to come: the owner's retest on the iPhone itself.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
