@@ -8,7 +8,8 @@
 # The "Source" options below are a COPY of data/sources.js. GitHub cannot read
 # the registry at render time, so this list must be regenerated from it and
 # checked for drift in CI — see docs/source-registry-notes.md §4c. Do not edit
-# the list by hand.
+# the list by hand. It is A–Z, like the registry, with "Not in this list" last;
+# §6 of those notes has the command that regenerates it.
 
 name: Propose a data change
 description: Propose one change to the dashboard. It is reviewed before anything is published.
@@ -88,28 +89,36 @@ body:
       label: Source
       description: Where you saw this. Must be a source already in the registry — if it is not listed, say so in the notes below and it will be added first.
       options:
-        - "WHO malaria guidelines"
-        - "WHO prequalification list"
-        - "WHO Malaria Threat Maps"
-        - "European Medicines Agency"
-        - "Nigeria: NAFDAC Green Book"
-        - "Tanzania: TMDA register"
-        - "Rwanda: Rwanda FDA register"
-        - "Uganda: National Drug Register"
-        - "Global Fund price and quality reporting"
+        - "BMJ Global Health: Rwanda MFT, 2025"
         - "ClinicalTrials.gov"
-        - "WWARN / IDDO malaria data"
-        - "WHO Essential Medicines List"
-        - "WHO PQ comparator products"
-        - "WHO prequalification guidance"
-        - "WHO assessment report: DHA–PPQ (Guilin)"
-        - "MMV pipeline: ganaplacide–lumefantrine"
+        - "European Medicines Agency"
+        - "Frontiers: Ghana efficacy study, 2023"
+        - "Global Fund price and quality reporting"
+        - "Malaria Journal: Burkina Faso MFT, 2022"
+        - "Malaria Journal: Kenya MFT pilot, 2025"
+        - "Manufacturer communications"
         - "MESA malaria medicines landscape"
+        - "MMV pipeline: ganaplacide–lumefantrine"
+        - "Nigeria: NAFDAC Green Book"
         - "Novartis: GanLum Phase III results"
         - "PLOS Medicine: ASPY in routine use"
-        - "Frontiers: Ghana efficacy study, 2023"
+        - "Rwanda: Rwanda FDA register"
+        - "Tanzania: TMDA register"
+        - "Uganda: National Drug Register"
         - "US President's Malaria Initiative"
-        - "Manufacturer communications"
+        - "Viet Nam: DAV register"
+        - "WHO assessment report: DHA–PPQ (Guilin)"
+        - "WHO Essential Medicines List"
+        - "WHO malaria guidelines"
+        - "WHO Malaria Threats Map"
+        - "WHO MFT implementation guide"
+        - "WHO national drug policy table"
+        - "WHO PQ comparator products"
+        - "WHO prequalification guidance"
+        - "WHO prequalification list"
+        - "WWARN / IDDO malaria data"
+        - "Zambia: ZAMRA register"
+        - "Zimbabwe: MCAZ register"
         - "Not in this list — explained in the notes below"
     validations:
       required: true
