@@ -1650,6 +1650,64 @@ of 2 Oct (jackson/translation-coverage.md), where a French `(largeur minimale :
 `hover` and `orientation` queries. With it, `content.en.json` is unchanged
 (same hash), and the French copies keep the query as written.
 
+### 3.37 Title, tagline, draft banner and map note, shortened (8 Oct 2026)
+
+Branch `header-and-notes-wording`, off `main` at `7c6aa1d`. Four wording
+changes, all requested by the owner on 8 Oct and applied exactly as given:
+
+| Where | Was | Now |
+| --- | --- | --- |
+| `<title>` (the browser tab) | LAUNCH Transparency Dashboard — Illustrated journey | LAUNCH Transparency Dashboard |
+| Tagline under the heading (`.hd-desc`) | Tracking new antimalarial medicines from research and development to market access — where each product stands, its access barriers, and opportunities to overcome them. | Tracking new antimalarial medicines along the market access pathway |
+| Draft banner (`BANNERS.draft`) | ⚠ Draft figures — not yet verified. Please do not quote them. | ⚠ Draft figures — not yet verified. |
+| Map note (`#mapnote`) | Each country is shaded by the furthest stage it has reached — a country counted in MFT plans is registered too. Counts are of the countries drawn on this map. | Each country is shaded by the furthest stage it has reached. |
+
+**Read as given, not reinterpreted.** The tagline request named only the new
+text, so the whole line was replaced, its second half included, and it has no
+full stop because the requested text has none. Restoring the second half is a
+one-line change. The `<title>` now matches the visible heading, and the old
+`index.html`, which already used exactly this title.
+
+**What the deletions remove, recorded so it is not rediscovered:**
+
+- **The banner** partly reverses §3.11: it keeps its amber colour and still
+  leads with the caveat, but no longer tells readers not to quote the figures.
+  The header meta ("Draft — figures not yet verified") and the map overlay are
+  unchanged.
+- **The map note's deleted sentence was the only place on the page that said
+  two things:** the levels are cumulative (an "in MFT plans" country is
+  registered too), and the counts cover only countries drawn on the map. The
+  second is not hypothetical: French Guiana has a product in policy but is not
+  on the basemap, which is the validator's 1 warning. `explainer.html` still
+  states the cumulative rule; nothing on this page does now.
+
+**Scope: this page only, and what is built from it** (`/fr`, `/pt`, RBM's
+copies). The old map sentence is still in six older pages: `index.html`,
+`option-b.html`, and their `unitaid/` and `synthetic/` copies. They are
+published but have been off the site menu since 30 Sep (§3.25), and were left
+alone.
+
+**No changelog line.** A line in `data/products.js` `changelog` would also go
+out in the daily subscriber email, and these are wording changes to the page,
+not to the data. Earlier wording changes (2 Oct) did get one; add it if the
+owner wants subscribers told.
+
+**Translation.** The four lines are four new English strings (591 in total
+before and after, 4 in, 4 out). `translate.yml` translates them after the
+merge; until it has run, `/fr` and `/pt` show those four lines in English.
+
+**Checked:** the verify block gave the expected results (0 errors, 1 warning;
+0 / 0; preview; `test-build-dataset.js` 28 / 0; country names all 252). Also:
+`build-locale-pages.js` all checks passed, `test-build-rbm-pages.js` 25 / 0,
+`test-mail-api.js` 194 / 0. Headless Chrome on the English page reads back all
+four new texts, and none of the old wording remains anywhere in the rendered
+page. No script matches the old texts: the only `<title>` rewriters
+(`build-unitaid-theme.js`, `build-synthetic-edition.js`) work on the other
+editions.
+
+**After merge:** wait for `translate.yml`, then rebuild RBM's copies and push
+them, per the handoff (§0, "Updating RBM's copy").
+
 | Rejected | Because |
 | --- | --- |
 | Never focusing anything on open | Keyboard and screen-reader users would have to find the dialog themselves; a desktop keyboard user loses the ready-to-type field |
