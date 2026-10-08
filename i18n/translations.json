@@ -4003,6 +4003,13 @@
       "fr": "Mauritanie",
       "pt": "Mauritânia"
     },
+    "bfe26e15de8131b7": {
+      "en": "Everything on this page is traceable to one of the public sources below.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Tout le contenu de cette page est traçable jusqu'à l'une des sources publiques ci-dessous.",
+      "pt": "Todo o conteúdo desta página pode ser rastreado até uma das fontes públicas abaixo."
+    },
     "c0002275769f1e0a": {
       "en": "Everything on this page is traceable to one of the public sources below. Each name opens that source's own official site in a new tab, so you can check any figure yourself.",
       "where": "static text",
@@ -4758,6 +4765,13 @@
       "bucket": "js",
       "fr": "\" + où + \"",
       "pt": "\" + onde + \""
+    },
+    "dc4e3f49ef5f695f": {
+      "en": "Malaria Product Launch Dashboard",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Tableau de bord de lancement de produits contre le paludisme",
+      "pt": "Painel de lançamento de produtos para a malária"
     },
     "dc5678ab2606df65": {
       "en": "this browser tab. Once it is connected, the LAUNCH team will read every message, and where",
