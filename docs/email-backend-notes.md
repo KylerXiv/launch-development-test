@@ -248,7 +248,9 @@ How it runs:
    the form shows its failure message and nothing else happens.
 2. **A welcome email** goes to the subscriber, with the dashboard link and,
    beside "Didn't sign up, or don't want these emails?", an **Unsubscribe**
-   link. It carries `List-Unsubscribe` and `List-Unsubscribe-Post` as before,
+   link. Since 8 Oct its text opens with the owner's wording, "You're now
+   subscribed to the LAUNCH Transparency Dashboard.", then says what they
+   will get (it used to open "Thanks for subscribing."). It carries `List-Unsubscribe` and `List-Unsubscribe-Post` as before,
    so the mail app's own button works too.
 3. **The team inbox gets the note**, "Someone subscribed…", with the
    address, the time, whether it is a returning subscriber, and the segment.
@@ -1084,11 +1086,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `team-email-form`, from `main` at `285afaa` (7 Oct) |
-| Commits | 1: the team's emails as a form, with these notes in the same commit |
+| Branch | `welcome-wording`, from `main` at `8748de7` (8 Oct) |
+| Commits | 1: the welcome email's opening sentence, with this note in the same commit |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
-| CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 171 passed |
-| Changed | `api/_mail.js` (`render()` rebuilt, `when()`, `SEGMENT_NAME`, `PARTNERS[].name`), `api/subscribe.js` and `api/feedback.js` (their team notes), `scripts/test-mail-api.js`, this document |
-| After merge | live at once for the LAUNCH site and both RBM copies, which post to this API. Nothing to rebuild |
-| Waiting on | the owner's merge, then a look at the first real note in Outlook; the owner's iPhone retest of the forms (illustrated-journey-ui-notes.md §3.36); RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
-| Before this | `mobile-forms`, PR #67, merged 7 Oct; RBM pages pushed as `62e9936`. `rbm-vercel-partner`, PR #66, merged 7 Oct, verified live. `rbm-embed-sizing`, PR #65, merged 7 Oct. `rbm-forms`, PR #64, merged 7 Oct. `subscribe-single-opt-in`, PR #62, merged 6 Oct. `email-feedback`, PR #40, merged 2 Oct. `email-subscribe`, PR #30, merged 1 Oct |
+| CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 172 passed, one new check for the sentence |
+| Changed | `api/subscribe.js` (the welcome's paragraph), `scripts/test-mail-api.js`, this document |
+| After merge | live at once for every new subscriber, from the LAUNCH site and both RBM copies. Nothing to rebuild |
+| Waiting on | the owner's merge; why a feedback note that Resend shows as sent did not reach the Outlook inbox (reported 8 Oct; not yet diagnosed: it needs that email's status in Resend); the owner's iPhone retest of the forms; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
+| Before this | `team-email-form`, PR #68, merged 7 Oct (§2.14). `mobile-forms`, PR #67, merged 7 Oct; RBM pages pushed as `62e9936`. `rbm-vercel-partner`, PR #66, merged 7 Oct. `rbm-embed-sizing`, PR #65, merged 7 Oct. `rbm-forms`, PR #64, merged 7 Oct. `subscribe-single-opt-in`, PR #62, merged 6 Oct. `email-feedback`, PR #40, merged 2 Oct. `email-subscribe`, PR #30, merged 1 Oct |

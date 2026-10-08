@@ -227,6 +227,7 @@ group("subscribe — a new address goes straight onto the list", async () => {
   ok("  and no email asks anyone to confirm", !JSON.stringify(r.calls).includes("/api/confirm") && r.calls.every(c => !c.body || !/confirm/i.test(c.body.subject)));
   const welcome = r.calls[2].body, team = r.calls[3].body;
   is("  the welcome goes to the subscriber", [welcome.to, welcome.subject], [["reader@example.org"], "You're subscribed to LAUNCH dashboard updates"]);
+  ok("  opening with the owner's sentence", welcome.text.includes("You're now subscribed to the LAUNCH Transparency Dashboard.") && welcome.html.includes("You&#39;re now subscribed to the LAUNCH Transparency Dashboard."));
   const unsub = tokenIn(welcome.text, "https://" + HOST + "/api/unsubscribe");
   is("  with an unsubscribe link for this address", unsub && mail.readToken(SECRET, "unsubscribe", unsub), { email: "reader@example.org" });
   ok("  in the HTML too", welcome.html.includes(`https://${HOST}/api/unsubscribe?t=${unsub}`));
