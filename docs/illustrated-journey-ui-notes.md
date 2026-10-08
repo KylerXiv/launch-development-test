@@ -304,6 +304,17 @@ French and Portuguese were still in the translation memory, so `/fr` and
 `api/confirm.js` is gone. Why, and what was accepted:
 [email-backend-notes.md](email-backend-notes.md) §2.3.
 
+**Revised on 8 Oct: two messages.** An address already on the list is now
+told so, and is not thanked again. New or returning: *"Thank you for
+subscribing. You'll receive an email whenever the dashboard's data is
+updated."* Already subscribed: *"This email address is already subscribed.
+You'll continue to receive an email whenever the dashboard's data is
+updated."* The server's answer says which (`status`). The owner asked for
+professional wording, so these replace *"Thank you — you are on the list."*
+Until `translate.yml` has run, they show in English on `/fr` and `/pt`. Why
+the page may now reveal that an address is subscribed:
+[email-backend-notes.md](email-backend-notes.md) §2.3.
+
 ### 3.11 The draft warning is amber, and leads with the caveat
 
 It was `--accent-soft` blue — the same treatment as every other note on the

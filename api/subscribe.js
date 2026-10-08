@@ -10,9 +10,12 @@
 //   3. The team inbox is told.
 // A failure in 2 or 3 is logged, not shown: the person is on the list.
 //
-// Someone already subscribed gets the same answer and no email, so the form
-// cannot be used to find out who is on the list, or to send a subscriber the
-// welcome over and over.
+// The answer says which case it was, so the page can say so: { status:
+// "subscribed" } for a new or returning address, { status: "already" } for one
+// already on the list (the owner's decision, 8 Oct 2026: it used to be the
+// same answer for both, which hid who is on the list but told an existing
+// subscriber nothing). Someone already subscribed is still sent no email, so
+// the form cannot be used to send a subscriber the welcome over and over.
 
 const mail = require("./_mail.js");
 
@@ -73,7 +76,7 @@ module.exports = async function subscribe(req, res) {
 
   if (state === "already") {
     console.log("[subscribe] already subscribed");
-    return mail.reply(res, 200, { ok: true });
+    return mail.reply(res, 200, { ok: true, status: "already" });
   }
 
   const unsubscribe = `${site}/api/unsubscribe?t=${mail.makeToken(cfg.secret, "unsubscribe", email)}`;
@@ -130,5 +133,5 @@ module.exports = async function subscribe(req, res) {
   if (!note.ok) mail.logFailure("subscribe", "notify team", note);
 
   console.log("[subscribe] subscribed" + (state === "returning" ? " (returning)" : "") + (note.ok ? ", team notified" : ", team NOT notified"));
-  return mail.reply(res, 200, { ok: true });
+  return mail.reply(res, 200, { ok: true, status: "subscribed" });
 };
