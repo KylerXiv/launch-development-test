@@ -3450,6 +3450,13 @@
       "fr": "OMS PQ produits comparateurs",
       "pt": "OMS PQ produtos comparadores"
     },
+    "9f49268e1b430e54": {
+      "en": "Thank you for subscribing. You'll receive an email whenever the dashboard's data is updated.",
+      "where": "line 3583",
+      "bucket": "js",
+      "fr": "Merci de votre inscription. Vous recevrez un courriel à chaque mise à jour des données du tableau de bord.",
+      "pt": "Obrigado por se inscrever. Receberá um e-mail sempre que os dados do painel forem atualizados."
+    },
     "9fd4f86a39ff327b": {
       "en": "Annex 4B spreadsheet",
       "where": "sources.sources[1].alsoSee[0].label",
@@ -4310,6 +4317,13 @@
       "bucket": "data",
       "fr": "Large recours aux achats",
       "pt": "ampla adesão às compras"
+    },
+    "cdbf79367143a24c": {
+      "en": "This email address is already subscribed. You'll continue to receive an email whenever the dashboard's data is updated.",
+      "where": "line 3581",
+      "bucket": "js",
+      "fr": "Cette adresse e-mail est déjà abonnée. Vous continuerez à recevoir un e-mail à chaque mise à jour des données du tableau de bord.",
+      "pt": "Este endereço de e-mail já está registado. Continuará a receber um e-mail sempre que os dados do painel forem atualizados."
     },
     "cdee2c76df32d868": {
       "en": "Pathway order",
