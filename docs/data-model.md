@@ -203,7 +203,7 @@ flowchart LR
     H --> OH
 
     subgraph rbm [RBM public data layer]
-        DS["build-dataset.js<br/>→ dashboard.json (en, fr, pt)"]
+        DS["build-dataset.js<br/>→ dashboard.json (en, fr, pt, es)"]
     end
     REAL --> DS
     SRCREG["data/sources.js"] --> DS

@@ -10,7 +10,8 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { transform, widget } = require("./build-rbm-pages");
+const vm = require("vm");
+const { transform, widget, loader } = require("./build-rbm-pages");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "illustrated-journey-dashboard.html"), "utf8");
 const widgetJs = fs.readFileSync(path.join(__dirname, "..", "assets", "report-issue.js"), "utf8");
@@ -67,5 +68,40 @@ threw = false;
 try { widget(widgetJs.replace('var ENDPOINT = "/api/feedback";', 'var ENDPOINT = "/x";'), API); } catch (e) { threw = true; }
 ok(threw, "a widget whose endpoint changed stops the build");
 
-console.log(`\n  build-rbm-pages: ${passed} passed, ${failed} failed\n`);
-process.exit(failed ? 1 : 0);
+// the loader, run for real on a small dataset: each page reads its own language
+// from texts with any number of languages. Until 8 Oct 2026 it accepted only
+// exactly { en, fr, pt }, so publishing Spanish would have broken every page
+// built before it (docs/jackson/spanish.md).
+function load(lang, locales) {
+  const t = (en) => Object.fromEntries(locales.map((l) => [l, l === "en" ? en : `${en}-${l}`]));
+  const ds = { schema_version: 1, locales, last_updated: "2026-10-08", data_status: "draft",
+    data: { host: "x", stages: [t("A")], glossary: { g: t("G") }, changelog: [],
+            products: [{ id: "p", note: t("N"), detail: { countries: { status: "verified" } } }],
+            treatmentPolicy: { countries: { NGA: { name: t("Nigeria") } } }, sources: [{ id: "s", plain: t("P") }] } };
+  const js = loader(lang, null).match(/<script>([\s\S]*)<\/script>/)[1];
+  const ctx = { document: { readyState: "complete", getElementById: () => null, querySelectorAll: () => [] },
+    fetch: () => Promise.resolve({ ok: true, json: () => Promise.resolve(ds) }) };
+  ctx.window = ctx;
+  vm.runInNewContext(js, ctx);
+  return new Promise((done) => setImmediate(() => done(ctx)));
+}
+(async () => {
+  const FOUR = ["en", "fr", "pt", "es"], THREE = ["en", "fr", "pt"];
+  let w = await load("fr", FOUR);
+  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A-fr" && w.LAUNCH_DATA.products[0].note === "N-fr" &&
+     w.LAUNCH_TREATMENT_POLICY.countries.NGA.name === "Nigeria-fr", "a French page reads French from a file with Spanish in it");
+  w = await load("es", FOUR);
+  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A-es" && w.LAUNCH_DATA.glossary.g === "G-es" &&
+     w.LAUNCH_SOURCES.sources[0].plain === "P-es", "the Spanish page reads Spanish");
+  w = await load("es", THREE);
+  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A" && w.LAUNCH_DATA.products[0].note === "N",
+     "the Spanish page reads English from a file published before Spanish");
+  w = await load("pt", THREE);
+  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A-pt", "a Portuguese page still reads a file with three languages");
+  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.products[0].detail.countries.status === "verified", "objects that are not texts are kept as they are");
+  { const { html: es } = transform(html, "es", { apiUrl: API });
+    ok(/LANG = "es"/.test(es) && /No se pudieron cargar/.test(es), "the Spanish page has its loader, with its own messages"); }
+
+  console.log(`\n  build-rbm-pages: ${passed} passed, ${failed} failed\n`);
+  process.exit(failed ? 1 : 0);
+})();

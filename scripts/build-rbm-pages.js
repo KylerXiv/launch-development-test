@@ -2,7 +2,8 @@
 // Builds the pages handed over to RBM: the illustrated journey dashboard, one
 // page per language, reading its data at runtime from the published
 // dashboard.json instead of from data/*.js. RBM embeds them (iframe) under its
-// /en, /fr and /pt routes.
+// /en, /fr and /pt routes; /es is ready for when it has one (RBM's platform had
+// no Spanish route on 22 Sep 2026, docs/source-registry-notes.md).
 //
 //   node scripts/build-rbm-pages.js                      # → dist/rbm/
 //   node scripts/build-rbm-pages.js --data-url <url>     # read another dashboard.json
@@ -11,19 +12,20 @@
 //   node scripts/build-rbm-pages.js --allow-stale        # as build-locale-pages.js
 //
 // Output (self-contained; host it as static files anywhere):
-//   dist/rbm/en/index.html, fr/index.html, pt/index.html
-//   dist/rbm/{en,fr,pt}/data/world-map.js, world-map-geo.js   map shapes, with that
+//   dist/rbm/en/index.html, fr/index.html, pt/index.html, es/index.html
+//   dist/rbm/{en,fr,pt,es}/data/world-map.js, world-map-geo.js   map shapes, with that
 //                               language's country names (static, never change)
-//   dist/rbm/{en,fr,pt}/assets/report-issue.js   the feedback form, in that language
+//   dist/rbm/{en,fr,pt,es}/assets/report-issue.js   the feedback form, in that language
 //   dist/rbm/assets/            icons and logos (shared)
 //   dist/rbm/README.md          how to host and embed
 //
-// HOW. The English page and the French and Portuguese pages that
+// HOW. The English page and the French, Portuguese and Spanish pages that
 // build-locale-pages.js writes (interface text already translated) are taken
 // as they are, and four things change:
 //   1. the <script src> tags for products.js, sources.js and treatment-policy.js
 //      go; a small loader fetches dashboard.json, picks the page's language out
-//      of every { en, fr, pt } text, rebuilds the three globals the page has
+//      of every { en, fr, pt, es } text (English where the file has no such
+//      language yet), rebuilds the three globals the page has
 //      always read (LAUNCH_DATA, LAUNCH_SOURCES, LAUNCH_TREATMENT_POLICY), and
 //      only then runs the page's own scripts (kept, unchanged, as deferred
 //      <script type="text/x-launch-app"> blocks);
@@ -51,7 +53,7 @@ const { applySkin } = require("./rbm-skin");
 const ROOT = path.resolve(__dirname, "..");
 const PAGE = "illustrated-journey-dashboard.html";
 const OUT = path.join(ROOT, "dist", "rbm");
-const LOCALES = ["en", "fr", "pt"];
+const LOCALES = ["en", "fr", "pt", "es"];
 const args = process.argv.slice(2);
 const argOf = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };
 const DATA_URL = argOf("--data-url") || "https://codebyjackson.github.io/launch-data-test/v1/dashboard.json";
@@ -76,8 +78,9 @@ const REPLACED = ["data/products.js", "data/sources.js", "data/treatment-policy.
 const PER_LANGUAGE = ["data/world-map.js", "data/world-map-geo.js", "assets/report-issue.js"];
 
 // Reader-facing messages, per language. New strings the translation memory does
-// not hold, so they are written here by hand — NOT reviewed yet: have a French
-// and a Portuguese speaker check them (docs/rbm-handover-notes.md).
+// not hold, so they are written here by hand — NOT reviewed yet: have a French,
+// a Portuguese and a Spanish speaker check them (docs/rbm-handover-notes.md,
+// docs/jackson/spanish.md).
 const MSG = {
   en: { fail: "<b>The dashboard data could not be loaded.</b> Please try again in a few minutes.",
         schema: "<b>This dashboard is being updated.</b> Please check back shortly." },
@@ -85,6 +88,8 @@ const MSG = {
         schema: "<b>Ce tableau de bord est en cours de mise à jour.</b> Veuillez revenir un peu plus tard." },
   pt: { fail: "<b>Não foi possível carregar os dados do painel.</b> Tente novamente dentro de alguns minutos.",
         schema: "<b>Este painel está a ser atualizado.</b> Volte a consultá-lo em breve." },
+  es: { fail: "<b>No se pudieron cargar los datos del panel.</b> Vuelva a intentarlo dentro de unos minutos.",
+        schema: "<b>Este panel se está actualizando.</b> Vuelva a consultarlo en breve." },
 };
 
 function loader(lang, apiUrl = API_URL) {
@@ -96,10 +101,14 @@ function loader(lang, apiUrl = API_URL) {
   "use strict";
   var DATA_URL = ${JSON.stringify(DATA_URL)}, LANG = ${JSON.stringify(lang)}, SCHEMA = ${SCHEMA};
   var MSG = ${JSON.stringify(MSG[lang])};
-  // every reader-facing text in dashboard.json is { en, fr, pt }: keep this page's
+  // every reader-facing text in dashboard.json is { en, fr, pt, ... }, one key
+  // per language the file lists in ds.locales: keep this page's, or the English
+  // where the file does not have this language yet. No fixed number of keys,
+  // so a language added to the file never breaks a page built before it.
+  var LOCS = ["en"];
   var isText = function (v) {
     return v && typeof v === "object" && !Array.isArray(v) && typeof v.en === "string" &&
-      Object.keys(v).length === 3 && "fr" in v && "pt" in v;
+      Object.keys(v).every(function (k) { return LOCS.indexOf(k) >= 0; });
   };
   var pick = function (v) {
     if (Array.isArray(v)) return v.map(pick);
@@ -123,6 +132,7 @@ function loader(lang, apiUrl = API_URL) {
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (ds) {
         if (ds.schema_version !== SCHEMA) { notice(MSG.schema); return; }
+        LOCS = Array.isArray(ds.locales) && ds.locales.indexOf("en") >= 0 ? ds.locales : ["en", "fr", "pt"];
         var d = pick(ds.data);
         window.LAUNCH_DATA = {
           meta: { lastUpdated: ds.last_updated, dataStatus: ds.data_status, host: d.host },
@@ -211,12 +221,12 @@ function widget(js, apiUrl = API_URL) {
 }
 
 function main() {
-  // the French and Portuguese pages (interface text) come from the locale build
+  // the translated pages (interface text) come from the locale build
   const stale = args.includes("--allow-stale") ? ["--allow-stale"] : [];
   execFileSync(process.execPath, [path.join(__dirname, "build-locale-pages.js"), ...stale], { cwd: ROOT, stdio: "ignore" });
 
   fs.rmSync(OUT, { recursive: true, force: true });
-  const sources = { en: path.join(ROOT, PAGE), fr: path.join(ROOT, "dist", "locale", "fr", PAGE), pt: path.join(ROOT, "dist", "locale", "pt", PAGE) };
+  const sources = Object.fromEntries(LOCALES.map((l) => [l, l === "en" ? path.join(ROOT, PAGE) : path.join(ROOT, "dist", "locale", l, PAGE)]));
   for (const lang of LOCALES) {
     const { html, removed, deferred } = transform(fs.readFileSync(sources[lang], "utf8"), lang);
     fs.mkdirSync(path.join(OUT, lang), { recursive: true });

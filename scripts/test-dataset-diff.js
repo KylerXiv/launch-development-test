@@ -57,6 +57,22 @@ b = base(); b.data.products[0].stages[0].note = text("");
 out = run(base(), b);
 ok(/n1 → —/.test(out), "an emptied value shows as a dash", out);
 
+// a language added (Spanish, Oct 2026): one line, not one per text, and still a change
+const withEs = (o) => JSON.parse(JSON.stringify(o), (k, v) => (v && typeof v.en === "string" && "pt" in v ? { ...v, es: k === "plain" ? v.en + "-es" : v.en } : v));
+const a3 = { ...base(), locales: ["en", "fr", "pt"] };
+b = { ...withEs(base()), locales: ["en", "fr", "pt", "es"] };
+out = run(a3, b);
+ok(/^1 change for/m.test(out) && /language added: `es`, in all 7 texts \(3 translated;/.test(out) && !/\(es\)`/.test(out),
+   "a new language is one line, with how much of it is translated", out);
+b.data.changelog.unshift({ date: "2026-10-09", product: "x", plain: { en: "New", fr: "New", pt: "New", es: "New" } });
+out = run(a3, b);
+ok(/^2 changes for/m.test(out) && /added `changelog`: 2026-10-09 · New/.test(out) && !/removed `changelog`/.test(out),
+   "a changelog line on top of a new language is still one line, not every entry", out);
+// after it is published: a Spanish-only change is labelled (es)
+const b2 = JSON.parse(JSON.stringify(b)); b2.data.stages[0].es = "A-es";
+out = run(b, b2);
+ok(/`stages\[0\] \(es\)`: A → A-es/.test(out), "a Spanish-only change is labelled (es)", out);
+
 fs.rmSync(T, { recursive: true, force: true });
 console.log(`\n  dataset-diff: ${passed} passed, ${failed} failed\n`);
 process.exit(failed ? 1 : 0);

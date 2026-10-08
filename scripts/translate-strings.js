@@ -2,8 +2,8 @@
 /**
  * scripts/translate-strings.js
  *
- * Translates the TEXT section of i18n/content.en.json into French and
- * Portuguese using Google Cloud Translation, and saves the results in a
+ * Translates the TEXT section of i18n/content.en.json into French, Portuguese
+ * and Spanish using Google Cloud Translation, and saves the results in a
  * translation memory at i18n/translations.json.
  *
  * It never reads the page or data/*.js, and never opens the VALUES section of
@@ -14,6 +14,7 @@
  *   node scripts/translate-strings.js --dry-run          # cost, no API calls
  *   node scripts/translate-strings.js --locale=fr
  *   node scripts/translate-strings.js --locale=pt
+ *   node scripts/translate-strings.js --locale=es
  *
  * Two rules govern everything here:
  *
@@ -48,7 +49,9 @@ const { requireFresh } = require("./assemble-content");
 
 const ROOT = path.resolve(__dirname, "..");
 const MEM = path.join(ROOT, "i18n", "translations.json");
-const TARGET = { fr: "fr", pt: "pt-PT" };
+// Google's target code for each locale. Spanish is general "es" (not a
+// regional variety), as is the /es page's <html lang>.
+const TARGET = { fr: "fr", pt: "pt-PT", es: "es" };
 
 // ---------------------------------------------------------------------------
 // Never send these, whatever bucket they turn up in.
@@ -213,7 +216,7 @@ async function main() {
   const locale = arg("locale", null);
 
   if (!dryRun && !TARGET[locale]) {
-    console.error("usage: --locale=fr | --locale=pt   (or --dry-run)");
+    console.error(`usage: ${Object.keys(TARGET).map((l) => `--locale=${l}`).join(" | ")}   (or --dry-run)`);
     process.exit(1);
   }
 
@@ -225,7 +228,7 @@ async function main() {
   const skipped = all.length - kept.length;
 
   // what is actually missing for this locale — the empty-locale-only rule
-  const locales = locale ? [locale] : ["fr", "pt"];
+  const locales = locale ? [locale] : Object.keys(TARGET);
   const report = {};
   for (const loc of locales) {
     const todo = kept.filter((s) => {

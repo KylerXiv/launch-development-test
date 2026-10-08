@@ -13,15 +13,15 @@
  * A page can align the bar with its own content column by setting
  * --nav-pad (side padding) and --nav-max (inner width) on :root.
  *
- * Language switch (opt-in): add data-languages="en,fr,pt" to the script tag and the
+ * Language switch (opt-in): add data-languages="en,fr,pt,es" to the script tag and the
  * bar gets a language button at its right-hand end. Only the illustrated journey
  * page has translated copies, so only that page asks for it. Which languages are
  * live is set in LANGS below, or at run time with
- *   window.LAUNCH_LOCALES_LIVE = { fr: true, pt: true }   (before this script)
+ *   window.LAUNCH_LOCALES_LIVE = { fr: true, pt: true, es: true }   (before this script)
  * A language that is not live shows as "coming soon" rather than linking to a page
  * that does not exist yet.
  *
- * LANGS keeps fr and pt off on purpose: the fr/ and pt/ folders exist only in a
+ * LANGS keeps fr, pt and es off on purpose: the fr/, pt/ and es/ folders exist only in a
  * build. scripts/build-public-site.sh writes them, and then prepends that
  * window.LAUNCH_LOCALES_LIVE line to every copy of this file in its output, so
  * the deployed site (Vercel, production and previews) links them. The repo
@@ -40,12 +40,13 @@
   if (!script || !script.parentNode) return;
   var current = script.getAttribute("data-current") || "";
 
-  // Translated copies are written by scripts/build-locale-pages.js to fr/ and pt/ folders
+  // Translated copies are written by scripts/build-locale-pages.js to fr/, pt/ and es/ folders
   // beside the English page. Flip `live` to true once those folders are deployed.
   var LANGS = [
     { code: "en", name: "English", live: true },
     { code: "fr", name: "Fran\u00e7ais", live: false },
-    { code: "pt", name: "Portugu\u00eas", live: false }
+    { code: "pt", name: "Portugu\u00eas", live: false },
+    { code: "es", name: "Espa\u00f1ol", live: false }
   ];
   var liveOverride = window.LAUNCH_LOCALES_LIVE || {};
   LANGS.forEach(function (l) { if (liveOverride[l.code] !== undefined) l.live = !!liveOverride[l.code]; });
@@ -106,7 +107,7 @@
 
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
   var cur = PAGES.filter(function (p) { return p.id === current; })[0] || PAGES[0];
-  // Inside fr/ or pt/ only the translated page itself exists, so the other views link up to the English ones.
+  // Inside fr/, pt/ or es/ only the translated page itself exists, so the other views link up to the English ones.
   function pageHref(p) { return curLang !== "en" && p.id !== current ? "../" + p.href : p.href; }
   // Where the same page lives in another language.
   function langHref(code) {

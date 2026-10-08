@@ -10,8 +10,8 @@ name: Proposal decision
 #                    and its preview instead and asks for the approval again:
 #                    what merges is always what the reviewer was shown.
 #                    Before merging it translates the proposal's new English
-#                    (scripts/proposal-translate.sh), so English, French and
-#                    Portuguese land as one commit; if the engine fails, the
+#                    (scripts/proposal-translate.sh), so English, French,
+#                    Portuguese and Spanish land as one commit; if the engine fails, the
 #                    English merges anyway and the translate bot fills the gap.
 #   rejected:...  -> records the reason and the fingerprint in
 #                    data/decisions.js, closes the issue and its PR.
@@ -153,8 +153,8 @@ jobs:
 
       # The approval is what lets the English reach a translation engine. On
       # this checkout — main with the snapshot applied — rebuild the content
-      # file, translate only its new strings, check the French and Portuguese
-      # pages, and replace the branch with that one commit. Only over $SHA:
+      # file, translate only its new strings, check the French, Portuguese and
+      # Spanish pages, and replace the branch with that one commit. Only over $SHA:
       # a push since the reviewer's preview makes this fail, and nothing merges.
       # An engine failure does not stop it (English does not wait for French);
       # a locale page that fails its self-check does.
@@ -183,6 +183,7 @@ jobs:
           APPROVER: ${{ github.event.sender.login }}
           LEFT_FR: ${{ steps.build.outputs.left_fr }}
           LEFT_PT: ${{ steps.build.outputs.left_pt }}
+          LEFT_ES: ${{ steps.build.outputs.left_es }}
           FAILED: ${{ steps.build.outputs.failed }}
         run: |
           # GitHub may still be working out whether the branch it was just
@@ -199,10 +200,10 @@ jobs:
           done
           gh workflow run vercel-deploy.yml --ref main
           gh workflow run publish.yml --ref main
-          if [ "$LEFT_FR" = 0 ] && [ "$LEFT_PT" = 0 ]; then
-            LANGS="Its French and Portuguese are in the same commit."
+          if [ "$LEFT_FR" = 0 ] && [ "$LEFT_PT" = 0 ] && [ "$LEFT_ES" = 0 ]; then
+            LANGS="Its French, Portuguese and Spanish are in the same commit."
           else
-            LANGS="French and Portuguese: ${LEFT_FR:-?} and ${LEFT_PT:-?} string(s) are still in English on \`/fr\` and \`/pt\` until the translate bot fills them${FAILED:+ — the translation engine failed for: $FAILED, see the run}."
+            LANGS="French, Portuguese and Spanish: ${LEFT_FR:-?}, ${LEFT_PT:-?} and ${LEFT_ES:-?} string(s) are still in English on \`/fr\`, \`/pt\` and \`/es\` until the translate bot fills them${FAILED:+ — the translation engine failed for: $FAILED, see the run}."
           fi
           gh issue comment "$ISSUE_NUMBER" --body \
             "**Approved by @$APPROVER.** #$PR is merged and the production dashboard is being rebuilt from it. $LANGS"

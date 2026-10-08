@@ -2,8 +2,8 @@
 /**
  * scripts/build-locale-pages.js
  *
- * Produces French and Portuguese copies of the illustrated journey dashboard
- * by substitution at build time. The source page and the source data files are
+ * Produces French, Portuguese and Spanish copies of the illustrated journey
+ * dashboard by substitution at build time. The source page and the source data files are
  * READ ONLY — nothing in the repo is modified, so the English page stays the
  * single source and this step is reversible by deleting the output.
  *
@@ -17,6 +17,7 @@
  *   dist/locale/fr/data/{products,sources}.js
  *   dist/locale/fr/data/  every other data file the page loads, unchanged
  *   dist/locale/pt/...
+ *   dist/locale/es/...
  *
  * Why per-locale copies of the data files: the page loads data/*.js with
  * <script src>, so the only way to give /fr/ French content without editing
@@ -55,8 +56,9 @@ const OUT = path.join(ROOT, "dist", "locale");
 const PAGE = "illustrated-journey-dashboard.html";
 const MEM = path.join(ROOT, "i18n", "translations.json");
 const COUNTRY_NAMES = path.join(ROOT, "i18n", "country-names.json");
-const LOCALES = ["fr", "pt"];
-const HTML_LANG = { fr: "fr", pt: "pt-PT" };
+// Adding a language: docs/jackson/spanish.md §4 lists every place it goes.
+const LOCALES = ["fr", "pt", "es"];
+const HTML_LANG = { fr: "fr", pt: "pt-PT", es: "es" };
 // Shared widgets the page loads from assets/. Their locale copies get the
 // reviewed-strings substitution (i18n/reviewed-strings.json).
 const ASSET_SCRIPTS = ["assets/report-issue.js", "assets/site-nav.js"];
@@ -474,8 +476,9 @@ function main() {
   verify();
 }
 
-// scripts/build-dataset.js reuses the same localisation, so the French and
-// Portuguese in the published dashboard.json are exactly those of /fr and /pt.
+// scripts/build-dataset.js reuses the same localisation, so the French,
+// Portuguese and Spanish in the published dashboard.json are exactly those of
+// /fr, /pt and /es.
 module.exports = { LOCALES, readData, localiseProducts, localiseSources, localiseTreatmentPolicy, localiseAsset, stat };
 
 if (require.main === module) main();

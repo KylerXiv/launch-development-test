@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the public deploy output: every public-facing HTML page (root,
-# unitaid/, synthetic/, and the fr/ and pt/ editions of the illustrated
+# unitaid/, synthetic/, and the fr/, pt/ and es/ editions of the illustrated
 # journey dashboard) plus the data/ and assets/ files they load.
 #
 # Deliberately excluded, and never copied here: briefs/, sourcing/, ontology/,
@@ -45,21 +45,21 @@ cp assets/who-emblem.svg assets/unitaid-logo.svg assets/report-issue.js assets/s
 mkdir -p "$OUT/assets/email"
 cp assets/email/unitaid-logo.png "$OUT/assets/email/"
 
-# French and Portuguese editions of the illustrated journey dashboard, from
+# French, Portuguese and Spanish editions of the illustrated journey dashboard, from
 # the translation memory (docs/translation-notes.md). --allow-stale because a
 # hand-made change reaches main before the translate bot has run, and English
 # does not wait for French: new text shows in English until it is translated.
 # A locale page that fails its self-check still fails the build.
 node scripts/build-locale-pages.js --allow-stale
-LOCALES="fr pt"
+LOCALES="fr pt es"
 for loc in $LOCALES; do
   mkdir -p "$OUT/$loc"
   cp -R "dist/locale/$loc/." "$OUT/$loc/"
 done
 
-# Switch the language menu on. assets/site-nav.js lists French and Portuguese
-# as "coming soon" by default, because the repo served as it is (a local server,
-# GitHub Pages) has no fr/ or pt/ folders to link to. This build has just
+# Switch the language menu on. assets/site-nav.js lists French, Portuguese and
+# Spanish as "coming soon" by default, because the repo served as it is (a local
+# server, GitHub Pages) has no fr/, pt/ or es/ folders to link to. This build has just
 # written them, so every copy of the menu in the output (the English page's and
 # each locale's own) is told they are live, through the menu's own
 # window.LAUNCH_LOCALES_LIVE setting. A language added to LOCALES is switched

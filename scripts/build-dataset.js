@@ -11,10 +11,10 @@
 // Writes nothing in the repo except under dist/ (gitignored). Publishing it is
 // .github/workflows/publish-dataset.yml's job, not this script's.
 //
-// TEXT. Every field a reader sees becomes { en, fr, pt }. The French and
-// Portuguese come from the same localisation as the /fr and /pt pages
-// (build-locale-pages.js), so the two can never disagree; a field with no
-// translation yet carries the English in fr and pt. Which fields are text is
+// TEXT. Every field a reader sees becomes { en, fr, pt, es }. The French,
+// Portuguese and Spanish come from the same localisation as the /fr, /pt and
+// /es pages (build-locale-pages.js), so the two can never disagree; a field
+// with no translation yet carries the English in fr, pt and es. Which fields are text is
 // the fixed list TEXT_PATHS below, not "whatever happens to be translated
 // today", so a field never changes type when its first translation lands. The
 // build fails if a translated field is missing from the list (it would be
@@ -49,12 +49,12 @@ const rules = require("./data-rules");
 const { assemble } = require("./assemble-content");
 const locale = require("./build-locale-pages");   // loads the memory and checks content.en.json
 
-const LOCALES = ["en", ...locale.LOCALES];          // en, fr, pt
+const LOCALES = ["en", ...locale.LOCALES];          // en, fr, pt, es
 
 // Every field a reader sees, as a path pattern: [] = any array index,
 // * = any object key. Mirrors localiseProducts/localiseSources in
 // build-locale-pages.js, plus the fields shown on the page that the
-// translation build does not reach yet (they carry English in fr/pt until it
+// translation build does not reach yet (they carry English in fr/pt/es until it
 // does, and keep their type when it does).
 const TEXT_PATHS = {
   products: [
@@ -97,8 +97,8 @@ function matches(pattern, at) {
 const getAt = (obj, at) => at.reduce((o, k) => (o == null ? undefined : o[k]), obj);
 const show = (at) => at.map((k) => (typeof k === "number" ? `[${k}]` : "." + k)).join("").replace(/^\./, "");
 
-// Replaces every string (or null) at a TEXT path with { en, fr, pt }, taking
-// fr and pt from the localised copies at the same place.
+// Replaces every string (or null) at a TEXT path with { en, fr, pt, es },
+// taking each language from the localised copies at the same place.
 function mergeText(en, copies, patterns, file) {
   const pats = patterns.map(tokens);
   const isText = (at) => pats.some((p) => matches(p, at));

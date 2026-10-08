@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Builds what an approved proposal merges: the proposal on main as main is now,
 # the English content rebuilt from it, and its new strings translated into
-# French and Portuguese — one commit on proposal/<n>, which
-# proposal-decision.yml then squash-merges. English, French and Portuguese land
-# on main together (docs/translation-notes.md).
+# French, Portuguese and Spanish — one commit on proposal/<n>, which
+# proposal-decision.yml then squash-merges. English and the three translations
+# land on main together (docs/translation-notes.md).
 #
 #   bash scripts/proposal-translate.sh <issue-number> <pr-head-sha>
 #
@@ -25,7 +25,7 @@
 # everything: nothing is pushed, and the approval job merges nothing.
 #
 # Uses TRANSLATE_ENGINE and GOOGLE_API_KEY from the environment. Prints
-# sha= content_hash= reviewed_hash= left_fr= left_pt= failed= and appends them
+# sha= content_hash= reviewed_hash= left_fr= left_pt= left_es= failed= and appends them
 # to $GITHUB_OUTPUT when set. Leaves the checkout on the branch it started on.
 set -euo pipefail
 N="${1:-}"
@@ -43,7 +43,7 @@ HASH=$(hash_of < i18n/content.en.json)
 export APPROVED_CONTENT_HASH="$HASH"
 
 FAILED=""
-for loc in fr pt; do
+for loc in fr pt es; do
   if ! node scripts/translate-strings.js --locale="$loc"; then
     FAILED="${FAILED:+$FAILED }$loc"
     echo "proposal-translate: translation to $loc failed; its new text stays in English until the translate bot runs" >&2
@@ -53,6 +53,7 @@ done
 left() { node scripts/translate-strings.js --dry-run | sed -n "s/^  $1: .* · \([0-9][0-9]*\) to translate .*/\1/p"; }
 LEFT_FR=$(left fr)
 LEFT_PT=$(left pt)
+LEFT_ES=$(left es)
 
 node scripts/build-locale-pages.js
 rm -rf dist
@@ -68,7 +69,7 @@ git push --quiet --force-with-lease="refs/heads/$BRANCH:$SHA" origin "HEAD:refs/
 NEW=$(git rev-parse HEAD)
 git checkout --quiet "$START"
 
-for kv in "sha=$NEW" "content_hash=$HASH" "reviewed_hash=$REVIEWED" "left_fr=$LEFT_FR" "left_pt=$LEFT_PT" "failed=$FAILED"; do
+for kv in "sha=$NEW" "content_hash=$HASH" "reviewed_hash=$REVIEWED" "left_fr=$LEFT_FR" "left_pt=$LEFT_PT" "left_es=$LEFT_ES" "failed=$FAILED"; do
   echo "$kv"
   if [ -n "${GITHUB_OUTPUT:-}" ]; then echo "$kv" >> "$GITHUB_OUTPUT"; fi
 done

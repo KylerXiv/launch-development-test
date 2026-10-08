@@ -5,8 +5,8 @@ name: Publish to RBM data repo
 #
 # STARTS
 #   - by itself at the end of every approval: proposal-decision.yml → publish.yml
-#     → translate.yml, which starts this with trigger=approval once French and
-#     Portuguese are settled;
+#     → translate.yml, which starts this with trigger=approval once French,
+#     Portuguese and Spanish are settled;
 #   - by hand ("Publish now"): Actions → "Publish to RBM data repo" → Run
 #     workflow, with a reason. For changes that reach main without a proposal:
 #     a revert, the yearly WHO update, a direct fix. Tick "dry run" to see what
