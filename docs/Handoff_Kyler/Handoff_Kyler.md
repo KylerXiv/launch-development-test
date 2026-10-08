@@ -1,6 +1,6 @@
 # Handoff — RBM staging dashboard
 
-> **Read §0 first.** It is the state of the project on 6 October 2026. Everything
+> **Read §0 first.** It is the state of the project on 8 October 2026. Everything
 > after it is the history of September's work, kept for its decisions. Where the
 > two disagree, §0 is current.
 
@@ -13,7 +13,7 @@ still open from then is carried below.*
 
 | | |
 | --- | --- |
-| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. Public since 6 Oct 2026. Work on `main`; **no pull request is open**, and everything up to #76 is merged |
+| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. Public since 6 Oct 2026. Work on `main`; everything up to #78 is merged. **One pull request is open**: `header-and-notes-wording` (title, tagline, draft banner and map note; [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.37) |
 | Other remotes | `keith` is `Keith-paradox/launch-development`. Do not push to it, or to `kochrisdev/launch-transparency-dashboard` |
 | Production | Vercel project `launch-development-test`: <https://launch-development-test.vercel.app/illustrated-journey-dashboard.html>, also `/fr/`, `/pt/`. Every push to `main` deploys it, the email functions in `api/` included |
 | RBM's test copies | `codebyjackson/launch-rbm-test`, **served twice**: <https://codebyjackson.github.io/launch-rbm-test/> (GitHub Pages) and <https://launch-rbm-test.vercel.app/> (Jackson's Vercel). `iframe-test.html` there is a mock of RBM's platform. Kyler has push access. Its pages are generated here; see "Updating RBM's copy" below |
@@ -72,9 +72,13 @@ All of it is recorded in [email-backend-notes.md](../email-backend-notes.md), wi
 | #67 | Phones: the forms stop opening the iOS picker and keyboard by themselves, Subscribe's pointer and the floating feedback button no longer misalign, and fields are 16px so iOS does not zoom | [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.36 |
 | #68, #72–#76 | Email wording and design, the already-subscribed message, the logo, and the name and organisation fields (above) | §2.3, §2.14, §2.15 |
 | #69–#71 | Jackson: the "yardstick", expected time against time taken, in plain words | [jackson/yardstick.md](../jackson/yardstick.md) |
+| #77 | This handoff's §0 | — |
+| #78 | Every source list A–Z: the registry, the footer in each language, and the proposal form's dropdown, which had drifted to 22 of 30 sources | [source-registry-notes.md](../source-registry-notes.md) §6 |
 
-**RBM's test copy is current:** last pushed as `235eed3` from `43da963`. It
-was checked live on both hosts, in English and French.
+**RBM's test copy is current with `main`:** last pushed as `7f7245b` from
+`7c6aa1d` (#78). It was checked live on both hosts, in all three languages.
+The open pull request changes the page, so it needs another push after it
+merges.
 
 ### Updating RBM's copy (after any merge that changes the page)
 
