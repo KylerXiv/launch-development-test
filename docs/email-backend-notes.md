@@ -258,11 +258,33 @@ How it runs:
    history below, and the team is still not told about unsubscribes.
 
 A failure in 2 or 3 is logged, not shown: the person is on the list.
-**Someone already subscribed** gets the same answer as a new address, and
-nothing is sent. So the form still cannot be used to find out who is on the
-list, nor to send a subscriber the welcome over and over. The page's success
-line went back to the 1 Oct single opt-in wording, *"Thank you — you are on
-the list."*, which is true for both.
+**Someone already subscribed** is sent nothing, so the form cannot be used to
+send a subscriber the welcome over and over.
+
+**Since 8 Oct the page tells them so.** The answer carries `status:
+"subscribed"` (new or returning) or `status: "already"`, and the page shows
+one of two messages, worded by the owner's request to be professional:
+
+- *"Thank you for subscribing. You'll receive an email whenever the
+  dashboard's data is updated."*
+- *"This email address is already subscribed. You'll continue to receive an
+  email whenever the dashboard's data is updated."*
+
+Until then both cases got the same answer, and the page said *"Thank you —
+you are on the list."* each time. That hid who is on the list, but told
+someone who was already subscribed nothing, and the owner saw it as
+confusing.
+
+| Option | |
+| --- | --- |
+| **Message on the page only** — chosen by the owner | Clear to the person, and no email |
+| Message plus an "already subscribed" email | Rejected: anyone could make this domain email a subscriber over and over, which is the spam-complaint risk of §2.3 |
+| Keep one answer for both | Rejected by the owner: an existing subscriber was thanked again and told nothing |
+
+**Accepted cost:** anyone can type an address and learn whether it is on the
+list. For a dashboard-updates list this was judged acceptable. The two
+sentences are new page text, so `/fr` and `/pt` show them in English until
+`translate.yml` has run after the merge (§2.11).
 
 Three choices made in building it:
 
@@ -745,6 +767,13 @@ it.
 The email the subscriber gets, the welcome, is unchanged: it already had
 its own layout, `letter()`.
 
+**Restyled on 8 Oct to the welcome's look, at the owner's request.** The
+form's rows, labels, dates and warning colours stay. The dark bar, grey card
+and shaded label column go. The team notes now use the welcome's teal brand
+line, 20px heading, 15px paragraphs and grey small print, on white, with a
+thin line between rows. So the three emails, welcome and both team notes,
+read as one family.
+
 ## 3. How it was verified
 
 **7 Oct 2026, the team's emails as a form (§2.14)**
@@ -1086,11 +1115,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `welcome-wording`, from `main` at `8748de7` (8 Oct) |
-| Commits | 1: the welcome email's opening sentence, with this note in the same commit |
+| Branch | `subscribe-status-and-team-look`, from `main` at `c6b6dd3` (8 Oct) |
+| Commits | 1: the already-subscribed message, and the team notes in the welcome's look, with these notes in the same commit |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
-| CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 172 passed, one new check for the sentence |
-| Changed | `api/subscribe.js` (the welcome's paragraph), `scripts/test-mail-api.js`, this document |
-| After merge | live at once for every new subscriber, from the LAUNCH site and both RBM copies. Nothing to rebuild |
-| Waiting on | the owner's merge; why a feedback note that Resend shows as sent did not reach the Outlook inbox (reported 8 Oct; not yet diagnosed: it needs that email's status in Resend); the owner's iPhone retest of the forms; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
-| Before this | `team-email-form`, PR #68, merged 7 Oct (§2.14). `mobile-forms`, PR #67, merged 7 Oct; RBM pages pushed as `62e9936`. `rbm-vercel-partner`, PR #66, merged 7 Oct. `rbm-embed-sizing`, PR #65, merged 7 Oct. `rbm-forms`, PR #64, merged 7 Oct. `subscribe-single-opt-in`, PR #62, merged 6 Oct. `email-feedback`, PR #40, merged 2 Oct. `email-subscribe`, PR #30, merged 1 Oct |
+| CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 174 passed |
+| Changed | `api/subscribe.js` (`status` in the answer), `api/_mail.js` (`render()` in the welcome's look), `illustrated-journey-dashboard.html` (two messages), `scripts/test-mail-api.js`, this document, `docs/illustrated-journey-ui-notes.md` |
+| After merge | the server side is live at once. The page messages need `translate.yml` (minutes, for `/fr` and `/pt`), then RBM's pages rebuilt and pushed |
+| Waiting on | the owner's merge; the Outlook delivery report (8 Oct, not yet diagnosed); the owner's iPhone retest of the forms; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
+| Before this | `welcome-wording`, PR #72, merged 8 Oct. `team-email-form`, PR #68, merged 7 Oct (§2.14). `mobile-forms`, PR #67, merged 7 Oct. `rbm-vercel-partner`, PR #66. `rbm-embed-sizing`, PR #65. `rbm-forms`, PR #64. `subscribe-single-opt-in`, PR #62. `email-feedback`, PR #40. `email-subscribe`, PR #30 |

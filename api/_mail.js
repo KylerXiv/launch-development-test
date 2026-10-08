@@ -322,12 +322,15 @@ function when(d = new Date()) {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())} UTC`;
 }
 
-// A note to the team inbox, laid out like a submitted form (7 Oct 2026): a
-// brand bar, a title, one line on what happened or what to do, the visitor's
-// message in a box when there is one, then the details as a bordered
-// two-column table (label left on grey, answer right), and a footer.
-// Table-based with inline styles only, because the inbox is Outlook, whose
-// Word-based renderer ignores most modern CSS.
+// A note to the team inbox: the welcome email's look (letter(), below), with
+// the details as a form. Since 8 Oct 2026, at the owner's request, the same
+// teal brand line, heading, paragraph and small print as the welcome, on
+// white; until then a dark bar on a grey card (7 Oct). Top to bottom: brand
+// line, title, one line on what happened or what to do, the visitor's message
+// in a box when there is one, the details as two columns (label, answer) with
+// a line between rows, and a footer. The rows are a table with inline styles,
+// because the inbox is Outlook, whose Word-based renderer ignores most modern
+// CSS.
 //
 // Each row is [label, value] or [label, value, { href, tone }]: `tone` is
 // "warn" (something to do) or "muted" (detail). Every value is escaped, and
@@ -342,54 +345,34 @@ function render(heading, message, rows, { intro = "", footer = "" } = {}) {
     .filter((l, i, a) => !(l === "" && (i === 0 || a[i - 1] === "")))
     .join("\n").replace(/\n+$/, "") + "\n";
 
-  const font = "font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif";
   const line = "border-bottom:1px solid #e3e9ec";
   const cell = (v, o) => {
     const shown = esc(v);
     const style = o && o.tone === "warn" ? "color:#b42318;font-weight:700"
-      : o && o.tone === "muted" ? "color:#6b7780;font-size:12px" : "color:#1a1a1a";
+      : o && o.tone === "muted" ? "color:#6b7780;font-size:13px" : "color:#1a1a1a";
     const body = o && o.href
       ? `<a href="${esc(o.href)}" style="color:#0E5A73;text-decoration:underline">${shown}</a>`
       : shown;
     return `<span style="${style}">${body}</span>`;
   };
-  const tableRows = rows.map(([k, v, o], i) => {
-    const last = i === rows.length - 1 ? "" : line;
-    return `<tr>` +
-      `<td width="34%" valign="top" style="padding:11px 14px;background:#f5f8f9;${last};border-right:1px solid #e3e9ec;` +
-        `${font};font-size:13px;line-height:20px;font-weight:600;color:#4a5761">${esc(k)}</td>` +
-      `<td valign="top" style="padding:11px 14px;${last};${font};font-size:14px;line-height:20px;word-break:break-word">${cell(v, o)}</td>` +
-      `</tr>`;
-  }).join("");
+  const tableRows = rows.map(([k, v, o]) =>
+    `<tr>` +
+    `<td width="34%" valign="top" style="padding:10px 12px 10px 0;${line};font-size:13px;line-height:20px;font-weight:600;color:#666">${esc(k)}</td>` +
+    `<td valign="top" style="padding:10px 0;${line};font-size:15px;line-height:20px;word-break:break-word">${cell(v, o)}</td>` +
+    `</tr>`).join("");
 
   const html =
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#eef3f5" style="background:#eef3f5">` +
-    `<tr><td align="center" style="padding:24px 12px">` +
-    `<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" ` +
-      `style="width:100%;max-width:600px;background:#ffffff;border:1px solid #dde5e8;border-radius:10px">` +
-    // brand bar
-    `<tr><td bgcolor="#0E5A73" style="background:#0E5A73;padding:13px 24px;border-radius:10px 10px 0 0;${font};` +
-      `font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffffff">LAUNCH Transparency Dashboard</td></tr>` +
-    // title and what happened
-    `<tr><td style="padding:22px 24px 4px;${font}">` +
-      `<div style="margin:0 0 6px;font-size:20px;line-height:1.3;font-weight:700;color:#1a1a1a">${esc(heading)}</div>` +
-      (intro ? `<div style="margin:0;font-size:14px;line-height:1.5;color:#4a5761">${esc(intro)}</div>` : "") +
-    `</td></tr>` +
-    // the visitor's message
+    `<div style="max-width:560px;font:15px/1.55 -apple-system,Segoe UI,Arial,sans-serif;color:#1a1a1a">` +
+    `<p style="margin:0 0 6px;color:#0E5A73;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">LAUNCH Transparency Dashboard</p>` +
+    `<p style="margin:0 0 14px;font-size:20px;font-weight:650">${esc(heading)}</p>` +
+    (intro ? `<p style="margin:0 0 16px">${esc(intro)}</p>` : "") +
     (message
-      ? `<tr><td style="padding:14px 24px 0">` +
-        `<div style="padding:12px 14px;border-left:3px solid #0E5A73;background:#f5f8f9;${font};font-size:14px;line-height:1.5;` +
-        `color:#1a1a1a;white-space:pre-wrap;word-break:break-word">${esc(message)}</div></td></tr>`
+      ? `<div style="margin:0 0 18px;padding:12px 14px;border-left:3px solid #0E5A73;background:#f4f7f8;white-space:pre-wrap;word-break:break-word">${esc(message)}</div>`
       : "") +
-    // the details, as a form
-    `<tr><td style="padding:16px 24px 22px">` +
-      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ` +
-        `style="border:1px solid #e3e9ec;border-radius:8px;border-collapse:separate">${tableRows}</table>` +
-    `</td></tr>` +
-    (footer
-      ? `<tr><td style="padding:0 24px 20px;${font};font-size:12px;line-height:1.5;color:#6b7780">${esc(footer)}</td></tr>`
-      : "") +
-    `</table></td></tr></table>`;
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ` +
+      `style="border-collapse:collapse;margin:0 0 18px;border-top:1px solid #e3e9ec">${tableRows}</table>` +
+    (footer ? `<p style="margin:0 0 8px;color:#666;font-size:13px">${esc(footer)}</p>` : "") +
+    `</div>`;
   return { text, html };
 }
 

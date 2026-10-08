@@ -223,7 +223,7 @@ group("subscribe — a new address goes straight onto the list", async () => {
   is("look up, create, welcome, tell the team", r.calls.map(pathOf),
      ["GET /contacts/reader%40example.org", "POST /contacts", "POST /emails", "POST /emails"]);
   is("  created subscribed, in the segment", r.calls[1].body, { email: "reader@example.org", unsubscribed: false, segments: [{ id: "seg_123" }] });
-  is("  the form is told ok, with nothing pending", [r.status, r.json], [200, { ok: true }]);
+  is("  the form is told ok: subscribed", [r.status, r.json], [200, { ok: true, status: "subscribed" }]);
   ok("  and no email asks anyone to confirm", !JSON.stringify(r.calls).includes("/api/confirm") && r.calls.every(c => !c.body || !/confirm/i.test(c.body.subject)));
   const welcome = r.calls[2].body, team = r.calls[3].body;
   is("  the welcome goes to the subscriber", [welcome.to, welcome.subject], [["reader@example.org"], "You're subscribed to LAUNCH dashboard updates"]);
@@ -261,16 +261,17 @@ group("subscribe — returning, already subscribed, and failures", async () => {
   is("an address that had unsubscribed: re-subscribed, into the segment, welcomed", r.calls.map(pathOf),
      ["GET /contacts/reader%40example.org", "PATCH /contacts/reader%40example.org", "POST /contacts/reader%40example.org/segments/seg_123", "POST /emails", "POST /emails"]);
   is("  the update is just unsubscribed: false", r.calls[1].body, { unsubscribed: false });
+  is("  and the form is told: subscribed", r.json, { ok: true, status: "subscribed" });
   ok("  and the team hears it is a returning subscriber", r.calls[4].body.text.includes("Subscriber: Returning"));
 
   const fresh = await call(subscribe, { body: SUB, addr: SEG, answer: [NO_CONTACT] });
   r = await call(subscribe, { body: SUB, addr: SEG, answer: [SUBSCRIBED] });
   is("already subscribed: made sure of the segment, and nothing sent", r.calls.map(pathOf),
      ["GET /contacts/reader%40example.org", "POST /contacts/reader%40example.org/segments/seg_123"]);
-  is("  the same answer as a new address, so the form cannot tell who is on the list", [r.status, r.json], [fresh.status, fresh.json]);
+  is("  and the form is told so, to show its own message (the owner's decision, 8 Oct)", [r.status, r.json, fresh.json], [200, { ok: true, status: "already" }, { ok: true, status: "subscribed" }]);
 
   r = await call(subscribe, { body: SUB, addr: SEG, answer: [SUBSCRIBED, { status: 500, body: { name: "application_error" } }] });
-  is("  a segment failure is not shown to them", [r.status, r.json], [200, { ok: true }]);
+  is("  a segment failure is not shown to them", [r.status, r.json], [200, { ok: true, status: "already" }]);
   ok("  but it is logged", r.logs.some(l => l.includes("add to segment failed")));
 
   r = await call(subscribe, { body: SUB, addr: SEG, answer: [UNSUBSCRIBED, { status: 200, body: {} }, { status: 500, body: {} }] });
@@ -291,11 +292,11 @@ group("subscribe — returning, already subscribed, and failures", async () => {
   is("the create failing: 502, and no welcome or team note", [r.status, r.calls.length], [502, 2]);
 
   r = await call(subscribe, { body: SUB, answer: [NO_CONTACT, { status: 201, body: {} }, { status: 500, body: {} }] });
-  is("the welcome failing does not undo the subscription", [r.status, r.json, r.calls.length], [200, { ok: true }, 4]);
+  is("the welcome failing does not undo the subscription", [r.status, r.json, r.calls.length], [200, { ok: true, status: "subscribed" }, 4]);
   ok("  but it is logged", r.logs.some(l => l.includes("send welcome failed")));
 
   r = await call(subscribe, { body: SUB, answer: [NO_CONTACT, { status: 201, body: {} }, { status: 200, body: {} }, { status: 500, body: {} }] });
-  is("the team's note failing does not either", [r.status, r.json], [200, { ok: true }]);
+  is("the team's note failing does not either", [r.status, r.json], [200, { ok: true, status: "subscribed" }]);
   ok("  but it is logged", r.logs.some(l => l.includes("notify team failed")));
 });
 
@@ -337,7 +338,7 @@ group("partners — RBM's pages, on another site (CORS)", async () => {
 
     r = await call(subscribe, { headers: from(PARTNER.origin), body: SUB, addr: SEG, answer: [NO_CONTACT] });
     is("a partner's subscribe goes through, and the page may read the answer",
-       [r.status, r.json, r.headers["access-control-allow-origin"], r.headers.vary], [200, { ok: true }, PARTNER.origin, "Origin"]);
+       [r.status, r.json, r.headers["access-control-allow-origin"], r.headers.vary], [200, { ok: true, status: "subscribed" }, PARTNER.origin, "Origin"]);
     const welcome = r.calls[2].body, team = r.calls[3].body;
     ok("  the welcome's dashboard link goes back to the partner's page", welcome.html.includes(`href="${PARTNER.dashboard}"`) && welcome.text.includes(PARTNER.dashboard));
     ok("  its unsubscribe link stays on this site, where the function is", welcome.text.includes(`https://${HOST}/api/unsubscribe?t=`) && !welcome.text.includes(PARTNER.origin + "/api/"));
@@ -369,7 +370,9 @@ group("the team's emails, laid out as a form", async () => {
   let r = await call(subscribe, { body: SUB, addr: SEG, answer: [NO_CONTACT] });
   const team = r.calls[3].body;
   ok("the subscriber note: a brand bar, a title, and what happened", team.html.includes("LAUNCH Transparency Dashboard") && team.html.includes(">New subscriber<") && team.html.includes("Nothing to do"));
-  ok("  the details as a two-column table, label on grey", (team.html.match(/<td width="34%"/g) || []).length === 5 && team.html.includes("background:#f5f8f9"));
+  ok("  the details as a two-column table, five rows", (team.html.match(/<td width="34%"/g) || []).length === 5);
+  const brandLine = 'color:#0E5A73;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">LAUNCH Transparency Dashboard';
+  ok("  in the welcome's look: the same brand line as the welcome, and no dark bar", team.html.includes(brandLine) && r.calls[2].body.html.includes(brandLine) && !team.html.includes('bgcolor="#0E5A73"'));
   ok("  a readable time, not an ISO stamp", /Signed up: \d{1,2} [A-Z][a-z]{2} \d{4}, \d\d:\d\d UTC/.test(team.text) && !/\d{4}-\d\d-\d\dT/.test(team.text + team.html));
   ok("  the list by name, not by id", team.text.includes("Mailing list: " + mail.SEGMENT_NAME) && !team.html.includes("seg_123"));
   ok("  the page they signed up on is a link, because this code built it", team.html.includes(`href="https://${HOST}/illustrated-journey-dashboard.html"`));
