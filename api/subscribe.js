@@ -1,6 +1,6 @@
 // POST /api/subscribe — "Subscribe for updates" on the illustrated journey page.
 //
-// Receives { email, page }. Single opt-in, the owner's decision on 6 Oct 2026
+// Receives { firstName, lastName, email, organisation (optional), page }. Single opt-in, the owner's decision on 6 Oct 2026
 // (docs/email-backend-notes.md §2.3): the address joins the list at once, and
 // the welcome email's unsubscribe link is the way off it. In this order:
 //   1. The address becomes a subscribed Resend contact in ADDRESSES.segment:
@@ -25,6 +25,15 @@ module.exports = async function subscribe(req, res) {
   const cfg = mail.config();
   if (!cfg) return mail.notConfigured(res, "subscribe");
 
+  // What the form collects (owner's list, 8 Oct 2026): first and last name and
+  // the address, all required, and the organisation, optional. The same
+  // checks the page runs.
+  const firstName = mail.line(body.firstName, 100);
+  const lastName = mail.line(body.lastName, 100);
+  const organisation = mail.line(body.organisation, 200);
+  if (!firstName || !lastName) {
+    return mail.reply(res, 400, { ok: false, error: "Please enter your first and last name." });
+  }
   const email = mail.line(body.email, 254);
   if (!mail.EMAIL_RE.test(email)) {
     return mail.reply(res, 400, { ok: false, error: "Please enter an email address we can reach you at." });
@@ -50,14 +59,30 @@ module.exports = async function subscribe(req, res) {
     return failed();
   }
 
+  // Names go in Resend's own fields. The organisation goes in the custom
+  // property mail.ORG_PROPERTY, which Resend refuses, with the whole call, until
+  // it is defined in the account: then the save is tried once more without it,
+  // so subscribing never fails for it, and the team's note says what to do.
+  const names = { first_name: firstName, last_name: lastName };
+  let orgSaved = !organisation;
+  const save = async (send) => {
+    if (organisation) {
+      const r = await send({ ...names, properties: { [mail.ORG_PROPERTY]: organisation } });
+      if (r.ok) { orgSaved = true; return r; }
+      if (!(r.status >= 400 && r.status < 500 && ![401, 403, 429].includes(r.status))) return r;
+      mail.logFailure("subscribe", "save organisation", r);
+    }
+    return send(names);
+  };
+
   if (state === "new") {
-    const made = await mail.addContact(cfg, email);
+    const made = await save(fields => mail.addContact(cfg, email, fields));
     if (!made.ok) {
       mail.logFailure("subscribe", "add contact", made);
       return failed();
     }
   } else if (state === "returning") {
-    const back = await mail.updateContact(cfg, email, { unsubscribed: false });
+    const back = await save(fields => mail.updateContact(cfg, email, { unsubscribed: false, ...fields }));
     if (!back.ok) {
       mail.logFailure("subscribe", "re-subscribe contact", back);
       return failed();
@@ -112,23 +137,29 @@ module.exports = async function subscribe(req, res) {
   // Laid out as a form (mail.render): plain labels, a readable time, the list's
   // name rather than its id, and what (if anything) the team has to do.
   const where = partner ? (partner.name || partner.dashboard) : "LAUNCH dashboard";
+  const MUTED = { tone: "muted" }, WARN = { tone: "warn" };
+  const todo = [];
+  if (!segmentOk) todo.push(`add them to "${mail.SEGMENT_NAME}" in Resend by hand`);
+  if (!orgSaved) todo.push(`create the contact property "${mail.ORG_PROPERTY}" in Resend (Audience → Properties, type text), so organisations are saved with the contact; this one is only in this email`);
   const rows = [
+    ["First name", firstName],
+    ["Last name", lastName],
     ["Email address", email],
+    ["Organisation", organisation || "Not given", organisation ? (orgSaved ? null : WARN) : MUTED],
     ["Signed up", mail.when()],
     ["Signed up on", where, { href: home }],
     ["Subscriber", state === "returning" ? "Returning: had unsubscribed before" : "New"],
-    !cfg.segment ? ["Mailing list", "None set: saved as a plain contact", { tone: "muted" }]
+    !cfg.segment ? ["Mailing list", "None set: saved as a plain contact", MUTED]
       : segmentOk ? ["Mailing list", mail.SEGMENT_NAME]
-      : ["Mailing list", `Not added. Add them to "${mail.SEGMENT_NAME}" by hand in Resend (segment ${cfg.segment}).`, { tone: "warn" }]
+      : ["Mailing list", `Not added. Add them to "${mail.SEGMENT_NAME}" by hand in Resend (segment ${cfg.segment}).`, WARN]
   ];
   const note = await mail.sendEmail(cfg, {
     subject: "[LAUNCH] New subscriber for dashboard updates",
     ...mail.render("New subscriber", "", rows, {
-      intro: segmentOk
-        ? "Someone subscribed to updates from the LAUNCH dashboard. Nothing to do: they are on the mailing list, and every update email carries their unsubscribe link."
-        : "Someone subscribed to updates from the LAUNCH dashboard. One thing to do: add them to the mailing list by hand (below).",
-      footer: "Sent automatically when someone subscribes on the dashboard. Their address is used only for the update emails.",
-      site
+      intro: todo.length
+        ? `${firstName} ${lastName} subscribed to updates from the LAUNCH dashboard. To do: ${todo.join("; and ")}.`
+        : `${firstName} ${lastName} subscribed to updates from the LAUNCH dashboard. Nothing to do: they are on the mailing list, and every update email carries their unsubscribe link.`,
+      footer: "Sent automatically when someone subscribes on the dashboard. Their details are used only for the update emails."
     }),
     form: "subscribe-team"
   });

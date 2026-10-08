@@ -108,7 +108,9 @@ const UNSUBSCRIBED = { status: 200, body: { object: "contact", id: "c1", email: 
 
 // ---- groups ----------------------------------------------------------------
 
-const SUB = { email: "reader@example.org" };
+// What the subscribe form sends: names required, organisation optional.
+const NAMES = { firstName: "Amina", lastName: "Bello" };
+const SUB = { ...NAMES, email: "reader@example.org" };
 
 // What the widget (assets/report-issue.js) posts.
 const REPORT = {
@@ -219,10 +221,10 @@ group("links in emails", async () => {
 });
 
 group("subscribe — a new address goes straight onto the list", async () => {
-  let r = await call(subscribe, { body: { email: "reader@example.org", page: "https://" + HOST + "/x" }, addr: SEG, answer: [NO_CONTACT] });
+  let r = await call(subscribe, { body: { ...NAMES, email: "reader@example.org", page: "https://" + HOST + "/x" }, addr: SEG, answer: [NO_CONTACT] });
   is("look up, create, welcome, tell the team", r.calls.map(pathOf),
      ["GET /contacts/reader%40example.org", "POST /contacts", "POST /emails", "POST /emails"]);
-  is("  created subscribed, in the segment", r.calls[1].body, { email: "reader@example.org", unsubscribed: false, segments: [{ id: "seg_123" }] });
+  is("  created subscribed, with first and last name, in the segment", r.calls[1].body, { email: "reader@example.org", unsubscribed: false, first_name: "Amina", last_name: "Bello", segments: [{ id: "seg_123" }] });
   is("  the form is told ok: subscribed", [r.status, r.json], [200, { ok: true, status: "subscribed" }]);
   ok("  and no email asks anyone to confirm", !JSON.stringify(r.calls).includes("/api/confirm") && r.calls.every(c => !c.body || !/confirm/i.test(c.body.subject)));
   const welcome = r.calls[2].body, team = r.calls[3].body;
@@ -245,22 +247,50 @@ group("subscribe — a new address goes straight onto the list", async () => {
   r = await call(subscribe, { headers: { host: "evil.example/phish?" }, body: SUB });
   is("a host that is not a host name is refused, and nothing is saved or sent", [r.status, r.calls.length], [400, 0]);
 
-  r = await call(subscribe, { body: { email: "nope" } });
+  r = await call(subscribe, { body: { ...NAMES, email: "nope" } });
   is("a malformed address is a 400", r.status, 400);
   is("  and nothing reaches Resend", r.calls.length, 0);
 
-  r = await call(subscribe, { body: { email: "a@b.co\r\nBcc: victim@example.org" } });
+  r = await call(subscribe, { body: { ...NAMES, email: "a@b.co\r\nBcc: victim@example.org" } });
   is("an address with a smuggled header line is refused", r.status, 400);
 
-  r = await call(subscribe, { body: { email: 12345 } });
+  r = await call(subscribe, { body: { ...NAMES, email: 12345 } });
   is("a non-string address is a 400, not a crash", r.status, 400);
+});
+
+group("subscribe — first and last name required, organisation optional", async () => {
+  for (const [label, body] of [["no first name", { lastName: "Bello", email: "a@example.org" }], ["no last name", { firstName: "Amina", email: "a@example.org" }],
+                               ["names of spaces only", { firstName: "  ", lastName: "\t", email: "a@example.org" }], ["names not strings", { firstName: 1, lastName: {}, email: "a@example.org" }]]) {
+    const r = await call(subscribe, { body });
+    is(`${label}: a 400 asking for both names, and nothing reaches Resend`, [r.status, r.json.error, r.calls.length], [400, "Please enter your first and last name.", 0]);
+  }
+  let r = await call(subscribe, { body: { ...SUB, organisation: "Ministry of Health, Nigeria" }, addr: SEG, answer: [NO_CONTACT] });
+  is("an organisation is saved on the contact as the custom property", r.calls[1].body.properties, { [mail.ORG_PROPERTY]: "Ministry of Health, Nigeria" });
+  ok("  and the team note shows it, with nothing to do", r.calls[3].body.text.includes("Organisation: Ministry of Health, Nigeria") && r.calls[3].body.text.includes("Nothing to do"));
+  r = await call(subscribe, { body: SUB, addr: SEG, answer: [NO_CONTACT] });
+  ok("no organisation: no properties sent, and \"Not given\" in grey", !("properties" in r.calls[1].body) && r.calls[3].body.html.includes('color:#6b7780">Not given'));
+
+  // Resend refuses the whole call for a property not defined in the account
+  const NO_PROP = { status: 422, body: { name: "validation_error", message: "Property organisation does not exist" } };
+  r = await call(subscribe, { body: { ...SUB, organisation: "MoH Nigeria" }, addr: SEG, answer: [NO_CONTACT, NO_PROP] });
+  is("the property not defined in Resend: saved again without it, so subscribing still works",
+     [r.status, r.json, r.calls.map(pathOf).slice(0, 3), r.calls[2].body.properties, r.calls[2].body.first_name], [200, { ok: true, status: "subscribed" }, ["GET /contacts/reader%40example.org", "POST /contacts", "POST /contacts"], undefined, "Amina"]);
+  const note = r.calls[4].body;
+  ok("  the team note says what to do, and shows the organisation in the warning colour", note.text.includes('To do: create the contact property "organisation" in Resend') && note.html.includes('color:#b42318;font-weight:bold">MoH Nigeria'));
+  ok("  and the log says the organisation was not saved", r.logs.some(l => l.includes("save organisation failed")));
+  r = await call(subscribe, { body: { ...SUB, organisation: "MoH Nigeria" }, addr: SEG, answer: [UNSUBSCRIBED, NO_PROP] });
+  is("  the same for a returning subscriber: the update is retried without it", [r.status, r.calls.map(pathOf).slice(1, 3), r.calls[2].body], [200, ["PATCH /contacts/reader%40example.org", "PATCH /contacts/reader%40example.org"], { unsubscribed: false, first_name: "Amina", last_name: "Bello" }]);
+  r = await call(subscribe, { body: { ...SUB, organisation: "MoH Nigeria" }, answer: [NO_CONTACT, { status: 500, body: { name: "application_error" } }] });
+  is("  but Resend failing for another reason is not retried: a 502", [r.status, r.calls.length], [502, 2]);
+  r = await call(subscribe, { body: { ...SUB, organisation: "MoH Nigeria" }, addr: SEG, answer: [SUBSCRIBED] });
+  is("already subscribed: the stored names and organisation are left alone", r.calls.map(pathOf), ["GET /contacts/reader%40example.org", "POST /contacts/reader%40example.org/segments/seg_123"]);
 });
 
 group("subscribe — returning, already subscribed, and failures", async () => {
   let r = await call(subscribe, { body: SUB, addr: SEG, answer: [UNSUBSCRIBED] });
   is("an address that had unsubscribed: re-subscribed, into the segment, welcomed", r.calls.map(pathOf),
      ["GET /contacts/reader%40example.org", "PATCH /contacts/reader%40example.org", "POST /contacts/reader%40example.org/segments/seg_123", "POST /emails", "POST /emails"]);
-  is("  the update is just unsubscribed: false", r.calls[1].body, { unsubscribed: false });
+  is("  the update re-subscribes and sets the names", r.calls[1].body, { unsubscribed: false, first_name: "Amina", last_name: "Bello" });
   is("  and the form is told: subscribed", r.json, { ok: true, status: "subscribed" });
   ok("  and the team hears it is a returning subscriber", r.calls[4].body.text.includes("Subscriber: Returning"));
 
@@ -275,7 +305,7 @@ group("subscribe — returning, already subscribed, and failures", async () => {
   ok("  but it is logged", r.logs.some(l => l.includes("add to segment failed")));
 
   r = await call(subscribe, { body: SUB, addr: SEG, answer: [UNSUBSCRIBED, { status: 200, body: {} }, { status: 500, body: {} }] });
-  ok("a returning subscriber outside the segment: the team note says to add them by hand", r.calls[4] && r.calls[4].body.text.includes("Not added") && r.calls[4].body.text.includes("by hand in Resend (segment seg_123)") && r.calls[4].body.text.includes("One thing to do"));
+  ok("a returning subscriber outside the segment: the team note says to add them by hand", r.calls[4] && r.calls[4].body.text.includes("Not added") && r.calls[4].body.text.includes("by hand in Resend (segment seg_123)") && r.calls[4].body.text.includes("To do:"));
 
   r = await call(subscribe, { body: SUB, answer: [{ status: 422, body: { name: "validation_error" } }] });
   is("a lookup answering some other 4xx is taken as 'no such contact'", r.calls.map(pathOf).slice(0, 2), ["GET /contacts/reader%40example.org", "POST /contacts"]);
@@ -344,7 +374,7 @@ group("partners — RBM's pages, on another site (CORS)", async () => {
     ok("  its unsubscribe link stays on this site, where the function is", welcome.text.includes(`https://${HOST}/api/unsubscribe?t=`) && !welcome.text.includes(PARTNER.origin + "/api/"));
     ok("  and the team hears which site it came from", team.text.includes("Signed up on: " + PARTNER.dashboard));
 
-    r = await call(subscribe, { headers: from(PARTNER.origin), body: { email: "nope" } });
+    r = await call(subscribe, { headers: from(PARTNER.origin), body: { ...NAMES, email: "nope" } });
     is("a partner's failed request is readable too, so its page can show the failure", [r.status, r.headers["access-control-allow-origin"]], [400, PARTNER.origin]);
 
     r = await call(feedback, { headers: from(PARTNER.origin), body: REPORT });
@@ -369,8 +399,9 @@ group("the team's emails, laid out as a form", async () => {
 
   let r = await call(subscribe, { body: SUB, addr: SEG, answer: [NO_CONTACT] });
   const team = r.calls[3].body;
-  ok("the subscriber note: a brand bar, a title, and what happened", team.html.includes("LAUNCH Transparency Dashboard") && team.html.includes(">New subscriber<") && team.html.includes("Nothing to do"));
-  ok("  the details as a two-column table, five rows", (team.html.match(/<td width="34%"/g) || []).length === 5);
+  ok("the subscriber note: a plain form, titled, saying who and that nothing is to do", team.html.includes(">New subscriber<") && team.text.includes("Amina Bello subscribed") && team.html.includes("Nothing to do"));
+  ok("  the details as a bordered two-column table, eight rows", (team.html.match(/<td width="34%"/g) || []).length === 8 && team.html.includes("border:1px solid #d5dde2"));
+  ok("  first name, last name, address and organisation come first", /First name: Amina\nLast name: Bello\nEmail address: reader@example.org\nOrganisation: Not given/.test(team.text));
   // The logo travels inside the email (an attachment shown with cid:), so Outlook
   // has nothing to block: on 8 Oct the hosted one showed as a broken image there.
   const logo = `<img src="cid:${mail.LOGO_CID}" width="120" height="42" alt="Unitaid"`;
@@ -378,16 +409,16 @@ group("the team's emails, laid out as a form", async () => {
   const attached = (b) => Array.isArray(b.attachments) && b.attachments.length === 1 &&
     b.attachments[0].content_id === mail.LOGO_CID && b.attachments[0].content_type === "image/png" &&
     b.attachments[0].filename === "unitaid-logo.png" && b.attachments[0].content === png;
-  for (const [name, b] of [["the team note", team], ["the welcome", r.calls[2].body]]) {
-    ok(`  ${name}: in the shared frame, with the Unitaid logo attached and shown inline, and "Powered by Unitaid"`,
-       b.html.includes(logo) && attached(b) && !/\.svg|https?:\/\/[^"]*unitaid-logo/.test(b.html) && b.html.includes("Powered by Unitaid") && b.html.includes("LAUNCH Transparency<br>Dashboard"));
-  }
+  ok("  the welcome: in the shared frame, with the Unitaid logo attached and shown inline, and \"Powered by Unitaid\"",
+     r.calls[2].body.html.includes(logo) && attached(r.calls[2].body) && !/\.svg|https?:\/\/[^"]*unitaid-logo/.test(r.calls[2].body.html) && r.calls[2].body.html.includes("Powered by Unitaid"));
+  ok("  the team note: no logo, no frame, nothing attached (the owner's \"just a form\")", !team.html.includes("<img") && !team.html.includes("Powered by") && !("attachments" in team));
   r = await call(feedback, { body: REPORT });
-  ok("  the feedback note too", r.calls[0].body.html.includes(logo) && attached(r.calls[0].body) && r.calls[0].body.html.includes("Powered by Unitaid"));
+  ok("  the feedback note: the same plain form", !r.calls[0].body.html.includes("<img") && !("attachments" in r.calls[0].body) && r.calls[0].body.html.includes("border:1px solid #d5dde2"));
   ok("  the inline logo is the PNG, byte for byte (api/_logo.js regenerated with it)", require("../api/_logo.js").LOGO_PNG_BASE64 === png);
+  ok("  no email uses the font: shorthand, which Outlook ignores", [team.html, r.calls[0].body.html, mail.letter({ heading: "H", paras: ["p"], button: { label: "B", href: "https://x.example" } }).html].every(h => !/font:\s*[\d\w]/.test(h)));
   const hosted = mail.letter({ heading: "H", paras: [], button: { label: "B", href: "https://x.example" }, site: "https://launch.example.org", logo: "hosted" });
   ok("  a hosted logo (the broadcast's) loads from the site and attaches nothing", hosted.html.includes(`src="https://launch.example.org${mail.LOGO_PATH}"`) && !("attachments" in hosted));
-  const bare = mail.render("T", "", [["a", "b"]], { logo: "hosted" });
+  const bare = mail.letter({ heading: "H", paras: [], button: { label: "B", href: "https://x.example" }, logo: "hosted" });
   ok("  a hosted logo with no site to load it from: the name stands in", bare.html.includes(">Unitaid</span>") && !bare.html.includes("<img"));
   ok("  a readable time, not an ISO stamp", /Signed up: \d{1,2} [A-Z][a-z]{2} \d{4}, \d\d:\d\d UTC/.test(team.text) && !/\d{4}-\d\d-\d\dT/.test(team.text + team.html));
   ok("  the list by name, not by id", team.text.includes("Mailing list: " + mail.SEGMENT_NAME) && !team.html.includes("seg_123"));
@@ -396,7 +427,7 @@ group("the team's emails, laid out as a form", async () => {
   ok("  and a footer", team.html.includes("Sent automatically when someone subscribes"));
 
   r = await call(subscribe, { body: SUB, addr: SEG, answer: [UNSUBSCRIBED, { status: 200, body: {} }, { status: 500, body: {} }] });
-  ok("a list that failed shows as something to do, in the warning colour", r.calls[4].body.html.includes("color:#b42318;font-weight:700\">Not added."));
+  ok("a list that failed shows as something to do, in the warning colour", r.calls[4].body.html.includes("color:#b42318;font-weight:bold\">Not added."));
 
   r = await call(feedback, { body: withReport({ page: { url: "https://phish.example/x" } }) });
   const fb = r.calls[0].body;
@@ -404,7 +435,7 @@ group("the team's emails, laid out as a form", async () => {
   ok("  the page the visitor reports is shown, never linked", fb.html.includes("https://phish.example/x") && !fb.html.includes('href="https://phish.example'));
   ok("  the footer says a reply reaches them", fb.text.includes("Reply to this email to answer them: the reply goes to amina@moh.example."));
   r = await call(feedback, { body: withReport({ email: null, name: null }) });
-  ok("  with no address: says it cannot be answered, in the warning colour", r.calls[0].body.html.includes("color:#b42318;font-weight:700\">Not given, so this cannot be answered") && r.calls[0].body.text.includes("They left no email address"));
+  ok("  with no address: says it cannot be answered, in the warning colour", r.calls[0].body.html.includes("color:#b42318;font-weight:bold\">Not given, so this cannot be answered") && r.calls[0].body.text.includes("They left no email address"));
 });
 
 group("feedback — request guard and configuration", async () => {
@@ -530,16 +561,16 @@ group("the whole journey", async () => {
   is("  → the welcome's one-click unsubscribe → unsubscribed", [r.status, r.calls.map(c => c.body)], [200, [{ unsubscribed: true }]]);
   r = await call(subscribe, { body: SUB, addr: SEG, answer: [UNSUBSCRIBED] });
   is("  → subscribe again → back on the list, with a new welcome", [r.status, r.calls[1].body, r.calls[3] && r.calls[3].body.subject],
-     [200, { unsubscribed: false }, "You're subscribed to LAUNCH dashboard updates"]);
+     [200, { unsubscribed: false, first_name: "Amina", last_name: "Bello" }, "You're subscribed to LAUNCH dashboard updates"]);
 });
 
 group("logs never carry the submission", async () => {
   const who = "private.person@example.org";
   const runs = [
-    await call(subscribe, { body: { email: who }, answer: [NO_CONTACT] }),
-    await call(subscribe, { body: { email: who }, answer: [SUBSCRIBED] }),
-    await call(subscribe, { body: { email: who }, answer: [NO_CONTACT, { status: 500, body: { name: "application_error", message: "An unexpected error occurred." } }] }),
-    await call(subscribe, { body: { email: who }, answer: [NO_CONTACT, { status: 201, body: {} }, { status: 500, body: { name: "application_error" } }] }),
+    await call(subscribe, { body: { ...NAMES, email: who }, answer: [NO_CONTACT] }),
+    await call(subscribe, { body: { ...NAMES, email: who }, answer: [SUBSCRIBED] }),
+    await call(subscribe, { body: { ...NAMES, email: who }, answer: [NO_CONTACT, { status: 500, body: { name: "application_error", message: "An unexpected error occurred." } }] }),
+    await call(subscribe, { body: { ...NAMES, email: who }, answer: [NO_CONTACT, { status: 201, body: {} }, { status: 500, body: { name: "application_error" } }] }),
     await call(unsubscribe, { headers: FORM, body: { t: token("unsubscribe", who) } }),
     await call(unsubscribe, { headers: FORM, body: { t: token("unsubscribe", who) }, answer: [{ status: 500, body: {} }] })
   ];

@@ -39,6 +39,12 @@ const ADDRESSES = {
 const DEFAULT_FROM = "LAUNCH dashboard <onboarding@resend.dev>";
 // What the team's emails call the segment, rather than its id.
 const SEGMENT_NAME = "LAUNCH dashboard updates";
+// The subscriber's organisation is saved on the Resend contact as this custom
+// property. Resend refuses a whole create or update that names a property not
+// yet defined in the account (its docs, read 8 Oct 2026), so api/subscribe.js
+// retries without it and the team's note says to define it (Audience →
+// Properties, key "organisation", type string).
+const ORG_PROPERTY = "organisation";
 
 // The page every email and every unsubscribe page links back to.
 const DASHBOARD = "/illustrated-journey-dashboard.html";
@@ -338,6 +344,10 @@ const LOGO_PATH = "/assets/email/unitaid-logo.png";
 const LOGO_CID = "unitaid-logo";
 const LOGO_ATTACHMENT = { filename: "unitaid-logo.png", content: LOGO_PNG_BASE64, content_id: LOGO_CID, content_type: "image/png" };
 const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+// Font styles as separate properties. Outlook's renderer ignores the `font:`
+// shorthand, which left headings plain there (the owner's screenshot, 8 Oct).
+const font = (size, weight = "normal", lineHeight = "1.5") =>
+  `font-family:${FONT};font-size:${size}px;font-weight:${weight};line-height:${lineHeight}`;
 
 // The frame every email shares (8 Oct 2026, at the owner's request: "make it
 // professional, with the Unitaid logo"): a white card on a light grey page;
@@ -352,7 +362,7 @@ function frame({ site, logo: how = "inline", heading, body, small = "" }) {
   const logo = src
     ? `<img src="${esc(src)}" width="120" height="42" alt="Unitaid" ` +
       `style="display:block;width:120px;height:42px;border:0;outline:none;text-decoration:none">`
-    : `<span style="font:700 18px/1 ${FONT};color:#212E92">Unitaid</span>`;
+    : `<span style="${font(18, "bold", "1")};color:#212E92">Unitaid</span>`;
   return (
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f5f7" style="background:#f3f5f7">` +
     `<tr><td align="center" style="padding:32px 12px">` +
@@ -362,76 +372,77 @@ function frame({ site, logo: how = "inline", heading, body, small = "" }) {
     `<tr><td style="padding:26px 32px 22px;border-bottom:1px solid #edf1f3">` +
       `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>` +
         `<td valign="middle">${logo}</td>` +
-        `<td valign="middle" align="right" style="font:700 11px/1.35 ${FONT};letter-spacing:.08em;text-transform:uppercase;color:#0E5A73">` +
+        `<td valign="middle" align="right" style="${font(11, "bold", "1.35")};letter-spacing:.08em;text-transform:uppercase;color:#0E5A73">` +
           `LAUNCH Transparency<br>Dashboard</td>` +
       `</tr></table>` +
     `</td></tr>` +
     // heading and body
-    `<tr><td style="padding:30px 32px 6px;font:16px/1.6 ${FONT};color:#1f2a30">` +
-      `<div style="margin:0 0 16px;font:700 24px/1.3 ${FONT};color:#111b21">${esc(heading)}</div>` +
+    `<tr><td style="padding:30px 32px 6px;${font(16, "normal", "1.6")};color:#1f2a30">` +
+      `<div style="margin:0 0 16px;${font(24, "bold", "1.3")};color:#111b21">${esc(heading)}</div>` +
       body +
     `</td></tr>` +
     // small print
     (small
       ? `<tr><td style="padding:10px 32px 28px">` +
-        `<div style="border-top:1px solid #edf1f3;padding-top:18px;font:13px/1.55 ${FONT};color:#6b7780">${small}</div>` +
+        `<div style="border-top:1px solid #edf1f3;padding-top:18px;${font(13, "normal", "1.55")};color:#6b7780">${small}</div>` +
         `</td></tr>`
       : `<tr><td style="padding:0 0 22px"></td></tr>`) +
     `</table>` +
     // under the card
     `<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px">` +
-      `<tr><td align="center" style="padding:16px 12px 0;font:12px/1.5 ${FONT};color:#8a959d">` +
+      `<tr><td align="center" style="padding:16px 12px 0;${font(12)};color:#8a959d">` +
         `LAUNCH Transparency Dashboard · Powered by Unitaid</td></tr>` +
     `</table>` +
     `</td></tr></table>`
   );
 }
 
-// A note to the team inbox, in the frame every email shares, with the details
-// as a form: one line on what happened or what to do, the visitor's message
-// in a box when there is one, then two columns (label, answer) with a line
-// between rows, and a footer as the small print.
+// A note to the team inbox, as a plain form (8 Oct 2026, the owner's
+// request: "just a form", no logo): the title, one line on what happened or
+// what to do, the visitor's message in a box when there is one, then the
+// details as a bordered two-column table (label on grey, answer on white), and
+// a footer. Tables, bgcolor and separate font properties only, for Outlook.
 //
 // Each row is [label, value] or [label, value, { href, tone }]: `tone` is
 // "warn" (something to do) or "muted" (detail). Every value is escaped, and
 // none a visitor typed ever becomes a link, because the inbox reading these is
 // the team's, and a form is an easy way to put a phishing URL in front of it.
 // `href` is only ever an address this code built (the site's own page, or a
-// PARTNERS page). `site` is where the logo is loaded from (frame()).
-function render(heading, message, rows, { intro = "", footer = "", site = null, logo = "inline" } = {}) {
+// PARTNERS page).
+function render(heading, message, rows, { intro = "", footer = "" } = {}) {
   const text = [heading, intro, "", message, "",
     ...rows.map(([k, v, o]) => `${k}: ${v}` + (o && o.href && o.href !== v ? ` (${o.href})` : "")),
     "", footer]
     .filter((l, i, a) => !(l === "" && (i === 0 || a[i - 1] === "")))
     .join("\n").replace(/\n+$/, "") + "\n";
 
-  const line = "border-bottom:1px solid #e3e9ec";
+  const border = "border:1px solid #d5dde2";
   const cell = (v, o) => {
     const shown = esc(v);
-    const style = o && o.tone === "warn" ? "color:#b42318;font-weight:700"
-      : o && o.tone === "muted" ? "color:#6b7780;font-size:13px" : "color:#1f2a30";
+    const style = o && o.tone === "warn" ? "color:#b42318;font-weight:bold"
+      : o && o.tone === "muted" ? "color:#6b7780" : "color:#1f2a30";
     const body = o && o.href
       ? `<a href="${esc(o.href)}" style="color:#0E5A73;text-decoration:underline">${shown}</a>`
       : shown;
     return `<span style="${style}">${body}</span>`;
   };
-  // a line between rows, none under the last: the small print's divider follows
-  const tableRows = rows.map(([k, v, o], i) => {
-    const sep = i < rows.length - 1 ? line : "border-bottom:0";
-    return `<tr>` +
-      `<td width="34%" valign="top" style="padding:10px 12px 10px 0;${sep};font:600 13px/20px ${FONT};color:#6b7780">${esc(k)}</td>` +
-      `<td valign="top" style="padding:10px 0;${sep};font:15px/20px ${FONT};word-break:break-word">${cell(v, o)}</td>` +
-      `</tr>`;
-  }).join("");
+  const tableRows = rows.map(([k, v, o]) =>
+    `<tr>` +
+    `<td width="34%" valign="top" bgcolor="#f3f6f8" style="padding:10px 14px;${border};background:#f3f6f8;${font(13, "bold", "20px")};color:#4a5761">${esc(k)}</td>` +
+    `<td valign="top" style="padding:10px 14px;${border};${font(15, "normal", "20px")};word-break:break-word">${cell(v, o)}</td>` +
+    `</tr>`).join("");
 
-  const body =
-    (intro ? `<p style="margin:0 0 18px">${esc(intro)}</p>` : "") +
+  const html =
+    `<div style="max-width:620px;${font(15)};color:#1f2a30">` +
+    `<p style="margin:0 0 8px;${font(20, "bold", "1.3")};color:#111b21">${esc(heading)}</p>` +
+    (intro ? `<p style="margin:0 0 18px;${font(15)}">${esc(intro)}</p>` : "") +
     (message
-      ? `<div style="margin:0 0 20px;padding:12px 14px;border-left:3px solid #0E5A73;background:#f4f7f8;white-space:pre-wrap;word-break:break-word">${esc(message)}</div>`
+      ? `<div style="margin:0 0 18px;padding:12px 14px;border-left:3px solid #0E5A73;background:#f4f7f8;${font(15)};white-space:pre-wrap;word-break:break-word">${esc(message)}</div>`
       : "") +
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ` +
-      `style="border-collapse:collapse;margin:0 0 8px;border-top:1px solid #e3e9ec">${tableRows}</table>`;
-  return withLogo(logo, { text, html: frame({ site, logo, heading, body, small: footer ? esc(footer) : "" }) });
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;${border}">${tableRows}</table>` +
+    (footer ? `<p style="margin:16px 0 0;${font(12)};color:#6b7780">${esc(footer)}</p>` : "") +
+    `</div>`;
+  return { text, html };
 }
 
 // An email to a subscriber, in the frame every email shares: a heading, a few
@@ -446,7 +457,7 @@ function letter({ heading, paras, button, small = [], site = null, logo = "inlin
   const btn =
     `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 22px"><tr>` +
     `<td bgcolor="#0E5A73" style="background:#0E5A73;border-radius:8px">` +
-    `<a href="${esc(button.href)}" style="display:inline-block;padding:13px 26px;font:600 15px/1 ${FONT};color:#ffffff;text-decoration:none;border-radius:8px">${esc(button.label)}</a>` +
+    `<a href="${esc(button.href)}" style="display:inline-block;padding:13px 26px;${font(15, "bold", "1")};color:#ffffff;text-decoration:none;border-radius:8px">${esc(button.label)}</a>` +
     `</td></tr></table>`;
   const body = paras.map(p => `<p style="margin:0 0 16px">${esc(p)}</p>`).join("") + btn;
   const smallHtml = small.map(s => `<p style="margin:0 0 6px">${esc(s.text)}` +
@@ -504,8 +515,9 @@ function updateContact(cfg, email, fields) {
   return resendRequest(cfg, "PATCH", contactPath(email), fields);
 }
 
-function addContact(cfg, email) {
-  const body = { email, unsubscribed: false };
+// `fields` adds Resend's own first_name/last_name and any custom `properties`.
+function addContact(cfg, email, fields = {}) {
+  const body = { email, unsubscribed: false, ...fields };
   if (cfg.segment) body.segments = [{ id: cfg.segment }];
   return resendRequest(cfg, "POST", "/contacts", body);
 }
@@ -515,7 +527,7 @@ function addToSegment(cfg, email) {
 }
 
 module.exports = {
-  ADDRESSES, SEGMENT_NAME, PARTNERS, EMAIL_RE, DASHBOARD, LOGO_PATH, LOGO_CID,
+  ADDRESSES, SEGMENT_NAME, ORG_PROPERTY, PARTNERS, EMAIL_RE, DASHBOARD, LOGO_PATH, LOGO_CID,
   config, reply, readRequest, partnerOf, notConfigured, logNotConfigured,
   line, block, esc, newRef, siteUrl, makeToken, readToken, readLink, page,
   when, render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure,
