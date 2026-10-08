@@ -1,6 +1,13 @@
 {
   "schema": 1,
   "entries": {
+    "0059798b7f7023e4": {
+      "en": "(optional)",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "(facultatif)",
+      "pt": "(opcional)"
+    },
     "016f16423ceeff2f": {
       "en": "Development complete",
       "where": "products.products[3].stages[0].note",
@@ -1485,6 +1492,13 @@
       "fr": "Le fichier data/products.js est manquant ou contient une erreur de syntaxe — exécutez",
       "pt": "O ficheiro data/products.js está em falta ou contém um erro de sintaxe — execute"
     },
+    "490007e10a85a10a": {
+      "en": "Please enter your first and last name.",
+      "where": "line 3601",
+      "bucket": "js",
+      "fr": "Veuillez saisir votre prénom et votre nom.",
+      "pt": "Por favor, introduza o seu nome e apelido."
+    },
     "4909004803e3c17c": {
       "en": "Artemisinin-based combination therapy — the standard class of malaria treatments pairing an artemisinin derivative with a longer-acting partner drug.",
       "where": "products.glossary.ACT",
@@ -2401,6 +2415,13 @@
       "fr": "MFT groupes de politique · ${esc(p.name)}",
       "pt": "MFT grupos de políticas · ${esc(p.name)}"
     },
+    "702ef921ed1d89bf": {
+      "en": "First name",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Prénom",
+      "pt": "Nome próprio"
+    },
     "70416ee603bde6c1": {
       "en": "First patient Sep 2025",
       "where": "products.products[1].detail.milestones[1].date",
@@ -2645,6 +2666,13 @@
       "bucket": "reviewed",
       "fr": "ans",
       "pt": "anos"
+    },
+    "7b4888049459f04a": {
+      "en": "Last name",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Nom de famille",
+      "pt": "Último nome"
     },
     "7b662112715afcad": {
       "en": "Registered widely; adopted as first-line in several Southeast Asian countries. Register-verified so far: Tanzania — 10 presentations across four manufacturers (Guilin D-ARTEPP incl. paediatric dispersible, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), all Registered/Compliant; Nigeria — 47 presentations, but only 26 Active (22 lapsed — registrations not being maintained, itself an underuse signal)",
@@ -5053,6 +5081,13 @@
       "fr": "À ce niveau de zoom, les sites trop proches pour être distingués s'affichent en un seul point numéroté, regroupés par nombre de patients. Zoomez pour les séparer ; cliquez sur un point pour afficher les études correspondantes.",
       "pt": "Os locais demasiado próximos para serem separados neste nível de zoom fundem-se num único ponto numerado, agrupados por número de doentes. Aumente o zoom para os separar; clique em qualquer ponto para ver os estudos correspondentes."
     },
+    "ebcd0a653ca64eac": {
+      "en": "Your details go to the LAUNCH team and are used only to email you about updates to this page. Every email has an unsubscribe link.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Vos coordonnées sont transmises à l'équipe LAUNCH et servent uniquement à vous informer des mises à jour de cette page par e-mail. Chaque e-mail contient un lien de désabonnement.",
+      "pt": "Os seus dados serão enviados à equipa LAUNCH e utilizados apenas para lhe enviar emails sobre atualizações desta página. Todos os emails contêm um link para cancelar a subscrição."
+    },
     "ec91fdd9256cb75a": {
       "en": "optional",
       "where": "assets/report-issue.js",
@@ -5205,6 +5240,13 @@
       "bucket": "data",
       "fr": "Combinaison non-artémisinine — la première innovation majeure dans le traitement du paludisme depuis l'introduction des ACTs il y a plus de 25 ans (Novartis) — candidate pour les contextes de résistance partielle à l'artémisinine et les stratégies MFT ; tue les parasites résistants et bloque la transmission.",
       "pt": "A combinação não artemisinina — a primeira grande inovação no tratamento da malária desde que ACTs foram introduzidas há mais de 25 anos (Novartis) — candidata para ambientes de resistência parcial à artemisinina e estratégias MFT; mata os parasitas resistentes e bloqueia a transmissão."
+    },
+    "f2488fd4ef4adbc6": {
+      "en": "Email address",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Adresse email",
+      "pt": "Endereço de e-mail"
     },
     "f2fa89324c34870f": {
       "en": "The health ministry writes the medicine into the national treatment guidelines. These decide what health workers prescribe and what the public sector buys. A WHO recommendation does not automatically become national policy.",
