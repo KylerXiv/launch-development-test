@@ -1723,6 +1723,13 @@
       "fr": "+${peers.length - 24} Plus d'informations dans l'onglet Pays",
       "pt": "+${peers.length - 24} mais no separador Países"
     },
+    "51ad3c5a7078f688": {
+      "en": "No. of countries",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Nombre de pays",
+      "pt": "Número de países"
+    },
     "5205d8c4889c0ac6": {
       "en": "countries by patient group",
       "where": "illustrated-journey-dashboard.html",
