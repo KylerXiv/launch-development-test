@@ -122,7 +122,12 @@ missing.
    to 10 min (Vercel's docs, read 2 Oct). Both forms already show their
    failure message on a 429. The rule counts POSTs only, so the CORS
    preflights of RBM's pages (§2.13) do not use it up.
-9. **Let RBM's pages post here** (§2.13). Two steps, in this order:
+9. **Create the contact property `organisation` in Resend** (Audience →
+   Properties, key `organisation`, type text), so a subscriber's organisation
+   is saved with the contact (§2.15). Until it exists, subscribing still
+   works, but the organisation reaches the team's note only, and the note
+   says so.
+10. **Let RBM's pages post here** (§2.13). Two steps, in this order:
    1. Add the host they are served from to `PARTNERS` in `api/_mail.js`:
       `origin` is scheme and domain only (`https://dashboards.endmalaria.org`,
       no path, no trailing slash), `dashboard` the English page there. Merge,
@@ -830,11 +835,61 @@ What it costs: about 3 KB more per email. Resend's own dashboard preview does
 not show inline images (its documentation says so), so a broken logo **there**
 is expected; real mail apps show it.
 
+**8 Oct, last: the team notes are a plain form, with no logo.** The first note
+after #75 still showed a broken logo in the owner's Outlook (most likely
+sent seconds before #75 went live, at 12:03:05). The owner asked to remove
+the logo from it and "make it just a form". The team notes (`render()`) now
+leave out `frame()`. They have a bold title, the summary line, the
+visitor's message (feedback), a bordered two-column table with labels on
+grey, and a one-line footer: no logo, no card, no "Powered by". The welcome
+and the update email keep the frame and the logo. The same screenshot showed
+the title plain, not bold: Outlook ignores the `font:` shorthand, so every
+email now sets `font-family`, `font-size`, `font-weight` and `line-height`
+separately (`font()`), and a test fails if a shorthand comes back.
+
 **Unitaid mark permission (open).** The handoff records the use of the
 Unitaid logo as an unconfirmed assumption that does not transfer to another
 page or surface. Emails are a new surface. Confirm with Unitaid before real
 subscribers. Removing it is one line (`frame()` falls back to the name in
 text when it has no logo).
+
+### 2.15 Subscribers give their name, and optionally their organisation
+
+**Asked by the owner on 8 Oct.** The form collects:
+
+| Field | Required | Stored in Resend as |
+| --- | --- | --- |
+| First name | yes | `first_name`, Resend's own field |
+| Last name | yes | `last_name`, Resend's own field |
+| Email address | yes | the contact's address |
+| Organisation | no | the custom property `organisation` (`ORG_PROPERTY`) |
+
+The page and the server run the same checks. Both names must be non-blank
+(at most 100 characters each). The organisation is cut to 200 characters,
+and the address is checked as before. A missing name gets *"Please enter
+your first and last name."*, with both empty fields marked, and nothing is
+sent. A returning subscriber's names (and organisation) are written again
+when they re-subscribe. **An address already on the list is left exactly as
+it is**: the form cannot be used to rename someone else's subscription.
+
+**Why the organisation has a fallback.** Resend refuses an entire create or
+update that names a custom property not yet defined in the account. Its
+docs (read 8 Oct): "If the properties don't exist… the call fails". Sending
+the organisation unconditionally would therefore stop every subscription
+until someone defined the property. So `subscribe.js` sends it, and on a
+refusal (a 4xx other than 401/403/429) saves the contact again without it.
+It logs `save organisation failed`, and the team's note says "To do: create
+the contact property "organisation" in Resend", showing the organisation in
+red, because then it exists only in that email. Any other failure is not
+retried.
+
+| Rejected | Because |
+| --- | --- |
+| Organisation only in the team's note | It would be lost to any export or later email |
+| A single "Full name" field | The owner listed first and last name separately, and Resend has a field for each |
+| Defining the property from code at startup | It needs an account-level write on every cold start, for a one-time setup step (§1 step 9) |
+
+The welcome email does not greet by name yet; the owner did not ask.
 
 ## 3. How it was verified
 
@@ -1177,11 +1232,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `email-logo-inline`, from `main` at `f906548` (8 Oct) |
-| Commits | 1: the logo inside the email for the welcome and team notes, with these notes in the same commit |
+| Branch | `subscriber-details`, from `main` at `c52664f` (8 Oct) |
+| Commits | 1: names and organisation from the form; the team notes as a plain form; separate font properties for Outlook. These notes are in the same commit |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
-| CI | runs on that pull request; `validate.yml` runs `test-notify-subscribers.js` (67) but not `test-mail-api.js` (179, local) |
-| Changed | `api/_mail.js` (`LOGO_ATTACHMENT`, `frame()`'s `logo`, `sendEmail()` passes `attachments`), `api/_logo.js` (new, the PNG as base64), `scripts/notify-subscribers.js` (`logo: "hosted"`), `scripts/test-mail-api.js`, this document |
-| After merge | live at once for every email sent through `/api/subscribe` and `/api/feedback`. Nothing to rebuild |
-| Waiting on | the owner's merge, then one real email in Outlook to confirm; **Unitaid's permission for its mark in emails**; the Outlook delivery report (8 Oct); the owner's iPhone retest; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8) |
-| Before this | `email-brand`, PR #74, merged 8 Oct. `subscribe-status-and-team-look`, PR #73, merged 8 Oct; RBM pages pushed as `0e8a4ab`. `welcome-wording`, PR #72. `team-email-form`, PR #68. `mobile-forms`, PR #67. `rbm-vercel-partner`, PR #66. `rbm-embed-sizing`, PR #65. `rbm-forms`, PR #64. `subscribe-single-opt-in`, PR #62. `email-feedback`, PR #40. `email-subscribe`, PR #30 |
+| CI | runs on that pull request; `validate.yml` runs `test-notify-subscribers.js` (67) and `test-build-rbm-pages.js` (25), not `test-mail-api.js` (194, local) |
+| Changed | `api/subscribe.js` (names, organisation, the fallback, the team note's rows), `api/_mail.js` (`render()` as a plain form, `font()`, `ORG_PROPERTY`, `addContact()` fields), `api/feedback.js`, `illustrated-journey-dashboard.html` (four fields), `scripts/test-mail-api.js`, this document, `docs/illustrated-journey-ui-notes.md` |
+| After merge | the server is live at once. The page needs `translate.yml` for the new labels, then RBM's pages rebuilt and pushed. **Create the `organisation` property in Resend** (§1 step 9) |
+| Waiting on | the owner's merge; the `organisation` property in Resend; Unitaid's permission for its mark (the welcome and update emails); the Outlook delivery report; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8) |
+| Before this | `email-logo-inline`, PR #75, merged 8 Oct. `email-brand`, PR #74. `subscribe-status-and-team-look`, PR #73; RBM pages `0e8a4ab`. `welcome-wording`, PR #72. `team-email-form`, PR #68. `mobile-forms`, PR #67. `rbm-vercel-partner`, PR #66. `rbm-embed-sizing`, PR #65. `rbm-forms`, PR #64. `subscribe-single-opt-in`, PR #62. `email-feedback`, PR #40. `email-subscribe`, PR #30 |

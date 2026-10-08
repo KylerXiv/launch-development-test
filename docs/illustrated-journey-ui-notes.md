@@ -315,6 +315,15 @@ Until `translate.yml` has run, they show in English on `/fr` and `/pt`. Why
 the page may now reveal that an address is subscribed:
 [email-backend-notes.md](email-backend-notes.md) §2.3.
 
+**Revised on 8 Oct: four fields.** The panel asks for **First name** and
+**Last name** (side by side, stacked under 380px), **Email address**, and
+**Organisation (optional)**, each with a visible label. Until then it had one
+field, with its label hidden. The page checks both names before posting,
+and marks the empty ones. With a keyboard, focus goes to First name; on a
+touch screen it still goes to the title (§3.36). The privacy line now says
+"Your details". Why and how they are stored:
+[email-backend-notes.md](email-backend-notes.md) §2.15.
+
 ### 3.11 The draft warning is amber, and leads with the caveat
 
 It was `--accent-soft` blue — the same treatment as every other note on the
