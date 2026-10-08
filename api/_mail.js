@@ -324,10 +324,19 @@ function when(d = new Date()) {
 
 // The Unitaid logo for emails: a PNG, because Gmail and Outlook do not show
 // SVG. assets/unitaid-logo.svg drawn at 240x84 on white (white so it stays
-// legible when a mail app darkens the email), shown at 120x42. Served by this
-// site (scripts/build-public-site.sh copies it), so an email links to it on
-// the host that sent it.
+// legible when a mail app darkens the email), shown at 120x42. Two ways in:
+//   - "inline" (the default): attached to the email itself and shown with
+//     src="cid:…", so nothing is fetched from the internet. Outlook blocks
+//     images it would have to fetch, for any sender not marked safe, and the
+//     team inbox showed a broken image for that reason on 8 Oct. The bytes
+//     are in api/_logo.js.
+//   - "hosted": loaded from this site (scripts/build-public-site.sh publishes
+//     it). Only for the daily update email, because Resend's broadcasts take
+//     no attachments.
+const { LOGO_PNG_BASE64 } = require("./_logo.js");
 const LOGO_PATH = "/assets/email/unitaid-logo.png";
+const LOGO_CID = "unitaid-logo";
+const LOGO_ATTACHMENT = { filename: "unitaid-logo.png", content: LOGO_PNG_BASE64, content_id: LOGO_CID, content_type: "image/png" };
 const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
 // The frame every email shares (8 Oct 2026, at the owner's request: "make it
@@ -335,11 +344,13 @@ const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 // the Unitaid logo top left and the dashboard's name top right; the heading
 // and body; small print under a divider; and "Powered by Unitaid" under the
 // card, as the dashboard itself says. Tables, bgcolor and inline styles only,
-// because Outlook's Word-based renderer ignores most modern CSS. `site` is the
-// absolute origin the logo is loaded from; without one the logo is left out.
-function frame({ site, heading, body, small = "" }) {
-  const logo = site
-    ? `<img src="${esc(site + LOGO_PATH)}" width="120" height="42" alt="Unitaid" ` +
+// because Outlook's Word-based renderer ignores most modern CSS. `logo` is
+// "inline" (the attached copy) or "hosted" (from `site`, the absolute origin
+// of this site); a hosted logo with no site gives the name in text instead.
+function frame({ site, logo: how = "inline", heading, body, small = "" }) {
+  const src = how === "inline" ? "cid:" + LOGO_CID : site ? site + LOGO_PATH : null;
+  const logo = src
+    ? `<img src="${esc(src)}" width="120" height="42" alt="Unitaid" ` +
       `style="display:block;width:120px;height:42px;border:0;outline:none;text-decoration:none">`
     : `<span style="font:700 18px/1 ${FONT};color:#212E92">Unitaid</span>`;
   return (
@@ -387,7 +398,7 @@ function frame({ site, heading, body, small = "" }) {
 // the team's, and a form is an easy way to put a phishing URL in front of it.
 // `href` is only ever an address this code built (the site's own page, or a
 // PARTNERS page). `site` is where the logo is loaded from (frame()).
-function render(heading, message, rows, { intro = "", footer = "", site = null } = {}) {
+function render(heading, message, rows, { intro = "", footer = "", site = null, logo = "inline" } = {}) {
   const text = [heading, intro, "", message, "",
     ...rows.map(([k, v, o]) => `${k}: ${v}` + (o && o.href && o.href !== v ? ` (${o.href})` : "")),
     "", footer]
@@ -420,14 +431,14 @@ function render(heading, message, rows, { intro = "", footer = "", site = null }
       : "") +
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ` +
       `style="border-collapse:collapse;margin:0 0 8px;border-top:1px solid #e3e9ec">${tableRows}</table>`;
-  return { text, html: frame({ site, heading, body, small: footer ? esc(footer) : "" }) };
+  return withLogo(logo, { text, html: frame({ site, logo, heading, body, small: footer ? esc(footer) : "" }) });
 }
 
 // An email to a subscriber, in the frame every email shares: a heading, a few
 // paragraphs, one button, and small print. Every link in it is one this code
 // built from the site's own address, never anything a visitor typed. `site`
 // is where the logo is loaded from (frame()).
-function letter({ heading, paras, button, small = [], site = null }) {
+function letter({ heading, paras, button, small = [], site = null, logo = "inline" }) {
   const text = [heading, "", ...paras.flatMap(p => [p, ""]),
     `${button.label}: ${button.href}`, "", ...small.map(s => s.link ? `${s.text} ${s.link}` : s.text)]
     .join("\n").replace(/\n+$/, "") + "\n";
@@ -441,7 +452,12 @@ function letter({ heading, paras, button, small = [], site = null }) {
   const smallHtml = small.map(s => `<p style="margin:0 0 6px">${esc(s.text)}` +
     (s.link ? ` <a href="${esc(s.link)}" style="color:#6b7780;text-decoration:underline">${esc(s.linkLabel || s.link)}</a>` : "") +
     `</p>`).join("");
-  return { text, html: frame({ site, heading, body, small: smallHtml }) };
+  return withLogo(logo, { text, html: frame({ site, logo, heading, body, small: smallHtml }) });
+}
+
+// An inline logo travels as an attachment, which sendEmail() passes on.
+function withLogo(logo, email) {
+  return logo === "inline" ? { ...email, attachments: [LOGO_ATTACHMENT] } : email;
 }
 
 // ---- Resend ------------------------------------------------------------------
@@ -470,10 +486,11 @@ function logFailure(form, what, r) {
 }
 
 // To the team inbox unless `to` says otherwise.
-function sendEmail(cfg, { to, subject, text, html, replyTo, headers, form }) {
+function sendEmail(cfg, { to, subject, text, html, replyTo, headers, attachments, form }) {
   const body = { from: cfg.from, to: to || cfg.to, subject, text, html, tags: [{ name: "form", value: form }] };
   if (replyTo) body.reply_to = replyTo;
   if (headers) body.headers = headers;
+  if (attachments && attachments.length) body.attachments = attachments;
   return resendRequest(cfg, "POST", "/emails", body);
 }
 
@@ -498,7 +515,7 @@ function addToSegment(cfg, email) {
 }
 
 module.exports = {
-  ADDRESSES, SEGMENT_NAME, PARTNERS, EMAIL_RE, DASHBOARD, LOGO_PATH,
+  ADDRESSES, SEGMENT_NAME, PARTNERS, EMAIL_RE, DASHBOARD, LOGO_PATH, LOGO_CID,
   config, reply, readRequest, partnerOf, notConfigured, logNotConfigured,
   line, block, esc, newRef, siteUrl, makeToken, readToken, readLink, page,
   when, render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure,

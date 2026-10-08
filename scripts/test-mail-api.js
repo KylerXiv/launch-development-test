@@ -371,14 +371,24 @@ group("the team's emails, laid out as a form", async () => {
   const team = r.calls[3].body;
   ok("the subscriber note: a brand bar, a title, and what happened", team.html.includes("LAUNCH Transparency Dashboard") && team.html.includes(">New subscriber<") && team.html.includes("Nothing to do"));
   ok("  the details as a two-column table, five rows", (team.html.match(/<td width="34%"/g) || []).length === 5);
-  const logo = `<img src="https://${HOST}${mail.LOGO_PATH}" width="120" height="42" alt="Unitaid"`;
-  for (const [name, html] of [["the team note", team.html], ["the welcome", r.calls[2].body.html]]) {
-    ok(`  ${name}: in the shared frame, with the Unitaid logo from this site, as a PNG, and "Powered by Unitaid"`,
-       html.includes(logo) && mail.LOGO_PATH.endsWith(".png") && !/\.svg/.test(html) && html.includes("Powered by Unitaid") && html.includes("LAUNCH Transparency<br>Dashboard"));
+  // The logo travels inside the email (an attachment shown with cid:), so Outlook
+  // has nothing to block: on 8 Oct the hosted one showed as a broken image there.
+  const logo = `<img src="cid:${mail.LOGO_CID}" width="120" height="42" alt="Unitaid"`;
+  const png = require("fs").readFileSync(require("path").join(__dirname, "..", "assets", "email", "unitaid-logo.png")).toString("base64");
+  const attached = (b) => Array.isArray(b.attachments) && b.attachments.length === 1 &&
+    b.attachments[0].content_id === mail.LOGO_CID && b.attachments[0].content_type === "image/png" &&
+    b.attachments[0].filename === "unitaid-logo.png" && b.attachments[0].content === png;
+  for (const [name, b] of [["the team note", team], ["the welcome", r.calls[2].body]]) {
+    ok(`  ${name}: in the shared frame, with the Unitaid logo attached and shown inline, and "Powered by Unitaid"`,
+       b.html.includes(logo) && attached(b) && !/\.svg|https?:\/\/[^"]*unitaid-logo/.test(b.html) && b.html.includes("Powered by Unitaid") && b.html.includes("LAUNCH Transparency<br>Dashboard"));
   }
   r = await call(feedback, { body: REPORT });
-  ok("  the feedback note too", r.calls[0].body.html.includes(logo) && r.calls[0].body.html.includes("Powered by Unitaid"));
-  ok("  with no site to load it from, the name stands in for the logo", mail.render("T", "", [["a", "b"]]).html.includes(">Unitaid</span>") && !mail.render("T", "", [["a", "b"]]).html.includes("<img"));
+  ok("  the feedback note too", r.calls[0].body.html.includes(logo) && attached(r.calls[0].body) && r.calls[0].body.html.includes("Powered by Unitaid"));
+  ok("  the inline logo is the PNG, byte for byte (api/_logo.js regenerated with it)", require("../api/_logo.js").LOGO_PNG_BASE64 === png);
+  const hosted = mail.letter({ heading: "H", paras: [], button: { label: "B", href: "https://x.example" }, site: "https://launch.example.org", logo: "hosted" });
+  ok("  a hosted logo (the broadcast's) loads from the site and attaches nothing", hosted.html.includes(`src="https://launch.example.org${mail.LOGO_PATH}"`) && !("attachments" in hosted));
+  const bare = mail.render("T", "", [["a", "b"]], { logo: "hosted" });
+  ok("  a hosted logo with no site to load it from: the name stands in", bare.html.includes(">Unitaid</span>") && !bare.html.includes("<img"));
   ok("  a readable time, not an ISO stamp", /Signed up: \d{1,2} [A-Z][a-z]{2} \d{4}, \d\d:\d\d UTC/.test(team.text) && !/\d{4}-\d\d-\d\dT/.test(team.text + team.html));
   ok("  the list by name, not by id", team.text.includes("Mailing list: " + mail.SEGMENT_NAME) && !team.html.includes("seg_123"));
   ok("  the page they signed up on is a link, because this code built it", team.html.includes(`href="https://${HOST}/illustrated-journey-dashboard.html"`));
