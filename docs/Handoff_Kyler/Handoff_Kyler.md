@@ -13,7 +13,7 @@ still open from then is carried below.*
 
 | | |
 | --- | --- |
-| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. Public since 6 Oct 2026. Work on `main`; everything up to #78 is merged. **One pull request is open**: `header-and-notes-wording` (title, tagline, draft banner and map note; [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.37) |
+| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. Public since 6 Oct 2026. Work on `main`; everything up to #79 is merged. **One pull request is open**: `title-malaria-product-launch` (the title becomes "Malaria Product Launch Dashboard", here and in RBM's mock; [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.38) |
 | Other remotes | `keith` is `Keith-paradox/launch-development`. Do not push to it, or to `kochrisdev/launch-transparency-dashboard` |
 | Production | Vercel project `launch-development-test`: <https://launch-development-test.vercel.app/illustrated-journey-dashboard.html>, also `/fr/`, `/pt/`. Every push to `main` deploys it, the email functions in `api/` included |
 | RBM's test copies | `codebyjackson/launch-rbm-test`, **served twice**: <https://codebyjackson.github.io/launch-rbm-test/> (GitHub Pages) and <https://launch-rbm-test.vercel.app/> (Jackson's Vercel). `iframe-test.html` there is a mock of RBM's platform. Kyler has push access. Its pages are generated here; see "Updating RBM's copy" below |
@@ -74,11 +74,14 @@ All of it is recorded in [email-backend-notes.md](../email-backend-notes.md), wi
 | #69–#71 | Jackson: the "yardstick", expected time against time taken, in plain words | [jackson/yardstick.md](../jackson/yardstick.md) |
 | #77 | This handoff's §0 | — |
 | #78 | Every source list A–Z: the registry, the footer in each language, and the proposal form's dropdown, which had drifted to 22 of 30 sources | [source-registry-notes.md](../source-registry-notes.md) §6 |
+| #79 | Tab title, tagline, draft banner ("Please do not quote them" gone) and map note, shortened | [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.37 |
 
-**RBM's test copy is current with `main`:** last pushed as `7f7245b` from
-`7c6aa1d` (#78). It was checked live on both hosts, in all three languages.
+**RBM's test copy is current with `main`:** last pushed as `7aa96ef` from
+`23843d4` (#79). It was checked live on both hosts, in all three languages.
 The open pull request changes the page, so it needs another push after it
-merges.
+merges, and **this time `iframe-test.html` changes too**: the mock's
+`launch` label (its banner, sidebar item and frame title) becomes the new
+title in all three languages (§3.38).
 
 ### Updating RBM's copy (after any merge that changes the page)
 

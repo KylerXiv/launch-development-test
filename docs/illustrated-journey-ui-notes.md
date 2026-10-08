@@ -1650,6 +1650,31 @@ of 2 Oct (jackson/translation-coverage.md), where a French `(largeur minimale :
 `hover` and `orientation` queries. With it, `content.en.json` is unchanged
 (same hash), and the French copies keep the query as written.
 
+| Rejected | Because |
+| --- | --- |
+| Never focusing anything on open | Keyboard and screen-reader users would have to find the dialog themselves; a desktop keyboard user loses the ready-to-type field |
+| Detecting iPhones by user agent | `pointer: coarse` describes the input, which is what matters, and covers Android, which opens its keyboard the same way |
+| Raising the panel above the floating button | The button would still show where they do not overlap, half-hidden; stepping aside is cleaner |
+
+**Checked** in headless Chrome, with RBM's copies built from this branch
+inside the mock platform, served locally:
+
+- **Touch screen, 390×844:** both forms' fields are 16px. Opening Send
+  feedback focuses `#ri-title`, and Subscribe `#sub-title`. The pointer is
+  under Subscribe.
+- **Desktop, 1440×900:** unchanged. Focus goes into `#ri-type` and
+  `#sub-email`, and the pointer is under Subscribe.
+- **375×667 and 390×844, in the mock:** nothing sticks out sideways (outside
+  or inside the frame), the page itself does not scroll, and the dialog fits
+  on screen. The floating button is hidden while Subscribe is open, and back
+  after.
+- **Screenshots at 375×667:** first view, the menu drawer, Subscribe open,
+  and feedback open. No JavaScript errors.
+
+**Not checked:** a real iPhone. Chrome cannot reproduce the picker or the
+zoom, so the fix removes their known causes, and each cause was measured gone.
+The owner's retest on the phone is the proof.
+
 ### 3.37 Title, tagline, draft banner and map note, shortened (8 Oct 2026)
 
 Branch `header-and-notes-wording`, off `main` at `7c6aa1d`. Four wording
@@ -1708,30 +1733,85 @@ editions.
 **After merge:** wait for `translate.yml`, then rebuild RBM's copies and push
 them, per the handoff (§0, "Updating RBM's copy").
 
+### 3.38 The title is "Malaria Product Launch Dashboard" (8 Oct 2026)
+
+Branch `title-malaria-product-launch`, off `main` at `23843d4`. The owner
+asked, on a screenshot of RBM's mock platform, for the title to become
+"Malaria Product Launch Dashboard" in both places it shows there: the mock's
+own banner, and this page's heading inside the frame. Also, the Sources
+intro loses its second sentence.
+
+| Where | Was | Now |
+| --- | --- | --- |
+| Heading (`h1.hd-title`) | **LAUNCH** (blue) Transparency Dashboard | Malaria Product Launch Dashboard |
+| `<title>` (browser tab) | LAUNCH Transparency Dashboard (§3.37) | Malaria Product Launch Dashboard |
+| Sources intro | Everything on this page is traceable to one of the public sources below. Each name opens that source's own official site in a new tab, so you can check any figure yourself. | Everything on this page is traceable to one of the public sources below. |
+| RBM's mock (`iframe-test.html` in `codebyjackson/launch-rbm-test`) | LAUNCH dashboard | Malaria Product Launch Dashboard; done after merge, below |
+
+**The tab follows the heading.** The request named the two titles on screen;
+the tab title was changed with them so the page does not carry two names.
+
+**The heading is one plain run of text, with no blue word.** The translation
+collector splits the page's text at every tag (`assemble-content.js`), so a
+coloured `<span>` makes its words a separate string, translated on its own
+and put back in English word order.
+
 | Rejected | Because |
 | --- | --- |
-| Never focusing anything on open | Keyboard and screen-reader users would have to find the dialog themselves; a desktop keyboard user loses the ready-to-type field |
-| Detecting iPhones by user agent | `pointer: coarse` describes the input, which is what matters, and covers Android, which opens its keyboard the same way |
-| Raising the panel above the floating button | The button would still show where they do not overlap, half-hidden; stepping aside is cleaner |
+| `<span>Malaria Product Launch</span> Dashboard`, keeping the blue lead | Two strings. French would read "Lancement de produits antipaludiques Tableau de bord", noun order reversed |
+| `Malaria Product <span>Launch</span> Dashboard` | Three strings, the same problem, and a blue word in the middle of the name |
 
-**Checked** in headless Chrome, with RBM's copies built from this branch
-inside the mock platform, served locally:
+As one string it is also shared by the heading and the tab: 591 strings
+before, 589 after (2 new; "LAUNCH", "Transparency Dashboard", the old tab
+title and the old Sources intro gone). The blue lead can come back if the
+owner prefers it, at the cost of hand-correcting the French and Portuguese
+in `i18n/translations.json`.
 
-- **Touch screen, 390×844:** both forms' fields are 16px. Opening Send
-  feedback focuses `#ri-title`, and Subscribe `#sub-title`. The pointer is
-  under Subscribe.
-- **Desktop, 1440×900:** unchanged. Focus goes into `#ri-type` and
-  `#sub-email`, and the pointer is under Subscribe.
-- **375×667 and 390×844, in the mock:** nothing sticks out sideways (outside
-  or inside the frame), the page itself does not scroll, and the dialog fits
-  on screen. The floating button is hidden while Subscribe is open, and back
-  after.
-- **Screenshots at 375×667:** first view, the menu drawer, Subscribe open,
-  and feedback open. No JavaScript errors.
+**"Launch" will be translated.** The translator's protected-terms list
+(`translate-strings.js` `PROTECT`) holds "LAUNCH" in capitals and matches case
+exactly, so "Launch" here is an ordinary word. Expect something like
+"Tableau de bord du lancement des produits antipaludiques". That reads
+correctly for a descriptive name; if the owner wants "LAUNCH" kept as the
+project's name, the title should be written in capitals.
 
-**Not checked:** a real iPhone. Chrome cannot reproduce the picker or the
-zoom, so the fix removes their known causes, and each cause was measured gone.
-The owner's retest on the phone is the proof.
+**The Sources links still show they open elsewhere.** The deleted sentence
+explained the links; each still carries the ↗ mark and opens in a new tab.
+
+**RBM's mock is changed after the merge, not before.** Its `launch` label
+drives the mock's banner, its sidebar item and the frame's `title` (what a
+screen reader announces for the embedded page), in English, French and
+Portuguese. Its French and Portuguese will be copied from what
+`translate.yml` produces for this page's heading, so the two titles agree in
+every language. Its static `<title>` and the iframe's `title` attribute change
+with it.
+
+**Still named "LAUNCH Transparency Dashboard" or "LAUNCH dashboard", left
+alone** because they are not this page's title:
+
+- the emails: the brand line and footer in `api/_mail.js`, the welcome's
+  first sentence in `api/subscribe.js` (the owner's own wording, under test
+  in `test-mail-api.js`), and the daily update in `notify-subscribers.js`;
+- the RSS feed's title (`make-feed.js`);
+- the schema.org dataset name in this page's JSON-LD (not shown to readers);
+- the disclaimer's prose, twice ("the LAUNCH dashboard");
+- RBM's README and start page, and the older pages (`index.html` and its
+  editions).
+
+**Fixed on the way:** §3.37 had been inserted in the middle of §3.36, so
+§3.36's "Rejected" table and its "Checked" list sat under the wording change.
+It is moved below §3.36; no line changed.
+
+**Checked:** verify block as expected (0 errors, 1 warning; 0 / 0; preview;
+`test-build-dataset.js` 28 / 0; country names all 252);
+`build-locale-pages.js` all checks passed; `test-build-rbm-pages.js` 25 / 0;
+`test-mail-api.js` 194 / 0. Headless Chrome reads back the new tab title,
+heading and Sources intro. Nothing in the page's code reads the heading; the
+feedback widget sends `document.title`, so the team's feedback notes will
+show the new name.
+
+**After merge:** wait for `translate.yml`; rebuild RBM's copies; change the
+mock's `launch` label in all three languages (from the bot's translations),
+its `<title>` and the iframe's `title`; push, then check both hosts.
 
 ## 4. Newly discovered, deferred, or left alone
 
