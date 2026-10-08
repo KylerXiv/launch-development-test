@@ -1813,6 +1813,55 @@ show the new name.
 mock's `launch` label in all three languages (from the bot's translations),
 its `<title>` and the iframe's `title`; push, then check both hosts.
 
+**Done after merge (8 Oct):** the bot gave "Tableau de bord de lancement de
+produits contre le paludisme" and "Painel de lançamento de produtos para a
+malária". RBM's pages and the mock (five places: the three `launch` labels,
+the `<title>`, the iframe's `title`) were pushed as `cb6efcb` and checked on
+both hosts. In French the name wraps to two lines in the mock's banner and
+three in its sidebar; nothing is cut off.
+
+### 3.39 The Filters counts have a column heading (8 Oct 2026)
+
+Branch `filters-count-heading`, off `main` at `9c5e43f`. The owner asked, on a
+screenshot of the map's Filters panel, for a heading over the numbers: "No. Of
+countries".
+
+**One heading, on the first group's line.** `.flt-cols` puts "Access stage"
+and the heading on one line, the heading right-aligned over `.ct`. It also
+serves the MFT policy numbers below, which count countries too.
+
+| Rejected | Because |
+| --- | --- |
+| A heading on each group's line | Two identical labels in a 222px panel; the column is one column |
+| A line of its own above the groups | Costs a row in a panel that already scrolls at some heights, for no gain over sharing the group's line |
+| Inside the `<h4>` | The `h4` is the group's name; a screen reader listing headings would read "Access stage No. of countries" |
+
+**Written "No. of countries".** The style is uppercase, as for the group
+names, so the request's "Of" and this "of" look the same on screen; the
+standard spelling is what the translator sees.
+
+**Measured in headless Chrome** (over CDP, panel screenshotted):
+
+- desktop, 1440px: the panel's content is 222px, so the heading wraps to
+  "NO. OF / COUNTRIES". It is allowed to (`min-width: 0`), and the group name
+  never does (`flex: none`). Kept, because two lines is how a narrow table's
+  column is usually headed, and it leaves room for longer translations;
+- phone, 390px: 298px, one line;
+- both: the heading's right edge is exactly the numbers' right edge (312px
+  and 344px).
+
+**Translation.** One new string (589 to 590). It is machine-translated after
+the merge. "No." has no precedent in the translations; an engine can read it
+as the word "no" ("Non."). Check the bot's French and Portuguese, and correct
+them by hand in `i18n/translations.json` if needed.
+
+**Checked:** verify block as expected (0 errors, 1 warning; 0 / 0; preview;
+`test-build-dataset.js` 28 / 0; country names all 252);
+`build-locale-pages.js` all checks passed; `test-build-rbm-pages.js` 25 / 0.
+
+**After merge:** wait for `translate.yml` and check its "No. of countries";
+rebuild RBM's copies and push them.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
