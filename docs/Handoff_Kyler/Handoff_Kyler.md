@@ -4,113 +4,202 @@
 > after it is the history of September's work, kept for its decisions. Where the
 > two disagree, §0 is current.
 
-## 0. Current state — 6 October 2026
+## 0. Current state — 8 October 2026
+
+*Start here in a new session. It replaces the 6 October version: everything
+still open from then is carried below.*
 
 ### Where things are
 
 | | |
 | --- | --- |
-| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. **Public since 6 Oct 2026.** Work on `main`; every branch from 5–6 Oct is merged |
+| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. Public since 6 Oct 2026. Work on `main`; **no pull request is open**, and everything up to #76 is merged |
 | Other remotes | `keith` is `Keith-paradox/launch-development`. Do not push to it, or to `kochrisdev/launch-transparency-dashboard` |
-| Production | Vercel project `launch-development-test`: <https://launch-development-test.vercel.app/illustrated-journey-dashboard.html>, also under `/fr/` and `/pt/`. Every push to `main` deploys |
-| Who can deploy | Vercel's Hobby plan refuses any commit whose Git author has no access to the Vercel project. Jackson (`codebyjackson`) has none, so his commits deploy only once a commit by Kyler sits on top, such as a merge commit. Check production after he pushes to `main` |
-| GitHub Actions | Runs again, free, since the repo went public (first good runs 09:42 UTC, 6 Oct). From 3 to 6 Oct every job was refused for billing ([developer-guide.md](../developer-guide.md) §8b) |
-| Repository secrets | `RESEND_API_KEY` (added 6 Oct), `GOOGLE_API_KEY`, `DATA_REPO_DEPLOY_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `VERCEL_DEPLOY_HOOK_URL`. Variable: `RBM_DATA_REPO` = `codebyjackson/launch-data-test` |
-| Email | Sent through Resend from `updates@tamarind.tech` to the team inbox `kyler@oqtiva.ai`, both set in `api/_mail.js`. Vercel holds `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET` for the forms; GitHub holds its own Resend key for the daily email |
+| Production | Vercel project `launch-development-test`: <https://launch-development-test.vercel.app/illustrated-journey-dashboard.html>, also `/fr/`, `/pt/`. Every push to `main` deploys it, the email functions in `api/` included |
+| RBM's test copies | `codebyjackson/launch-rbm-test`, **served twice**: <https://codebyjackson.github.io/launch-rbm-test/> (GitHub Pages) and <https://launch-rbm-test.vercel.app/> (Jackson's Vercel). `iframe-test.html` there is a mock of RBM's platform. Kyler has push access. Its pages are generated here; see "Updating RBM's copy" below |
+| RBM's data | `codebyjackson/launch-data-test`, written by `publish-dataset.yml`; the pages read `v1/dashboard.json` from it |
+| Who can deploy | Vercel's Hobby plan refuses commits whose author has no access. Jackson's commits deploy only under a Kyler commit, such as a merge |
+| GitHub Actions | Runs, free, since the repo went public |
+| Repository secrets | `RESEND_API_KEY`, `GOOGLE_API_KEY`, `DATA_REPO_DEPLOY_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `VERCEL_DEPLOY_HOOK_URL`. Variable: `RBM_DATA_REPO`. Vercel holds its own `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET` for the forms: a new Resend key goes in **both** places |
+| Email | Resend, from `updates@tamarind.tech` to the team inbox `kyler@oqtiva.ai` (`api/_mail.js`). Free plan: 100 emails a day, reset at 00:00 UTC |
 | Collaborators | `KylerXiv` (owner) and `codebyjackson` (write) |
 
 The verify block and its expected results are in [CLAUDE.md](../../CLAUDE.md).
-The one at the top of the history below is out of date.
 
-### What landed on 5–6 October
+### How the two forms work now
+
+All of it is recorded in [email-backend-notes.md](../email-backend-notes.md), with every decision, the alternatives and the numbers.
+
+- **Subscribe is single opt-in** (§2.3). Pressing Notify me saves the contact
+  at once and sends a welcome with an unsubscribe link. There is no confirm
+  email; `api/confirm.js` is gone.
+- **The form asks for first name, last name, email and, optionally,
+  organisation** (§2.15). The names go in Resend's own fields. The
+  organisation goes in the custom contact property `organisation`, which must
+  exist in Resend. Until it does, the contact is saved without it and the
+  team's note says "To do: create the contact property". **Kyler reported
+  creating it on 8 Oct; not yet seen confirmed by a real note.**
+- **What the page says:**
+  - new or returning: "Thank you for subscribing…", plus the welcome and
+    the team note;
+  - **already subscribed: "This email address is already subscribed…" and
+    nothing is sent**, so anyone testing with one address sees no email
+    after the first time. The form now reveals whether an address is on
+    the list; the owner accepted that.
+- **The emails:**
+  - the welcome and the daily update share one frame (§2.14), with the
+    Unitaid logo top left and "Powered by Unitaid";
+  - the welcome carries the logo inside the email (`cid:`, bytes in
+    `api/_logo.js`), because Outlook blocks fetched images;
+  - the daily update loads the logo from the site, because Resend broadcasts
+    take no attachments;
+  - **the team's notes are a plain bordered form with no logo**, at the
+    owner's request.
+- **RBM's copies post both forms to this project's API** (§2.13). It accepts
+  them only from the origins listed in `PARTNERS` in `api/_mail.js`. Today
+  those are both test hosts. **Every host that serves the pages needs an
+  entry**; a missing one shows "could not add you" to every reader.
+
+### What landed on 6–8 October
 
 | PR | What it does | Notes |
 | --- | --- | --- |
-| #54 | Subscribers get one email a day, at 15:00 UTC, on days the changelog gains lines (`notify-subscribers.yml`). Manual run: `preview` (team inbox only) or `send` | [subscriber-updates-notes.md](../subscriber-updates-notes.md) |
-| #55 | Source watchers for ClinicalTrials.gov (`propose-trials.js`), and for the NAFDAC and TMDA registers (`propose-registers.js`). Proposals can now add a country to the map, citing its register | [source-proposals-notes.md](../source-proposals-notes.md) |
-| #56 | The preview workflow's deploy step stops after 5 minutes and the job after 10, so a blocked deploy cannot burn hours | [pr-preview-notes.md](../pr-preview-notes.md) |
-| #57 | Disclaimer: "Unitaid does not accept legal responsibility…" instead of "We do not…" (Unitaid's request) | [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.35 |
-| #58 | Developer guide brought up to date: Vercel hosting, every workflow, Actions minutes and billing (§8b) | [developer-guide.md](../developer-guide.md) |
-| #59 | Proposal intake starts by itself only for issues from the owner, members or collaborators. On a public repo anyone else could otherwise make the bot commit to `main` and deploy a preview | [pr-preview-notes.md](../pr-preview-notes.md) |
-| #60 | Jackson: verified country lists, where every entry cites `sources` and `checked`, and register fetchers for Rwanda, Zambia, Zimbabwe and Viet Nam | his commits |
+| #62 | Subscribe: single opt-in, no confirm email | [email-backend-notes.md](../email-backend-notes.md) §2.3 |
+| #63 | Jackson: RBM's design on RBM's pages (`scripts/rbm-skin.js`) | his commit |
+| #64 | RBM's pages post Subscribe and Send feedback to this API, cross-origin, for `PARTNERS` only; `build-rbm-pages.js --api-url` | §2.13 |
+| #65 | RBM README: size the frame to the screen, not 2400px. In a taller frame the feedback button and dialog end up out of view | [rbm-handover-notes.md](../rbm-handover-notes.md) §4 |
+| #66 | The Vercel copy of RBM's pages added to `PARTNERS`. Its absence was the "sometimes it fails" report | §2.13 |
+| #67 | Phones: the forms stop opening the iOS picker and keyboard by themselves, Subscribe's pointer and the floating feedback button no longer misalign, and fields are 16px so iOS does not zoom | [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.36 |
+| #68, #72–#76 | Email wording and design, the already-subscribed message, the logo, and the name and organisation fields (above) | §2.3, §2.14, §2.15 |
+| #69–#71 | Jackson: the "yardstick", expected time against time taken, in plain words | [jackson/yardstick.md](../jackson/yardstick.md) |
 
-**Checked working on 6 Oct, on GitHub and on the live site:**
-- Every workflow run since the merges passed, including the new test steps in
-  `validate.yml`.
-- Two `preview` runs of the subscriber email reached the team inbox.
-- The source watchers' first run, on real data: no proposals, as expected.
-  FD-TACT's passed registry estimate was left for a person.
-- The English, French and Portuguese pages load. Both form endpoints answer.
+**RBM's test copy is current:** last pushed as `235eed3` from `43da963`. It
+was checked live on both hosts, in English and French.
+
+### Updating RBM's copy (after any merge that changes the page)
+
+The pages in `codebyjackson/launch-rbm-test` are **built here, not live
+copies**. A merge here reaches RBM's pages only when someone does this. Do
+it right after the merge, unprompted.
+
+1. `git pull` on `main`. If the merge changed page text, wait for the
+   `translate.yml` run, then check that `node scripts/assemble-content.js
+   --check` says up to date.
+2. `node scripts/build-rbm-pages.js`. The forms post to production by
+   default.
+3. Clone `codebyjackson/launch-rbm-test`, and **first** set
+   `git config user.name "Kyler"` and
+   `git config user.email "141990926+KylerXiv@users.noreply.github.com"` in
+   that clone (see the traps below).
+4. `diff -rq dist/rbm <clone>` and read what differs. Copy only the changed
+   pages (`en|fr|pt/index.html`, and `*/assets/report-issue.js` if the widget
+   changed). Leave alone the repo's own files: `index.html`,
+   `iframe-test.html`, `rbm-shell/`, `.nojekyll`, the README's "Live test
+   copy" block, and `assets/email/` (the email logo, which RBM's pages do not
+   use).
+5. Commit as "…, from launch-development-test `<sha>`" and push. GitHub
+   Pages and Vercel redeploy in about a minute. Check with `curl`, because
+   browsers may keep the old page for 10 minutes (`max-age=600`).
+
+### Traps found this session
+
+- **This Mac's global git identity is `keith-paythonic
+  <keith@paythonic.dev>`.** Only this checkout overrides it. Two commits in
+  the RBM repo went out under it (`177c74e`, `4f3437e`). They were left in
+  place, because changing them needs a force-push on Jackson's `main`. Set
+  the identity in every fresh clone.
+- **"It didn't change" is usually the browser cache.** GitHub Pages lets a
+  browser reuse a page for 10 minutes. Test in a private window.
+- **Already subscribed sends nothing.** To test repeatedly, use `+`
+  addresses (`name+test8@gmail.com`), or delete the test contacts in Resend.
+  Delete them afterwards too, because the daily update goes to everyone in
+  the segment.
+- **Resend's dashboard preview does not show inline images**, so the
+  welcome's logo looks broken there. Real mail apps show it.
+- **A Vercel function bundles only the files its build detects.** That is
+  why the logo's bytes live in `api/_logo.js` and are not read from disk; a
+  test guards it.
+- **Outlook ignores the `font:` shorthand.** Every email sets font
+  properties separately, and a test guards it.
+- **The translation collector takes any quoted phrase in the page's code
+  for text.** `isMediaQuery` in `assemble-content.js` now also covers
+  `pointer`, `hover` and `orientation` queries. Check new code strings with
+  `assemble-content.js --check`.
 
 ### What runs by itself next
 
 | When | What |
 | --- | --- |
-| Daily, 15:00 UTC | Subscriber email. The first run, 6 Oct, sends nothing and only marks the starting point |
-| Mondays, 06:00 UTC | Trials fetch, then the source watchers |
+| Daily, 15:00 UTC (GitHub runs it late; 19:57 and 20:23 UTC on 6–7 Oct) | Subscriber email, on days the changelog gained lines |
+| Mondays, 06:00 UTC | Trials fetch, then the source watchers. **The 5 Oct run failed** (billing, before the repo went public). Next: 12 Oct |
 | 1st of the month | Data review reminder issue |
-| 3rd of the month, 06:30 UTC | Global Fund, regulatory and the six national registers, then the source watchers |
+| 3rd of the month, 06:30 UTC | Global Fund, regulatory and the national registers, then the watchers |
 
-**October's monthly fetch never ran**: it was refused for billing on 3 Oct.
-Start "Scheduled source fetch" by hand, or wait for 3 November. A fetch can
-open watch issues and file proposals, which are public now.
+**October's monthly fetch never ran**: it was refused on 3 Oct and has not
+been started since. Start "Scheduled source fetch" by hand, or wait for
+3 November. It can open watch issues and file proposals, which are public.
 
 ### Still open
 
+**Waiting on Kyler:**
+- **Confirm the `organisation` property works.** Subscribe once with an
+  organisation and a fresh address. The team's note should say "Nothing to
+  do", not "To do: create the contact property".
+- **Retest the forms on a real iPhone**, on `iframe-test.html`: no picker
+  popping open, Subscribe's pointer under its button, no zoom. #67 was
+  verified only in Chrome's phone emulation.
+- **The feedback note that never reached Outlook (8 Oct).** Open it in
+  Resend: if "Delivered", look in Outlook's Junk or Microsoft's quarantine,
+  and mark `updates@tamarind.tech` safe; otherwise read the bounce reason.
+- **Set the Vercel Firewall rate-limit rule** (email-backend-notes.md §1
+  step 8). Since single opt-in it is the only brake on scripted sign-ups.
+- **Decide on returning subscribers.** Anyone who unsubscribed is
+  re-subscribed by the form, automatically (§2.3).
+- **The responsive-testing plan of 6 Oct**, in rounds 1–3: browsers on the
+  Mac, real devices, a cross-origin frame. Done so far: the mock's frame,
+  the phone fixes and Chrome emulation.
+- **Four corrections to `data/sources.js`** from 5 Oct: the WHO guidelines
+  at v10.0 (10 Sep 2026), the comparator list of 30 June 2026, the "MESA"
+  file being Unitaid's 2015 report, and the Essential Medicines List edition
+  (Unitaid's item 5).
+- **Unitaid's feedback of 5 Oct:** only the disclaimer was done (#57).
+  Coartem Baby is out, pricing waits on Unitaid, and "Status" / "On
+  pathway" were for that week's meeting.
+
 **Waiting on Unitaid:**
-1. Whether pricing data is included. They are checking.
-2. Permission to show the Unitaid mark and the WHO emblem, including on RBM's
-   embedded copy.
-3. Who the data controller is for the subscribe and feedback emails.
-4. A shared Unitaid inbox, and a Unitaid sending domain, to replace the test
-   addresses in `api/_mail.js`.
-5. Which Essential Medicines List to cite: the 2023 list the page links, or
-   the 2025 one.
-6. Whether Uganda's register stays listed under Sources while it feeds no data.
+1. Whether pricing data is included.
+2. **Permission for the Unitaid mark and the WHO emblem**, now including the
+   Unitaid logo **in the welcome and update emails**, which are a new
+   surface. Removing it from emails is one line in `frame()`.
+3. The data controller for the subscribe and feedback emails, which now
+   hold names and organisations.
+4. A shared Unitaid inbox and sending domain, to replace `kyler@oqtiva.ai`
+   and `updates@tamarind.tech`.
+5. Which Essential Medicines List to cite (2023 or 2025).
+6. Whether Uganda's register stays listed while it feeds no data.
 
-**Unitaid's feedback of 5 Oct.** Kyler chose to act only on the disclaimer
-(#57). Do not start the others unprompted:
-- **Coartem Baby:** Unitaid will not include it. It is not in the data.
-- **Pricing:** waiting on item 1 above.
-- **"Status" and "On pathway":** for that week's meeting. Facts, if it comes
-  back:
-  - "Delayed" is stage status `late`: an analyst marked that step as the
-    access barrier. It is measured against no date, and the page does not
-    define it.
-  - "On pathway" is the years since the first dated milestone, with no end.
-  - The reviewer suggests ending "market access" at WHO prequalification plus
-    recommendation, which gives 2022 for ASPY and 2015 for DHA–PPQ; GanLum
-    and ALAQ have not reached it.
-
-**Waiting on Kyler's go-ahead: four corrections to `data/sources.js`,** found
-on 5 Oct by checking the sheet of "new public sources". All seven sheet rows
-were already in the registry.
-- WHO malaria guidelines: version 10.0, 10 Sep 2026, not 13 Aug 2025. The
-  guideline's MAGICapp record id changes with each version; the stable key is
-  the short code `LwRMXj`.
-- WHO comparator list: the 30 June 2026 edition, which names the comparators
-  for ASPY and DHA–PPQ.
-- "MESA malaria medicines landscape": the file is Unitaid's own 2015 report,
-  which MESA only hosts.
-- Essential Medicines List edition: decided by Unitaid's item 5.
+**Waiting on RBM:**
+- **The address their platform will serve the pages from**, to add to
+  `PARTNERS`. The README asks them for every host, staging included.
+- **Agreement that their readers' details go to the LAUNCH team.**
+- **Their staging frame**, to check the embed: it should be sized to the
+  screen, as their Threats Map embed is.
 
 **Not built:**
-- A confirmation email to people who send feedback. The suggested design is a
-  fixed text that never repeats their message, sent only when they gave an
-  address, with the reference number.
-- Watchers for #60's four new registers: one row each in `REGISTERS`, in
-  `propose-registers.js`.
-- A WHO guideline version watcher, and a comparator-list watcher.
+- A confirmation email for people who send feedback.
+- A welcome email that greets the subscriber by name (the names are now
+  collected).
+- Watchers for #60's four new registers, a WHO guideline version watcher,
+  and a comparator-list watcher.
+- `build-rbm-pages.js` still copies `assets/email/` into `dist/rbm/`. It is
+  harmless, and it is not pushed to RBM's repo; excluding it would be one
+  line.
 
-**Housekeeping:**
-- **Branch protection is now available,** because the repo is public, and not
-  switched on. §5's "Blocked on GitHub Pro" no longer applies to this
-  repository.
-- **Jackson needs a Vercel seat,** or his commits keep needing one by Kyler on
-  top before they deploy.
-- **Test fixtures work once.** A rejected test proposal is never proposed
-  again; the EMA fixture is already used up. See each `test-data/*/README.md`.
-- **Responsive testing** on devices and browsers is with Kyler, 6 Oct.
+**Housekeeping (carried):**
+- Branch protection is available, because the repo is public, and is not
+  switched on.
+- Jackson needs a Vercel seat for his commits to deploy on their own.
+- Test fixtures work once (`test-data/*/README.md`).
 
 ---
 
