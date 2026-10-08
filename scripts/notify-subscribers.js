@@ -140,7 +140,8 @@ function compose(entries, { preview = false, sample = false } = {}) {
     small: [
       { text: "You're getting this because you subscribed to updates from the LAUNCH Transparency Dashboard." },
       { text: "Don't want these emails?", link: preview ? SITE + mail.DASHBOARD : UNSUBSCRIBE, linkLabel: "Unsubscribe" }
-    ]
+    ],
+    site: SITE
   });
   return { subject: (preview ? "[Preview] " : "") + subjectFor(entries), ...body };
 }

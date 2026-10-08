@@ -371,8 +371,14 @@ group("the team's emails, laid out as a form", async () => {
   const team = r.calls[3].body;
   ok("the subscriber note: a brand bar, a title, and what happened", team.html.includes("LAUNCH Transparency Dashboard") && team.html.includes(">New subscriber<") && team.html.includes("Nothing to do"));
   ok("  the details as a two-column table, five rows", (team.html.match(/<td width="34%"/g) || []).length === 5);
-  const brandLine = 'color:#0E5A73;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">LAUNCH Transparency Dashboard';
-  ok("  in the welcome's look: the same brand line as the welcome, and no dark bar", team.html.includes(brandLine) && r.calls[2].body.html.includes(brandLine) && !team.html.includes('bgcolor="#0E5A73"'));
+  const logo = `<img src="https://${HOST}${mail.LOGO_PATH}" width="120" height="42" alt="Unitaid"`;
+  for (const [name, html] of [["the team note", team.html], ["the welcome", r.calls[2].body.html]]) {
+    ok(`  ${name}: in the shared frame, with the Unitaid logo from this site, as a PNG, and "Powered by Unitaid"`,
+       html.includes(logo) && mail.LOGO_PATH.endsWith(".png") && !/\.svg/.test(html) && html.includes("Powered by Unitaid") && html.includes("LAUNCH Transparency<br>Dashboard"));
+  }
+  r = await call(feedback, { body: REPORT });
+  ok("  the feedback note too", r.calls[0].body.html.includes(logo) && r.calls[0].body.html.includes("Powered by Unitaid"));
+  ok("  with no site to load it from, the name stands in for the logo", mail.render("T", "", [["a", "b"]]).html.includes(">Unitaid</span>") && !mail.render("T", "", [["a", "b"]]).html.includes("<img"));
   ok("  a readable time, not an ISO stamp", /Signed up: \d{1,2} [A-Z][a-z]{2} \d{4}, \d\d:\d\d UTC/.test(team.text) && !/\d{4}-\d\d-\d\dT/.test(team.text + team.html));
   ok("  the list by name, not by id", team.text.includes("Mailing list: " + mail.SEGMENT_NAME) && !team.html.includes("seg_123"));
   ok("  the page they signed up on is a link, because this code built it", team.html.includes(`href="https://${HOST}/illustrated-journey-dashboard.html"`));

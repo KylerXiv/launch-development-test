@@ -774,6 +774,35 @@ line, 20px heading, 15px paragraphs and grey small print, on white, with a
 thin line between rows. So the three emails, welcome and both team notes,
 read as one family.
 
+**8 Oct, later: one professional frame for every email, with the Unitaid
+logo.** The owner found the welcome itself too plain ("make it
+professional… add the Unitaid logo"). `frame()` in `_mail.js` is now the
+shell of all four emails: the welcome (`letter()`), both team notes
+(`render()`), and the daily update email (`notify-subscribers.js`, which uses
+`letter()`). It has:
+
+- a white card on a light grey page;
+- the **Unitaid logo** top left and "LAUNCH Transparency Dashboard" top right;
+- a 24px heading, then the body;
+- for subscribers, a button drawn as a coloured table cell, the one form
+  Outlook renders;
+- small print under a divider;
+- "LAUNCH Transparency Dashboard · Powered by Unitaid" under the card, as
+  the dashboard itself says.
+
+| Decision | Because |
+| --- | --- |
+| The logo as a **PNG**, `assets/email/unitaid-logo.png`: `assets/unitaid-logo.svg` drawn at 240×84, shown at 120×42 | Gmail and Outlook do not show SVG |
+| On a **white** background, not transparent | A mail app that darkens emails would put the navy wordmark on near-black |
+| **Loaded from this site** (`LOGO_PATH`, copied by `build-public-site.sh`), from the host that sent the email | No attachment weight in every email. Outlook may ask the reader to "download pictures", as it does for any sender's images. The `alt="Unitaid"` text shows until then |
+| An inline (CID) attachment instead | Rejected: about 3 KB in every email, and a second path to test, for a logo most clients show anyway |
+
+**Unitaid mark permission (open).** The handoff records the use of the
+Unitaid logo as an unconfirmed assumption that does not transfer to another
+page or surface. Emails are a new surface. Confirm with Unitaid before real
+subscribers. Removing it is one line (`frame()` falls back to the name in
+text when it has no logo).
+
 ## 3. How it was verified
 
 **7 Oct 2026, the team's emails as a form (§2.14)**
@@ -1115,11 +1144,11 @@ documented there, and the rest of the preview test settles them:
 
 | | |
 | --- | --- |
-| Branch | `subscribe-status-and-team-look`, from `main` at `c6b6dd3` (8 Oct) |
-| Commits | 1: the already-subscribed message, and the team notes in the welcome's look, with these notes in the same commit |
+| Branch | `email-brand`, from `main` at `4899006` (8 Oct) |
+| Commits | 1: one professional frame, with the Unitaid logo, for every email, with these notes in the same commit |
 | Push and PR | not pushed when this was written; the pull request against `main` comes from this branch |
-| CI | runs on that pull request. `test-mail-api.js` is not in `validate.yml`; locally 174 passed |
-| Changed | `api/subscribe.js` (`status` in the answer), `api/_mail.js` (`render()` in the welcome's look), `illustrated-journey-dashboard.html` (two messages), `scripts/test-mail-api.js`, this document, `docs/illustrated-journey-ui-notes.md` |
-| After merge | the server side is live at once. The page messages need `translate.yml` (minutes, for `/fr` and `/pt`), then RBM's pages rebuilt and pushed |
-| Waiting on | the owner's merge; the Outlook delivery report (8 Oct, not yet diagnosed); the owner's iPhone retest of the forms; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8); the owner's call on re-subscribing returning addresses (§2.3) |
-| Before this | `welcome-wording`, PR #72, merged 8 Oct. `team-email-form`, PR #68, merged 7 Oct (§2.14). `mobile-forms`, PR #67, merged 7 Oct. `rbm-vercel-partner`, PR #66. `rbm-embed-sizing`, PR #65. `rbm-forms`, PR #64. `subscribe-single-opt-in`, PR #62. `email-feedback`, PR #40. `email-subscribe`, PR #30 |
+| CI | runs on that pull request; `validate.yml` runs `test-notify-subscribers.js` (67) but not `test-mail-api.js` (177, local) |
+| Changed | `api/_mail.js` (`frame()`, `LOGO_PATH`, `letter()` and `render()` inside it), `api/subscribe.js` and `api/feedback.js` (pass `site`), `scripts/notify-subscribers.js` (passes `SITE`), `scripts/build-public-site.sh` (publishes the PNG), `assets/email/unitaid-logo.png` (new), both test scripts, this document, `docs/subscriber-updates-notes.md` |
+| After merge | live at once: the next email from the LAUNCH site or either RBM copy uses it, since emails come from this API, not from the pages. Nothing to rebuild for RBM |
+| Waiting on | the owner's merge; **Unitaid's permission for its mark in emails**; the Outlook delivery report (8 Oct); the owner's iPhone retest; RBM's real host for `PARTNERS`; RBM's agreement on its readers' data (§2.13); the rate-limit rule (§1 step 8) |
+| Before this | `subscribe-status-and-team-look`, PR #73, merged 8 Oct; RBM pages pushed as `0e8a4ab`. `welcome-wording`, PR #72. `team-email-form`, PR #68. `mobile-forms`, PR #67. `rbm-vercel-partner`, PR #66. `rbm-embed-sizing`, PR #65. `rbm-forms`, PR #64. `subscribe-single-opt-in`, PR #62. `email-feedback`, PR #40. `email-subscribe`, PR #30 |

@@ -46,6 +46,8 @@ module.exports = async function feedback(req, res) {
   const data = body.data && typeof body.data === "object" ? body.data : {};
   const version = [mail.line(data.lastUpdated, 40), mail.line(data.dataStatus, 40)].filter(Boolean);
   const ref = mail.newRef();
+  // Where the email's logo is loaded from: this site (null leaves it out).
+  const site = mail.siteUrl(req);
 
   // Laid out as a form (mail.render). The page address is the visitor's own
   // report of where they were, so it is shown as text, never as a link.
@@ -71,7 +73,8 @@ module.exports = async function feedback(req, res) {
       intro: `${TYPES[type]} · ${product}`,
       footer: email
         ? `Reference ${ref}. Reply to this email to answer them: the reply goes to ${email}.`
-        : `Reference ${ref}. They left no email address, so this cannot be answered.`
+        : `Reference ${ref}. They left no email address, so this cannot be answered.`,
+      site
     }),
     // Reply in the inbox goes straight to the visitor when they left an address.
     replyTo: email || null,

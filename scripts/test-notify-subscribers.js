@@ -99,6 +99,7 @@ group("What the email says", () => {
   const e = N.compose([p, OLD[1]]);
   ok("text and HTML both carry Resend's unsubscribe placeholder", e.text.includes(N.UNSUBSCRIBE) && e.html.includes('href="' + N.UNSUBSCRIBE + '"'));
   ok("it links to the public dashboard", e.html.includes(N.SITE + mail.DASHBOARD) && /^https:\/\//.test(N.SITE));
+  ok("it carries the Unitaid logo from the public site, like the welcome", e.html.includes(`src="${N.SITE}${mail.LOGO_PATH}"`) && e.html.includes('alt="Unitaid"'));
   ok("dates across months are both written in full", e.text.includes("updated between 8 September 2026 and 5 October 2026:"));
   ok("dates within a month read 'between 1 and 5 October 2026'",
     N.compose([line("2026-10-05", "All", "a", "A."), line("2026-10-01", "All", "b", "B.")]).text.includes("updated between 1 and 5 October 2026:"));

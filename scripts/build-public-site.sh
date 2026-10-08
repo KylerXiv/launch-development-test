@@ -40,6 +40,10 @@ cp data/products.js data/products.synthetic.js data/world-map.js \
 # Shared assets
 cp assets/journey-icons/icons.js assets/journey-icons/icons-solid.js "$OUT/assets/journey-icons/"
 cp assets/who-emblem.svg assets/unitaid-logo.svg assets/report-issue.js assets/site-nav.js "$OUT/assets/"
+# The emails' logo (api/_mail.js LOGO_PATH): emails load it from this site,
+# as a PNG because mail apps do not show SVG
+mkdir -p "$OUT/assets/email"
+cp assets/email/unitaid-logo.png "$OUT/assets/email/"
 
 # French and Portuguese editions of the illustrated journey dashboard, from
 # the translation memory (docs/translation-notes.md). --allow-stale because a

@@ -98,7 +98,8 @@ module.exports = async function subscribe(req, res) {
         "You're now subscribed to the LAUNCH Transparency Dashboard. We'll email you when its data is updated: new milestones, corrected figures and newly verified country registrations."
       ],
       button: { label: "Open the dashboard", href: home },
-      small: [{ text: "Didn't sign up, or don't want these emails?", link: unsubscribe, linkLabel: "Unsubscribe" }]
+      small: [{ text: "Didn't sign up, or don't want these emails?", link: unsubscribe, linkLabel: "Unsubscribe" }],
+      site
     }),
     // RFC 2369 + RFC 8058: the mail app's own "Unsubscribe" button, which
     // posts straight to the link with no page in between.
@@ -126,7 +127,8 @@ module.exports = async function subscribe(req, res) {
       intro: segmentOk
         ? "Someone subscribed to updates from the LAUNCH dashboard. Nothing to do: they are on the mailing list, and every update email carries their unsubscribe link."
         : "Someone subscribed to updates from the LAUNCH dashboard. One thing to do: add them to the mailing list by hand (below).",
-      footer: "Sent automatically when someone subscribes on the dashboard. Their address is used only for the update emails."
+      footer: "Sent automatically when someone subscribes on the dashboard. Their address is used only for the update emails.",
+      site
     }),
     form: "subscribe-team"
   });

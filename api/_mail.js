@@ -322,23 +322,72 @@ function when(d = new Date()) {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())} UTC`;
 }
 
-// A note to the team inbox: the welcome email's look (letter(), below), with
-// the details as a form. Since 8 Oct 2026, at the owner's request, the same
-// teal brand line, heading, paragraph and small print as the welcome, on
-// white; until then a dark bar on a grey card (7 Oct). Top to bottom: brand
-// line, title, one line on what happened or what to do, the visitor's message
-// in a box when there is one, the details as two columns (label, answer) with
-// a line between rows, and a footer. The rows are a table with inline styles,
-// because the inbox is Outlook, whose Word-based renderer ignores most modern
-// CSS.
+// The Unitaid logo for emails: a PNG, because Gmail and Outlook do not show
+// SVG. assets/unitaid-logo.svg drawn at 240x84 on white (white so it stays
+// legible when a mail app darkens the email), shown at 120x42. Served by this
+// site (scripts/build-public-site.sh copies it), so an email links to it on
+// the host that sent it.
+const LOGO_PATH = "/assets/email/unitaid-logo.png";
+const FONT = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+
+// The frame every email shares (8 Oct 2026, at the owner's request: "make it
+// professional, with the Unitaid logo"): a white card on a light grey page;
+// the Unitaid logo top left and the dashboard's name top right; the heading
+// and body; small print under a divider; and "Powered by Unitaid" under the
+// card, as the dashboard itself says. Tables, bgcolor and inline styles only,
+// because Outlook's Word-based renderer ignores most modern CSS. `site` is the
+// absolute origin the logo is loaded from; without one the logo is left out.
+function frame({ site, heading, body, small = "" }) {
+  const logo = site
+    ? `<img src="${esc(site + LOGO_PATH)}" width="120" height="42" alt="Unitaid" ` +
+      `style="display:block;width:120px;height:42px;border:0;outline:none;text-decoration:none">`
+    : `<span style="font:700 18px/1 ${FONT};color:#212E92">Unitaid</span>`;
+  return (
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f5f7" style="background:#f3f5f7">` +
+    `<tr><td align="center" style="padding:32px 12px">` +
+    `<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" ` +
+      `style="width:100%;max-width:600px;background:#ffffff;border:1px solid #e2e8ec;border-radius:12px">` +
+    // header: logo, and the dashboard's name
+    `<tr><td style="padding:26px 32px 22px;border-bottom:1px solid #edf1f3">` +
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>` +
+        `<td valign="middle">${logo}</td>` +
+        `<td valign="middle" align="right" style="font:700 11px/1.35 ${FONT};letter-spacing:.08em;text-transform:uppercase;color:#0E5A73">` +
+          `LAUNCH Transparency<br>Dashboard</td>` +
+      `</tr></table>` +
+    `</td></tr>` +
+    // heading and body
+    `<tr><td style="padding:30px 32px 6px;font:16px/1.6 ${FONT};color:#1f2a30">` +
+      `<div style="margin:0 0 16px;font:700 24px/1.3 ${FONT};color:#111b21">${esc(heading)}</div>` +
+      body +
+    `</td></tr>` +
+    // small print
+    (small
+      ? `<tr><td style="padding:10px 32px 28px">` +
+        `<div style="border-top:1px solid #edf1f3;padding-top:18px;font:13px/1.55 ${FONT};color:#6b7780">${small}</div>` +
+        `</td></tr>`
+      : `<tr><td style="padding:0 0 22px"></td></tr>`) +
+    `</table>` +
+    // under the card
+    `<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px">` +
+      `<tr><td align="center" style="padding:16px 12px 0;font:12px/1.5 ${FONT};color:#8a959d">` +
+        `LAUNCH Transparency Dashboard · Powered by Unitaid</td></tr>` +
+    `</table>` +
+    `</td></tr></table>`
+  );
+}
+
+// A note to the team inbox, in the frame every email shares, with the details
+// as a form: one line on what happened or what to do, the visitor's message
+// in a box when there is one, then two columns (label, answer) with a line
+// between rows, and a footer as the small print.
 //
 // Each row is [label, value] or [label, value, { href, tone }]: `tone` is
 // "warn" (something to do) or "muted" (detail). Every value is escaped, and
 // none a visitor typed ever becomes a link, because the inbox reading these is
 // the team's, and a form is an easy way to put a phishing URL in front of it.
 // `href` is only ever an address this code built (the site's own page, or a
-// PARTNERS page).
-function render(heading, message, rows, { intro = "", footer = "" } = {}) {
+// PARTNERS page). `site` is where the logo is loaded from (frame()).
+function render(heading, message, rows, { intro = "", footer = "", site = null } = {}) {
   const text = [heading, intro, "", message, "",
     ...rows.map(([k, v, o]) => `${k}: ${v}` + (o && o.href && o.href !== v ? ` (${o.href})` : "")),
     "", footer]
@@ -349,50 +398,50 @@ function render(heading, message, rows, { intro = "", footer = "" } = {}) {
   const cell = (v, o) => {
     const shown = esc(v);
     const style = o && o.tone === "warn" ? "color:#b42318;font-weight:700"
-      : o && o.tone === "muted" ? "color:#6b7780;font-size:13px" : "color:#1a1a1a";
+      : o && o.tone === "muted" ? "color:#6b7780;font-size:13px" : "color:#1f2a30";
     const body = o && o.href
       ? `<a href="${esc(o.href)}" style="color:#0E5A73;text-decoration:underline">${shown}</a>`
       : shown;
     return `<span style="${style}">${body}</span>`;
   };
-  const tableRows = rows.map(([k, v, o]) =>
-    `<tr>` +
-    `<td width="34%" valign="top" style="padding:10px 12px 10px 0;${line};font-size:13px;line-height:20px;font-weight:600;color:#666">${esc(k)}</td>` +
-    `<td valign="top" style="padding:10px 0;${line};font-size:15px;line-height:20px;word-break:break-word">${cell(v, o)}</td>` +
-    `</tr>`).join("");
+  // a line between rows, none under the last: the small print's divider follows
+  const tableRows = rows.map(([k, v, o], i) => {
+    const sep = i < rows.length - 1 ? line : "border-bottom:0";
+    return `<tr>` +
+      `<td width="34%" valign="top" style="padding:10px 12px 10px 0;${sep};font:600 13px/20px ${FONT};color:#6b7780">${esc(k)}</td>` +
+      `<td valign="top" style="padding:10px 0;${sep};font:15px/20px ${FONT};word-break:break-word">${cell(v, o)}</td>` +
+      `</tr>`;
+  }).join("");
 
-  const html =
-    `<div style="max-width:560px;font:15px/1.55 -apple-system,Segoe UI,Arial,sans-serif;color:#1a1a1a">` +
-    `<p style="margin:0 0 6px;color:#0E5A73;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">LAUNCH Transparency Dashboard</p>` +
-    `<p style="margin:0 0 14px;font-size:20px;font-weight:650">${esc(heading)}</p>` +
-    (intro ? `<p style="margin:0 0 16px">${esc(intro)}</p>` : "") +
+  const body =
+    (intro ? `<p style="margin:0 0 18px">${esc(intro)}</p>` : "") +
     (message
-      ? `<div style="margin:0 0 18px;padding:12px 14px;border-left:3px solid #0E5A73;background:#f4f7f8;white-space:pre-wrap;word-break:break-word">${esc(message)}</div>`
+      ? `<div style="margin:0 0 20px;padding:12px 14px;border-left:3px solid #0E5A73;background:#f4f7f8;white-space:pre-wrap;word-break:break-word">${esc(message)}</div>`
       : "") +
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ` +
-      `style="border-collapse:collapse;margin:0 0 18px;border-top:1px solid #e3e9ec">${tableRows}</table>` +
-    (footer ? `<p style="margin:0 0 8px;color:#666;font-size:13px">${esc(footer)}</p>` : "") +
-    `</div>`;
-  return { text, html };
+      `style="border-collapse:collapse;margin:0 0 8px;border-top:1px solid #e3e9ec">${tableRows}</table>`;
+  return { text, html: frame({ site, heading, body, small: footer ? esc(footer) : "" }) };
 }
 
-// An email to a subscriber: a heading, a few paragraphs, one button, and small
-// print. Every link in it is one this code built from the site's own address,
-// never anything a visitor typed.
-function letter({ heading, paras, button, small = [] }) {
+// An email to a subscriber, in the frame every email shares: a heading, a few
+// paragraphs, one button, and small print. Every link in it is one this code
+// built from the site's own address, never anything a visitor typed. `site`
+// is where the logo is loaded from (frame()).
+function letter({ heading, paras, button, small = [], site = null }) {
   const text = [heading, "", ...paras.flatMap(p => [p, ""]),
     `${button.label}: ${button.href}`, "", ...small.map(s => s.link ? `${s.text} ${s.link}` : s.text)]
     .join("\n").replace(/\n+$/, "") + "\n";
-  const html =
-    `<div style="max-width:520px;font:15px/1.55 -apple-system,Segoe UI,Arial,sans-serif;color:#1a1a1a">` +
-    `<p style="margin:0 0 6px;color:#0E5A73;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">LAUNCH Transparency Dashboard</p>` +
-    `<p style="margin:0 0 14px;font-size:20px;font-weight:650">${esc(heading)}</p>` +
-    paras.map(p => `<p style="margin:0 0 14px">${esc(p)}</p>`).join("") +
-    `<p style="margin:18px 0 22px"><a href="${esc(button.href)}" style="display:inline-block;padding:11px 20px;border-radius:8px;background:#0E5A73;color:#ffffff;font-weight:650;text-decoration:none">${esc(button.label)}</a></p>` +
-    small.map(s => `<p style="margin:0 0 8px;color:#666;font-size:13px">${esc(s.text)}` +
-      (s.link ? ` <a href="${esc(s.link)}" style="color:#666">${esc(s.linkLabel || s.link)}</a>` : "") + `</p>`).join("") +
-    `</div>`;
-  return { text, html };
+  // the button as a table cell with a background: the one form Outlook draws
+  const btn =
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 22px"><tr>` +
+    `<td bgcolor="#0E5A73" style="background:#0E5A73;border-radius:8px">` +
+    `<a href="${esc(button.href)}" style="display:inline-block;padding:13px 26px;font:600 15px/1 ${FONT};color:#ffffff;text-decoration:none;border-radius:8px">${esc(button.label)}</a>` +
+    `</td></tr></table>`;
+  const body = paras.map(p => `<p style="margin:0 0 16px">${esc(p)}</p>`).join("") + btn;
+  const smallHtml = small.map(s => `<p style="margin:0 0 6px">${esc(s.text)}` +
+    (s.link ? ` <a href="${esc(s.link)}" style="color:#6b7780;text-decoration:underline">${esc(s.linkLabel || s.link)}</a>` : "") +
+    `</p>`).join("");
+  return { text, html: frame({ site, heading, body, small: smallHtml }) };
 }
 
 // ---- Resend ------------------------------------------------------------------
@@ -449,7 +498,7 @@ function addToSegment(cfg, email) {
 }
 
 module.exports = {
-  ADDRESSES, SEGMENT_NAME, PARTNERS, EMAIL_RE, DASHBOARD,
+  ADDRESSES, SEGMENT_NAME, PARTNERS, EMAIL_RE, DASHBOARD, LOGO_PATH,
   config, reply, readRequest, partnerOf, notConfigured, logNotConfigured,
   line, block, esc, newRef, siteUrl, makeToken, readToken, readLink, page,
   when, render, letter, sendEmail, getContact, updateContact, addContact, addToSegment, logFailure,
