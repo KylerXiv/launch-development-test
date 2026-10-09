@@ -198,6 +198,42 @@ year per stage in the data — a bigger change to the data model for one field.
 If a later translation words the date differently, that row falls back to
 "Ongoing, no start date" rather than showing a wrong number.
 
+## Follow-up: expected-time tag on phones (9 Oct)
+
+On phones (640px and under) the clock tag under the WHO pair ran out of its
+column and past the Market Access card. The pair's column is 66px wide inside
+its bracket (84px minimum, less padding and borders), but the tag could not get
+narrower than 112px: it is a flex row, and a flex item does not shrink below
+its longest word, so the clock, "2 years" and "expected" stayed side by side.
+Measured in Chrome at 360px and 390px: 18px past the column and 4px past the
+card in English, 9px past the column in French.
+
+Chosen (option B of four, the user's pick): the tag may wrap, so "expected"
+drops to a second line under the clock and the number, and the number never
+splits ("2" over "years" before). CSS only, in the existing 640px rule; no
+markup, data or translation change. Measured the same way on en, fr, pt and
+es: the WHO pair's tags sit 9px inside their column, every other tag fits its
+column exactly (it is capped at 100%), all are 14px or more inside their card,
+and the page does not scroll sideways.
+
+Rejected:
+- Also sizing each column to its longest word (option A). It would stop "WHO
+  recommendation" breaking as "recommenda-tion", but the user chose the smaller
+  change; the hyphenation is left as it is.
+- Hiding "expected" on phones (option C): one-line tags, but it changes the
+  markup that i18n/reviewed-strings.json line 94 matches, and phone readers
+  lose the word.
+- A vertical list on phones (option D): fits best, but it is a new layout for
+  the strip, about 650px tall, and has to cancel alignPathGroup()'s lift.
+
+Found in passing, left alone: the French tag reads "2 années attendu" (should
+agree: "attendues") and "1.5" keeps the decimal point on /fr. Translations come
+from the bot only, so this is for the bot or a source wording change.
+
+Branch `fix/phone-expected-tag`. The RBM pages are rebuilt from it and copied
+into launch-rbm-test on branch `fix/phone-expected-tag` there. The data repo
+does not change: dashboard.json carries no CSS.
+
 ## Status
 
 Local branch `feat/yardstick`, one commit, not pushed. Notes moved to `docs/jackson/` at the owner's request, so they can revert or fix it themselves. Verify block: both
