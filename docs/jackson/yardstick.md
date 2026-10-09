@@ -254,9 +254,21 @@ smaller names still split in en/fr/es. Stacking the two cards is clean at
 360px. A vertical list works in every language but doubles the strip's
 height (about 655px against 330-360px).
 
-Branch `fix/phone-expected-tag`. The RBM pages are rebuilt from it and copied
-into launch-rbm-test on branch `fix/phone-expected-tag` there. The data repo
-does not change: dashboard.json carries no CSS.
+Then a rename (same day, the owner's wording): the second access group,
+"Country / Population Access", is now "Country Access", next to "Market
+Access". One string in PHASES, read by the card title, its aria-label and
+the Time taken table. The collector sees exactly one string swapped and
+nothing else. i18n/ is left to the translate bot, as always: until it runs
+on main, /fr, /pt and /es show "Country Access" in English. The existing
+"Country access" (lower-case, the map) is a different string and was not
+reused, so the two titles keep the same casing.
+
+Branch `fix/phone-expected-tag`, three commits. The tag and step-name fixes
+are rebuilt and copied into launch-rbm-test on branch `fix/phone-expected-tag`
+there (from 14a2c84). The rename is not: copy-rbm-pages.js refuses a build
+whose translations are behind, so the RBM pages for it are rebuilt after the
+merge and the bot's commit, from main. The data repo does not change:
+dashboard.json carries neither the CSS nor the group names.
 
 ## Status
 
