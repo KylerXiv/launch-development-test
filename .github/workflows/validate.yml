@@ -35,10 +35,12 @@ jobs:
           node scripts/test-build-dataset.js --allow-stale
           node scripts/test-dataset-diff.js
       # The pages handed over to RBM, built from the same page: a change to it
-      # that the build no longer understands fails here.
+      # that the build no longer understands fails here. And the copy into the
+      # RBM test repository, which must stop rather than wipe hand edits there.
       - name: RBM pages build
         run: |
           node scripts/test-build-rbm-pages.js
+          node scripts/test-copy-rbm-pages.js
           node scripts/build-rbm-pages.js --allow-stale
       # The daily update email to subscribers: what counts as new, what the
       # email says, and that a re-run never sends twice. No network, no key.

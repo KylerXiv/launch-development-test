@@ -108,7 +108,12 @@ scrolls. `iframe-test.html` in this folder shows it working.
 
 These files are generated in the LAUNCH pipeline repository by
 `node scripts/build-rbm-pages.js` from the same page as the LAUNCH site, so a
-fix there reaches here on the next build. Do not edit them by hand.
+fix there reaches here on the next build. Do not edit them by hand: a change
+made here is replaced by the next build. `build-manifest.json` records what
+the build wrote (the sha256 of each file in en/, fr/, pt/, es/ and assets/,
+and the commit it was built from), so an edit made here can be found; the
+LAUNCH repository's `scripts/copy-rbm-pages.js` stops a copy that would
+replace one.
 `--api-url` sets where the two forms post (default: the LAUNCH production
 site); `--api-url none` builds them switched off, as they were until
 7 Oct 2026.
