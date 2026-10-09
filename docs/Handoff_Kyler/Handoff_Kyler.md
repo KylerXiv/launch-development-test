@@ -13,7 +13,7 @@ still open from then is carried below.*
 
 | | |
 | --- | --- |
-| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. Public since 6 Oct 2026. Work on `main`; everything up to #82 is merged. **One pull request is open**: `phone-header-buttons` (on phones, Download CSV and Subscribe fill the row again; [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.40) |
+| Repository | `KylerXiv/launch-development-test`, this checkout's `origin`. Public since 6 Oct 2026. Work on `main`; everything up to #83 is merged. No pull request changing the page is open |
 | Other remotes | `keith` is `Keith-paradox/launch-development`. Do not push to it, or to `kochrisdev/launch-transparency-dashboard` |
 | Production | Vercel project `launch-development-test`: <https://launch-development-test.vercel.app/illustrated-journey-dashboard.html>, also `/fr/`, `/pt/`. Every push to `main` deploys it, the email functions in `api/` included |
 | RBM's test copies | `codebyjackson/launch-rbm-test`, **served twice**: <https://codebyjackson.github.io/launch-rbm-test/> (GitHub Pages) and <https://launch-rbm-test.vercel.app/> (Jackson's Vercel). `iframe-test.html` there is a mock of RBM's platform. Kyler has push access. Its pages are generated here; see "Updating RBM's copy" below |
@@ -78,13 +78,17 @@ All of it is recorded in [email-backend-notes.md](../email-backend-notes.md), wi
 | #80 | The title is "Malaria Product Launch Dashboard", on the page and in RBM's mock; the Sources intro loses its second sentence | §3.38 |
 | #81 | A "No. of countries" heading over the map Filters' numbers | §3.39 |
 | #82 | Jackson: Spanish (`/es`, RBM `es/`, and `es` in `dashboard.json`) | [jackson/spanish.md](../jackson/spanish.md) |
+| #83 | Phones: Download CSV and Subscribe fill the row in every language (on an iPhone it was as wide as its words in English and Portuguese) | [illustrated-journey-ui-notes.md](../illustrated-journey-ui-notes.md) §3.40 |
 
-**RBM's test copy is current with `main`:** Jackson pushed it with Spanish
-(`61345d8`, from `41cd7af`), which includes #81. Checked by building here: his
-pages differ from this checkout's build only by the open pull request's
-change. RBM's own `iframe-test.html` carries the new title since `cb6efcb`
-(#80). The open pull request changes the page, so it needs another push after
-it merges.
+**RBM's test copy is current with `main`:** last pushed as `145065c` from
+`88fc717` (#83), all four languages. Checked live on both hosts, inside the
+mock, in WebKit with an iPhone profile. RBM's own `iframe-test.html` carries
+the new title since `cb6efcb` (#80).
+
+**The push is what makes a merge visible inside the iframe.** On 8 Oct the
+owner tested #83 in the mock straight after merging it and still saw the bug:
+production had the fix, RBM's copy did not yet. Push RBM's copy as soon as a
+page change merges.
 
 ### Updating RBM's copy (after any merge that changes the page)
 
