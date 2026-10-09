@@ -217,9 +217,9 @@ column exactly (it is capped at 100%), all are 14px or more inside their card,
 and the page does not scroll sideways.
 
 Rejected:
-- Also sizing each column to its longest word (option A). It would stop "WHO
-  recommendation" breaking as "recommenda-tion", but the user chose the smaller
-  change; the hyphenation is left as it is.
+- Also sizing each column to its longest word (option A), in the same change.
+  The user chose the smaller change first; the step names were then fixed on
+  their own, below.
 - Hiding "expected" on phones (option C): one-line tags, but it changes the
   markup that i18n/reviewed-strings.json line 94 matches, and phone readers
   lose the word.
@@ -229,6 +229,30 @@ Rejected:
 Found in passing, left alone: the French tag reads "2 années attendu" (should
 agree: "attendues") and "1.5" keeps the decimal point on /fr. Translations come
 from the bot only, so this is for the bot or a source wording change.
+
+Then the step names (same day). With overflow-wrap: break-word and
+hyphens: auto, a name split inside a word whenever the word was wider than
+its column: 7 words across the four languages, the same at 360px and 390px
+(en recommendation, Procurement; fr Recommandation, Enregistrement; pt
+Recomendação; es Recomendación, Adquisiciones). English got a hyphen;
+Spanish and French broke with none.
+
+Chosen (option 1 of two that worked, the user's pick): names break only
+between words, and every column is at least as wide as its longest word
+(min-width: min-content). The rule sits after the 760px block, because that
+block sets .pathnode { min-width: 72px } at the same specificity. Measured
+before the change: 0 splits in all four languages at both widths, the strip
+no wider than before (742 / 785 / 735 / 744px), the English strip 30px
+shorter.
+
+Rejected, each measured at 390px: a wider WHO column only (124px), smaller
+names (11px) with a slimmer bracket, and shorter WHO names. The first and
+third fix WHO but take width from the other columns, so the split moves to
+another step (Procurement, développement, regulamentar, Investigación);
+smaller names still split in en/fr/es. Stacking the two cards is clean at
+390px but splits "In-country" and overflows the French card by 10px at
+360px. A vertical list works in every language but doubles the strip's
+height (about 655px against 330-360px).
 
 Branch `fix/phone-expected-tag`. The RBM pages are rebuilt from it and copied
 into launch-rbm-test on branch `fix/phone-expected-tag` there. The data repo
