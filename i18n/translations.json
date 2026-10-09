@@ -56,6 +56,14 @@
       "pt": "EMA, ou outro organismo regulador rigoroso, como a FDA dos EUA.",
       "es": "La EMA u otro organismo regulador estricto como la FDA de Estados Unidos."
     },
+    "02fbac0f514db02e": {
+      "en": "Largest variance:",
+      "where": "line 1841 (in markup)",
+      "bucket": "js",
+      "fr": "Variance la plus importante :",
+      "pt": "Maior variação:",
+      "es": "Mayor variación:"
+    },
     "036ac56e007c2946": {
       "en": "National medicines regulators.",
       "where": "products.stageInfo[4].who",
@@ -102,6 +110,14 @@
       "fr": "Suivre chaque médicament à travers les sept étapes pour les patients.",
       "pt": "Acompanhe cada medicamento em sete etapas até à administração ao doente.",
       "es": "Siga cada medicamento a través de los siete pasos para los pacientes."
+    },
+    "054496e4e79ea6a1": {
+      "en": "Recommended for P. falciparum",
+      "where": "line 3127",
+      "bucket": "js",
+      "fr": "Recommandé pour P. falciparum",
+      "pt": "Recomendado para P. falciparum",
+      "es": "Recomendado para P. falciparum"
     },
     "05bda580bf80ffbe": {
       "en": "That email address does not look right.",
@@ -224,6 +240,14 @@
       "fr": "Le parcours d'accès en huit étapes. Choisissez une étape pour découvrir ce qui s'y passe et où se trouve chaque médicament.",
       "pt": "O processo de acesso em oito etapas. Escolha um passo para ver o que acontece nele e onde se encontra cada medicamento.",
       "es": "La vía de acceso de ocho etapas. Elija una etapa para ver qué sucede allí y dónde se encuentra cada medicamento."
+    },
+    "09a9a228394cfed9": {
+      "en": "· so far",
+      "where": "line 1820 (in markup)",
+      "bucket": "js",
+      "fr": "· jusqu'à présent",
+      "pt": "· até agora",
+      "es": "· hasta ahora"
     },
     "0a8787a41b1d29db": {
       "en": "' + L().unit + '",
@@ -377,6 +401,14 @@
       "pt": "Compatível com TZA 10 · NGA 26/47 ativo",
       "es": "Cumple con TZA 10 · NGA 26/47 activo"
     },
+    "10afa98480f2d06c": {
+      "en": "Reset filters",
+      "where": "line 3305",
+      "bucket": "js",
+      "fr": "Réinitialiser les filtres",
+      "pt": "Redefinir filtros",
+      "es": "Restablecer filtros"
+    },
     "115d5fc0862d574a": {
       "en": "${done} of ${p.stages.length} stages complete",
       "where": "illustrated-journey-dashboard.html",
@@ -499,6 +531,14 @@
       "bucket": "markup",
       "fr": "Résultats de l'étude",
       "pt": "Resultado do estudo"
+    },
+    "154dd6abe6eb8ed3": {
+      "en": "No national treatment policy lists ${n} yet.",
+      "where": "line 3131",
+      "bucket": "js",
+      "fr": "Aucune liste de politique nationale de traitement ${n} pour le moment.",
+      "pt": "Nenhuma política nacional de tratamento lista ${n} ainda.",
+      "es": "Aún no existe ninguna política nacional de tratamiento que incluya ${n}."
     },
     "159403084fe68a63": {
       "en": "Democratic People's Republic of Korea",
@@ -696,6 +736,14 @@
       "pt": "verificado",
       "es": "verificado"
     },
+    "1c50993b009c62dd": {
+      "en": "years",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "années",
+      "pt": "anos",
+      "es": "años"
+    },
     "1cc4fc382178a964": {
       "en": "Iran (Islamic Republic of)",
       "where": "resistance.dict.country[32]",
@@ -710,6 +758,14 @@
       "fr": "Non testé P. falciparum",
       "pt": "Não testado P. falciparum",
       "es": "Sin probar P. falciparum"
+    },
+    "1d483722fb7b04ca": {
+      "en": "Source: WHO ${esc(m.edition || \"World Malaria Report\")}, Annex 4B (${esc(String(m.policyYear || \"\"))} policy).",
+      "where": "line 3171",
+      "bucket": "js",
+      "fr": "Source : OMS ${esc(m.edition || \"World Malaria Report\")}, Annexe 4B (${esc(String(m.policyYear || \"\"))} politique).",
+      "pt": "Fonte: OMS ${esc(m.edition || \"World Malaria Report\")}, Anexo 4B (${esc(String(m.policyYear || \"\"))} política).",
+      "es": "Fuente: OMS ${esc(m.edition || \"World Malaria Report\")}, Anexo 4B (${esc(String(m.policyYear || \"\"))} política)."
     },
     "1e199b200fcfa3b9": {
       "en": "Global Fund price and quality reporting",
@@ -733,6 +789,14 @@
       "fr": "[LAUNCH] Échec de l'abonnement :",
       "pt": "[LAUNCH] Falha na inscrição:",
       "es": "[LAUNCH] Error al suscribirse:"
+    },
+    "20afc9418dfd7d5b": {
+      "en": "from expected",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "par rapport aux attentes",
+      "pt": "do esperado",
+      "es": "de lo esperado"
     },
     "20d912488c606192": {
       "en": "[LAUNCH] data/products.js is missing or has a syntax error — run node scripts/validate-data.js",
@@ -835,6 +899,14 @@
       "pt": "Uma análise independente dos medicamentos antimaláricos existentes e dos seus fabricantes.",
       "es": "Un análisis independiente de los medicamentos contra la malaria que existen y de quién los fabrica."
     },
+    "2559d945241893fb": {
+      "en": "routine use by ${due}",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "utilisation courante par ${due}",
+      "pt": "uso de rotina por ${due}",
+      "es": "uso rutinario por ${due}"
+    },
     "255cd279e75752c1": {
       "en": "Added a poster view showing where each medicine sits in development.",
       "where": "products.changelog[13].plain",
@@ -874,6 +946,14 @@
       "pt": "Guia da OMS sobre a utilização simultânea de vários tratamentos de primeira linha contra a malária, com exemplos de países.",
       "es": "Guía de la OMS sobre el uso simultáneo de varios tratamientos de primera línea contra la malaria, con ejemplos por país."
     },
+    "28391d3bc64ec15c": {
+      "en": "of",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "de",
+      "pt": "de",
+      "es": "de"
+    },
     "298a9207a732a11d": {
       "en": "Next step",
       "where": "line 2043",
@@ -889,6 +969,14 @@
       "fr": "L'essai principal a été un succès, annoncé le 12 novembre 2025. Les travaux relatifs à la demande d'autorisation ont maintenant commencé.",
       "pt": "O ensaio clínico principal foi bem-sucedido, conforme anunciado a 12 de novembro de 2025. O trabalho de preparação do pedido de aprovação já foi iniciado.",
       "es": "El ensayo principal tuvo éxito, según se anunció el 12 de noviembre de 2025. Ya se ha comenzado a trabajar en la solicitud de aprobación."
+    },
+    "2a1237f61d2167d5": {
+      "en": "Variance",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Variance",
+      "pt": "Variância",
+      "es": "Diferencia"
     },
     "2b457cd87edb3758": {
       "en": "French Guiana",
@@ -1042,6 +1130,14 @@
       "fr": "Il faut bien que quelqu'un paie. Les organismes financeurs et les gouvernements lancent des appels d'offres, fixent des prix de référence et prévoient la demande. Un médicament peut être recommandé, enregistré et figurer dans les directives, et pourtant être très peu acheté.",
       "pt": "Alguém tem de pagar. Os financiadores e os governos realizam concursos, acordam preços de referência e preveem a procura. Um medicamento pode ser recomendado, registado e constar das diretrizes, e ainda assim ser pouco comprado."
     },
+    "31664d7522f5c7db": {
+      "en": "Recommended for P. vivax",
+      "where": "line 3128",
+      "bucket": "js",
+      "fr": "Recommandé pour P. vivax",
+      "pt": "Recomendado para P. vivax",
+      "es": "Recomendado para P. vivax"
+    },
     "31a004d8f81b13b8": {
       "en": "Subscribe for updates",
       "where": "static text",
@@ -1088,6 +1184,14 @@
       "pt": "Formação em inclusão de guidelines e gestão de casos",
       "es": "Formación en inclusión de directrices y gestión de casos"
     },
+    "33bcd6d446ef50ac": {
+      "en": "Show on map",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Afficher sur la carte",
+      "pt": "Mostrar no mapa",
+      "es": "Mostrar en el mapa"
+    },
     "33dea82cf709eb76": {
       "en": "Illustrated journey",
       "where": "assets/site-nav.js",
@@ -1110,6 +1214,14 @@
       "bucket": "data",
       "fr": "Élimination retardée des parasites",
       "pt": "Eliminação tardia de parasitas"
+    },
+    "34ca0e76608842ff": {
+      "en": "Group",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Groupe",
+      "pt": "Grupo",
+      "es": "Grupo"
     },
     "350be3643ce78043": {
       "en": "Organisation",
@@ -1241,6 +1353,14 @@
       "bucket": "data",
       "fr": "Ces données sont issues des proportions de génotypes de l'OMS, qui ne comportent pas de classification de résistance/sensibilité propre. Voir l'en-tête du fichier scripts/normalize-molecular-markers.js.",
       "pt": "Derivado das proporções de genótipos da OMS, que não têm classificação própria de resistência/suscetibilidade. Consulte o cabeçalho de scripts/normalize-molecular-markers.js."
+    },
+    "38e024f2fc38bf16": {
+      "en": "No countries match the filters on the left.",
+      "where": "line 3305",
+      "bucket": "js",
+      "fr": "Aucun pays ne correspond aux filtres de gauche.",
+      "pt": "Nenhum país corresponde aos filtros à esquerda.",
+      "es": "Ningún país coincide con los filtros de la izquierda."
     },
     "39490d8fc8fba044": {
       "en": "Label update — pregnancy",
@@ -1438,6 +1558,14 @@
       "fr": "Votre adresse e-mail",
       "pt": "O seu endereço de email"
     },
+    "40386f928a53a5e1": {
+      "en": "Under 1 year",
+      "where": "line 1730",
+      "bucket": "js",
+      "fr": "Moins d'un an",
+      "pt": "Menos de 1 ano",
+      "es": "Menos de 1 año"
+    },
     "40465cda43f08d53": {
       "en": "US$15.3m in 2025",
       "where": "products.products[3].detail.milestones[7].date",
@@ -1499,6 +1627,14 @@
       "fr": "Vérifiez que la hausse de 2025 se confirme dans le prochain extrait trimestriel du PQR.",
       "pt": "Verifique se o máximo de 2025 se mantém no próximo extrato trimestral do PQR.",
       "es": "Verificar que el repunte de 2025 se mantenga en el próximo extracto trimestral de PQR."
+    },
+    "425654236278a5ff": {
+      "en": "since ${y.start}",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "depuis ${y.start}",
+      "pt": "desde ${y.start}",
+      "es": "desde ${y.start}"
     },
     "4256e512fcfb03ca": {
       "en": "Chad",
@@ -1772,6 +1908,14 @@
       "fr": "Cartes de la menace du paludisme de l'OMS",
       "pt": "Mapas de Ameaça da Malária da OMS"
     },
+    "4cb4ea25583c2564": {
+      "en": "year",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "année",
+      "pt": "ano",
+      "es": "año"
+    },
     "4cbd4c78df14b0e8": {
       "en": "Registration footprint: 25+ countries and expanding",
       "where": "products.products[2].detail.access[1]",
@@ -2043,6 +2187,14 @@
       "pt": "As ferramentas de prevenção estão numa lista separada.",
       "es": "Las herramientas de prevención están en una lista aparte."
     },
+    "5554a3400a196209": {
+      "en": "Recommended for Plasmodium vivax malaria",
+      "where": "line 3128",
+      "bucket": "js",
+      "fr": "Recommandé pour le paludisme à Plasmodium vivax",
+      "pt": "Recomendado para a malária por Plasmodium vivax.",
+      "es": "Recomendado para la malaria por Plasmodium vivax"
+    },
     "55e1ea9bbe0754e4": {
       "en": "⚠ Draft figures — not yet verified.",
       "where": "line 1541 (in markup)",
@@ -2196,6 +2348,14 @@
       "fr": "exigences d'adoption",
       "pt": "Requisitos de adoção",
       "es": "Requisitos de adopción"
+    },
+    "5ab7a9742db99b64": {
+      "en": "Before the clock",
+      "where": "line 1872 (in markup)",
+      "bucket": "js",
+      "fr": "Avant l'horloge",
+      "pt": "Antes do relógio",
+      "es": "Antes del reloj"
     },
     "5b0d203157e25a47": {
       "en": "Co-developed with MMV under access-oriented partnership",
@@ -2697,6 +2857,14 @@
       "pt": "MFT grupos de políticas · ${esc(p.name)}",
       "es": "MFT grupos políticos · ${esc(p.name)}"
     },
+    "701d021d08c54579": {
+      "en": "Country",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Pays",
+      "pt": "País",
+      "es": "País"
+    },
     "702ef921ed1d89bf": {
       "en": "First name",
       "where": "static text",
@@ -2736,6 +2904,14 @@
       "fr": "L'essai principal s'est terminé le 25 novembre 2025 avec 1 720 participants — chiffre désormais confirmé par le registre public des essais cliniques.",
       "pt": "O ensaio clínico principal terminou a 25 de novembro de 2025 com 1.720 participantes — um número agora confirmado pelo registo público de ensaios clínicos.",
       "es": "El ensayo principal finalizó el 25 de noviembre de 2025 con 1.720 participantes, cifra que ahora ha sido confirmada por el registro público de ensayos clínicos."
+    },
+    "717e6fd2cb6590d3": {
+      "en": "Tick a group to draw its borders on the map.",
+      "where": "line 3130",
+      "bucket": "js",
+      "fr": "Cochez un groupe pour tracer ses frontières sur la carte.",
+      "pt": "Marque um grupo para desenhar as suas fronteiras no mapa.",
+      "es": "Marca un grupo para dibujar sus límites en el mapa."
     },
     "719d0b497776fd7b": {
       "en": "Hide the sources",
@@ -3257,6 +3433,14 @@
       "fr": "Définitions",
       "pt": "Definições",
       "es": "Definiciones"
+    },
+    "87765a3bb65b1c5f": {
+      "en": "< 1 year",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "< 1 an",
+      "pt": "< 1 ano",
+      "es": "< 1 año"
     },
     "8794761935a27c03": {
       "en": "Dose-optimization of co-formulation",
@@ -3950,6 +4134,14 @@
       "pt": "Baixar CSV",
       "es": "Descargar CSV"
     },
+    "a4b9a49018fb698a": {
+      "en": "this step is not moving as fast as expected.",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Cette étape n'avance pas aussi vite que prévu.",
+      "pt": "Esta etapa não está a avançar tão rapidamente quanto o esperado.",
+      "es": "Este paso no está avanzando tan rápido como se esperaba."
+    },
     "a4eafd170ae63892": {
       "en": "No single-source dependency",
       "where": "products.products[3].detail.access[1]",
@@ -4028,6 +4220,14 @@
       "fr": "À l'heure",
       "pt": "No horário",
       "es": "A tiempo"
+    },
+    "a6d077fd2795f22c": {
+      "en": "not yet in routine use",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "pas encore en usage courant",
+      "pt": "ainda não é de uso rotineiro",
+      "es": "aún no se utiliza de forma rutinaria"
     },
     "a7692387c3d3d29c": {
       "en": "Not started (stage glyph dimmed, no badge)",
@@ -4529,12 +4729,28 @@
       "pt": "Apenas P. vivax",
       "es": "Solo P. vivax"
     },
+    "c36d819e7bc6d2b7": {
+      "en": "Use",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Utiliser",
+      "pt": "Uso",
+      "es": "Usar"
+    },
     "c3782c86d8099f3f": {
       "en": "Philippines",
       "where": "resistance.dict.country[49]",
       "bucket": "data",
       "fr": "Philippines",
       "pt": "Filipinas"
+    },
+    "c3feeae30938dcfd": {
+      "en": "Country recommended use",
+      "where": "line 3130",
+      "bucket": "js",
+      "fr": "Utilisation recommandée par pays",
+      "pt": "Uso recomendado pelo país",
+      "es": "Uso recomendado por el país"
     },
     "c406421c2b35a533": {
       "en": "Actual",
@@ -4612,6 +4828,14 @@
       "bucket": "data",
       "fr": "Vanuatu",
       "pt": "Vanuatu"
+    },
+    "c5c20f1edbed3f95": {
+      "en": "Tick a group on the left to see its countries.",
+      "where": "line 3130",
+      "bucket": "js",
+      "fr": "Cochez un groupe à gauche pour voir ses pays.",
+      "pt": "Selecione um grupo à esquerda para ver os países a ele associados.",
+      "es": "Marca un grupo a la izquierda para ver sus países."
     },
     "c5fd21cb7eba116d": {
       "en": "No national treatment policy lists ${mftProductName()} yet.",
@@ -5034,6 +5258,14 @@
       "pt": "Visão geral",
       "es": "Descripción general"
     },
+    "d4f2a7b441c3a9b9": {
+      "en": "Country / Population Access",
+      "where": "line 1769",
+      "bucket": "js",
+      "fr": "Accès au pays/à la population",
+      "pt": "Acesso por país/população",
+      "es": "Acceso por país/población"
+    },
     "d56a72deeaec87a4": {
       "en": "Phase III (KALUMA, NCT05842954) met primary endpoint: 97.4% PCR-corrected cure rate; registry records 1,720 participants and trial completion 25 Nov 2025 (34 sites, 12 African countries)",
       "where": "products.products[0].stages[0].note",
@@ -5343,6 +5575,14 @@
       "pt": "Compromissos de acesso e fornecimento",
       "es": "Compromisos de acceso y suministro"
     },
+    "de838855e4a6e04e": {
+      "en": "Stage",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Scène",
+      "pt": "Fase",
+      "es": "Escenario"
+    },
     "de88cd57732491c0": {
       "en": "A source is missing or out of date",
       "where": "assets/report-issue.js",
@@ -5548,6 +5788,14 @@
       "fr": "À propos des données.",
       "pt": "Sobre os dados."
     },
+    "e553018f5a198a70": {
+      "en": "Actual so far",
+      "where": "line 1837",
+      "bucket": "js",
+      "fr": "Situation actuelle jusqu'à présent",
+      "pt": "Até ao momento, está tudo bem.",
+      "es": "Real hasta ahora"
+    },
     "e595f45dc6c9e766": {
       "en": "Europe",
       "where": "illustrated-journey-dashboard.html",
@@ -5744,6 +5992,14 @@
       "fr": "Mali",
       "pt": "Mali"
     },
+    "ee95f419b3ef07a6": {
+      "en": "Step ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ?",
+      "where": "line 1995",
+      "bucket": "js",
+      "fr": "Étape ${stepNo(i)}, ${esc(s)}${exp}. Indique ce qui se passe ici et où se trouve chaque médicament${n ?",
+      "pt": "Passo ${stepNo(i)}, ${esc(s)}${exp}. Mostra o que acontece aqui e onde cada medicamento é ${n ?",
+      "es": "Paso ${stepNo(i)}, ${esc(s)}${exp}. Muestra lo que sucede aquí y dónde está cada medicamento${n ?"
+    },
     "eebbf6457e46a7f6": {
       "en": "complete",
       "where": "illustrated-journey-dashboard.html",
@@ -5872,6 +6128,14 @@
       "fr": "Sierra Leone",
       "pt": "Serra Leoa"
     },
+    "f454490d0ff5eeaa": {
+      "en": "Clock starts here",
+      "where": "line 1872 (in markup)",
+      "bucket": "js",
+      "fr": "Le chronomètre démarre ici",
+      "pt": "O relógio começa aqui.",
+      "es": "El reloj empieza aquí."
+    },
     "f4c92e89b1757884": {
       "en": "The LAUNCH team reads every message, and where you have pointed us to a public source that checks out, we correct the data at the next update. If you left an email address, any reply from us will quote the reference below.",
       "where": "assets/report-issue.js",
@@ -5879,6 +6143,14 @@
       "fr": "L'équipe LAUNCH lit chaque message et, lorsque vous nous indiquez une source publique vérifiée, nous corrigeons les données lors de la prochaine mise à jour. Si vous avez laissé une adresse e-mail, toute réponse de notre part mentionnera la référence ci-dessous.",
       "pt": "A equipa LAUNCH lê todas as mensagens e, quando nos indica uma fonte pública fidedigna, corrigimos os dados na próxima atualização. Se deixou um endereço de e-mail, qualquer resposta nossa citará a referência abaixo.",
       "es": "El equipo de LAUNCH lee todos los mensajes y, si nos has indicado una fuente pública que sea fiable, corregimos los datos en la siguiente actualización. Si nos has proporcionado una dirección de correo electrónico, en cualquier respuesta que te enviemos citaremos la referencia que aparece a continuación."
+    },
+    "f5045a33c56778ec": {
+      "en": "Market Access",
+      "where": "line 1768",
+      "bucket": "js",
+      "fr": "Accès au marché",
+      "pt": "Acesso ao mercado",
+      "es": "Acceso al mercado"
     },
     "f5ce37ee7d826b21": {
       "en": "Time taken",
@@ -5951,6 +6223,14 @@
       "pt": "Cadeias de fornecimento de API estabelecidas",
       "es": "Cadenas de suministro de API establecidas"
     },
+    "f8828e3c1bcefe25": {
+      "en": "Listed for treatment in national policy",
+      "where": "line 3128",
+      "bucket": "js",
+      "fr": "Inscrit sur la liste des traitements prévus par la politique nationale",
+      "pt": "Incluído na lista de tratamentos da política nacional.",
+      "es": "Incluido en la lista de tratamientos de la política nacional."
+    },
     "f8b776e7f71956a4": {
       "en": "Global Fund price and quality reporting, PMI",
       "where": "products.stageInfo[6].source",
@@ -5966,6 +6246,14 @@
       "fr": "Publié en 2025",
       "pt": "Publicado em 2025",
       "es": "Publicado en 2025"
+    },
+    "f9695985aa331d68": {
+      "en": "First-line for confirmed (tested) cases in national policy",
+      "where": "line 3127",
+      "bucket": "js",
+      "fr": "Première ligne pour les cas confirmés (testés) dans la politique nationale",
+      "pt": "Primeira linha de defesa para casos confirmados (testados) na política nacional.",
+      "es": "Primera línea de actuación para casos confirmados (analizados) en la política nacional"
     },
     "f99eeb59eb9596ad": {
       "en": "MFT rotation sequencing and resistance impact",
@@ -6069,6 +6357,14 @@
       "pt": "Orientações de pré-qualificação da OMS",
       "es": "Guía de precalificación de la OMS"
     },
+    "fee0893458029c7a": {
+      "en": "Current stage · Status",
+      "where": "line 2015 (in markup)",
+      "bucket": "js",
+      "fr": "Étape actuelle · Statut",
+      "pt": "Etapa atual · Estado",
+      "es": "Etapa actual · Estado"
+    },
     "ff78656420d8f76f": {
       "en": "Child-friendly dispersible formulation",
       "where": "products.products[1].detail.access[2]",
@@ -6076,6 +6372,14 @@
       "fr": "Formule dispersible adaptée aux enfants",
       "pt": "Fórmula dispersível adequada para crianças",
       "es": "Fórmula dispersable apta para niños."
+    },
+    "ff9e7ad554141785": {
+      "en": "Recommended for Plasmodium falciparum malaria",
+      "where": "line 3127",
+      "bucket": "js",
+      "fr": "Recommandé pour le paludisme à Plasmodium falciparum",
+      "pt": "Recomendado para a malária por Plasmodium falciparum.",
+      "es": "Recomendado para la malaria por Plasmodium falciparum"
     },
     "ffd08b32396a2766": {
       "en": "US$41.5m since 2008",
