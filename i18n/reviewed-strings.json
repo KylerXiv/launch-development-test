@@ -101,7 +101,6 @@
     { "file": "illustrated-journey-dashboard.html", "src": "<small>Variance</small>", "en": "Variance" },
     { "file": "illustrated-journey-dashboard.html", "src": "? \"so far\" :", "en": "so far" },
     { "file": "illustrated-journey-dashboard.html", "src": ": \"from expected\"}", "en": "from expected" },
-    { "file": "illustrated-journey-dashboard.html", "src": "? \"n/a\" :", "en": "n/a" },
     { "file": "illustrated-journey-dashboard.html", "src": "? \", expected \" +", "en": "expected" },
 
     { "file": "assets/report-issue.js", "src": "\"Something on the page looks wrong\"", "en": "Something on the page looks wrong" },
