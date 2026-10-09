@@ -101,15 +101,20 @@ it right after the merge, unprompted.
    `git config user.name "Kyler"` and
    `git config user.email "141990926+KylerXiv@users.noreply.github.com"` in
    that clone (see the traps below).
-4. `diff -rq dist/rbm <clone>` and read what differs. Copy only the changed
-   pages (`en|fr|pt/index.html`, and `*/assets/report-issue.js` if the widget
-   changed). Leave alone the repo's own files: `index.html`,
-   `iframe-test.html`, `rbm-shell/`, `.nojekyll`, the README's "Live test
-   copy" block, and `assets/email/` (the email logo, which RBM's pages do not
-   use).
-5. Commit as "…, from launch-development-test `<sha>`" and push. GitHub
-   Pages and Vercel redeploy in about a minute. Check with `curl`, because
-   browsers may keep the old page for 10 minutes (`max-age=600`).
+4. `node scripts/copy-rbm-pages.js --to <clone>` (since 9 Oct 2026; it
+   replaced copying by hand). It replaces `en/ fr/ pt/ es/ assets/` and
+   `build-manifest.json`, and leaves the repo's own files alone (`index.html`,
+   `iframe-test.html`, `rbm-shell/`, `.nojekyll`, the README). **If it stops
+   and lists files "changed there after the last copy", someone edited RBM's
+   pages directly** (Keith did on 8 Oct: 12 commits). Do not force it: move
+   the change into `illustrated-journey-dashboard.html` here, merge, then
+   copy with `--force`. It also refuses a test build, a build from
+   uncommitted files, and a build made before the translate bot caught up.
+   The first copy after this change needs `--first-copy`
+   (docs/jackson/rbm-keith-port.md).
+5. Commit as it prints ("…, from launch-development-test `<sha>`") and push.
+   GitHub Pages and Vercel redeploy in about a minute. Check with `curl`,
+   because browsers may keep the old page for 10 minutes (`max-age=600`).
 
 ### Traps found this session
 
@@ -201,9 +206,6 @@ been started since. Start "Scheduled source fetch" by hand, or wait for
   collected).
 - Watchers for #60's four new registers, a WHO guideline version watcher,
   and a comparator-list watcher.
-- `build-rbm-pages.js` still copies `assets/email/` into `dist/rbm/`. It is
-  harmless, and it is not pushed to RBM's repo; excluding it would be one
-  line.
 
 **Housekeeping (carried):**
 - Branch protection is available, because the repo is public, and is not
