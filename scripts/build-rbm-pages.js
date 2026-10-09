@@ -18,6 +18,10 @@
 //   dist/rbm/{en,fr,pt,es}/assets/report-issue.js   the feedback form, in that language
 //   dist/rbm/assets/            icons and logos (shared)
 //   dist/rbm/README.md          how to host and embed
+//   dist/rbm/build-manifest.json  what this build wrote (each file's sha256), from
+//                               which commit and with which settings. Copying the
+//                               build into launch-rbm-test is scripts/copy-rbm-pages.js,
+//                               which reads it to stop a copy that would wipe hand edits.
 //
 // HOW. The English page and the French, Portuguese and Spanish pages that
 // build-locale-pages.js writes (interface text already translated) are taken
@@ -47,6 +51,7 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 const { applySkin } = require("./rbm-skin");
 
@@ -56,14 +61,16 @@ const OUT = path.join(ROOT, "dist", "rbm");
 const LOCALES = ["en", "fr", "pt", "es"];
 const args = process.argv.slice(2);
 const argOf = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };
-const DATA_URL = argOf("--data-url") || "https://codebyjackson.github.io/launch-data-test/v1/dashboard.json";
+const DEFAULT_DATA_URL = "https://codebyjackson.github.io/launch-data-test/v1/dashboard.json";
+const DATA_URL = argOf("--data-url") || DEFAULT_DATA_URL;
 const SCHEMA = 1;
 // Where the two forms post: the origin of the LAUNCH Vercel project, whose
 // api/_mail.js must list the host these pages are served from in PARTNERS, or
 // the browser blocks every post. Production, never a PR preview (those
 // addresses expire). "none" turns both forms off. The address changes when
 // the project moves to Unitaid's hosting: rebuild with the new one.
-const API_ARG = argOf("--api-url") || "https://launch-development-test.vercel.app";
+const DEFAULT_API = "https://launch-development-test.vercel.app";
+const API_ARG = argOf("--api-url") || DEFAULT_API;
 const API_URL = API_ARG === "none" ? null : API_ARG.replace(/\/+$/, "");
 if (API_URL && !/^https?:\/\/[^/\s]+$/.test(API_URL)) {
   throw new Error(`--api-url must be an origin like https://example.org (no path), or "none"; got ${API_ARG}`);
@@ -76,6 +83,34 @@ const REPLACED = ["data/products.js", "data/sources.js", "data/treatment-policy.
 // copy, from the locale build: country names in the map files, the feedback
 // form's wording in report-issue.js. Everything else in assets/ is shared.
 const PER_LANGUAGE = ["data/world-map.js", "data/world-map-geo.js", "assets/report-issue.js"];
+
+// The folders a build fills, and so the folders a copy into launch-rbm-test
+// replaces (scripts/copy-rbm-pages.js). The rest of that repository (its
+// README, index.html, iframe-test.html, rbm-shell/) is its own.
+const BUILT = [...LOCALES, "assets"];
+const MANIFEST = "build-manifest.json";
+// A file's sha256, line endings aside: git checks text out with CRLF on
+// Windows, so the same page can sit on disk either way.
+const TEXT_FILE = /\.(html|js|json|svg|md|css|txt)$/i;
+function fingerprint(file) {
+  let b = fs.readFileSync(file);
+  if (TEXT_FILE.test(file)) b = Buffer.from(b.toString("utf8").replace(/\r\n/g, "\n"), "utf8");
+  return crypto.createHash("sha256").update(b).digest("hex");
+}
+// Every file in the built folders of dir, as { "en/index.html": sha256, ... }.
+function manifestOf(dir) {
+  const out = {};
+  const walk = (rel) => {
+    const abs = path.join(dir, rel);
+    if (!fs.existsSync(abs)) return;
+    for (const e of fs.readdirSync(abs, { withFileTypes: true })) {
+      const r = rel + "/" + e.name;
+      if (e.isDirectory()) walk(r); else out[r] = fingerprint(path.join(dir, r));
+    }
+  };
+  BUILT.forEach(walk);
+  return Object.fromEntries(Object.keys(out).sort().map((k) => [k, out[k]]));
+}
 
 // Reader-facing messages, per language. New strings the translation memory does
 // not hold, so they are written here by hand — NOT reviewed yet: have a French,
@@ -246,9 +281,27 @@ function main() {
   fs.cpSync(path.join(ROOT, "assets"), path.join(OUT, "assets"), { recursive: true });
   fs.rmSync(path.join(OUT, "assets", "site-nav.js"), { force: true });
   fs.rmSync(path.join(OUT, "assets", "report-issue.js"), { force: true });   // per language now
+  fs.rmSync(path.join(OUT, "assets", "email"), { recursive: true, force: true });   // the LAUNCH emails' logo
   fs.copyFileSync(path.join(ROOT, "rbm", "README.md"), path.join(OUT, "README.md"));
+  // What this build wrote, and whether it is one to publish: built from
+  // committed files, with the default data and API addresses, after the
+  // translate bot caught up. scripts/copy-rbm-pages.js reads it.
+  const git = (a) => { try { return execFileSync("git", a, { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); } catch { return null; } };
+  const head = git(["rev-parse", "HEAD"]);
+  const dirty = git(["status", "--porcelain", "--", PAGE, "data", "assets", "i18n", "scripts", "rbm"]);
+  const { problems } = require("./assemble-content");
+  fs.writeFileSync(path.join(OUT, MANIFEST), JSON.stringify({
+    note: "Written by scripts/build-rbm-pages.js in KylerXiv/launch-development-test. These pages are BUILT: change that repository and rebuild, never the files here. scripts/copy-rbm-pages.js compares every file below with what is here before it copies a new build, and stops if one was changed.",
+    built_from: head,
+    clean: head != null && dirty === "",
+    translations_current: problems().length === 0,
+    data_url: DATA_URL,
+    api_url: API_URL,
+    test_build: DATA_URL !== DEFAULT_DATA_URL || API_ARG !== DEFAULT_API,
+    files: manifestOf(OUT),
+  }, null, 2) + "\n", "utf8");
   console.log(`  assets/ (shared), README.md\n  data: ${DATA_URL}\n  forms: ${API_URL ? API_URL + "/api/{subscribe,feedback}" : "off (--api-url none)"}\n  → ${path.relative(ROOT, OUT)}/`);
 }
 
-module.exports = { transform, loader, widget };
+module.exports = { transform, loader, widget, manifestOf, fingerprint, BUILT, MANIFEST };
 if (require.main === module) main();

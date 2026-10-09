@@ -293,8 +293,11 @@ What RBM will receive, online for testing. Built from `main` by
 
 **When it needs a rebuild:** only when the page itself changes (layout, wording,
 code). A **data** change never does: the pages read the newest `dashboard.json`
-on every visit. Rebuild: `node scripts/build-rbm-pages.js`, copy `dist/rbm/` into
-the repo (keep `index.html`, `iframe-test.html`, `.nojekyll`), commit, push.
+on every visit. Rebuild: `node scripts/build-rbm-pages.js`, then
+`node scripts/copy-rbm-pages.js --to <launch-rbm-test checkout>` (since 9 Oct
+2026; it keeps `index.html`, `iframe-test.html`, `.nojekyll` and stops if the
+pages there were edited by hand, see `docs/jackson/rbm-keith-port.md`), commit,
+push.
 Automating that is a possible next step (a workflow and a second deploy key).
 
 ## 12. Tested on GitHub (1–2 Oct 2026)
