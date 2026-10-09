@@ -198,6 +198,78 @@ year per stage in the data — a bigger change to the data model for one field.
 If a later translation words the date differently, that row falls back to
 "Ongoing, no start date" rather than showing a wrong number.
 
+## Follow-up: expected-time tag on phones (9 Oct)
+
+On phones (640px and under) the clock tag under the WHO pair ran out of its
+column and past the Market Access card. The pair's column is 66px wide inside
+its bracket (84px minimum, less padding and borders), but the tag could not get
+narrower than 112px: it is a flex row, and a flex item does not shrink below
+its longest word, so the clock, "2 years" and "expected" stayed side by side.
+Measured in Chrome at 360px and 390px: 18px past the column and 4px past the
+card in English, 9px past the column in French.
+
+Chosen (option B of four, the user's pick): the tag may wrap, so "expected"
+drops to a second line under the clock and the number, and the number never
+splits ("2" over "years" before). CSS only, in the existing 640px rule; no
+markup, data or translation change. Measured the same way on en, fr, pt and
+es: the WHO pair's tags sit 9px inside their column, every other tag fits its
+column exactly (it is capped at 100%), all are 14px or more inside their card,
+and the page does not scroll sideways.
+
+Rejected:
+- Also sizing each column to its longest word (option A), in the same change.
+  The user chose the smaller change first; the step names were then fixed on
+  their own, below.
+- Hiding "expected" on phones (option C): one-line tags, but it changes the
+  markup that i18n/reviewed-strings.json line 94 matches, and phone readers
+  lose the word.
+- A vertical list on phones (option D): fits best, but it is a new layout for
+  the strip, about 650px tall, and has to cancel alignPathGroup()'s lift.
+
+Found in passing, left alone: the French tag reads "2 années attendu" (should
+agree: "attendues") and "1.5" keeps the decimal point on /fr. Translations come
+from the bot only, so this is for the bot or a source wording change.
+
+Then the step names (same day). With overflow-wrap: break-word and
+hyphens: auto, a name split inside a word whenever the word was wider than
+its column: 7 words across the four languages, the same at 360px and 390px
+(en recommendation, Procurement; fr Recommandation, Enregistrement; pt
+Recomendação; es Recomendación, Adquisiciones). English got a hyphen;
+Spanish and French broke with none.
+
+Chosen (option 1 of two that worked, the user's pick): names break only
+between words, and every column is at least as wide as its longest word
+(min-width: min-content). The rule sits after the 760px block, because that
+block sets .pathnode { min-width: 72px } at the same specificity. Measured
+before the change: 0 splits in all four languages at both widths, the strip
+no wider than before (742 / 785 / 735 / 744px), the English strip 30px
+shorter.
+
+Rejected, each measured at 390px: a wider WHO column only (124px), smaller
+names (11px) with a slimmer bracket, and shorter WHO names. The first and
+third fix WHO but take width from the other columns, so the split moves to
+another step (Procurement, développement, regulamentar, Investigación);
+smaller names still split in en/fr/es. Stacking the two cards is clean at
+390px but splits "In-country" and overflows the French card by 10px at
+360px. A vertical list works in every language but doubles the strip's
+height (about 655px against 330-360px).
+
+Then a rename (same day, the owner's wording): the second access group,
+"Country / Population Access", is now "Country Access", next to "Market
+Access". One string in PHASES, read by the card title, its aria-label and
+the Time taken table. The collector sees exactly one string swapped and
+nothing else. i18n/ is left to the translate bot, as always: until it runs
+on main, /fr, /pt and /es show "Country Access" in English. The existing
+"Country access" (lower-case, the map) is a different string and was not
+reused, so the two titles keep the same casing.
+
+Branch `fix/phone-expected-tag`, three commits. The tag and step-name fixes
+are rebuilt and copied into launch-rbm-test on branch `fix/phone-expected-tag`
+there (from 14a2c84). The rename is not: copy-rbm-pages.js refuses a build
+whose translations are behind, so the RBM pages for it are rebuilt after the
+merge and the bot's commit, from main. The data repo does not change:
+dashboard.json carries neither the CSS nor the group names.
+
 ## Status
 
 Local branch `feat/yardstick`, one commit, not pushed. Notes moved to `docs/jackson/` at the owner's request, so they can revert or fix it themselves. Verify block: both
