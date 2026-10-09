@@ -3954,6 +3954,14 @@
       "fr": "Une initiative LAUNCH de",
       "pt": "Uma iniciativa LAUNCH de"
     },
+    "9a383b7887d2c58a": {
+      "en": "Country Access",
+      "where": "line 1792",
+      "bucket": "js",
+      "fr": "Accès au pays",
+      "pt": "Acesso ao país",
+      "es": "Acceso al país"
+    },
     "9b0f1b10aff55228": {
       "en": "planned",
       "where": "assets/report-issue.js",
