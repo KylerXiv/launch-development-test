@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>How the LAUNCH data reaches the RBM website</title>
+<!-- Source of LAUNCH-how-data-reaches-RBM.png and .pdf (the one-picture, no-jargon
+     version of the three repos). To update: edit this file, then render it at
+     1600x900 (PNG at 2x, 3200x1800) and print it to a 1600x900 PDF with headless
+     Chrome; docs/jackson/phone-fixes.md §4 has the Chrome setup. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  @page { size: 1600px 900px; margin: 0; }
+  :root {
+    --ground: #F2F5F6; --card: #FFFFFF; --ink: #16303F; --ink-2: #3F5564; --line: #DCE3E7;
+    --c1: #0F4C64; --c2: #0E6B5C; --c3: #B4541A; --warn-bg: #FBF0DA; --warn-line: #E9C98A;
+    --f: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; --mono: "IBM Plex Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { width: 1600px; height: 900px; background: var(--ground); color: var(--ink); font-family: var(--f);
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: hidden; }
+  .page { padding: 48px 56px 0; display: grid; grid-template-rows: auto auto 1fr auto; height: 900px; }
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+  h1 { margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -.01em; }
+  .asof { font: 500 13px/1 var(--mono); color: var(--ink-2); letter-spacing: .04em; padding-bottom: 8px; }
+  .sub { margin: 10px 0 26px; font-size: 19px; color: var(--ink-2); }
+  .flow { display: grid; grid-template-columns: 1fr 120px 1fr 120px 1fr; align-items: stretch; min-height: 0; }
+  .box { background: var(--card); border: 2.5px solid var(--c); border-radius: 18px; padding: 26px 28px 20px; display: flex; flex-direction: column; }
+  .b1 { --c: var(--c1); } .b2 { --c: var(--c2); } .b3 { --c: var(--c3); }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--c); }
+  .box h2 { margin: 12px 0 14px; font-size: 26px; line-height: 1.22; font-weight: 700; }
+  .repo { align-self: flex-start; font: 400 13px/1 var(--mono); color: var(--ink-2); background: #F1F4F5; padding: 7px 10px; border-radius: 6px; margin-bottom: 18px; }
+  ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 13px; }
+  li { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; font-size: 17px; line-height: 1.38; }
+  li b { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--c); color: #fff; font-size: 14px; font-weight: 700; margin-top: -2px; }
+  li em { font-style: normal; color: var(--ink-2); }
+  .run { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+  .run strong { color: var(--ink); }
+  .arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #5F7380; text-align: center; font-size: 13.5px; font-weight: 600; line-height: 1.3; padding: 0 8px; }
+  .arrow svg { width: 52px; height: 28px; }
+  .notes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 22px 0 40px; }
+  .note { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; font-size: 15px; line-height: 1.42; color: var(--ink-2); }
+  .note h3 { margin: 0 0 5px; font-size: 16px; color: var(--ink); }
+  .note.todo { background: var(--warn-bg); border-color: var(--warn-line); }
+</style>
+<body>
+<div class="page">
+  <div class="head">
+    <h1>How the LAUNCH data reaches the RBM website</h1>
+    <div class="asof">AS OF 10 OCT 2026</div>
+  </div>
+  <p class="sub">Three places, one direction: our team prepares and approves → one public data file → RBM's dashboard pages show it.</p>
+
+  <div class="flow">
+    <section class="box b1">
+      <div class="eyebrow">1 · Our workspace (private)</div>
+      <h2>Collect, check and approve</h2>
+      <span class="repo">launch-development-test</span>
+      <ol>
+        <li><b>1</b><span>Information comes in from public sources: WHO, national registers, trials <em>(the map uses reliable sources only)</em></span></li>
+        <li><b>2</b><span>A team member proposes a change</span></li>
+        <li><b>3</b><span>Someone else reviews and approves it</span></li>
+        <li><b>4</b><span>It is translated into French, Portuguese and Spanish automatically</span></li>
+      </ol>
+      <div class="run"><strong>Run by:</strong> the LAUNCH team · private, only the team can see it</div>
+    </section>
+
+    <div class="arrow">
+      <svg viewBox="0 0 52 28" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h44M35 3l12 11-12 11"/></svg>
+      <span>sent automatically after approval</span>
+    </div>
+
+    <section class="box b2">
+      <div class="eyebrow">2 · Public data file</div>
+      <h2>One file with all the dashboard data</h2>
+      <span class="repo">launch-data-test</span>
+      <ol>
+        <li><b>1</b><span>Holds every medicine, stage and source, in 4 languages</span></li>
+        <li><b>2</b><span>Updated after each approval <em>(RBM's pages show it within about 10 minutes)</em></span></li>
+        <li><b>3</b><span>Every version is kept, so we can see what was public and when</span></li>
+      </ol>
+      <div class="run"><strong>Run by:</strong> updated automatically · public, anyone can read it</div>
+    </section>
+
+    <div class="arrow">
+      <svg viewBox="0 0 52 28" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M49 14H5M17 3L5 14l12 11"/></svg>
+      <span>read on every visit</span>
+    </div>
+
+    <section class="box b3">
+      <div class="eyebrow">3 · RBM dashboard pages</div>
+      <h2>What visitors see on RBM's site</h2>
+      <span class="repo">launch-rbm-test</span>
+      <ol>
+        <li><b>1</b><span>English, French, Portuguese and Spanish pages, in RBM's look, on desktop and phone</span></li>
+        <li><b>2</b><span>Shown inside RBM's website <em>(/en, /fr, /pt; Spanish is ready for when RBM adds it)</em></span></li>
+        <li><b>3</b><span>Always show the latest approved data, with no work on RBM's side</span></li>
+        <li><b>4</b><span>Visitors can subscribe for updates or send feedback</span></li>
+      </ol>
+      <div class="run"><strong>Run by:</strong> handed over to RBM · built from our workspace, so a page change is made once for every language</div>
+    </section>
+  </div>
+
+  <div class="notes">
+    <div class="note"><h3>A person approves every change</h3>Nothing reaches the public file without review.</div>
+    <div class="note"><h3>Mistakes are easy to undo</h3>Undo the change, click "Publish now", and the public file is put right.</div>
+    <div class="note"><h3>Checked end to end</h3>All four languages go through the same steps; the live data matched a fresh build on 9 Oct 2026.</div>
+    <div class="note todo"><h3>Before go-live</h3>RBM's website address has to be added for the two forms, and the expected time for each step is still a working estimate.</div>
+  </div>
+</div>
+</body>
+</html>
