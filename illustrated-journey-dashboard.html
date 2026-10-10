@@ -1371,6 +1371,14 @@
     .pathnode .plabel { overflow-wrap: normal; hyphens: manual; }
     .pathnode { flex: 1 0 72px; min-width: min-content; }
     .pathgroup { flex: 1 0 84px; min-width: min-content; }
+    /* Safari (10 Oct 2026): WebKit sizes each card (.phase, min-width:
+       min-content) from its steps' min-content alone and leaves out their
+       72px flex-basis, so a step with short words ("R&D & clinical") was
+       laid out at 72px but counted narrower. The card came out up to 29px
+       too narrow and its hidden overflow cut off the last step and the WHO
+       bracket. With the label at least 72px, a step's min-content is never
+       below its basis, so both engines agree. Chrome was never affected. */
+    .pathnode .plabel { min-width: 72px; box-sizing: border-box; }
   }
 </style>
 

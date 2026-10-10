@@ -1941,7 +1941,7 @@ profile, inside the live mock, switching en → pt → es → fr → en on both
 hosts: 362px row and two 177px buttons every time, also with the row forced
 not to stretch. Still to come: the owner's retest on the iPhone itself.
 
-### 3.41 The step panel and the medicines table stay inside the screen (9 Oct 2026)
+### 3.41 The step panel, the medicines table and the pathway cards stay inside the screen (9-10 Oct 2026)
 
 Found while checking #86 live: the owner saw /fr still overflowing on a
 phone. The strip itself was fine. Two other places were not, and both
@@ -1977,6 +1977,42 @@ Checked, live pages with the CSS added, headless Chrome:
   off, and no text past its own column.
 - Widths outside the two new rules (641–680px, and 861px and up) were
   already clean and do not change.
+
+**Pathway cards in Safari, phones (10 Oct).** The owner's iPhone, after #86
+and rbm-test #9: both the LAUNCH page and RBM's mock still cut off the end of
+the strip. "WHO recommendatio(n)" and its bracket were cut on the Market
+Access card, and "In-country delivery" and its tag on the Country Access
+card. Chrome never showed it. Playwright's WebKit with an iPhone 13 profile
+(390px) does, on the live pages:
+
+| Page | Card 1: content past the card | Card 2: content past the card |
+| --- | --- | --- |
+| LAUNCH en | 16px (WHO bracket) | 20px ("In-country delivery") |
+| LAUNCH fr | 0 | 23px |
+| RBM en | 18px | 25px |
+| RBM fr | 0 | 29px |
+
+The cause is how WebKit sizes a card. A card has `min-width: min-content`.
+WebKit adds up its steps' min-content widths but leaves out their 72px
+flex-basis (#86's step-name rule). A step with short words, such as "R&D &
+clinical" or "Country registration", is laid out at 72px but counted
+narrower. The card comes out too narrow, and its `overflow: hidden` cuts off
+the right-hand end.
+
+Fix: the step label is at least 72px wide (`min-width: 72px`, border-box), so
+a step's min-content is never below its basis and the two engines agree.
+
+Checked after the fix:
+- WebKit, iPhone 13: nothing cut off on either card, LAUNCH en/fr/pt/es and
+  RBM en/fr/pt/es.
+- Chrome: unchanged. Same strip widths, 0 split words at 360px and 390px,
+  all 25 states clean.
+- The step panels in WebKit, iPhone 13 and iPad Mini: no header past its
+  panel. Before the fix, French step 3 was 69px past, the page 446px wide.
+
+This network blocks github.io for Playwright's WebKit, so the RBM pages were
+tested with their files served from the local repos (rbm-test `main`, and
+launch-data-test's dashboard.json).
 
 Rejected:
 - Moving the table's stacked phone layout up from 680px to about 800px. It
