@@ -20,7 +20,8 @@ end to end on GitHub (section 12).*
 | `codebyjackson/launch-rbm-test` (public) | test copy of the pages to hand over to RBM | https://codebyjackson.github.io/launch-rbm-test/ |
 
 Diagrams: the architecture artifact (all parts, technical) and
-`docs/jackson/img/LAUNCH-how-data-reaches-RBM.png` (one picture, no jargon).
+`docs/jackson/img/LAUNCH-how-data-reaches-RBM.png` (one picture, no jargon;
+updated 10 Oct 2026, with a PDF and its editable `.html` source alongside).
 
 Working notes with every decision and check: `docs/remove-resistance-notes.md`,
 `docs/public-data-layer-notes.md`, `docs/rbm-handover-notes.md`.

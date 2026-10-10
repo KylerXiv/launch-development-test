@@ -263,12 +263,18 @@ on main, /fr, /pt and /es show "Country Access" in English. The existing
 "Country access" (lower-case, the map) is a different string and was not
 reused, so the two titles keep the same casing.
 
-Branch `fix/phone-expected-tag`, three commits. The tag and step-name fixes
-are rebuilt and copied into launch-rbm-test on branch `fix/phone-expected-tag`
-there (from 14a2c84). The rename is not: copy-rbm-pages.js refuses a build
-whose translations are behind, so the RBM pages for it are rebuilt after the
-merge and the bot's commit, from main. The data repo does not change:
-dashboard.json carries neither the CSS nor the group names.
+Merged and live:
+- All three are in #86 (merged 9 Oct), and the bot translated the rename
+  (`9f6aaaf`).
+- RBM got the tag and step-name fixes in rbm-test #8, and the rename in #9,
+  built from main after the bot.
+- The data repo did not change: dashboard.json carries neither the CSS nor
+  the group names.
+
+Two follow-ups went out in #87 (10 Oct): the step panel and the medicines
+table, plus an iPhone Safari bug in the step-name rule that cut off the end
+of each card. The whole story, with the test setup and the release order, is
+in [phone-fixes.md](phone-fixes.md).
 
 ## Status
 
