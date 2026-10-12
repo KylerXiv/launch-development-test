@@ -1147,3 +1147,136 @@ fs.writeFileSync(F,y.replace(re,(_,a)=>a+n.map(x=>"        - \""+x+"\"\n").join(
 1. Wait for `translate.yml` to commit `i18n/content.en.json`.
 2. Rebuild the RBM pages (`node scripts/build-rbm-pages.js`) and push them to
    `codebyjackson/launch-rbm-test`: their footer code changed.
+
+---
+
+## 7. Raw data addresses beside the public page (12 Oct 2026)
+
+**Branch:** `feat/sources-raw-data` (off `main` at `655c5db`) · pull request,
+not merged · **Files:** `data/sources.js`, `scripts/data-rules.js`,
+`illustrated-journey-dashboard.html`, `scripts/build-dataset.js`,
+`public-data/v1/schema.json`, this document.
+
+Every source with a fetcher now shows two addresses in the Sources footer.
+The source's name links to the page a reader can use. Under the description,
+"Raw data (for developers):" is followed by the address the fetcher reads, as
+plain, selectable text in `<code>`, never a link.
+
+### The problem
+
+Two footer links pointed at something other than a page a reader can use.
+`zamra` was `…/portal/publicaccess/onSearchPublicRegisteredproducts?section_id=2`,
+the fetcher's data address, which shows an SQL error in a browser.
+`who-mft-guide` was the IRIS PDF download. The source sheet (Public
+Sources_Malaria, "Fetcher / data link" column) also lists a fetcher address
+for most automated sources; readers need none of them as links.
+
+### Decision: two addresses, the raw one as text
+
+- `url` stays what it always was: the page a reader opens. The name links to it.
+- `dataUrl` (new, optional) holds the fetcher's address, copied from the
+  constant in `scripts/fetch-*.js`. All eight matched the list given for this
+  change exactly. TMDA's `BASE` is the host only; the fetcher adds
+  `/publicaccess/onSearchPublicRegisteredproducts`, which is the address given.
+  `rwanda-fda` has none: its fetcher reads the public page itself.
+- It is shown as text, so a developer can copy it and nobody clicks into an
+  error page. `user-select: all` selects the whole address in one click, and
+  it breaks anywhere, so a phone never scrolls sideways.
+
+| Rejected | Because |
+| --- | --- |
+| Replace the public link with the fetcher's address | That is what `zamra` did by accident: a reader clicking the name got an SQL error |
+| Show the raw address as a second, clickable link | Most of them show an error or raw data, or download a file (MCAZ is POST only; ClinicalTrials.gov returns JSON); a link invites the click |
+| Leave the raw addresses off the page | They are already public (the fetchers are open code), and showing them lets a developer check where a figure comes from |
+
+### What changed
+
+| Source | `url` | `dataUrl` |
+| --- | --- | --- |
+| clinicaltrials | unchanged | `https://clinicaltrials.gov/api/v2/studies` |
+| who-pq-fpp | unchanged | the FPP list's CSV export |
+| ema | unchanged | the EU-M4all opinions spreadsheet |
+| nafdac | unchanged | `http://greenbook.nafdac.gov.ng/` (plain HTTP, as the fetcher uses) |
+| tmda | `/portal/#/…` → `https://imis2.tmda.go.tz/#/public/registered-medicines` (the old one redirects there) | `…/publicaccess/onSearchPublicRegisteredproducts` |
+| zamra | data address → `https://app.zamra.co.zm:42882/portal/#/public/registered-medicines` | `…/portal/publicaccess/onSearchPublicRegisteredproducts` |
+| mcaz | unchanged | `…/Medicines/GetMedicinesByCategory?category=1` (POST only) |
+| dav | unchanged | `…/soDangKy/GetAllPublicServerPaging` |
+| who-mft-guide | IRIS PDF → `https://www.who.int/publications/i/item/9789240103603`; the PDF moved to `alsoSee` as "The PDF itself" (it opens fine, so it stays a link) | none |
+
+Each changed entry has `checked: 2026-10-12`. `zamra`, `tmda` and
+`who-mft-guide` each have a line in `findings` saying why the url changed. The
+file's header documents `dataUrl`. The fetchers are unchanged.
+
+**Validator.** `checkSources` accepts `dataUrl` as optional: when present, it
+must be a string that is an http(s) URL with no spaces. Negative-tested on a
+copy of the file: `ftp://…`, a space, an empty string, a number, `null` and an
+array each give exactly one error; absent and plain `http://` give none; six
+breaks at once give six. Still errors only, never warnings (§2), and the
+documented counts are unchanged (0 errors, 1 warning). The analyst guide's
+troubleshooting table has never listed the source-file messages, so nothing
+was added there.
+
+**Translation.** The label is markup text inside the page script, so
+`assemble-content.js` collects it ("Raw data (for developers):", js bucket),
+and the bot translates it after the merge. "The PDF itself" is collected as an
+`alsoSee` label. The addresses are never collected for translation: they sit
+only in `content.en.json`'s values section, which `translate-strings.js` never
+sends. `content.en.json` is left to the translate bot, as usual.
+
+### RBM dataset
+
+Adding `dataUrl` is allowed in v1 (public-data/README.md, "Change rules":
+adding a field is not breaking; pages ignore fields they do not know). It is
+in `SOURCE_FIELDS` in `build-dataset.js`, and `public-data/v1/schema.json`
+documents it as an optional string (the publish workflow copies the schema to
+the data repo). It is not translated: it is not in `TEXT_PATHS`.
+
+`public-data/CHANGELOG.md` was **not** edited by hand. It is the publish log,
+written by `publish-dataset.yml` from `dataset-diff.js`. The copy in this repo
+is only the starter used when the data repo has none, so a hand entry here
+would never be published. The next publish records the change by itself: a dry
+run of `dataset-diff.js` against the published file lists 12 changes (eight
+`sources[…].dataUrl` added, the `tmda`, `zamra` and `who-mft-guide` urls, and
+the new `alsoSee`).
+
+### Verified (12 Oct 2026)
+
+- Verify block: treatment policy byte-identical (line endings aside);
+  `validate-data.js` 0 errors, 1 warning (French Guiana); synthetic 0 / 0;
+  `make-preview.js` ok; `test-build-dataset.js --allow-stale` 30 / 0 (without
+  the flag it stops on the stale `content.en.json`, as on any text change
+  before the bot runs; CI passes the flag); country names cover all 252.
+- `test-build-rbm-pages.js` 33 / 0, `test-copy-rbm-pages.js` 20 / 0,
+  `test-dataset-diff.js` 11 / 0, `proposal-lib.js selftest` 58 / 0; locale build
+  self-check passed; dataset schema v1 valid (502 text fields, one more for
+  "The PDF itself").
+- Headless Chrome at 1280 px and 375 px, on the LAUNCH page (en and fr) and on
+  an RBM test build reading the new `dashboard.json` locally: 8 raw lines, none
+  of them a link; the zamra, tmda and nafdac names link to their public pages;
+  no sideways scroll; 0 script errors. The WHO MFT guide's name links to WHO's
+  page and "The PDF itself" to the PDF. Rwanda has no raw line.
+- The other 21 footer entries are byte-identical to the live site (`main`).
+
+### Old addresses still in the repo
+
+- Old zamra data address (`…?section_id=2`): `i18n/content.en.json` only, a
+  generated snapshot the bot rewrites. `fetch-zamra.js` also builds that
+  address at runtime as its `sourceUrl`; fetchers were not to be changed.
+- IRIS address: `data/sources.js`, as the "The PDF itself" link (intended), and
+  `i18n/content.en.json`.
+- Old TMDA `/portal/` address: `scripts/fetch-tmda.js` line 104 (`sourceUrl`,
+  unchanged by rule; it still works, as it redirects), and the CSV rows the
+  fetcher wrote from it (`sourcing/staging/tmda_registrations.csv` and the test
+  fixture `test-data/registers/tmda-ganlum-registered.csv`).
+
+### After merge
+
+1. `translate.yml` translates the new label and "The PDF itself" and commits
+   `i18n/`. Until then `/fr`, `/pt` and `/es` show them in English.
+2. **Publish now** (by hand). Only a publish puts `dataUrl` and the three new
+   urls into `dashboard.json`; RBM's pages show the raw lines after it.
+3. Then rebuild launch-rbm-test from `main`: `node scripts/build-rbm-pages.js`,
+   then `node scripts/copy-rbm-pages.js --to ../launch-rbm-test`, a branch
+   `update/main-<sha>`, PR and merge. Only the 4 `index.html` files and the
+   manifest should change (their footer code changed). The copy guard refuses
+   a build made before the bot's commit.

@@ -82,7 +82,9 @@ const TEXT_PATHS = {
 
 // Fields of a source entry that are published; findings and relevance are the
 // registry's own internal notes (its header says so).
-const SOURCE_FIELDS = ["id", "title", "label", "org", "category", "group", "url", "alsoSee", "year", "products", "plain", "collection"];
+// dataUrl (12 Oct 2026): the address a fetcher reads, an added optional field
+// (allowed in v1, public-data/README.md "Change rules"); never translated.
+const SOURCE_FIELDS = ["id", "title", "label", "org", "category", "group", "url", "dataUrl", "alsoSee", "year", "products", "plain", "collection"];
 
 const args = process.argv.slice(2);
 const argOf = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };

@@ -869,6 +869,11 @@
   .srclist .srcname { font-weight: 650; color: var(--ink-2); }
   .srclist li > span { display: block; }
   .srclist li > span a { font-weight: 400; }
+  /* A fetcher's address: plain, selectable text, never a link (12 Oct 2026).
+     Long API addresses break anywhere, so a phone never scrolls sideways. */
+  .srclist .srcraw { display: block; font-size: 12.5px; color: var(--ink-2); }
+  .srclist .srcraw code { font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 12px;
+    overflow-wrap: anywhere; word-break: break-all; user-select: all; background: var(--surface-2); border-radius: 4px; padding: 0 4px; }
   /* Footer: the disclaimer leads, in a tinted panel with an accent edge, so it is not overlooked. */
   /* Section cards under the map (8 Oct 2026): About the data, Sources and Definitions
      share one card and one plain bold title; the disclaimer keeps its blue notice. */
@@ -3783,7 +3788,12 @@
       const name = s.url ? link(s.url, s.label || s.title)
                          : `<span class="srcname">${esc(s.label || s.title)}</span>`;
       const also = (s.alsoSee || []).map(a => " " + link(a.url, a.label) + ".").join("");
-      return `<li>${name}<span>${esc(s.plain)}${also}</span></li>`;
+      // The address a fetcher reads, for developers: plain, copyable text and
+      // never a link, since it often shows an error or raw data in a browser
+      // (12 Oct 2026). The name above stays the link to the public page.
+      const raw = s.dataUrl
+        ? ` <span class="srcraw">Raw data (for developers): <code>${esc(s.dataUrl)}</code></span>` : "";
+      return `<li>${name}<span>${esc(s.plain)}${also}${raw}</span></li>`;
     };
 
     const shown = reg.sources.filter(s => s.public)

@@ -487,6 +487,11 @@
       if (s.url !== null && !/^https?:\/\/\S+$/.test(s.url || ""))
         err(`${at}: "url" must be an http(s) URL, or null where none exists`);
 
+      // optional: the address a fetcher reads, shown as plain text (never a
+      // link). Absent is fine; present, it must be a real address.
+      if (s.dataUrl !== undefined && (typeof s.dataUrl !== "string" || !/^https?:\/\/\S+$/.test(s.dataUrl)))
+        err(`${at}: "dataUrl" must be an http(s) URL with no spaces, or left out`);
+
       (s.alsoSee || []).forEach((a, j) => {
         if (!a || !a.label || !/^https?:\/\/\S+$/.test(a.url || ""))
           err(`${at}: alsoSee[${j}] needs a label and an http(s) url`);
