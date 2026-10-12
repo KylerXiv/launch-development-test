@@ -112,20 +112,24 @@ function manifestOf(dir) {
   return Object.fromEntries(Object.keys(out).sort().map((k) => [k, out[k]]));
 }
 
-// Reader-facing messages, per language. New strings the translation memory does
-// not hold, so they are written here by hand — NOT reviewed yet: have a French,
-// a Portuguese and a Spanish speaker check them (docs/rbm-handover-notes.md,
-// docs/jackson/spanish.md).
-const MSG = {
-  en: { fail: "<b>The dashboard data could not be loaded.</b> Please try again in a few minutes.",
-        schema: "<b>This dashboard is being updated.</b> Please check back shortly." },
-  fr: { fail: "<b>Les données du tableau de bord n'ont pas pu être chargées.</b> Veuillez réessayer dans quelques minutes.",
-        schema: "<b>Ce tableau de bord est en cours de mise à jour.</b> Veuillez revenir un peu plus tard." },
-  pt: { fail: "<b>Não foi possível carregar os dados do painel.</b> Tente novamente dentro de alguns minutos.",
-        schema: "<b>Este painel está a ser atualizado.</b> Volte a consultá-lo em breve." },
-  es: { fail: "<b>No se pudieron cargar los datos del panel.</b> Vuelva a intentarlo dentro de unos minutos.",
-        schema: "<b>Este panel se está actualizando.</b> Vuelva a consultarlo en breve." },
+// Reader-facing messages. Only the English is written here: French, Portuguese
+// and Spanish come from the translation memory, like every other text on the
+// pages, through one i18n/reviewed-strings.json entry per sentence (12 Oct
+// 2026; until then they were written here by hand, outside the translate bot).
+// A sentence the memory does not hold yet stays English.
+const MSG_EN = {
+  failHead: "The dashboard data could not be loaded.",
+  failBody: "Please try again in a few minutes.",
+  schemaHead: "This dashboard is being updated.",
+  schemaBody: "Please check back shortly.",
 };
+const escHtml = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function messages(t = (s) => s) {
+  const m = (head, body) => `<b>${escHtml(t(head))}</b> ${escHtml(t(body))}`;
+  return { fail: m(MSG_EN.failHead, MSG_EN.failBody), schema: m(MSG_EN.schemaHead, MSG_EN.schemaBody) };
+}
+// English until main() has read the memory (the tests build loaders without it)
+let MSG = Object.fromEntries(LOCALES.map((l) => [l, messages()]));
 
 function loader(lang, apiUrl = API_URL) {
   // with no API to post to, Subscribe is hidden here (the page has no </head>
@@ -259,6 +263,10 @@ function main() {
   // the translated pages (interface text) come from the locale build
   const stale = args.includes("--allow-stale") ? ["--allow-stale"] : [];
   execFileSync(process.execPath, [path.join(__dirname, "build-locale-pages.js"), ...stale], { cwd: ROOT, stdio: "ignore" });
+  // the loader's messages, from the same memory (read here, not at load, so the
+  // tests can require this file before the translate bot has run)
+  const locale = require("./build-locale-pages");
+  MSG = Object.fromEntries(LOCALES.map((l) => [l, l === "en" ? messages() : messages((s) => locale.reviewedText(l, s))]));
 
   fs.rmSync(OUT, { recursive: true, force: true });
   const sources = Object.fromEntries(LOCALES.map((l) => [l, l === "en" ? path.join(ROOT, PAGE) : path.join(ROOT, "dist", "locale", l, PAGE)]));
@@ -303,5 +311,5 @@ function main() {
   console.log(`  assets/ (shared), README.md\n  data: ${DATA_URL}\n  forms: ${API_URL ? API_URL + "/api/{subscribe,feedback}" : "off (--api-url none)"}\n  → ${path.relative(ROOT, OUT)}/`);
 }
 
-module.exports = { transform, loader, widget, manifestOf, fingerprint, BUILT, MANIFEST };
+module.exports = { transform, loader, widget, messages, manifestOf, fingerprint, BUILT, MANIFEST };
 if (require.main === module) main();
