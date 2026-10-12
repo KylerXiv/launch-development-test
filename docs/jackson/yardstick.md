@@ -19,7 +19,8 @@ Everything is in one commit on `feat/yardstick`, so each of these is safe:
   same order as `stages`) or `wholeYears` in `data/products.js`, then run
   `node scripts/validate-data.js`. No code change. Set an entry to `null` to
   stop measuring that stage. Mark it `"basis": "published"` once LAUNCH agrees
-  it, and update the footnote text in the page (search for "Expected times:").
+  it. The note under "Time taken" lists the steps of each basis from the data
+  (12 Oct 2026), so it follows on its own.
 - **Change the wording.** Every visible phrase is in
   `illustrated-journey-dashboard.html`, in the block that starts
   `// ---- yardstick`. If you change one of the phrases listed in

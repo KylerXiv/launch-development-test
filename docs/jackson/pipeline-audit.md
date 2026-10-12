@@ -26,7 +26,7 @@ https://claude.ai/artifact/DWvEoXHLWzqYzfkC1riptx.
 | --- | --- | --- |
 | Are the built pages what a build from `main` produces? | 127 of 127 files on the live sites match the repos, which match a fresh build | Pass: nobody edited a built page by hand |
 | Does every text reach the translate bot? | 100% of collected strings, fr/pt/es; the browser sweep found no page text outside the pipeline | 3 gaps fixed (RBM error messages, CSV headings, the bot's trigger) |
-| Are there facts typed into the page? | 2 found (the disclaimer, the yardstick note) | Both kept as they are, by the owner's decision |
+| Are there facts typed into the page? | 2 found (the disclaimer, the yardstick note) | Kept at first; later on 12 Oct the owner asked for both to read from the data (§9) |
 
 ---
 
@@ -160,3 +160,30 @@ other CSV words and the first loader sentence were already in the memory).
 | Branch | `fix/pipeline-audit`: `da826ed` fixes, `5e8fb2b` disclaimer put back, `487dd21` notes, then the yardstick note put back and these notes |
 | launch-rbm-test | rebuilt after the bot's commit (§6, step 4) |
 | launch-data-test | no change |
+
+## 9. Follow-up: both facts read from the data (12 Oct 2026, later)
+
+The owner reversed §8 #1 and #4: no fact about the data should be typed into
+the page. Branch `fix/data-driven-statements`, from `main` at `655c5db`.
+
+| Where | Before | Now |
+| --- | --- | --- |
+| Disclaimer, 2nd paragraph | "Country stages in this version are illustrative and have not been verified, except for the Nigeria and Tanzania registrations." | `renderDisclaimer()` names the medicines from each `detail.countries.status`: "Country registrations have been verified for: ASPY, DHA–PPQ." and, only if any list is `illustrative` or `draft`, "Country stages have not been verified yet for: …". A medicine with no country list is not named. The legal sentences around it are unchanged |
+| Yardstick note ("Time taken") | "Expected times: country registration follows a published timeline. The other steps use LAUNCH's working estimates, still to be agreed." | `yardNote()` lists the steps of each `basis`: "Expected times from a published timeline: Country registration." and "Expected times from LAUNCH's working estimates, still to be agreed: WHO recommendation, …". A line with no steps is left out |
+
+Unlike `da826ed`, each fixed label is a whole literal with no names inside it,
+so `assemble-content.js` collects all four for the bot; the names come from
+the data (product names stay English, stage names are already translated).
+Both fields reach RBM in `dashboard.json`, so the RBM pages follow too.
+
+**Tested:** the CI steps in `validate.yml` pass (`--allow-stale` where CI uses
+it). Headless Chrome on the English page and on an RBM build reading a fresh
+`dashboard.json`: both sentences show as above; on /fr the stage names are
+French and the four labels wait in English for the bot.
+
+**Undo or change:** `git revert` the commit. The wording is the four literals in
+`renderDisclaimer()` and `yardNote()` in `illustrated-journey-dashboard.html`.
+
+**After the merge:** the bot translates the four labels and the split
+disclaimer paragraph; then rebuild launch-rbm-test from `main` (no data
+publish: `dashboard.json` does not change).
