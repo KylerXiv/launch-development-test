@@ -18,14 +18,27 @@ which did not start for four of the files it reads. Four are fixed here. The
 fifth, the disclaimer, which says country stages are unverified except Nigeria
 and Tanzania while both lists have been verified since 6 Oct, was fixed and
 then put back as it was at the owner's request (12 Oct): its wording is the
-owner's decision (§2). The smaller findings left alone are in §5.
+owner's decision (§2). The smaller findings left alone are in §5, and the
+decisions still open are in §8.
+
+Report page for the team (private until shared):
+https://claude.ai/artifact/DWvEoXHLWzqYzfkC1riptx. It says the same as this
+file.
+
+## At a glance
+
+| Question | Result | Status |
+| --- | --- | --- |
+| Are the built pages what a build from `main` produces? | 127 of 127 files on the live sites match the repos, which match a fresh build | Pass: nobody edited a built page by hand |
+| Does every text reach the translate bot? | 100% of collected strings, fr/pt/es; the browser sweep found no page text outside the pipeline | 3 gaps fixed (RBM error messages, CSV headings, the bot's trigger) |
+| Are there facts typed into the page? | 2 found | 1 fixed (yardstick note); the disclaimer is waiting for a decision (§8) |
 
 ---
 
 ## How to undo or change it
 
-- **Everything:** do not merge the branch, or `git revert` its commit after the
-  merge. Then rebuild launch-rbm-test from `main` as usual.
+- **Everything:** do not merge the branch, or `git revert` its commits after
+  the merge. Then rebuild launch-rbm-test from `main` as usual.
 - **The disclaimer is unchanged** on this branch (the fix was reverted on
   12 Oct). The reverted version is in commit `da826ed` if you want it back:
   it replaced the Nigeria/Tanzania clause with a sentence built from
@@ -119,9 +132,9 @@ same; "TBC"; unconfirmed price notes (never translated, by design).
 - `test-build-rbm-pages.js` 33/0, `test-copy-rbm-pages.js` 20/0,
   `test-dataset-diff.js` 11/0; `assemble-content.js --check` current with the
   regenerated content file; no NUL bytes.
-- Stub run in a scratch worktree (memory emptied, every string stubbed):
-  locale build 100% for fr/pt/es (684 strings); the RBM loader's `MSG` carries
-  `[stub-xx]` text in all three.
+- Stub run in a scratch worktree (memory emptied, every string stubbed), before
+  the disclaimer revert: locale build 100% for fr/pt/es (684 strings); the RBM
+  loader's `MSG` carries `[stub-xx]` text in all three.
 - Headless Chrome (system Chrome through Playwright), English and the three stub
   languages, every panel opened: 0 script errors. English differs from `main`
   only in the disclaimer and the yardstick note (the disclaimer change was
@@ -137,9 +150,22 @@ same; "TBC"; unconfirmed price notes (never translated, by design).
 **Not checked:** the real Google output for the new strings (it runs after the
 merge); a real phone (no layout changed).
 
+## 8. Decisions for the owner
+
+| # | Decision | Options | Recommendation |
+| --- | --- | --- | --- |
+| 1 | **The disclaimer's wording.** It says country stages are unverified "except for the Nigeria and Tanzania registrations", but the data marks both country lists verified, with a source per country (Pyramax 13 countries, DHA–PPQ 15). The page contradicts itself in all four languages and on RBM | Leave it; delete that clause; use the data-driven sentence from `da826ed`; write new wording | If it is Unitaid's legal text, check with whoever owns it first |
+| 2 | **The RBM error messages.** On 9 Oct the owner chose not to fix this gap; this branch fixes it. The hand-written fr/pt/es wording is replaced by the bot's, as the "bot only" rule asks, but three sentences show in English until the bot runs after the merge | Keep the fix; drop it (revert the `build-rbm-pages.js`, test and reviewed-strings parts) | Keep |
+| 3 | **CSV column names in fr/pt/es.** The branch translates them all, to match the CSV's contents, which were already translated. A script that reads the CSV by column name would then see different names per language | Keep them translated; make every heading English | Keep translated |
+| 4 | **The yardstick note's English.** "Expected times: country registration follows a published timeline." becomes "Expected times from a published timeline: Country registration." | Accept; reword (`yardNote` in the page) | Accept, or reword as you prefer |
+| 5 | **The 4 strings Google rejects** (PQ/MFT, es 3, fr 1). Left alone on 9 Oct and here | Leave; try the fix, proved in CI with the real Google key | Owner's call |
+
+After these: push the branch for Kyler to merge, then follow §6.
+
 ## Status
 
 | | |
 | --- | --- |
-| Branch | `fix/pipeline-audit` (local, not pushed) |
+| Branch | `fix/pipeline-audit` (local, not pushed): `da826ed` the fixes, `5e8fb2b` disclaimer put back, then this notes update |
 | launch-rbm-test, launch-data-test | no change until the rebuild in §6 |
+| Open | the five decisions in §8 |
