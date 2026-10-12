@@ -11,13 +11,14 @@ on a local branch.*
 build from `main`, file for file, and no person has written a translation since
 1 Oct. Every visible text on /fr, /pt and /es reaches the Google bot; the only
 English left is English on purpose (names, citations, two abbreviations). The
-audit found two facts typed into the page instead of read from the data (one of
-them wrong today: the disclaimer said country stages are unverified except
-Nigeria and Tanzania, while both lists have been verified since 6 Oct), and
+audit found two facts typed into the page instead of read from the data, and
 three places where text skipped the bot: the RBM loader's error messages
 (hand-written in fr/pt/es), seven CSV column names, and the bot's own trigger,
-which did not start for four of the files it reads. All five are fixed here.
-Five smaller findings are left alone, with the reasons in §5.
+which did not start for four of the files it reads. Four are fixed here. The
+fifth, the disclaimer, which says country stages are unverified except Nigeria
+and Tanzania while both lists have been verified since 6 Oct, was fixed and
+then put back as it was at the owner's request (12 Oct): its wording is the
+owner's decision (§2). The smaller findings left alone are in §5.
 
 ---
 
@@ -25,11 +26,10 @@ Five smaller findings are left alone, with the reasons in §5.
 
 - **Everything:** do not merge the branch, or `git revert` its commit after the
   merge. Then rebuild launch-rbm-test from `main` as usual.
-- **Only the disclaimer:** in `illustrated-journey-dashboard.html`, delete
-  `<p id="disc-countries" hidden></p>` and the small function after `tracked`
-  that fills it, and put back your own sentence in the paragraph above. The
-  data-driven sentence names a medicine only when its
-  `detail.countries.status` is not `"verified"`; today none is named.
+- **The disclaimer is unchanged** on this branch (the fix was reverted on
+  12 Oct). The reverted version is in commit `da826ed` if you want it back:
+  it replaced the Nigeria/Tanzania clause with a sentence built from
+  `detail.countries.status`.
 - **The yardstick note's wording:** `yardNote` in the page. Which steps it names
   comes from `yardstick.expected[i].basis` in `data/products.js` (`"published"`
   or `"estimate"`).
@@ -54,7 +54,7 @@ Five smaller findings are left alone, with the reasons in §5.
 
 | Where | What it said | Why it is wrong | Fix |
 | --- | --- | --- | --- |
-| Disclaimer, 2nd paragraph | "Country stages in this version are illustrative and have not been verified, except for the Nigeria and Tanzania registrations." | Written on 2 Oct. Since 6 Oct both country lists are `status: "verified"`, with a source per country. Found on 7 Oct, not fixed then | The clause is removed. A new sentence, built from the data, names any medicine whose country data is not verified: "Country stages for X are illustrative and have not been verified." Hidden today |
+| Disclaimer, 2nd paragraph | "Country stages in this version are illustrative and have not been verified, except for the Nigeria and Tanzania registrations." | Written on 2 Oct. Since 6 Oct both country lists are `status: "verified"`, with a source per country. Found on 7 Oct, not fixed then | **Not changed (owner's decision, 12 Oct).** A data-driven version was built (`da826ed`) and reverted; the wording of the disclaimer is for the owner to decide |
 | Yardstick note ("Time taken") | "country registration follows a published timeline. The other steps use LAUNCH's working estimates" | True today, but the data already says which step is published (`basis`); a change there would leave the note wrong | The note names the steps whose `basis` is `"published"`. It now reads "Expected times from a published timeline: Country registration." |
 
 ## 3. Text that skipped the translate bot
@@ -74,7 +74,7 @@ same; "TBC"; unconfirmed price notes (never translated, by design).
 
 | File | Change |
 | --- | --- |
-| `illustrated-journey-dashboard.html` | disclaimer clause removed, `#disc-countries` added and filled from the data; `yardNote` from `basis`; CSV `CSV_COL` / `CSV_REC` |
+| `illustrated-journey-dashboard.html` | `yardNote` from `basis`; CSV `CSV_COL` / `CSV_REC` (the disclaimer is as on `main`) |
 | `i18n/reviewed-strings.json` | 13 entries: 9 CSV words, 4 loader sentences (156 in all) |
 | `scripts/build-rbm-pages.js` | `MSG_EN` + `messages()`; translations read in `main()` after the locale build; `messages` exported |
 | `scripts/build-locale-pages.js` | `reviewedText(loc, en)` exported |
@@ -99,7 +99,7 @@ same; "TBC"; unconfirmed price notes (never translated, by design).
 ## 6. After the merge
 
 1. Kyler merges. The page changed, so the translate bot starts by itself and
-   translates the 12 new strings (fr/pt/es).
+   translates the 10 new strings (fr/pt/es).
 2. Data repo: nothing to publish (no data or data text changed; Publish now
    would say "No change").
 3. Pull `main`, then `node scripts/build-rbm-pages.js` and
@@ -107,8 +107,7 @@ same; "TBC"; unconfirmed price notes (never translated, by design).
    `update/main-<sha>` in launch-rbm-test, PR, merge. Only the 4 `index.html`
    files and the manifest should change. Do not rebuild before the bot's
    commit: copy-rbm-pages refuses a build whose translations are behind.
-4. Check: the disclaimer has no Nigeria/Tanzania sentence in any language; a
-   CSV from /fr has French column names; in launch-rbm-test the loader's
+4. Check: a CSV from /fr has French column names; in launch-rbm-test the loader's
    `var MSG` holds the bot's wording.
 
 ## 7. How it was tested (12 Oct 2026)
@@ -125,12 +124,15 @@ same; "TBC"; unconfirmed price notes (never translated, by design).
   `[stub-xx]` text in all three.
 - Headless Chrome (system Chrome through Playwright), English and the three stub
   languages, every panel opened: 0 script errors. English differs from `main`
-  only in the disclaimer and the yardstick note. CSV downloaded in en/fr/es:
+  only in the disclaimer and the yardstick note (the disclaimer change was
+  reverted afterwards). CSV downloaded in en/fr/es:
   every column name and record type stubbed in fr/es.
 - Forced case (built copies only): DHA–PPQ's country status set to
-  "illustrative" and stage 6 to "published". The disclaimer then reads
-  "Country stages for DHA–PPQ are illustrative and have not been verified." and
-  the note names both steps, in English and French.
+  "illustrative" and stage 6 to "published". The note names both steps, in
+  English and French.
+- After the disclaimer revert: the disclaimer matches `main` exactly;
+  `test-build-rbm-pages.js` 33/0, `test-build-dataset.js --allow-stale` 30/0,
+  `validate-data.js` 0 errors 1 warning, locale build self-check passed.
 
 **Not checked:** the real Google output for the new strings (it runs after the
 merge); a real phone (no layout changed).
