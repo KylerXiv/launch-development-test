@@ -4338,6 +4338,14 @@
       "pt": "Transações PQR do Fundo Global, 2008–2026 (234 ordens; 15,3 milhões de dólares em 2025; principais compradores: Uganda, Madagáscar, Moçambique)",
       "es": "Transacciones de PQR del Fondo Mundial, 2008–2026 (234 órdenes; US$15,3 millones en 2025; principales compradores: Uganda, Madagascar, Mozambique)"
     },
+    "ab099acb18802839": {
+      "en": "The PDF itself",
+      "where": "sources.sources[22].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Le PDF lui-même",
+      "pt": "O próprio PDF",
+      "es": "El propio PDF"
+    },
     "abd149214539d9f2": {
       "en": "India",
       "where": "resistance.dict.country[30]",
@@ -4537,6 +4545,14 @@
       "fr": "Nous avons reformulé la description de ce médicament pour qu'elle corresponde aux propres termes du fabricant : le premier changement majeur dans le traitement du paludisme depuis plus de 25 ans.",
       "pt": "Reformulámos a descrição deste medicamento para que corresponda às palavras do próprio fabricante: a primeira grande mudança no tratamento da malária em mais de 25 anos.",
       "es": "Hemos reformulado la descripción de este medicamento para que coincida con las propias palabras del fabricante: el primer cambio importante en el tratamiento de la malaria en más de 25 años."
+    },
+    "b6339a99ea07dc26": {
+      "en": "Raw data (for developers):",
+      "where": "line 3795 (in markup)",
+      "bucket": "js",
+      "fr": "Données brutes (pour les développeurs) :",
+      "pt": "Dados brutos (para programadores):",
+      "es": "Datos sin procesar (para desarrolladores):"
     },
     "b6e45f9e9005a81c": {
       "en": "Views:",
