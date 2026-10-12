@@ -696,6 +696,14 @@
       "pt": "Em orientações nacionais",
       "es": "En las directrices nacionales"
     },
+    "1a5849aca57851ea": {
+      "en": "This dashboard is being updated.",
+      "where": "scripts/build-rbm-pages.js",
+      "bucket": "reviewed",
+      "fr": "Ce tableau de bord est en cours de mise à jour.",
+      "pt": "Este painel está a ser atualizado.",
+      "es": "Este panel de control se está actualizando."
+    },
     "1b454b0a28d0323f": {
       "en": "Please describe the issue.",
       "where": "assets/report-issue.js",
@@ -937,6 +945,14 @@
       "fr": "MFT politique",
       "pt": "MFT política",
       "es": "Política MFT"
+    },
+    "27ba1653113af170": {
+      "en": "Please try again in a few minutes.",
+      "where": "scripts/build-rbm-pages.js",
+      "bucket": "reviewed",
+      "fr": "Veuillez réessayer dans quelques minutes.",
+      "pt": "Por favor, tente novamente dentro de alguns minutos.",
+      "es": "Por favor, inténtelo de nuevo en unos minutos."
     },
     "28150031cffefcc2": {
       "en": "WHO's guide to using several first-line malaria treatments at once, with country examples.",
@@ -2427,6 +2443,14 @@
       "fr": "Afghanistan",
       "pt": "Afeganistão"
     },
+    "5e28eda83dbeee21": {
+      "en": "Please check back shortly.",
+      "where": "scripts/build-rbm-pages.js",
+      "bucket": "reviewed",
+      "fr": "Veuillez revenir bientôt.",
+      "pt": "Por favor, volte em breve.",
+      "es": "Vuelva a consultar en breve."
+    },
     "5e48e99c9debaf26": {
       "en": "Novartis",
       "where": "products.products[0].detail.research.lead",
@@ -2601,6 +2625,14 @@
       "bucket": "data",
       "fr": "Pipéraquine",
       "pt": "Piperaquina"
+    },
+    "652bcc3a47842889": {
+      "en": "Item",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Article",
+      "pt": "Artigo",
+      "es": "Artículo"
     },
     "65e95dd1350dd2e7": {
       "en": "16 Feb 2012",
@@ -3954,6 +3986,14 @@
       "fr": "Une initiative LAUNCH de",
       "pt": "Uma iniciativa LAUNCH de"
     },
+    "99c40ab405926cb5": {
+      "en": "Date",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Date",
+      "pt": "Data",
+      "es": "Fecha"
+    },
     "9a383b7887d2c58a": {
       "en": "Country Access",
       "where": "line 1792",
@@ -4642,6 +4682,14 @@
       "bucket": "data",
       "fr": "Mauritanie",
       "pt": "Mauritânia"
+    },
+    "bfdd510698ef3ccb": {
+      "en": "Record",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Enregistrer",
+      "pt": "Registo",
+      "es": "Registro"
     },
     "bfe26e15de8131b7": {
       "en": "Everything on this page is traceable to one of the public sources below.",
@@ -6317,6 +6365,14 @@
       "fr": "Sur le chemin",
       "pt": "Na trilha",
       "es": "En el camino"
+    },
+    "fb9ef894175c3274": {
+      "en": "Product",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Produit",
+      "pt": "Produto",
+      "es": "Producto"
     },
     "fca2d28d964bcd04": {
       "en": "2015–2023; requal. 20 Jan 2025",
