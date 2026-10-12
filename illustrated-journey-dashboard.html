@@ -1870,19 +1870,7 @@
     return s.kind === "going" ? { t: "On track so far", tone: "good" } : { t: yrsText(0), tone: "good" };
   }
   const yardPill = (r, sm) => `<span class="ysp${sm ? " sm" : ""} ${r.tone}">${esc(r.t)}${r.going && !sm ? ` <i>· so far</i>` : ""}</span>`;
-  // Which steps rest on a published timeline is each step's `basis` in the
-  // data, so the note names them from there (12 Oct 2026; it used to name
-  // country registration in the text).
-  const yardNote = () => {
-    const pub = YARD.expected.map((e, i) => (e && e.basis === "published" ? STAGES[i] : null)).filter(Boolean);
-    const est = YARD.expected.some(e => e && e.basis !== "published");
-    const names = pub.join(", ");
-    const parts = [];
-    if (pub.length) parts.push(`Expected times from a published timeline: ${names}.`);
-    if (est) parts.push(pub.length ? "The other steps use LAUNCH's working estimates, still to be agreed."
-      : "Expected times are LAUNCH's working estimates, still to be agreed.");
-    return parts.length ? `<p class="ysnote">${esc(parts.join(" "))}</p>` : "";
-  };
+  const yardNote = () => `<p class="ysnote">Expected times: country registration follows a published timeline. The other steps use LAUNCH's working estimates, still to be agreed.</p>`;
   // under "On pathway" in the medicines table
   function yardBadge(p) {
     const y = yardstick(p);
