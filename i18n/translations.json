@@ -579,6 +579,14 @@
       "pt": "${esc(mftName(iso3))} entre ${ids.length} ${esc(region)} países · ${esc(p.name)}",
       "es": "${esc(mftName(iso3))} entre ${ids.length} ${esc(region)} países · ${esc(p.name)}"
     },
+    "1621c101ea57a1d5": {
+      "en": "Country registrations have been verified for:",
+      "where": "line 3831",
+      "bucket": "js",
+      "fr": "Les enregistrements des pays ont été vérifiés pour :",
+      "pt": "Os registos por país foram verificados para:",
+      "es": "Se han verificado los registros de países para:"
+    },
     "1622625d0a49a1c6": {
       "en": "The national register of every medicine approved for sale in Tanzania.",
       "where": "static text",
@@ -601,6 +609,14 @@
       "fr": "Consortium MORU / DeTACT",
       "pt": "Consórcio MORU / DeTACT",
       "es": "Consorcio MORU / DeTACT"
+    },
+    "16b68775095ea381": {
+      "en": "Country stages have not been verified yet for:",
+      "where": "line 3832",
+      "bucket": "js",
+      "fr": "Les étapes nationales n'ont pas encore été vérifiées pour :",
+      "pt": "As etapas de verificação de cada país ainda não foram realizadas para:",
+      "es": "Las etapas de los países aún no han sido verificadas para:"
     },
     "16d79713fa054668": {
       "en": "delayed",
@@ -1753,6 +1769,14 @@
       "pt": "• ainda em curso",
       "es": "· Todavía continúa"
     },
+    "474170f8ae56bb78": {
+      "en": "Expected times from a published timeline:",
+      "where": "line 1885",
+      "bucket": "js",
+      "fr": "Délais prévus d'après le calendrier publié :",
+      "pt": "Horários previstos com base num cronograma publicado:",
+      "es": "Tiempos previstos según un cronograma publicado:"
+    },
     "47d2f7b20b006500": {
       "en": "Health-worker training on new regimen",
       "where": "products.products[0].detail.adoption[1]",
@@ -2077,6 +2101,14 @@
       "fr": "pays par groupe de patients",
       "pt": "países por grupo de doentes",
       "es": "países por grupo de pacientes"
+    },
+    "520d813b2d122207": {
+      "en": "Unitaid does not accept legal responsibility for the accuracy of the data. In particular, Unitaid does not guarantee that it is complete, up to date or fit for a specific purpose.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Unitaid décline toute responsabilité quant à l'exactitude des données. En particulier, Unitaid ne garantit pas qu'elles soient complètes, à jour ou adaptées à un usage particulier.",
+      "pt": "Unitaid não assume responsabilidade legal pela exatidão dos dados. Em particular, o Unitaid não garante que os dados estejam completos, atualizados ou adequados a uma finalidade específica.",
+      "es": "Unitaid no asume responsabilidad legal por la exactitud de los datos. En particular, Unitaid no garantiza que sean completos, estén actualizados o sean adecuados para un propósito específico."
     },
     "5214e61ae7a3a4e4": {
       "en": "Off. Tick a policy group on the left to draw its borders.",
@@ -2602,6 +2634,14 @@
       "fr": "Achats (voies publiques)",
       "pt": "Concursos (canais públicos)",
       "es": "Adquisiciones (canales públicos)"
+    },
+    "63903d2630cae975": {
+      "en": "Expected times from LAUNCH's working estimates, still to be agreed:",
+      "where": "line 1886",
+      "bucket": "js",
+      "fr": "Délais prévus d'après les estimations de travail de LAUNCH, encore à convenir :",
+      "pt": "Tempos previstos a partir das estimativas de trabalho de LAUNCH, ainda a acordar:",
+      "es": "Tiempos previstos según las estimaciones de trabajo de LAUNCH, aún por acordar:"
     },
     "63a5e0438e217a36": {
       "en": "Recorded that Eurartesim passed its World Health Organization quality re-check in January 2025. Figures we cannot yet confirm are shown as TBC.",
@@ -5852,6 +5892,14 @@
       "bucket": "data",
       "fr": "République centrafricaine",
       "pt": "República Centro-Africana"
+    },
+    "e5249a678fb08550": {
+      "en": "Users should carry out their own country-level checks before making any decision based on this data.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Les utilisateurs doivent effectuer leurs propres vérifications au niveau national avant de prendre toute décision basée sur ces données.",
+      "pt": "Os utilizadores devem realizar as suas próprias verificações a nível nacional antes de tomarem qualquer decisão com base nestes dados.",
+      "es": "Los usuarios deben realizar sus propias comprobaciones a nivel de país antes de tomar cualquier decisión basada en estos datos."
     },
     "e53228c78ba613ea": {
       "en": "About the data.",
