@@ -21,6 +21,13 @@
 //   "group"       "data"     — a register, database or feed a figure comes from
 //                 "document" — a one-off paper, report or announcement
 //   "url"         null where no public URL exists (see pmi, manufacturer)
+//                 — the page a reader can open; the source's name links here
+//   "dataUrl"     optional — the address a fetcher reads (copied from the
+//                 scripts/fetch-*.js constant). Shown on the page as plain,
+//                 copyable text under "Raw data (for developers)", never as a
+//                 link: it often shows an error or raw data in a browser.
+//                 Leave it out when the fetcher reads the public page itself
+//                 (rwanda-fda)
 //   "alsoSee"     related official links shown alongside the main one
 //   "year"        publication year, or a description for living documents
 //   "products"    ["all"] or specific product ids from data/products.js
@@ -68,6 +75,7 @@ window.LAUNCH_SOURCES =
       "category": "Clinical evidence",
       "group": "data",
       "url": "https://clinicaltrials.gov/",
+      "dataUrl": "https://clinicaltrials.gov/api/v2/studies",
       "year": "Updated daily",
       "products": ["all"],
       "plain": "Trial records: how many people took part, when a trial finished, and what it found.",
@@ -75,7 +83,7 @@ window.LAUNCH_SOURCES =
       "public": true,
       "findings": "Fetched weekly by scripts/fetch-trials.js via API v2. Sponsor-entered statuses can be stale; slipped completion dates are an early bottleneck warning.",
       "relevance": "The primary trial feed for every product in the portfolio.",
-      "checked": "2026-09-21"
+      "checked": "2026-10-12"
     },
     {
       "id": "ema",
@@ -85,6 +93,7 @@ window.LAUNCH_SOURCES =
       "category": "Regulatory / quality",
       "group": "data",
       "url": "https://www.ema.europa.eu/en/medicines/download-medicine-data",
+      "dataUrl": "https://www.ema.europa.eu/en/documents/report/medicines-output-opinions_outside_eu-report_en.xlsx",
       "year": "Updated nightly",
       "products": ["all"],
       "plain": "European approval decisions, including its opinions on medicines meant for use outside Europe.",
@@ -92,7 +101,7 @@ window.LAUNCH_SOURCES =
       "public": true,
       "findings": "Fetched monthly by scripts/fetch-regulatory.js, which reads the EU-M4all (Article 58) opinions table. Column names were revamped in 2023 — pin them per snapshot.",
       "relevance": "The EU-M4all route is how several of these medicines obtained a stringent-authority opinion without a European market.",
-      "checked": "2026-09-21"
+      "checked": "2026-10-12"
     },
     {
       "id": "frontiers-ghana-tes",
@@ -221,6 +230,7 @@ window.LAUNCH_SOURCES =
       "category": "National register",
       "group": "data",
       "url": "https://greenbook.nafdac.gov.ng/",
+      "dataUrl": "http://greenbook.nafdac.gov.ng/",
       "year": "Continuous",
       "products": ["all"],
       "plain": "The national register of every medicine approved for sale in Nigeria.",
@@ -228,7 +238,7 @@ window.LAUNCH_SOURCES =
       "public": true,
       "findings": "Fetched monthly by scripts/fetch-nafdac.js. 48 portfolio registrations at first snapshot, 22 of them lapsed. Plain HTTP only — the host's HTTPS hangs after handshake.",
       "relevance": "Ground truth for the country access map's registered level in Nigeria, the largest malaria burden country.",
-      "checked": "2026-09-21"
+      "checked": "2026-10-12"
     },
     {
       "id": "novartis-kaluma",
@@ -288,15 +298,16 @@ window.LAUNCH_SOURCES =
       "org": "Tanzania Medicines and Medical Devices Authority",
       "category": "National register",
       "group": "data",
-      "url": "https://imis2.tmda.go.tz/portal/#/public/registered-medicines",
+      "url": "https://imis2.tmda.go.tz/#/public/registered-medicines",
+      "dataUrl": "https://imis2.tmda.go.tz/publicaccess/onSearchPublicRegisteredproducts",
       "year": "Continuous",
       "products": ["all"],
       "plain": "The national register of every medicine approved for sale in Tanzania.",
       "collection": "automated",
       "public": true,
-      "findings": "Fetched monthly by scripts/fetch-tmda.js. 12 portfolio registrations at first snapshot, all compliant.",
+      "findings": "Fetched monthly by scripts/fetch-tmda.js. 12 portfolio registrations at first snapshot, all compliant. The url changed on 12 Oct 2026: the old /portal/#/public/registered-medicines address redirects to /#/public/registered-medicines, which is now used directly.",
       "relevance": "Ground truth for the country access map's registered level in Tanzania.",
-      "checked": "2026-09-21"
+      "checked": "2026-10-12"
     },
     {
       "id": "uganda-nda",
@@ -340,6 +351,7 @@ window.LAUNCH_SOURCES =
       "category": "National register",
       "group": "data",
       "url": "https://dichvucong.dav.gov.vn/congbothuoc/index",
+      "dataUrl": "https://dichvucong.dav.gov.vn/api/services/app/soDangKy/GetAllPublicServerPaging",
       "year": "Continuous",
       "products": ["all"],
       "plain": "The national register of every medicine approved for sale in Viet Nam.",
@@ -347,7 +359,7 @@ window.LAUNCH_SOURCES =
       "public": true,
       "findings": "Fetched monthly by scripts/fetch-dav.js. Searched per ingredient stem; Vietnamese drops the final \"e\" (\"Pyronaridin\", \"Piperaquin\"). Portfolio matches on 5 Oct 2026: DHA-PPQ x10, 8 valid (including Eurartesim 20/160 and 40/320) and 2 expired; ASPY x2 — Shin Poong Pyramax. Cited on the country access map since 6 Oct 2026.",
       "relevance": "Ground truth for the country access map's registered level in Viet Nam.",
-      "checked": "2026-10-05"
+      "checked": "2026-10-12"
     },
     {
       "id": "whopar-ma140",
@@ -433,15 +445,18 @@ window.LAUNCH_SOURCES =
       "org": "World Health Organization, Global Malaria Programme",
       "category": "MFT strategy",
       "group": "document",
-      "url": "https://iris.who.int/server/api/core/bitstreams/3429ad55-4291-4b1a-bdd9-783495692d9b/content",
+      "url": "https://www.who.int/publications/i/item/9789240103603",
+      "alsoSee": [
+        { "label": "The PDF itself", "url": "https://iris.who.int/server/api/core/bitstreams/3429ad55-4291-4b1a-bdd9-783495692d9b/content" }
+      ],
       "year": "2024",
       "products": ["pyramax", "dhappq"],
       "plain": "WHO's guide to using several first-line malaria treatments at once, with country examples.",
       "collection": "static",
       "public": true,
-      "findings": "Annex 2 (pp. 21-22) gives country plans. Nigeria: a pilot is planned in two areas, with 20% AL, 40% DHA-PPQ and 40% ASPY where seasonal malaria chemoprevention runs, and 10% ASAQ, 20% AL, 35% DHA-PPQ and 35% ASPY elsewhere. Rwanda: AL, DHA-PPQ and ASPY in rotation in six pilot districts, 2024-2025. Uganda: rotation only \"being considered\". Tanzania: scope \"remains to be confirmed\"; the guide says ASPY was not yet registered there, which TMDA's own register contradicts (Pyramax since 2017). Cited on the country access map since 6 Oct 2026.",
+      "findings": "Annex 2 (pp. 21-22) gives country plans. Nigeria: a pilot is planned in two areas, with 20% AL, 40% DHA-PPQ and 40% ASPY where seasonal malaria chemoprevention runs, and 10% ASAQ, 20% AL, 35% DHA-PPQ and 35% ASPY elsewhere. Rwanda: AL, DHA-PPQ and ASPY in rotation in six pilot districts, 2024-2025. Uganda: rotation only \"being considered\". Tanzania: scope \"remains to be confirmed\"; the guide says ASPY was not yet registered there, which TMDA's own register contradicts (Pyramax since 2017). Cited on the country access map since 6 Oct 2026. The url changed on 12 Oct 2026: it was the IRIS PDF download; it is now WHO's publication page, and the PDF is an alsoSee link.",
       "relevance": "Supports the In MFT plans level for Nigeria (planned) and Rwanda.",
-      "checked": "2026-10-05"
+      "checked": "2026-10-12"
     },
     {
       "id": "who-wmr-annex-4b",
@@ -505,6 +520,7 @@ window.LAUNCH_SOURCES =
       "category": "Regulatory / quality",
       "group": "data",
       "url": "https://extranet.who.int/prequal/medicines/prequalified/finished-pharmaceutical-products",
+      "dataUrl": "https://extranet.who.int/prequal/medicines/prequalified/finished-pharmaceutical-products/export?page&_format=csv",
       "alsoSee": [
         { "label": "Prevention tools are on a separate list", "url": "https://extranet.who.int/prequal/vector-control-products/prequalified-product-list" }
       ],
@@ -515,7 +531,7 @@ window.LAUNCH_SOURCES =
       "public": true,
       "findings": "Fetched monthly by scripts/fetch-regulatory.js. CSV headers drift between editions; suspensions and delistings are published as separate notices, so the pipeline snapshots and diffs rather than trusting the current file.",
       "relevance": "Quality-assured supply is a precondition for donor procurement.",
-      "checked": "2026-09-21"
+      "checked": "2026-10-12"
     },
     {
       "id": "wwarn-iddo",
@@ -541,15 +557,16 @@ window.LAUNCH_SOURCES =
       "org": "Zambia Medicines Regulatory Authority",
       "category": "National register",
       "group": "data",
-      "url": "https://app.zamra.co.zm:42882/portal/publicaccess/onSearchPublicRegisteredproducts?section_id=2",
+      "url": "https://app.zamra.co.zm:42882/portal/#/public/registered-medicines",
+      "dataUrl": "https://app.zamra.co.zm:42882/portal/publicaccess/onSearchPublicRegisteredproducts",
       "year": "Continuous",
       "products": ["all"],
       "plain": "The national register of every medicine approved for sale in Zambia.",
       "collection": "automated",
       "public": true,
-      "findings": "Fetched monthly by scripts/fetch-zamra.js. The whole register in one call (3,519 medicines on 5 Oct 2026). Its server omits an intermediate certificate, which is supplied from scripts/certs/ with verification left on. Portfolio matches on 5 Oct 2026: ASPY x1 — Pyramax tablets, ZAMRA-HM-25-239, 11 Jul 2025 to 10 Jul 2030, Registered/Compliant; DHA-PPQ x7. Cited on the country access map since 6 Oct 2026.",
+      "findings": "Fetched monthly by scripts/fetch-zamra.js. The whole register in one call (3,519 medicines on 5 Oct 2026). Its server omits an intermediate certificate, which is supplied from scripts/certs/ with verification left on. Portfolio matches on 5 Oct 2026: ASPY x1 — Pyramax tablets, ZAMRA-HM-25-239, 11 Jul 2025 to 10 Jul 2030, Registered/Compliant; DHA-PPQ x7. Cited on the country access map since 6 Oct 2026. The url changed on 12 Oct 2026: it was the fetcher's data address, which shows an SQL error in a browser; it is now the public register page, and the data address is dataUrl.",
       "relevance": "Ground truth for the country access map's registered level in Zambia.",
-      "checked": "2026-10-05"
+      "checked": "2026-10-12"
     },
     {
       "id": "mcaz",
@@ -559,6 +576,7 @@ window.LAUNCH_SOURCES =
       "category": "National register",
       "group": "data",
       "url": "https://onlineservices.mcaz.co.zw/onlineregister/",
+      "dataUrl": "https://onlineservices.mcaz.co.zw/onlineregister/Medicines/GetMedicinesByCategory?category=1",
       "year": "Continuous",
       "products": ["all"],
       "plain": "The national register of every medicine approved for sale in Zimbabwe.",
@@ -566,7 +584,7 @@ window.LAUNCH_SOURCES =
       "public": true,
       "findings": "Fetched monthly by scripts/fetch-mcaz.js. The whole register in one request (3,154 medicines on 5 Oct 2026). Portfolio matches on 5 Oct 2026: DHA-PPQ x1 — DUO-COTECXIN 40/320mg, 2025/7.5/7111, 27 Oct 2025 to 26 Oct 2030. No ASPY. Cited on the country access map since 6 Oct 2026.",
       "relevance": "Ground truth for the country access map's registered level in Zimbabwe.",
-      "checked": "2026-10-05"
+      "checked": "2026-10-12"
     }
   ]
 }

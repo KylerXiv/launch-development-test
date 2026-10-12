@@ -158,6 +158,7 @@
               "label": { "$ref": "#/$defs/textOrNull" },
               "title": { "$ref": "#/$defs/textOrNull" },
               "url": { "type": ["string", "null"] },
+              "dataUrl": { "type": "string", "description": "Optional, added 12 Oct 2026. The address the LAUNCH fetcher reads (an API or file download). For developers only: show it as plain text, not a link, since it often shows an error or raw data in a browser. Never translated." },
               "plain": { "$ref": "#/$defs/text" }
             }
           }
