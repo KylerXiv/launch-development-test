@@ -146,6 +146,19 @@
     { "file": "assets/site-nav.js", "src": "\"LAUNCH views\"", "en": "LAUNCH views" },
     { "file": "assets/site-nav.js", "src": "\"sn-vp\">Views: <", "en": "Views:" },
     { "file": "assets/site-nav.js", "src": "<small>coming soon</small>", "en": "coming soon" },
-    { "file": "assets/site-nav.js", "src": "aria-label=\"Language: '", "en": "Language:" }
+    { "file": "assets/site-nav.js", "src": "aria-label=\"Language: '", "en": "Language:" },
+    { "file": "illustrated-journey-dashboard.html", "src": "product: \"Product\"", "en": "Product" },
+    { "file": "illustrated-journey-dashboard.html", "src": "record: \"Record\"", "en": "Record" },
+    { "file": "illustrated-journey-dashboard.html", "src": "item: \"Item\"", "en": "Item" },
+    { "file": "illustrated-journey-dashboard.html", "src": "status: \"Status\"", "en": "Status" },
+    { "file": "illustrated-journey-dashboard.html", "src": "date: \"Date\"", "en": "Date" },
+    { "file": "illustrated-journey-dashboard.html", "src": "anticipated: \"Anticipated\"", "en": "Anticipated" },
+    { "file": "illustrated-journey-dashboard.html", "src": "source: \"Source\"", "en": "Source" },
+    { "file": "illustrated-journey-dashboard.html", "src": "stageRow: \"Stage\"", "en": "Stage" },
+    { "file": "illustrated-journey-dashboard.html", "src": "milestoneRow: \"Milestone\"", "en": "Milestone" },
+    { "file": "scripts/build-rbm-pages.js", "src": "failHead: \"The dashboard data could not be loaded.\"", "en": "The dashboard data could not be loaded." },
+    { "file": "scripts/build-rbm-pages.js", "src": "failBody: \"Please try again in a few minutes.\"", "en": "Please try again in a few minutes." },
+    { "file": "scripts/build-rbm-pages.js", "src": "schemaHead: \"This dashboard is being updated.\"", "en": "This dashboard is being updated." },
+    { "file": "scripts/build-rbm-pages.js", "src": "schemaBody: \"Please check back shortly.\"", "en": "Please check back shortly." }
   ]
 }

@@ -269,6 +269,16 @@ function applyReviewed(text, file, loc) {
   return text;
 }
 
+// One reviewed string's translation, for text that lives outside the page and
+// its two widgets: the RBM loader's messages (scripts/build-rbm-pages.js). The
+// same memory and the same guard as applyReviewed(); English where there is
+// none yet.
+function reviewedText(loc, en) {
+  const e = reviewedEntryOf(en) || entryOf(en);
+  const v = e && e[loc] && scriptSafe(en, e[loc]);
+  return v || en;
+}
+
 // Every data file the page loads, from its own <script src> tags. A fixed list
 // here is how the locale pages lost data/sources.js when the Sources footer
 // moved into it: the page loaded a file the build never copied.
@@ -479,6 +489,6 @@ function main() {
 // scripts/build-dataset.js reuses the same localisation, so the French,
 // Portuguese and Spanish in the published dashboard.json are exactly those of
 // /fr, /pt and /es.
-module.exports = { LOCALES, readData, localiseProducts, localiseSources, localiseTreatmentPolicy, localiseAsset, stat };
+module.exports = { LOCALES, readData, localiseProducts, localiseSources, localiseTreatmentPolicy, localiseAsset, reviewedText, stat };
 
 if (require.main === module) main();

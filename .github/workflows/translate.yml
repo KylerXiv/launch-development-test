@@ -15,8 +15,9 @@ name: Translate new text
 # net for an engine failure there; normally it finds nothing to do.
 #
 # A push to main is the approval here (docs/translation-notes.md): what it
-# changed is already live in English. The bot commit touches only i18n/, which
-# the path filter ignores, so it cannot retrigger itself.
+# changed is already live in English. The bot commit touches only
+# i18n/content.en.json and i18n/translations.json, which the path filter does
+# not list, so it cannot retrigger itself.
 #
 # Manual run: Actions → "Translate new text" → Run workflow — for instance once
 # the engine is back after a failure.
@@ -29,11 +30,21 @@ name: Translate new text
 on:
   push:
     branches: [main]
+    # Every file assemble-content.js collects text from. The last four were
+    # missing until 12 Oct 2026, so new text in the feedback form, the site
+    # menu, the reviewed list or the RBM loader alone waited in English for
+    # some other change to start the bot. Only reviewed-strings.json is named
+    # in i18n/: the bot's own commit (content.en.json, translations.json)
+    # must not start it again.
     paths:
       - illustrated-journey-dashboard.html
       - data/products.js
       - data/sources.js
       - scripts/assemble-content.js
+      - i18n/reviewed-strings.json
+      - assets/report-issue.js
+      - assets/site-nav.js
+      - scripts/build-rbm-pages.js
   workflow_dispatch:
     inputs:
       after_approval:

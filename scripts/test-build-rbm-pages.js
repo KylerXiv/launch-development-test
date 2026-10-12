@@ -11,7 +11,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const { transform, widget, loader } = require("./build-rbm-pages");
+const { transform, widget, loader, messages } = require("./build-rbm-pages");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "illustrated-journey-dashboard.html"), "utf8");
 const widgetJs = fs.readFileSync(path.join(__dirname, "..", "assets", "report-issue.js"), "utf8");
@@ -100,7 +100,12 @@ function load(lang, locales) {
   ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A-pt", "a Portuguese page still reads a file with three languages");
   ok(w.LAUNCH_DATA && w.LAUNCH_DATA.products[0].detail.countries.status === "verified", "objects that are not texts are kept as they are");
   { const { html: es } = transform(html, "es", { apiUrl: API });
-    ok(/LANG = "es"/.test(es) && /No se pudieron cargar/.test(es), "the Spanish page has its loader, with its own messages"); }
+    ok(/LANG = "es"/.test(es) && /could not be loaded/.test(es), "the Spanish page has its loader (messages in English until main() reads the memory)"); }
+  // The messages come from the translation memory (12 Oct 2026), not from
+  // text written in the script: whatever the lookup returns goes in, escaped.
+  { const m = messages((s) => "[es] " + s + " <&>");
+    ok(m.fail === "<b>[es] The dashboard data could not be loaded. &lt;&amp;&gt;</b> [es] Please try again in a few minutes. &lt;&amp;&gt;", "loader messages come from the translation lookup, HTML-escaped");
+    ok(messages().schema === "<b>This dashboard is being updated.</b> Please check back shortly.", "with no lookup the messages are the English"); }
 
   console.log(`\n  build-rbm-pages: ${passed} passed, ${failed} failed\n`);
   process.exit(failed ? 1 : 0);
