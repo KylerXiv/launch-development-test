@@ -55,6 +55,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       DATA_REPO: ${{ vars.RBM_DATA_REPO }}
     steps:

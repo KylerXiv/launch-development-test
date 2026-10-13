@@ -65,6 +65,7 @@ concurrency:
 jobs:
   translate:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       # main as it is now, not the commit that triggered this: an earlier run
       # queued in the group may have moved it.

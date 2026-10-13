@@ -11,7 +11,8 @@
 
 A **static** site with no build step and no backend, on purpose: one HTML file renders
 one data file in the browser. There is no framework, no bundler, no package.json
-— the repo root is served as-is (GitHub Pages today; any static host later).
+— the pages are plain files (served by Vercel today, through
+`scripts/build-public-site.sh`; any static host later).
 The reason: the dataset is tiny (a handful of products ×
 ~10 metrics), the maintainers are analysts rather than developers, and the
 18-month initiative will be handed over — so there is nothing to install,
@@ -269,9 +270,29 @@ No test framework by design; two layers instead:
   "preview failed" comment. A job that runs out of time is cancelled, which
   skips that comment and leaves the previous preview link looking current. A
   good run takes under 1.5 minutes.
-- **Every other workflow still has the six-hour default.** None of them waits
-  on Vercel, but a `timeout-minutes` on each would cap the cost of any future
-  hang.
+- **Every job now has its own limit** (13 Oct 2026), set well above its
+  longest recent run, so a hang costs minutes, not six hours:
+
+  | Workflow | Job | Limit (min) | Longest recent run |
+  | --- | --- | --- | --- |
+  | `validate.yml` | validate | 15 | 0.9 |
+  | `publish.yml` | snapshot | 10 | 1.0 |
+  | `translate.yml` | translate | 20 | 1.0 |
+  | `vercel-deploy.yml` | deploy-hook | 5 | 0.8 |
+  | `pr-preview.yml` | preview | 10 (deploy step 5) | 1.7 |
+  | `publish-dataset.yml` | publish | 10 | 0.7 |
+  | `notify-subscribers.yml` | notify | 10 | 0.3 |
+  | `reminder.yml` | remind | 5 | — |
+  | `sourcing.yml` | fetch | 30 | 0.2 (weekly run) |
+  | `source-proposals.yml` | propose | 60 | 2.1 |
+  | `proposal-intake.yml` | check / outside | 10 / 5 | 1.6 |
+  | `proposal-decision.yml` | approve / reject | 20 / 10 | 1.2 |
+
+  `translate` and `approve` get 20 because a large text change means many
+  calls to Google. `fetch` gets 30 because the monthly run reads every register.
+  `propose` gets 60 because it waits up to 10 minutes for intake on each
+  proposal it files, one at a time. If a limit is ever hit by honest work,
+  raise that one limit; don't remove it.
 
 ## 9. Extension notes
 

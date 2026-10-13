@@ -8,6 +8,13 @@ This is the current description of the translation pipeline. It replaces
 
 **If you build the staging dashboard, read §2 and §6. Everything else is background.**
 
+> **Out of date in two places (13 Oct 2026).** `scripts/i18n-identifiers.js`
+> was deleted with the WHO resistance overlay on 1 Oct (`caf0062`); the terms
+> the engine must not translate are now the `PROTECT` list in
+> `scripts/translate-strings.js`. `DEEPL_API_KEY` is not used: the code supports
+> only `TRANSLATE_ENGINE=google` (the default) and `stub`, which writes test
+> values, not translations. The rest of this document stands.
+
 ---
 
 ## 1. What DEV-31 changed, in one paragraph

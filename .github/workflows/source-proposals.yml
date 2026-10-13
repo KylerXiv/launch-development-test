@@ -65,6 +65,8 @@ jobs:
     # whole, by a fetch of that source that succeeded.
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion != 'cancelled'
     runs-on: ubuntu-latest
+    # Waits up to 10 minutes for intake on each proposal it files, one at a time.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:

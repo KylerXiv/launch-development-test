@@ -38,6 +38,7 @@ jobs:
     # Proposals only: a watch report labelled by mistake is not one.
     if: github.event.label.name == 'approved' && contains(github.event.issue.labels.*.name, 'proposal')
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -274,6 +275,7 @@ jobs:
   reject:
     if: startsWith(github.event.label.name, 'rejected') && contains(github.event.issue.labels.*.name, 'proposal')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:

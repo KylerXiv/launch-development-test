@@ -28,6 +28,7 @@ concurrency:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       # main as it is now, not the commit that started this run: after an
       # approval the decision job pushes its record to main while this run
