@@ -135,10 +135,11 @@ on its own website. `iframe-test.html`, `rbm-shell/` and the test start page
 `index.html` are not handed over. The pages keep reading the data from the
 public data repository.
 
-**Not decided:** whether RBM receives the `launch-rbm-test` repository (the
-robot keeps applying releases) or a copy of the files (each new release's
-`rbm-pages.tar.gz` is then handed to them). `rbm/README.md` now covers both,
-and says what to host (`en/ fr/ pt/ es/ assets/`, plus `build-manifest.json`).
+**Decided later the same day:** RBM receives **a copy of the files only**
+(`en/ fr/ pt/ es/ assets/`), not the repository. The release workflow and the
+robot are for the development stage: they keep the test copy up to date and
+do not run at RBM. Page changes after handover reach RBM as an updated set of
+files sent by the team; the format is not decided yet. `rbm/README.md` says so.
 
 **To do before RBM goes live:**
 - Add RBM's website address to `PARTNERS` in `api/_mail.js` (not known yet).

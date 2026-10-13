@@ -228,9 +228,9 @@ No test framework by design; two layers instead:
   ([rbm/README.md](../rbm/README.md), "How updates arrive";
   [jackson/rbm-releases.md](jackson/rbm-releases.md)). Building and copying
   by hand (`copy-rbm-pages.js --to`) still works when needed. After handover,
-  Unitaid owns this repository and the data repository, and RBM receives the
-  pages it embeds, either as the `launch-rbm-test` repository or as a copy of
-  the files ([rbm/README.md](../rbm/README.md), "What to host"). See
+  Unitaid owns this repository and the data repository, and RBM receives a
+  copy of the files it embeds ([rbm/README.md](../rbm/README.md), "What to
+  host"). The release robot is for the development stage only. See
   [rbm-handover-notes.md](rbm-handover-notes.md) and
   [Handoff_Kyler.md](Handoff_Kyler/Handoff_Kyler.md). The `feed.xml` URL
   still points at the old GitHub Pages site: update `SITE` in
