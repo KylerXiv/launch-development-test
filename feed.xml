@@ -5,7 +5,14 @@
     <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
     <description>Changes to tracked antimalarial product statuses on the LAUNCH dashboard (draft data).</description>
     <language>en</language>
-    <lastBuildDate>Thu, 08 Oct 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 13 Oct 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>GanLum: WHO PQ listing: status set to “done”; date set to “15 Sep 2026”; sentence set…</title>
+      <description>WHO PQ listing: status set to “done”; date set to “15 Sep 2026”; sentence set to “Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG).”. Source: WHO prequalification list, 2026-09-21. Proposed in issue #99, approved by review.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-10-13:GanLum:WHO PQ listing: status set to “done”; da</guid>
+      <pubDate>Tue, 13 Oct 2026 12:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>All: Illustrated journey dashboard: a yardstick compares how long each stage is ex…</title>
       <description>Illustrated journey dashboard: a yardstick compares how long each stage is expected to take with how long it has taken. New "yardstick" block in this file: expected years per stage (WHO recommendation 2, WHO PQ listing 1.5, country registration 2, national policy adoption 2, procurement 2, in-country delivery 3) and 8 for the whole journey. Country registration follows a published timeline; the others are LAUNCH working estimates, still to be agreed. Shown as a badge under On pathway (ASPY 6 yrs late, DHA–PPQ 8 yrs late, GanLum and ALAQ not approved yet), a box at the top of an open row, and a new Time taken view. No stage data changed.</description>
