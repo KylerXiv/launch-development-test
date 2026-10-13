@@ -11,7 +11,8 @@
 
 A **static** site with no build step and no backend, on purpose: one HTML file renders
 one data file in the browser. There is no framework, no bundler, no package.json
-— the repo root is served as-is (GitHub Pages today; any static host later).
+— the pages are plain files (served by Vercel today, through
+`scripts/build-public-site.sh`; any static host later).
 The reason: the dataset is tiny (a handful of products ×
 ~10 metrics), the maintainers are analysts rather than developers, and the
 18-month initiative will be handed over — so there is nothing to install,

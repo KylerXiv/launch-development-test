@@ -1,35 +1,45 @@
-# LAUNCH Transparency Dashboard (Prototype)
+# LAUNCH Transparency Dashboard
 
-**Live site: https://kochrisdev.github.io/launch-transparency-dashboard/**
+Tracks new antimalarial medicines from approval to country access, for the
+RBM Partnership to End Malaria and Unitaid.
 
-Three design options are live for client review, running off the same data:
+**Production page: the illustrated journey,
+https://launch-development-test.vercel.app/illustrated-journey-dashboard.html**,
+also in French, Portuguese and Spanish at the same path under `/fr/`,
+`/pt/` and `/es/` (for example `/fr/illustrated-journey-dashboard.html`).
 
-- **Option A — journey board** (default, `index.html`): one row per medicine, its
-  full pathway left to right, each gate shown as its own stage glyph inked in
-  the status colour with a status badge in the corner. Emphasises each product's
-  story.
-- **Option B — comparison matrix** ([`option-b.html`](https://kochrisdev.github.io/launch-transparency-dashboard/option-b.html)):
-  stages as rows, medicines as columns. Emphasises cross-product comparison at
-  each gate. Distinct visual identity (deep green, serif display, dark header band).
-- **Illustrated journey** ([`illustrated-journey-dashboard.html`](https://kochrisdev.github.io/launch-transparency-dashboard/illustrated-journey-dashboard.html)):
-  Option A plus an eight-stage pathway legend strip naming every glyph, and
-  larger stage markers. Since Option A now carries the same glyphs, this view
-  differs from it only by that legend strip and marker size.
+This repository is the source of truth: the data, the pages, the translations,
+the email functions in `api/` and every workflow. Two other repositories
+receive its output:
 
-The pages cross-link in their headers. Both include the country access map,
-the pathway timing chart, CSV download and the Recent updates panel; glossary
-tooltips and the print view are Option-A-only for now. Once the client picks a
-direction, the other option is deleted and the remaining extras are
-consolidated into the winner.
+- **`codebyjackson/launch-data-test`**: the approved dataset
+  `v1/dashboard.json`, written only by `publish-dataset.yml`.
+- **`codebyjackson/launch-rbm-test`**: the static pages for RBM in four
+  languages, built by `scripts/build-rbm-pages.js` and copied with
+  `scripts/copy-rbm-pages.js`.
 
-There is also a third, complementary view (not part of the A/B decision):
+Developers start with [CLAUDE.md](CLAUDE.md) and the
+[developer guide](docs/developer-guide.md).
 
-- **Pipeline poster** ([`pipeline.html`](https://kochrisdev.github.io/launch-transparency-dashboard/pipeline.html)):
+## Views
+
+Every view reads the same data file and is deployed with the site:
+
+- **Illustrated journey** (`illustrated-journey-dashboard.html`): the
+  production page. It is the only view that is translated, has the Subscribe
+  and Send feedback forms and the MapLibre country map, and is built for RBM.
+- **Option A, journey board** (`index.html`): one row per medicine, its full
+  pathway left to right, each gate shown as its own stage glyph inked in the
+  status colour with a status badge in the corner.
+- **Option B, comparison matrix** ([`option-b.html`](https://launch-development-test.vercel.app/option-b.html)):
+  stages as rows, medicines as columns, for cross-product comparison at each
+  gate.
+- **Pipeline poster** ([`pipeline.html`](https://launch-development-test.vercel.app/pipeline.html)):
   the portfolio laid out MMV-poster style — development-phase columns
   (Preclinical → Approved · scaling up), category-colored product cards with
   bottleneck dots, a prevention lane for planned tools. Placement is driven by
   each product's `phase` field; cards click through to the journey board.
-- **Data story** ([`story.html`](https://kochrisdev.github.io/launch-transparency-dashboard/story.html)):
+- **Data story** ([`story.html`](https://launch-development-test.vercel.app/story.html)):
   "The Waiting Years" — a scroll-driven narrative for donors and advocacy: one
   medicine's decade from approval to (still-pending) adoption, told through a
   sticky visual that shifts from portfolio → timeline → pathway → bottlenecks →
@@ -61,7 +71,7 @@ controls the on-page banner.
 
 | Guide | Audience |
 | --- | --- |
-| [Project explainer](docs/project-explainer.md) | **All stakeholders, expert and non-expert** — the whole project in plain language: the problem, the domain, how to read the dashboard, where the numbers come from, and how it is built. Start here. Also available as a designed web page: [explainer.html](https://kochrisdev.github.io/launch-transparency-dashboard/explainer.html). |
+| [Project explainer](docs/project-explainer.md) | **All stakeholders, expert and non-expert** — the whole project in plain language: the problem, the domain, how to read the dashboard, where the numbers come from, and how it is built. Start here. Also available as a designed web page: [explainer.html](https://launch-development-test.vercel.app/explainer.html). |
 | [User guide](docs/user-guide.md) | Donors, ministries of health, implementing partners, pharma — how to read and use the dashboard. |
 | [Data analyst guide](docs/data-analyst-guide.md) | Whoever maintains the data — update loop, data dictionary, governance rules, confirmation register, cadence. |
 | [Data model & lineage](docs/data-model.md) | Analysts and developers extending the data — entities, keys and relationships, the lineage of every derived data product, and extension playbooks. |
@@ -76,17 +86,17 @@ controls the on-page banner.
 | File | Role |
 | --- | --- |
 | `index.html` | The dashboard, design option A (journey board). Static — no build step, no backend. |
-| `option-b.html` | Design option B (comparison matrix), live for client review. Reads the same data file. |
+| `option-b.html` | Design option B (comparison matrix). Reads the same data file. |
 | `pipeline.html` | Pipeline poster view (MMV-style phase columns). Reads the same data file. |
 | `story.html` | Scroll-driven data story ("The Waiting Years") for advocacy audiences. Reads the same data file. |
-| `unitaid/` | **Unitaid brand edition** of the dashboards and data story (journey board, matrix, poster, story) per [brandpad.io/unitaid](https://brandpad.io/unitaid/) — generated from the originals by `scripts/build-unitaid-theme.js`; regenerate, don't hand-edit. Live at [/unitaid/](https://kochrisdev.github.io/launch-transparency-dashboard/unitaid/). |
+| `unitaid/` | **Unitaid brand edition** of the dashboards and data story (journey board, matrix, poster, story) per [brandpad.io/unitaid](https://brandpad.io/unitaid/) — generated from the originals by `scripts/build-unitaid-theme.js`; regenerate, don't hand-edit. Live at [/unitaid/](https://launch-development-test.vercel.app/unitaid/). |
 | `scripts/build-unitaid-theme.js` | Rebuilds `unitaid/` from the current originals (brand-token override layer, Source Sans 3, brand strip, official logo lockup). |
-| `synthetic/` | **Synthetic-data edition** of the dashboards (all views + widget) running off `data/products.synthetic.js` — fictional companies and figures for development while real data is collected. Generated by `scripts/build-synthetic-edition.js`; regenerate, don't hand-edit. Live at [/synthetic/](https://kochrisdev.github.io/launch-transparency-dashboard/synthetic/). |
+| `synthetic/` | **Synthetic-data edition** of the dashboards (all views + widget) running off `data/products.synthetic.js` — fictional companies and figures for development while real data is collected. Generated by `scripts/build-synthetic-edition.js`; regenerate, don't hand-edit. Live at [/synthetic/](https://launch-development-test.vercel.app/synthetic/). |
 | `scripts/build-synthetic-edition.js` | Rebuilds `synthetic/` from the current originals (data script rewrite + warning strip). |
 | `data/products.synthetic.js` | The fictional dataset behind `synthetic/` — same contract as `data/products.js`, validated by the same validator. |
 | `streamlit-app/` | Parallel Python/Streamlit platform: same views, flexible data input (bundled file / URL / upload) and runtime configuration. See [its README](streamlit-app/README.md). |
 | `powerbi/` | Power BI kit: live-refreshing Power Query scripts, CSV exports, LAUNCH theme, DAX measures and a page-by-page build guide. See [its README](powerbi/README.md). |
-| `data/products.js` | **The only file that changes in routine updates** — feeds both design options. Strict JSON wrapped in `window.LAUNCH_DATA =`. |
+| `data/products.js` | **The only file that changes in routine updates** — feeds every view. Strict JSON wrapped in `window.LAUNCH_DATA =`. |
 | `widget.html` | Embeddable single-product tracker for partner sites (`?product=aspy` etc.). |
 | `data/world-map.js` | Generated map geometry (Natural Earth, public domain) — rerun `scripts/build-map.js` to regenerate. |
 | `assets/journey-icons/icons.js` | **The journey icon set** — the eight stage glyphs, one monoline system on a 24×24 grid, stroked in `currentColor` so each takes its status colour and follows the light/dark theme. Loaded by the dashboards; the single source of truth for the geometry. |
@@ -107,7 +117,7 @@ controls the on-page banner.
 | `scripts/fetch-mcaz.js` | MCAZ register pull — Zimbabwe's online register of medicines. |
 | `scripts/fetch-dav.js` | DAV register pull — Viet Nam's public register of marketing authorisations. |
 | `scripts/fetch-rwanda.js` | Rwanda FDA register pull — Rwanda's register of human medicines, one HTML page read from its rows' data attributes. |
-| `ontology/` | Semantic layer: `launch.ttl` (hand-authored OWL/SKOS ontology), `context.jsonld` (JSON-LD context), `launch-shapes.ttl` (SHACL governance shapes — the validator's rules, independently verifiable by any RDF consumer), `launch-data.jsonld` (**generated** linked-data projection of the dataset), `launch-history.jsonld` (**generated** temporal graph of status periods over the history snapshots), `index.html` (**generated** browsable rendering, live at [/ontology/](https://kochrisdev.github.io/launch-transparency-dashboard/ontology/)). See [docs/ontology.md](docs/ontology.md). |
+| `ontology/` | Semantic layer: `launch.ttl` (hand-authored OWL/SKOS ontology), `context.jsonld` (JSON-LD context), `launch-shapes.ttl` (SHACL governance shapes — the validator's rules, independently verifiable by any RDF consumer), `launch-data.jsonld` (**generated** linked-data projection of the dataset), `launch-history.jsonld` (**generated** temporal graph of status periods over the history snapshots), `index.html` (**generated** browsable rendering, live at [/ontology/](https://launch-development-test.vercel.app/ontology/)). See [docs/ontology.md](docs/ontology.md). |
 | `scripts/build-ontology.js` | Regenerates `ontology/launch-data.jsonld` from `data/products.js` — rerun after any data change. |
 | `scripts/build-history-graph.js` | Regenerates `ontology/launch-history.jsonld`, the temporal knowledge graph over the `history/` snapshots (status periods per product × stage) — bot-rebuilt by CI on data changes. |
 | `scripts/make-preview.js` | Optional: builds `preview.html`, a single self-contained file for emailing/sharing. |
@@ -118,7 +128,7 @@ controls the on-page banner.
 ### Embedding a single product on a partner site
 
 ```html
-<iframe src="https://kochrisdev.github.io/launch-transparency-dashboard/widget.html?product=aspy"
+<iframe src="https://launch-development-test.vercel.app/widget.html?product=aspy"
         title="LAUNCH tracker — ASPY"
         style="width:100%;max-width:720px;height:200px;border:1px solid #ddd;border-radius:10px"></iframe>
 ```
@@ -134,7 +144,7 @@ procurement volume splits and country maps at all three levels. It powers a
 separate **`synthetic/` edition** of the dashboards (journey board, matrix,
 poster, story, widget) so development can continue while real data is being
 collected — the real dashboards and `data/products.js` are never touched.
-Live at [/synthetic/](https://kochrisdev.github.io/launch-transparency-dashboard/synthetic/).
+Live at [/synthetic/](https://launch-development-test.vercel.app/synthetic/).
 
 `synthetic/` is generated — regenerate it after any change to the original
 pages or the synthetic data, don't hand-edit:
@@ -179,35 +189,34 @@ render time — they can never disagree with the board.
 
 ## Hosting and deployment
 
-The site deploys automatically via GitHub Pages: every push to `main` goes live at
-https://kochrisdev.github.io/launch-transparency-dashboard/ within a minute or two.
-CI validates the data on the same push but does not gate the Pages deploy —
-treat a red validation run as a fix-now signal. There is no build step — the
-repo root is served as-is.
+Production is the Vercel project `launch-development-test`. `vercel.json` runs
+`scripts/build-public-site.sh` into `public-site/`, and every push to `main`
+goes live at https://launch-development-test.vercel.app/ within a minute or
+two. CI validates the data on the same push but does not gate the deploy, so
+treat a red validation run as a fix-now signal. Pull requests get preview
+deployments (`pr-preview.yml`). The functions behind the two forms live in
+`api/` and run only on Vercel.
 
-### Handover options for RBM
+### RBM
 
-1. **RBM hosts** (preferred for production): copy the static set —
-   `index.html`, `pipeline.html`, `story.html`, `widget.html`, `data/`,
-   `feed.xml`, `.nojekyll` (plus `option-b.html` during the design review) —
-   to any static path on
-   dashboards.endmalaria.org. No server-side requirements — plain static files.
-2. **RBM embeds**: keep this Pages deployment (or a fork under an RBM GitHub org)
-   and embed it:
+RBM embeds the pages in an iframe on dashboards.endmalaria.org (decided
+23 Sep 2026). `scripts/build-rbm-pages.js` builds RBM's copies of the
+illustrated journey in four languages, `scripts/copy-rbm-pages.js` copies them
+into `codebyjackson/launch-rbm-test`, and each page fetches the published
+`dashboard.json` when it loads, so a data change needs no rebuild. See
+[rbm/README.md](rbm/README.md) and
+[docs/rbm-handover-notes.md](docs/rbm-handover-notes.md).
 
-   ```html
-   <iframe src="https://kochrisdev.github.io/launch-transparency-dashboard/"
-           title="LAUNCH Transparency Dashboard"
-           style="width:100%;min-height:1400px;border:0"></iframe>
-   ```
-
-To move the repo to an organisation later, GitHub's *Transfer ownership* keeps the
-history and CI; only the Pages URL changes.
+To move the repo to an organisation later, GitHub's *Transfer ownership* keeps
+the history and CI; the URLs, the Actions secrets and the deploy key then
+need updating.
 
 ## Viewing locally
 
-Open `index.html` directly in a browser (no server needed), or build the single-file
-version with `node scripts/make-preview.js` and share `preview.html` as one attachment.
+Open `illustrated-journey-dashboard.html` directly in a browser (no server
+needed). To see exactly what Vercel serves, run `bash scripts/build-public-site.sh`
+and serve `public-site/`. To share one file, build it with
+`node scripts/make-preview.js` and send `preview.html`.
 
 ## Products
 
