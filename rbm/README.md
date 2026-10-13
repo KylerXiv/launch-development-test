@@ -24,11 +24,13 @@ Host these, side by side, exactly as they are:
   shapes and country names, not the dashboard's data) and feedback form;
 - `assets/`: the icons and logos every page loads from `../assets/`. Without
   it, the pages lose their icons;
-- `build-manifest.json`: optional, but keep it. It lists every file's
-  fingerprint and the version, so an update can be checked against it.
+That is 38 files: HTML, JavaScript, SVG and PNG. The styles are inside each
+page, so there are no separate CSS files, and there is no build step or server
+code.
 
-Not needed: `index.html`, `iframe-test.html` and `rbm-shell/` in the LAUNCH
-test copy are for testing only.
+Not needed: `index.html`, `iframe-test.html`, `rbm-shell/`,
+`build-manifest.json`, `launch-release.json` and `.github/` in the LAUNCH test
+copy are for development and testing only.
 
 The dashboard's data is **not** in these files. Each page loads it from the
 public data repository (below) every time it opens, so new data appears with
@@ -128,43 +130,26 @@ https://codebyjackson.github.io/launch-rbm-test/iframe-test.html
 **Data:** nothing to do. The pages read the newest approved `dashboard.json`
 every time they open.
 
-**Page changes** (wording, layout, a fix) come as numbered releases
-(`rbm-v1`, `rbm-v2`, …) on the LAUNCH pipeline repository's Releases page,
-https://github.com/KylerXiv/launch-development-test/releases. A release is
-made only when the pages actually change, never for a data change. Each
-release holds `rbm-pages.tar.gz` (the five items above, ready to host), a note
-of what changed, and the copy script with its checks.
-
-How a release gets here depends on how the pages are hosted:
-
-- **Hosting the LAUNCH repository `launch-rbm-test`** (or a transfer of it):
-  its workflow `.github/workflows/launch-update.yml` applies each new release
-  by itself, once a day or when run by hand from its Actions tab. It checks the
-  release, commits the new pages, and records the version in
-  `launch-release.json` and its README. If a check fails, nothing changes, and
-  an issue titled "LAUNCH update not applied" says why. Set the repository
-  variable `LAUNCH_UPDATE_MODE` to `pr` to review each update as a pull request
-  first (this also needs Settings → Actions → "Allow GitHub Actions to create
-  and approve pull requests"). Set `LAUNCH_REPO` if the LAUNCH repository moves.
-  No key or token is needed: the release is public.
-- **Hosting a copy of the files:** download `rbm-pages.tar.gz` from the newest
-  release, unpack it, and replace `en/`, `fr/`, `pt/`, `es/`, `assets/` and
-  `build-manifest.json` with what it holds. Replace the folders whole, so that
-  files a newer version no longer uses are removed. The LAUNCH team says when a
-  new release is out.
+**Page changes** (wording, layout, a fix): the LAUNCH team sends an updated set
+of these files. Replace `en/`, `fr/`, `pt/`, `es/` and `assets/` whole with the
+new ones, so that files a newer version no longer uses are removed.
 
 **Never edit the hosted files by hand.** They are built from the same page as
 the LAUNCH site, so a change made only here never reaches the LAUNCH site or
-the translations, and the next release replaces it. Ask the LAUNCH team for
-the change instead. In a hosted repository, the update stops on a hand edit
-and names the file, using `build-manifest.json` and `copy-rbm-pages.js`.
+the translations, and the next set of files replaces it. Ask the LAUNCH team
+for the change instead.
 
 **A breaking change to the data's format** is rare and announced in advance.
 The data is then published at a new address (`v2/`) while the current one
-stays live, and the pages show "being updated" only if they are left on an
-old version after the old address is retired. Apply the release that reads
-the new address before that date.
+stays live. Put up the new set of files before the old address is retired, or
+the pages show that the dashboard is being updated.
 
-For the LAUNCH team: `node scripts/build-rbm-pages.js` builds these pages.
-`--api-url` sets where the two forms post (default: the LAUNCH production
-site); `--api-url none` builds them switched off.
+### For the LAUNCH team (development stage only)
+
+`node scripts/build-rbm-pages.js` builds these pages; `--api-url` sets where
+the two forms post, and `--api-url none` builds them switched off. During
+development, every page change is published as a release (`rbm-v1`, `rbm-v2`,
+…), and the test copy `codebyjackson/launch-rbm-test` applies each one by
+itself with `.github/workflows/launch-update.yml`. Each release's
+`rbm-pages.tar.gz` holds exactly the files listed under "What to host". None
+of this runs at RBM.
