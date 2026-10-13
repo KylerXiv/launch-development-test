@@ -51,14 +51,13 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 const { applySkin } = require("./rbm-skin");
+const { LOCALES, BUILT, MANIFEST, fingerprint, manifestOf } = require("./rbm-manifest");
 
 const ROOT = path.resolve(__dirname, "..");
 const PAGE = "illustrated-journey-dashboard.html";
 const OUT = path.join(ROOT, "dist", "rbm");
-const LOCALES = ["en", "fr", "pt", "es"];
 const args = process.argv.slice(2);
 const argOf = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };
 const DEFAULT_DATA_URL = "https://codebyjackson.github.io/launch-data-test/v1/dashboard.json";
@@ -84,33 +83,9 @@ const REPLACED = ["data/products.js", "data/sources.js", "data/treatment-policy.
 // form's wording in report-issue.js. Everything else in assets/ is shared.
 const PER_LANGUAGE = ["data/world-map.js", "data/world-map-geo.js", "assets/report-issue.js"];
 
-// The folders a build fills, and so the folders a copy into launch-rbm-test
-// replaces (scripts/copy-rbm-pages.js). The rest of that repository (its
-// README, index.html, iframe-test.html, rbm-shell/) is its own.
-const BUILT = [...LOCALES, "assets"];
-const MANIFEST = "build-manifest.json";
-// A file's sha256, line endings aside: git checks text out with CRLF on
-// Windows, so the same page can sit on disk either way.
-const TEXT_FILE = /\.(html|js|json|svg|md|css|txt)$/i;
-function fingerprint(file) {
-  let b = fs.readFileSync(file);
-  if (TEXT_FILE.test(file)) b = Buffer.from(b.toString("utf8").replace(/\r\n/g, "\n"), "utf8");
-  return crypto.createHash("sha256").update(b).digest("hex");
-}
-// Every file in the built folders of dir, as { "en/index.html": sha256, ... }.
-function manifestOf(dir) {
-  const out = {};
-  const walk = (rel) => {
-    const abs = path.join(dir, rel);
-    if (!fs.existsSync(abs)) return;
-    for (const e of fs.readdirSync(abs, { withFileTypes: true })) {
-      const r = rel + "/" + e.name;
-      if (e.isDirectory()) walk(r); else out[r] = fingerprint(path.join(dir, r));
-    }
-  };
-  BUILT.forEach(walk);
-  return Object.fromEntries(Object.keys(out).sort().map((k) => [k, out[k]]));
-}
+// The folders a build fills (BUILT), the manifest's name, and the
+// fingerprints in it come from scripts/rbm-manifest.js, which releases ship
+// beside copy-rbm-pages.js so the copy's checks run anywhere.
 
 // Reader-facing messages. Only the English is written here: French, Portuguese
 // and Spanish come from the translation memory, like every other text on the

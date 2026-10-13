@@ -94,8 +94,8 @@ scrolls. `iframe-test.html` in this folder shows it working.
   `https://launch-development-test.vercel.app/api/` rather than to this host,
   which has none. That service accepts them only from hosts on its list
   (`PARTNERS` in the LAUNCH repository's `api/_mail.js`). Today the list holds
-  the two copies of the test repository: `https://codebyjackson.github.io`
-  (GitHub Pages) and `https://launch-rbm-test.vercel.app` (Vercel). **Every
+  the test repository's copy on GitHub Pages, `https://codebyjackson.github.io`.
+  **Every
   host that serves these pages needs its own entry, test and staging
   included: tell the LAUNCH team each host's address** (scheme and domain,
   e.g. `https://dashboards.endmalaria.org`) before readers use it. On a host
@@ -104,16 +104,34 @@ scrolls. `iframe-test.html` in this folder shows it working.
   Subscribers' addresses and feedback go to the LAUNCH team, and the emails
   are in English.
 
-## Rebuilding
+## How updates arrive
 
 These files are generated in the LAUNCH pipeline repository by
-`node scripts/build-rbm-pages.js` from the same page as the LAUNCH site, so a
-fix there reaches here on the next build. Do not edit them by hand: a change
-made here is replaced by the next build. `build-manifest.json` records what
-the build wrote (the sha256 of each file in en/, fr/, pt/, es/ and assets/,
-and the commit it was built from), so an edit made here can be found; the
-LAUNCH repository's `scripts/copy-rbm-pages.js` stops a copy that would
-replace one.
+`node scripts/build-rbm-pages.js` from the same page as the LAUNCH site. Do not
+edit them by hand: a change made here is replaced by the next update, and the
+update refuses to run until it has been moved into the LAUNCH repository.
+
+When a change to the page lands there, its workflow "Release RBM pages"
+publishes the new pages as a numbered release (`rbm-v1`, `rbm-v2`, …) with a
+note of what changed. A release is made only when the pages actually change:
+data never needs one, because the pages read `dashboard.json` when they load.
+
+The test repository picks each release up by itself: its workflow
+`.github/workflows/launch-update.yml` checks once a day (or when run by hand
+from its Actions tab), runs the checks below, commits the new pages to `main`,
+records the version in `launch-release.json` and the README's "Live version"
+line, and makes a matching release there. If a check fails, nothing is
+changed: it opens an issue titled "LAUNCH update not applied" saying why.
+Set the repository variable `LAUNCH_UPDATE_MODE` to `pr` to have each update
+opened as a pull request to review instead (that also needs Settings → Actions
+→ "Allow GitHub Actions to create and approve pull requests"). Set
+`LAUNCH_REPO` when the LAUNCH repository moves.
+
+**The checks.** `build-manifest.json` records what the build wrote (the
+sha256 of each file in en/, fr/, pt/, es/ and assets/, and the commit it was
+built from), so an edit made here can be found. `copy-rbm-pages.js`, shipped in
+every release, stops an update that would replace one. It also stops one built
+before the translations caught up, or from uncommitted files.
 `--api-url` sets where the two forms post (default: the LAUNCH production
 site); `--api-url none` builds them switched off, as they were until
 7 Oct 2026.

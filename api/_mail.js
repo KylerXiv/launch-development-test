@@ -60,10 +60,9 @@ const DASHBOARD = "/illustrated-journey-dashboard.html";
 // Send feedback (found 7 Oct, when the test repo was also deployed to Vercel).
 // `name` is what the team's emails call the site.
 const PARTNERS = [
-  // the test copy, codebyjackson/launch-rbm-test, on GitHub Pages
-  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/", name: "RBM test copy (GitHub Pages)" },
-  // the same repository, also deployed to Vercel
-  { origin: "https://launch-rbm-test.vercel.app", dashboard: "https://launch-rbm-test.vercel.app/en/", name: "RBM test copy (Vercel)" }
+  // the test copy, codebyjackson/launch-rbm-test, on GitHub Pages. Its Vercel
+  // deployment (launch-rbm-test.vercel.app) was retired on 13 Oct 2026.
+  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/", name: "RBM test copy (GitHub Pages)" }
 ];
 
 // The same test both forms already run in the browser, so an address the page
