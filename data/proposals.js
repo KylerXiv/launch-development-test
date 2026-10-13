@@ -18,29 +18,5 @@ window.LAUNCH_PROPOSALS =
   "meta": {
     "updated": "2026-10-13"
   },
-  "proposals": [
-    {
-      "id": "p-97",
-      "issue": 97,
-      "target": {
-        "product": "ganlum",
-        "stage": 3,
-        "field": "next"
-      },
-      "stageName": "WHO PQ listing",
-      "productName": "GanLum",
-      "was": "",
-      "now": "TEST – manual walkthrough, will be rejected. Nothing here is real data.",
-      "evidence": {
-        "src": "who-pq-fpp",
-        "srcLabel": "WHO prequalification list",
-        "asOf": "2026-10-13",
-        "ref": "https://extranet.who.int/prequal/medicines/prequalified/finished-pharmaceutical-products"
-      },
-      "notes": "End-to-end test of the data proposal chain (intake → PR → preview → decision). It will be rejected with rejected:not-a-change, so nothing is published.",
-      "origin": "analyst:codebyjackson",
-      "state": "waiting",
-      "fingerprint": "sha1:94db846f89fa68d7"
-    }
-  ]
+  "proposals": []
 }

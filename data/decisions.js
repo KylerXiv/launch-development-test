@@ -12,7 +12,7 @@
 window.LAUNCH_DECISIONS =
 {
   "meta": {
-    "updated": "2026-10-01"
+    "updated": "2026-10-13"
   },
   "decisions": [
     {
@@ -318,6 +318,20 @@ window.LAUNCH_DECISIONS =
       "pr": 39,
       "commit": "24acb2f13e7f90717a5d6cb72a954e5fe5951d61",
       "contentHash": "ec54209fc4dd20544f4d7e0ed85806cf9b6d2fb6337ce8f99905d2e8edfe52f0"
+    },
+    {
+      "issue": 97,
+      "state": "rejected",
+      "reason": "rejected:not-a-change",
+      "by": "codebyjackson",
+      "on": "2026-10-13",
+      "target": {
+        "product": "ganlum",
+        "stage": 3,
+        "field": "next"
+      },
+      "proposed": "TEST – manual walkthrough, will be rejected. Nothing here is real data.",
+      "fingerprint": "sha1:94db846f89fa68d7"
     }
   ]
 }
