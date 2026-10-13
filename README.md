@@ -5,7 +5,8 @@ RBM Partnership to End Malaria and Unitaid.
 
 **Production page: the illustrated journey,
 https://launch-development-test.vercel.app/illustrated-journey-dashboard.html**,
-also in French (`/fr/`), Portuguese (`/pt/`) and Spanish (`/es/`).
+also in French, Portuguese and Spanish at the same path under `/fr/`,
+`/pt/` and `/es/` (for example `/fr/illustrated-journey-dashboard.html`).
 
 This repository is the source of truth: the data, the pages, the translations,
 the email functions in `api/` and every workflow. Two other repositories
