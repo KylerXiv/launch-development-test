@@ -332,6 +332,38 @@ window.LAUNCH_DECISIONS =
       },
       "proposed": "TEST – manual walkthrough, will be rejected. Nothing here is real data.",
       "fingerprint": "sha1:94db846f89fa68d7"
+    },
+    {
+      "issue": 99,
+      "state": "approved",
+      "by": "codebyjackson",
+      "on": "2026-10-13",
+      "target": {
+        "product": "ganlum",
+        "stage": 3,
+        "field": "several"
+      },
+      "proposed": [
+        {
+          "field": "status",
+          "was": "idle",
+          "now": "done"
+        },
+        {
+          "field": "date",
+          "was": "",
+          "now": "15 Sep 2026"
+        },
+        {
+          "field": "note",
+          "was": "Not on the WHO PQ EOI list yet (24th malaria EOI, 27 Feb 2026, checked)",
+          "now": "Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG)."
+        }
+      ],
+      "fingerprint": "sha1:851aa6af792b30ec",
+      "pr": 100,
+      "commit": "e0fc9d7408ba5d5f3888cb85d4c8fb95a6005cec",
+      "contentHash": "b9dcc7219d63d122a8d91119ee9c34ae34ad9e664f6e21c007fe0fc36b002c3c"
     }
   ]
 }
