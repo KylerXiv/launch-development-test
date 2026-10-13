@@ -227,8 +227,10 @@ No test framework by design; two layers instead:
   `codebyjackson/launch-rbm-test` applies each release by itself once a day
   ([rbm/README.md](../rbm/README.md), "How updates arrive";
   [jackson/rbm-releases.md](jackson/rbm-releases.md)). Building and copying
-  by hand (`copy-rbm-pages.js --to`) still works when needed. Unitaid owns the
-  repository and the hosting after handover. See
+  by hand (`copy-rbm-pages.js --to`) still works when needed. After handover,
+  Unitaid owns this repository and the data repository, and RBM receives the
+  pages it embeds, either as the `launch-rbm-test` repository or as a copy of
+  the files ([rbm/README.md](../rbm/README.md), "What to host"). See
   [rbm-handover-notes.md](rbm-handover-notes.md) and
   [Handoff_Kyler.md](Handoff_Kyler/Handoff_Kyler.md). The `feed.xml` URL
   still points at the old GitHub Pages site: update `SITE` in

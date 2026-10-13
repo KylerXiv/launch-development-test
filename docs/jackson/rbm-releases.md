@@ -127,3 +127,21 @@ page change merged → translate bot
 
 Not yet seen live: a release with real page changes. The first page change
 merged here goes through the whole chain.
+
+## 6. Handover to RBM (13 Oct 2026)
+
+**Decided:** RBM shows the `/en` `/fr` `/pt` (and later `/es`) pages in iframes
+on its own website. `iframe-test.html`, `rbm-shell/` and the test start page
+`index.html` are not handed over. The pages keep reading the data from the
+public data repository.
+
+**Not decided:** whether RBM receives the `launch-rbm-test` repository (the
+robot keeps applying releases) or a copy of the files (each new release's
+`rbm-pages.tar.gz` is then handed to them). `rbm/README.md` now covers both,
+and says what to host (`en/ fr/ pt/ es/ assets/`, plus `build-manifest.json`).
+
+**To do before RBM goes live:**
+- Add RBM's website address to `PARTNERS` in `api/_mail.js` (not known yet).
+- The forms still post to this project's Vercel production address. That
+  address goes with this project's hosting when it moves, and the pages must
+  then be rebuilt.

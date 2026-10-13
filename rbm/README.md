@@ -16,6 +16,24 @@ assets/                                             icons and logos (shared)
 The platform has /en, /fr and /pt routes today. The Spanish page (es/) is
 ready for a /es route if one is added; until then it can be linked directly.
 
+## What to host
+
+Host these, side by side, exactly as they are:
+
+- `en/`, `fr/`, `pt/`, `es/`: the four pages, each with its own `data/` (map
+  shapes and country names, not the dashboard's data) and feedback form;
+- `assets/`: the icons and logos every page loads from `../assets/`. Without
+  it, the pages lose their icons;
+- `build-manifest.json`: optional, but keep it. It lists every file's
+  fingerprint and the version, so an update can be checked against it.
+
+Not needed: `index.html`, `iframe-test.html` and `rbm-shell/` in the LAUNCH
+test copy are for testing only.
+
+The dashboard's data is **not** in these files. Each page loads it from the
+public data repository (below) every time it opens, so new data appears with
+nothing to do here.
+
 Data: `https://codebyjackson.github.io/launch-data-test/v1/dashboard.json`
 (contract and change rules: the README of that repository). Map rendering uses
 MapLibre GL JS from cdnjs.cloudflare.com.
@@ -72,7 +90,8 @@ inside the frame.
 a frame taller than the screen the button sits below the visible area until
 the reader scrolls to the frame's end, and the dialog opens out of view.
 Sized to the screen, the button stays in the bottom corner while the reader
-scrolls. `iframe-test.html` in this folder shows it working.
+scrolls. The LAUNCH test copy shows it working inside a mock of the platform:
+https://codebyjackson.github.io/launch-rbm-test/iframe-test.html
 
 ## What readers see when something is wrong
 
@@ -106,32 +125,46 @@ scrolls. `iframe-test.html` in this folder shows it working.
 
 ## How updates arrive
 
-These files are generated in the LAUNCH pipeline repository by
-`node scripts/build-rbm-pages.js` from the same page as the LAUNCH site. Do not
-edit them by hand: a change made here is replaced by the next update, and the
-update refuses to run until it has been moved into the LAUNCH repository.
+**Data:** nothing to do. The pages read the newest approved `dashboard.json`
+every time they open.
 
-When a change to the page lands there, its workflow "Release RBM pages"
-publishes the new pages as a numbered release (`rbm-v1`, `rbm-v2`, …) with a
-note of what changed. A release is made only when the pages actually change:
-data never needs one, because the pages read `dashboard.json` when they load.
+**Page changes** (wording, layout, a fix) come as numbered releases
+(`rbm-v1`, `rbm-v2`, …) on the LAUNCH pipeline repository's Releases page,
+https://github.com/KylerXiv/launch-development-test/releases. A release is
+made only when the pages actually change, never for a data change. Each
+release holds `rbm-pages.tar.gz` (the five items above, ready to host), a note
+of what changed, and the copy script with its checks.
 
-The test repository picks each release up by itself: its workflow
-`.github/workflows/launch-update.yml` checks once a day (or when run by hand
-from its Actions tab), runs the checks below, commits the new pages to `main`,
-records the version in `launch-release.json` and the README's "Live version"
-line, and makes a matching release there. If a check fails, nothing is
-changed: it opens an issue titled "LAUNCH update not applied" saying why.
-Set the repository variable `LAUNCH_UPDATE_MODE` to `pr` to have each update
-opened as a pull request to review instead (that also needs Settings → Actions
-→ "Allow GitHub Actions to create and approve pull requests"). Set
-`LAUNCH_REPO` when the LAUNCH repository moves.
+How a release gets here depends on how the pages are hosted:
 
-**The checks.** `build-manifest.json` records what the build wrote (the
-sha256 of each file in en/, fr/, pt/, es/ and assets/, and the commit it was
-built from), so an edit made here can be found. `copy-rbm-pages.js`, shipped in
-every release, stops an update that would replace one. It also stops one built
-before the translations caught up, or from uncommitted files.
+- **Hosting the LAUNCH repository `launch-rbm-test`** (or a transfer of it):
+  its workflow `.github/workflows/launch-update.yml` applies each new release
+  by itself, once a day or when run by hand from its Actions tab. It checks the
+  release, commits the new pages, and records the version in
+  `launch-release.json` and its README. If a check fails, nothing changes, and
+  an issue titled "LAUNCH update not applied" says why. Set the repository
+  variable `LAUNCH_UPDATE_MODE` to `pr` to review each update as a pull request
+  first (this also needs Settings → Actions → "Allow GitHub Actions to create
+  and approve pull requests"). Set `LAUNCH_REPO` if the LAUNCH repository moves.
+  No key or token is needed: the release is public.
+- **Hosting a copy of the files:** download `rbm-pages.tar.gz` from the newest
+  release, unpack it, and replace `en/`, `fr/`, `pt/`, `es/`, `assets/` and
+  `build-manifest.json` with what it holds. Replace the folders whole, so that
+  files a newer version no longer uses are removed. The LAUNCH team says when a
+  new release is out.
+
+**Never edit the hosted files by hand.** They are built from the same page as
+the LAUNCH site, so a change made only here never reaches the LAUNCH site or
+the translations, and the next release replaces it. Ask the LAUNCH team for
+the change instead. In a hosted repository, the update stops on a hand edit
+and names the file, using `build-manifest.json` and `copy-rbm-pages.js`.
+
+**A breaking change to the data's format** is rare and announced in advance.
+The data is then published at a new address (`v2/`) while the current one
+stays live, and the pages show "being updated" only if they are left on an
+old version after the old address is retired. Apply the release that reads
+the new address before that date.
+
+For the LAUNCH team: `node scripts/build-rbm-pages.js` builds these pages.
 `--api-url` sets where the two forms post (default: the LAUNCH production
-site); `--api-url none` builds them switched off, as they were until
-7 Oct 2026.
+site); `--api-url none` builds them switched off.
