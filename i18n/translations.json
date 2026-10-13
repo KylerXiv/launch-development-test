@@ -158,14 +158,6 @@
       "pt": "Nove apresentações pré-qualificadas (PQ) de três fabricantes (Alfasigma, Guilin, Beijing Holley) — segurança do abastecimento pela diversidade",
       "es": "Nueve presentaciones de PQ'd de tres fabricantes (Alfasigma, Guilin, Beijing Holley): seguridad del suministro a través de la diversidad."
     },
-    "07dcc067aee67beb": {
-      "en": "Prequalified by WHO on 15 Sep 2026 (WHO ref TEST-0001, Novartis Pharma AG).",
-      "where": "products.products[0].stages[3].note",
-      "bucket": "data",
-      "fr": "Préqualifié par l'OMS le 15 septembre 2026 (réf. OMS TEST-0001, Novartis Pharma AG).",
-      "pt": "Pré-qualificado pela OMS em 15 de setembro de 2026 (ref. OMS TEST-0001, Novartis Pharma AG).",
-      "es": "Precalificado por la OMS el 15 de septiembre de 2026 (referencia de la OMS TEST-0001, Novartis Pharma AG)."
-    },
     "07e9ffda646ae720": {
       "en": "Pre-submission dialogue",
       "where": "products.products[0].detail.milestones[2].next",
@@ -2149,14 +2141,6 @@
       "fr": "MFT décisions stratégiques",
       "pt": "MFT decisões de estratégia",
       "es": "MFT decisiones estratégicas"
-    },
-    "532834b0cba6c26f": {
-      "en": "GanLum — WHO PQ listing updated (source: WHO prequalification list).",
-      "where": "products.changelog[0].plain",
-      "bucket": "data",
-      "fr": "GanLum — Liste de l'OMS PQ mise à jour (source : liste de préqualification de l'OMS).",
-      "pt": "GanLum — Lista da OMS PQ atualizada (fonte: lista de pré-qualificação da OMS).",
-      "es": "GanLum — Listado PQ de la OMS actualizado (fuente: lista de precalificación de la OMS)."
     },
     "53289e5eb860ce00": {
       "en": "LAUNCH Transparency Dashboard — Illustrated journey",
@@ -4191,14 +4175,6 @@
       "fr": "Chronologie réelle",
       "pt": "Cronograma real",
       "es": "Cronograma real"
-    },
-    "a0e10e7011dbb055": {
-      "en": "15 Sep 2026",
-      "where": "products.products[0].stages[3].date",
-      "bucket": "data",
-      "fr": "15 septembre 2026",
-      "pt": "15 de setembro de 2026",
-      "es": "15 de septiembre de 2026"
     },
     "a1afa2fdf677e2ff": {
       "en": "WHO PQ listing (tablets)",
