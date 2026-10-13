@@ -130,19 +130,12 @@ https://codebyjackson.github.io/launch-rbm-test/iframe-test.html
 **Data:** nothing to do. The pages read the newest approved `dashboard.json`
 every time they open.
 
-**Page changes** (wording, layout, a fix): the LAUNCH team sends an updated set
-of these files. Replace `en/`, `fr/`, `pt/`, `es/` and `assets/` whole with the
-new ones, so that files a newer version no longer uses are removed.
-
-**Never edit the hosted files by hand.** They are built from the same page as
-the LAUNCH site, so a change made only here never reaches the LAUNCH site or
-the translations, and the next set of files replaces it. Ask the LAUNCH team
-for the change instead.
+**Please do not edit the hosted files by hand.** They are built from the same
+page as the LAUNCH site, so a change made only here never reaches the LAUNCH
+site or the translations. Ask the LAUNCH team for the change instead.
 
 **A breaking change to the data's format** is rare and announced in advance.
-The data is then published at a new address (`v2/`) while the current one
-stays live. Put up the new set of files before the old address is retired, or
-the pages show that the dashboard is being updated.
+The current data address stays live in the meantime.
 
 ### For the LAUNCH team (development stage only)
 
@@ -150,6 +143,7 @@ the pages show that the dashboard is being updated.
 the two forms post, and `--api-url none` builds them switched off. During
 development, every page change is published as a release (`rbm-v1`, `rbm-v2`,
 …), and the test copy `codebyjackson/launch-rbm-test` applies each one by
-itself with `.github/workflows/launch-update.yml`. Each release's
-`rbm-pages.tar.gz` holds exactly the files listed under "What to host". None
-of this runs at RBM.
+itself with `.github/workflows/launch-update.yml`. **That workflow is for the
+development stage only and will be removed from `launch-rbm-test` before
+handover.** Each release's `rbm-pages.tar.gz` holds exactly the files listed
+under "What to host".

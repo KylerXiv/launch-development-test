@@ -138,8 +138,9 @@ public data repository.
 **Decided later the same day:** RBM receives **a copy of the files only**
 (`en/ fr/ pt/ es/ assets/`), not the repository. The release workflow and the
 robot are for the development stage: they keep the test copy up to date and
-do not run at RBM. Page changes after handover reach RBM as an updated set of
-files sent by the team; the format is not decided yet. `rbm/README.md` says so.
+do not run at RBM, and `launch-update.yml` will be removed from
+`launch-rbm-test` before handover. How page changes reach RBM after handover
+is not decided yet, so the documents do not describe it.
 
 **To do before RBM goes live:**
 - Add RBM's website address to `PARTNERS` in `api/_mail.js` (not known yet).
