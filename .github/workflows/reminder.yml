@@ -17,7 +17,6 @@ permissions:
 jobs:
   remind:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
       - name: Open review issue
         env:

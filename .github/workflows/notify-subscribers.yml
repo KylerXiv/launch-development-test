@@ -43,7 +43,6 @@ concurrency:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
       # Exactly the commit this run is recorded against (not main as it is
       # when the step runs), so the next run starts where this one ended.
