@@ -222,7 +222,13 @@ No test framework by design; two layers instead:
 - **RBM**: decided 23 Sep 2026, RBM embeds the page in an iframe served from
   this site's own origin, and receives the data as `dashboard.json` through
   `publish-dataset.yml`. `scripts/build-rbm-pages.js` builds RBM's own copies
-  of the page. Unitaid owns the repository and the hosting after handover. See
+  of the page. When those copies change, `release-rbm-pages.yml` publishes
+  them as a release (`rbm-v1`, `rbm-v2`, …), and the robot in
+  `codebyjackson/launch-rbm-test` applies each release by itself once a day
+  ([rbm/README.md](../rbm/README.md), "How updates arrive";
+  [jackson/rbm-releases.md](jackson/rbm-releases.md)). Building and copying
+  by hand (`copy-rbm-pages.js --to`) still works when needed. Unitaid owns the
+  repository and the hosting after handover. See
   [rbm-handover-notes.md](rbm-handover-notes.md) and
   [Handoff_Kyler.md](Handoff_Kyler/Handoff_Kyler.md). The `feed.xml` URL
   still points at the old GitHub Pages site: update `SITE` in

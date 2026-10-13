@@ -41,6 +41,7 @@ jobs:
         run: |
           node scripts/test-build-rbm-pages.js
           node scripts/test-copy-rbm-pages.js
+          node scripts/test-rbm-release.js
           node scripts/build-rbm-pages.js --allow-stale
       # The daily update email to subscribers: what counts as new, what the
       # email says, and that a re-run never sends twice. No network, no key.

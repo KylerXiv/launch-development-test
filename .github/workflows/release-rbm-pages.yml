@@ -1,0 +1,118 @@
+name: Release RBM pages
+
+# Builds the RBM pages (scripts/build-rbm-pages.js) and, when they differ from
+# the last release, publishes the next one: rbm-v1, rbm-v2, … The robot in
+# codebyjackson/launch-rbm-test (.github/workflows/launch-update.yml there)
+# checks for a new release every day and applies it. Nothing here pushes to
+# main or to any other repository: a release is the hand-over.
+#
+# When it runs:
+#   - after "Translate new text" succeeds on main. That is how a change to the
+#     page reaches here: the bot's commit is made with GITHUB_TOKEN, which
+#     starts no workflow by itself, but workflow_run does (the same way
+#     source-proposals.yml follows the source fetch);
+#   - after a push to main that changes something the pages are built from but
+#     the translate bot does not watch (the RBM skin, icons, map shapes,
+#     country names, a hand correction in translations.json);
+#   - by hand (Actions → Release RBM pages → Run workflow).
+#
+# Most runs end with "no release": data, docs and source changes leave every
+# page byte-identical. A run before the translate bot has caught up also makes
+# none, and waits for the bot's run to start it again, so new text never goes
+# out in English. Notes: docs/jackson/rbm-releases.md.
+
+on:
+  workflow_run:
+    workflows: ["Translate new text"]
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - "scripts/rbm-skin.js"
+      - "scripts/rbm-manifest.js"
+      - "scripts/build-locale-pages.js"
+      - "assets/**"
+      - "data/world-map.js"
+      - "data/world-map-geo.js"
+      - "i18n/translations.json"
+      - "i18n/country-names.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # to create the release (a tag on main and its files)
+
+concurrency:
+  group: rbm-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main          # the newest main, including the translate bot's commit
+          fetch-depth: 0     # the commits since the last release, for its notes
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Translations up to date?
+        id: fresh
+        run: |
+          if node scripts/assemble-content.js --check; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "No release: i18n/content.en.json is behind the page, so new text would go out in English. The translate bot's run starts this workflow again when it has caught up." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Build the RBM pages
+        if: steps.fresh.outputs.ok == 'true'
+        run: node scripts/build-rbm-pages.js
+
+      - name: Find the last release
+        if: steps.fresh.outputs.ok == 'true'
+        id: last
+        run: |
+          TAG=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+                --jq '[.[] | select(.draft | not) | select(.tag_name | startswith("rbm-v"))][0].tag_name // ""')
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          mkdir -p "$RUNNER_TEMP/last"
+          if [ -n "$TAG" ]; then
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern build-manifest.json --dir "$RUNNER_TEMP/last"
+          fi
+
+      - name: Decide, and package
+        if: steps.fresh.outputs.ok == 'true'
+        id: rel
+        run: |
+          node scripts/rbm-release.js \
+            --previous-tag "${{ steps.last.outputs.tag }}" \
+            --previous "$RUNNER_TEMP/last/build-manifest.json" \
+            --out "$RUNNER_TEMP/release"
+
+      - name: Publish the release
+        if: steps.rel.outputs.release == 'true'
+        run: |
+          TAG="${{ steps.rel.outputs.tag }}"
+          gh release create "$TAG" "$RUNNER_TEMP"/release/rbm-pages.tar.gz \
+            "$RUNNER_TEMP"/release/build-manifest.json \
+            "$RUNNER_TEMP"/release/copy-rbm-pages.js \
+            "$RUNNER_TEMP"/release/rbm-manifest.js \
+            --target "$(git rev-parse HEAD)" \
+            --title "RBM pages $TAG" \
+            --notes-file "$RUNNER_TEMP/release/notes.md"
+          echo "Published **$TAG**. The robot in launch-rbm-test applies it on its next daily run." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Say why there is no release
+        if: steps.fresh.outputs.ok == 'true' && steps.rel.outputs.release != 'true'
+        env:
+          REASON: ${{ steps.rel.outputs.reason }}
+        run: |
+          echo "No release: $REASON." >> "$GITHUB_STEP_SUMMARY"
