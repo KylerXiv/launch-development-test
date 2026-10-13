@@ -22,7 +22,7 @@ page change merged → translate bot
 → release-rbm-pages.yml: build, compare       ──▶  launch-update.yml (daily, 07:20 UTC)
   with the last release; publish rbm-vN             new rbm-v* release? check it, copy it,
   only if the pages changed                         commit to main, record the version,
-                                                    release, ask Pages to build
+                                                    release; the push starts Pages' build
                                                     · a failed check → an issue, nothing changed
 ```
 
@@ -90,9 +90,11 @@ page change merged → translate bot
   long as the copy came from a clean build.
 - **No timeout on the new workflows**, the same as the others here (owner's
   decision on 13 Oct to set limits from a month of real runs).
-- **Untested before merge:** whether GitHub Pages rebuilds after a push made
-  with the robot's `GITHUB_TOKEN`. The robot asks Pages to build anyway
-  (`POST /pages/builds`, `pages: write`). The first real run confirms it.
+- **GitHub Pages builds on the robot's push by itself** (found on `rbm-v1`).
+  The robot first also asked for a build (`POST /pages/builds`). That started
+  a second build, which cancelled the first and left "errored" entries in the
+  Pages build list, though the robot's commit deployed. The request and
+  `pages: write` were dropped (launch-rbm-test #15).
 - **The office network** blocks `codebyjackson.github.io`, so the first live
   check of the pages after an update is made from another network.
 
@@ -100,6 +102,28 @@ page change merged → translate bot
 
 | | |
 | --- | --- |
-| This repo | `feat/rbm-releases`: `release-rbm-pages.yml`, `rbm-release.js` and its test (17 checks, in `validate.yml`), `rbm-manifest.js` (moved helpers), `PARTNERS` without the Vercel copy, `rbm/README.md` "How updates arrive", developer guide §8 |
-| launch-rbm-test | `feat/launch-update`: `.github/workflows/launch-update.yml`, README with the "Live version" line, the new "How updates arrive" section, and no Vercel host |
-| Tests | `test-rbm-release` 17/0, `test-copy-rbm-pages` 20/0, `test-build-rbm-pages` 33/0, `test-mail-api` 194/0; the verify block (below) |
+| This repo | Merged as #93 (`390fbe0`): `release-rbm-pages.yml`, `rbm-release.js` and its test (17 checks, in `validate.yml`), `rbm-manifest.js` (moved helpers), `PARTNERS` without the Vercel copy, `rbm/README.md` "How updates arrive", developer guide §8 |
+| launch-rbm-test | Merged as #14 (`launch-update.yml`, README "Live version" line and "How updates arrive", no Vercel host) and #15 (no extra Pages build request). Repo website link set to GitHub Pages |
+| Tests | `test-rbm-release` 17/0, `test-copy-rbm-pages` 20/0, `test-build-rbm-pages` 33/0, `test-mail-api` 194/0, `test-source-watchers` 61/0, `test-dataset-diff` 11/0, `test-notify-subscribers` 67/0; verify block 0 errors and 1 warning, synthetic 0/0, dataset 30/0, country names 252, normalizer identical |
+
+## 5. The first live run, 13 Oct 2026
+
+1. **The merge of #93 published `rbm-v1` by itself.** It was started by the push
+   trigger, because `scripts/rbm-manifest.js` changed, and holds 38 files.
+   The run that followed the translate bot found the pages unchanged and made
+   no second release ("the pages are the same as rbm-v1").
+2. **The robot applied `rbm-v1`** (run by hand, on `main`). Commit `db7e4e4`
+   by `github-actions[bot]` touched only `build-manifest.json` (its
+   `built_from` line), `launch-release.json` (new) and the README's "Live
+   version" line. It also made release `rbm-v1` in launch-rbm-test. GitHub
+   Pages deployed `db7e4e4`.
+3. **Run again, the robot did nothing:** "Up to date: rbm-v1 is live", no
+   commit.
+4. **Refusal.** On a throwaway branch, `en/index.html` was edited by hand and
+   `launch-release.json` set to an older tag. The robot (a dry run, off
+   `main`) refused at "Check it, and copy it in", named the file and the
+   commit, changed nothing, and opened issue #16. The issue was then closed
+   and the branch deleted.
+
+Not yet seen live: a release with real page changes. The first page change
+merged here goes through the whole chain.
