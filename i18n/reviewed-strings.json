@@ -141,8 +141,6 @@
     { "file": "assets/site-nav.js", "src": "\"Follow each medicine through the seven steps to patients.\"", "en": "Follow each medicine through the seven steps to patients." },
     { "file": "assets/site-nav.js", "src": "name: \"Pipeline\"", "en": "Pipeline" },
     { "file": "assets/site-nav.js", "src": "\"Where each product is, trial to launch.\"", "en": "Where each product is, trial to launch." },
-    { "file": "assets/site-nav.js", "src": "name: \"Story\"", "en": "Story" },
-    { "file": "assets/site-nav.js", "src": "\"How long each medicine waited.\"", "en": "How long each medicine waited." },
     { "file": "assets/site-nav.js", "src": "\"LAUNCH views\"", "en": "LAUNCH views" },
     { "file": "assets/site-nav.js", "src": "\"sn-vp\">Views: <", "en": "Views:" },
     { "file": "assets/site-nav.js", "src": "<small>coming soon</small>", "en": "coming soon" },
