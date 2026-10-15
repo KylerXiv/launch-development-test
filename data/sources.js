@@ -267,7 +267,7 @@ window.LAUNCH_SOURCES =
       "url": "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1003669",
       "year": "2021",
       "products": ["pyramax"],
-      "plain": "A study of how pyronaridine-artesunate performed in ordinary clinical use across five African countries.",
+      "plain": "A study of how artesunate–pyronaridine performed in ordinary clinical use across five African countries.",
       "collection": "static",
       "public": true,
       "findings": "Single-arm, open-label cohort event monitoring study. Published 15 June 2021 in PLOS Medicine vol. 18 — the source sheet recorded 2024 and named MMV as publisher; PLOS is the publisher and 2021 the year.",
