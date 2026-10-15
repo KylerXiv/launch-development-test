@@ -1821,6 +1821,12 @@
   // Years only, read with the page's own rules (stageYear): see
   // docs/jackson/yardstick.md for the choices behind each.
   const YARD = DATA.yardstick || null;
+  // The comparison with each medicine's own dates (the years-late badge, the
+  // box at the top of an open row, and the Time taken view with its Variance
+  // column) is hidden at the partners' request (feedback email, 15 Oct 2026)
+  // until the benchmark method is agreed. The expected time under each stage
+  // on the pathway strip stays (owner's choice). true brings all three back.
+  const YARD_COMPARE = false;
   // How far a step ran past its expected time, as a plain signed number.
   const varianceText = n => "+" + yrsText(n);
   // Market Access is every stage before country registration; Country
@@ -1840,7 +1846,7 @@
     return m ? +m[1] : null;
   }
   function yardstick(p) {
-    if (!YARD) return null;
+    if (!YARD || !YARD_COMPARE) return null;
     const start = firstYear(p);
     if (start == null || stageYear(p.stages[1]) == null) return { approved: false };
     const recYear = stageYear(p.stages[2]);
@@ -2220,14 +2226,14 @@
                 <div class="swg" role="group" aria-label="Journey view">
                   <button type="button" data-v="time" aria-pressed="true">Actual timeline</button>
                   <button type="button" data-v="path" aria-pressed="false">Pathway order</button>
-                  ${YARD ? `<button type="button" data-v="taken" aria-pressed="false">Time taken</button>` : ""}
+                  ${YARD && YARD_COMPARE ? `<button type="button" data-v="taken" aria-pressed="false">Time taken</button>` : ""}
                 </div></div>
             </div>
             ${yardBox(p)}
             <div class="views">
               <div class="view" data-v="time">${journeyTime(p)}</div>
               <div class="view" data-v="path" hidden><div class="trackbox"><div class="track">${stagesHtml}</div></div></div>
-              ${YARD ? `<div class="view" data-v="taken" hidden>${yardTable(p)}</div>` : ""}
+              ${YARD && YARD_COMPARE ? `<div class="view" data-v="taken" hidden>${yardTable(p)}</div>` : ""}
             </div>
             <div class="gatepanel" id="${esc(p.id)}-gate" hidden></div>
             ${p.flag ? `<div class="flagnote"><span>${esc(p.flag)}</span></div>` : ""}
