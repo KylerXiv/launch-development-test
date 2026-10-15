@@ -119,8 +119,9 @@ module.exports = async function subscribe(req, res) {
     ...mail.letter({
       heading: "You're subscribed",
       paras: [
-        // The opening sentence is the owner's wording (8 Oct 2026).
-        "You're now subscribed to the LAUNCH Transparency Dashboard. We'll email you when its data is updated: new milestones, corrected figures and newly verified country registrations."
+        // The opening sentence is the owner's wording (8 Oct 2026). The second
+        // follows the Subscribe box's wording (15 Oct 2026 feedback).
+        "You're now subscribed to the LAUNCH Transparency Dashboard. We'll email you when product information is updated."
       ],
       button: { label: "Open the dashboard", href: home },
       small: [{ text: "Didn't sign up, or don't want these emails?", link: unsubscribe, linkLabel: "Unsubscribe" }],
