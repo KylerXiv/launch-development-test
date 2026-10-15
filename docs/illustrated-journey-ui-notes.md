@@ -2265,8 +2265,70 @@ drafts below.
   on the page. The Global Malaria Programme was always written out, and #110
   replaced it.
 
+**Rows 52–53, procurement: what the reviewer saw is real.** The card was
+headed "Treatments procured through public channels" but counted packs. For
+DHA–PPQ, "11,493,039 packs" added 12 kinds of pack as one each: a blister of
+3 tablets, and a box of 25 blisters of 9 (225 tablets). ASPY's packs hold 90
+tablets or 90 sachets.
+- **New script, `scripts/build-procurement-summary.js`.** It reads the PQR
+  extract (`sourcing/staging/procurement_transactions.csv`, 12,151 rows) and
+  writes each product's `detail.volume`:
+  - `total` is now transactions and value: "68 transactions · US$14.5m
+    (2018–2025)" and "234 transactions · US$41.5m (2008–2026)".
+  - `period` keeps the 2025 value and the top three buyers by value.
+  - `byPresentation` holds, per pack, the label, transactions, packs and
+    courses.
+  - `coursesRule` says how courses were counted.
+  The totals reproduce the old ones exactly (940,111 and 11,493,039 packs;
+  US$14,519,230 and US$41,491,395; the same 2025 values and buyers), so only
+  the way they are shown changed. `--check` exits 1 when `data/products.js`
+  no longer matches the extract. A presentation missing from its `LABELS`
+  table stops the script, so a person names every new pack.
+- **"Transactions" means PQR rows** (68 and 234). These are the "orders" the
+  old text counted. One purchase order can have several rows: there are 45
+  and 97 distinct purchase-order numbers.
+- **The course rule comes from the extract itself, not from a dosing
+  assumption.** Global Fund product names give the tablets in one course after
+  a dash: artemether–lumefantrine's adult course is "20mg+120mg - 24" in the
+  same file, and DHA–PPQ's largest is "40mg+320mg - 9". So courses = packs ×
+  (tablets per pack ÷ tablets per course).
+  - **No estimate (null)** where the name has no dash, or the pack does not
+    divide evenly. That covers the three "40mg+320mg | dispers tab" packs,
+    and "40mg+320mg - 3" in a "Blister-8", which is inconsistent in the
+    extract.
+  - **DHA–PPQ:** 24,223,797 courses from 8,114,772 of 11,493,039 packs.
+  - **ASPY:** none, because its names state no course and its courses depend
+    on body weight.
+  - **Rejected:** one course per pack (wrong for boxes of 25 blisters), and
+    weight-band dosing ranges (a 90-tablet ASPY pack is 7.5 to 30 courses).
+- **The page.** The card is headed "Procurement through public channels"
+  (also its `i18n/reviewed-strings.json` entry). Its table lists Presentation,
+  Transactions, Packs and Treatment courses (est.), with "not estimated" where
+  null, and the rule under it. With a table, the card spans the whole row
+  (`.card-wide`); at ~300px wide it cut off two columns. On phones each
+  presentation is a block, its name and then three labelled figures. The
+  table borrows `.ystable`'s look, but that table's phone rule hides columns
+  2–3 (Expected and Actual), which here are Transactions and Packs, so it is
+  overridden.
+- **Row 53.** A single 100% channel from the PQR is now the sheet's sentence,
+  "100% of transactions in the dataset shown are from Global Fund PQR; this is
+  not the product's total global procurement.", instead of a full-width bar.
+  `split` stays in the data, because the validator requires it and RBM's file
+  carries it. More than one channel would draw the bar as before.
+- **Translation and RBM.** The new text fields (`byPresentation[].label`,
+  `coursesRule`) were added to the three lists that carry data text:
+  `assemble-content.js`, `build-locale-pages.js` and `build-dataset.js`'s
+  `TEXT_PATHS`. A built `dashboard.json` has them in all four languages,
+  English until the bot runs. The validator now checks `byPresentation`:
+  labels, whole numbers, courses a number or null, and a `coursesRule`. Each
+  of three deliberate breaks was refused.
+- **Checked in WebKit,** at 1440px and as an iPhone 13: no page errors, and
+  DHA–PPQ's 12 rows and ASPY's 2 rows fit with no sideways scroll. GanLum's row
+  reads "Not started · Regulatory submission in preparation · No publicly
+  documented barrier identified", and the glossary lists EU-M4all.
+
 **Changelog: two entries dated 2026-10-15,** one for GanLum and one for the
-glossary (the procurement change is added to the second). The plan the
+glossary and procurement. The plan the
 owner approved ("do what you can") said these would go out in one
 subscriber email. `history-continues.js`
 accepts them as "a later change on 2026-10-15".

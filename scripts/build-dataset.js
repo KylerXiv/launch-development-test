@@ -70,6 +70,7 @@ const TEXT_PATHS = {
     "products[].detail.research.geographies", "products[].detail.research.timeline",
     "products[].detail.price.note", "products[].detail.volumeNote",
     "products[].detail.volume.total", "products[].detail.volume.period", "products[].detail.volume.split[].channel",
+    "products[].detail.volume.byPresentation[].label", "products[].detail.volume.coursesRule",
     "products[].detail.milestones[].milestone", "products[].detail.milestones[].label",
     "products[].detail.milestones[].next", "products[].detail.milestones[].date",
     "products[].detail.milestones[].anticipated",
