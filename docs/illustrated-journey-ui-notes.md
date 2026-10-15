@@ -2211,9 +2211,9 @@ RBM release is made either, and "Publish now" also waits.
 
 Branch `feedback/ganlum-glossary-procurement`, off `main` at `edcb5d0`. From
 the partners' "Oct 15 Feedback Emails" rows 50–58. Done here: rows 50 and
-52–56. Not done: row 51 (claims audit; research is in progress, for review
-first), row 57 (needs Jan's statement) and row 58 (needs Unitaid's brand
-guide). The owner said to "do what you can" on 15 Oct, after reading the
+52–56. Row 51 (claims audit) is researched, in `docs/claims-audit-2026-10.md`,
+for review before any page change. Not done: row 57 (needs Jan's statement)
+and row 58 (needs Unitaid's brand guide). The owner said to "do what you can" on 15 Oct, after reading the
 drafts below.
 
 **Row 50, GanLum: a status change, not only wording.**
@@ -2227,10 +2227,24 @@ drafts below.
   Searching on 15 Oct 2026 found no announced filing or decision, so
   "in preparation" matches it. `asOf` is 2026-10-15.
 - **Use case.** Now "Non-artemisinin combination in late-stage development.
-  Novartis positions it for settings with artemisinin partial resistance and
-  for MFT strategies." Removed: "kills resistant parasites and blocks
-  transmission" and the "first major innovation… (Novartis)" quote. The access
-  line loses "— no separate paediatric development needed".
+  Novartis presents it as having the potential to combat antimalarial drug
+  resistance; LAUNCH tracks it as a candidate for settings with artemisinin
+  partial resistance and for multiple first-line therapy (MFT) strategies."
+  Removed: "kills resistant parasites and blocks transmission" and the "first
+  major innovation… (Novartis)" quote, which dropped Novartis's own "if
+  approved". The access line loses "— no separate paediatric development
+  needed".
+  - **Corrected the same day.** The first version, the draft the owner
+    approved, said "Novartis positions it … for MFT strategies". The row 51
+    research found no MFT in Novartis's or MMV's material, and a re-read of
+    Novartis's 12 Nov 2025 release confirmed it on 15 Oct. The release does
+    say "potential to combat antimalarial resistance", "highly effective
+    against mutant malaria parasites associated with partial drug
+    resistance", and "potential to … block transmission". MFT is LAUNCH's
+    framing, so it is attributed to LAUNCH.
+  - **Row 51, the claims audit.** It is in `docs/claims-audit-2026-10.md`,
+    for review: about 40 claims across the four medicines, each categorised,
+    sourced and given proposed wording. Nothing else in it is applied yet.
 - **Barrier.** "No barrier recorded" was the page default for every medicine
   without a barrier. It now reads "No publicly documented barrier
   identified", for ALAQ as well as GanLum. A GanLum-only wording would have
