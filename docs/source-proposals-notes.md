@@ -709,3 +709,31 @@ Approval (SRA)".
 **After merge:** wait for `translate.yml`, then press "Publish now"
 (`publish-dataset.yml`) so RBM's file carries the new names in all four
 languages.
+
+**Missed in #108: `meta.lastUpdated` was not moved.** #108 (merged
+15 Oct, `706d919`) changed `data/products.js` but left the date at
+2026-10-08. `publish.yml` names each snapshot after that date, so it found
+`history/products-2026-10-08.js` with different content and no new changelog
+entry for that day, and refused rather than rewrite history ("an edit that did
+not bump meta.lastUpdated"). The guard was right. The feed, linked-data and
+history-graph rebuilds in that run did not happen either. Fix
+(`fix/last-updated-15-oct`): `lastUpdated` is 2026-10-15. Still no changelog
+line, as #108 said, so no subscriber email. The data-analyst guide's
+checklist asks for both a changelog line and a new date; this skips the
+first on purpose. Checked by running `publish.yml`'s steps on a copy of
+`main` with the fix: validate, then a new `history/products-2026-10-15.js`,
+the feed (25 entries), `launch-data.jsonld` and `launch-history.jsonld`
+(9 snapshots, 2026-08-15 → 2026-10-15).
+
+Lesson: any edit to `data/products.js`, wording included, moves
+`meta.lastUpdated`. The validator does not check this; only `publish.yml`
+does, after the merge.
+
+**Translation failed on both merges, for a reason unrelated to these PRs.**
+Google answered "API Key not found. Please pass a valid API key." The
+`GOOGLE_API_KEY` secret exists, but Google no longer knows the key. The last
+good run was 13 Oct, 09:05 UTC. Until a valid key is in the secret and
+`translate.yml` is run again, the new text and names show in English on
+`/fr`, `/pt` and `/es`. No RBM release is made either (the latest is
+`rbm-v5`, 13 Oct), because a release waits for the bot. RBM's copy therefore
+still shows the old page, and "Publish now" must wait too.
