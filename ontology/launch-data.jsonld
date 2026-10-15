@@ -4,7 +4,7 @@
     {
       "@id": "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#dataset",
       "@type": "Dataset",
-      "lastUpdated": "2026-10-08",
+      "lastUpdated": "2026-10-15",
       "dataStatus": "launch:datastatus-draft",
       "tracksProduct": [
         "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#product-ganlum",
@@ -19,7 +19,7 @@
       "@type": "Concept",
       "inScheme": "launch:PathwayStageScheme",
       "notation": "0",
-      "prefLabel": "R&D & clinical",
+      "prefLabel": "R&D and Clinical",
       "stageIndex": 0,
       "operatorNote": "Manufacturer and product development partnerships — product-specific; see each product's manufacturedBy / coDevelopedBy."
     },
@@ -28,7 +28,7 @@
       "@type": "Concept",
       "inScheme": "launch:PathwayStageScheme",
       "notation": "1",
-      "prefLabel": "Regulatory approval (SRA)",
+      "prefLabel": "Stringent Regulatory Approval (SRA)",
       "stageIndex": 1,
       "operatedBy": [
         "https://kochrisdev.github.io/launch-transparency-dashboard/ontology/launch-data.jsonld#org-ema",
