@@ -419,11 +419,16 @@
     // and is therefore far more specific than a generic alias list — without
     // this order, "Procurement note" is taken by the volume-note field before
     // the Procurement step ever sees it.
+    // A spaced "&" and "and" count as the same word here, so a spreadsheet
+    // headed with a stage's old name still maps after a rename: "R&D &
+    // clinical" became "R&D and Clinical" on 15 Oct 2026. "R&D" itself has no
+    // spaces round its "&" and is left alone.
+    var normStage = function (s) { return norm(s).replace(/ & /g, " and "); };
     (stageNames || []).forEach(function (sn, i) {
-      var target = norm(sn);
+      var target = normStage(sn);
       headers.forEach(function (h) {
         if (used[h]) return;
-        var n = norm(h);
+        var n = normStage(h);
         var isNote = / note$| notes$/.test(n);
         var base = n.replace(/ (status|note|notes|state)$/, "");
         var hit = base === target ||

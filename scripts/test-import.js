@@ -239,6 +239,10 @@ group("Planning — stages and the whole loop", () => {
   is("stage statuses are planned", plan.updates.length, 1);
   const fields = plan.updates[0].changes.map(c => c.field).sort();
   is("against the right stage indexes", fields, ["stage:0:status", "stage:2:status"]);
+  // "R&D & clinical" above is the stage's name before 15 Oct 2026; the
+  // current one must map too.
+  is("a stage's current name maps as well as its old one",
+     imp.guessMapping(["Name", "R&D and Clinical"], d.stages).stages[0], { status: "R&D and Clinical" });
 
   // applying the plan must leave data the validator still accepts
   const before = rules.checkData(d).errors.length;

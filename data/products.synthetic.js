@@ -24,8 +24,8 @@ window.LAUNCH_DATA =
     "synthetic": true
   },
   "stages": [
-    "R&D & clinical",
-    "Regulatory approval (SRA)",
+    "R&D and Clinical",
+    "Stringent Regulatory Approval (SRA)",
     "WHO recommendation",
     "WHO PQ listing",
     "Country registration",

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // The source watcher for ClinicalTrials.gov. Reads sourcing/staging/trials.csv
 // and, for each portfolio medicine still in development, follows the trial
-// its "R&D & clinical" stage is waiting on. When the registry states something
+// its "R&D and Clinical" stage is waiting on. When the registry states something
 // new about that trial outright, it writes a proposal in the issue form's own
 // layout, so intake, the pull request, the preview and the approval treat it
 // exactly as they treat a person's.
@@ -41,7 +41,7 @@ const { parseCsv } = require("./fetch-regulatory.js");
 
 const ROOT = path.join(__dirname, "..");
 const FETCHED = "sourcing/staging/trials.csv";
-const STAGE = "R&D & clinical";
+const STAGE = "R&D and Clinical";
 const SOURCE_ID = "clinicaltrials";
 const DATE_FIELD = "The date this stage was reached";
 // A medicine whose staged trials fall by more than a fifth since the last

@@ -105,7 +105,7 @@ for (const [file, want] of [
 ]) {
   group("Trials: test-data/trials/" + file);
   const w = watcher("propose-trials.js", ["--staging", "test-data/trials/" + file, "--today", today]);
-  ok("exits 0 with one proposal, for ALAQ's trial stage", w.code === 0 && w.manifest.length === 1 && w.manifest[0].title === "Proposal: ALAQ · R&D & clinical", w.stdout);
+  ok("exits 0 with one proposal, for ALAQ's trial stage", w.code === 0 && w.manifest.length === 1 && w.manifest[0].title === "Proposal: ALAQ · R&D and Clinical", w.stdout);
   const { built, res } = intake(w.bodies[0] || "");
   ok("intake reads it as a one-field proposal, from the watcher", built.ok && built.proposal.target.field === "date" && /^watcher:/.test(built.proposal.origin), built.errors);
   if (built.ok) {
@@ -201,6 +201,16 @@ const started = dataWith((d) => { const x = d.products.find((p) => p.id === "gan
 const sp = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", "test-data/registers/nafdac-ganlum-registered.csv", "--data", started]);
 ok("a stage already under way keeps its wording: the proposal only draws the country",
   sp.manifest.length === 1 && !/### The status of this stage/.test(sp.bodies[0]) && /### Country map\n\nNGA: registered/.test(sp.bodies[0]), sp.stdout);
+
+// Intake finds the stage by its name, so the form's list must be the data's
+// list. It drifted once: from 2 Oct 2026 the form offered "Procurement" after
+// the data had renamed it "Procurement (public channels)", and every such
+// proposal was refused. Found and fixed with the 15 Oct stage renames.
+group("The proposal form");
+const formYml = fs.readFileSync(path.join(ROOT, ".github/ISSUE_TEMPLATE/propose-change.yml"), "utf8");
+const formStages = [...formYml.split("id: stage")[1].split("validations:")[0].matchAll(/- "([^"]+)"/g)].map((m) => m[1]);
+ok("its \"Which stage\" options are the data's stages, in order",
+  JSON.stringify(formStages) === JSON.stringify(lib.readData().data.stages), formStages);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail) { console.log("Failed:\n  " + failures.join("\n  ")); process.exit(1); }

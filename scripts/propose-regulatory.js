@@ -9,7 +9,7 @@
 //
 // One watcher per source, in WATCHERS below:
 //   WHO PQ — a listing on the WHO Prequalification list → "WHO PQ listing"
-//   EMA    — a positive EU-M4all / Article 58 opinion   → "Regulatory approval (SRA)"
+//   EMA    — a positive EU-M4all / Article 58 opinion   → "Stringent Regulatory Approval (SRA)"
 //
 // Each proposes only what its source states outright, as one unit: the stage
 // is done, from when, a factual sentence naming the references, and — if the
@@ -62,7 +62,7 @@ const WATCHERS = [
     // Only a positive opinion. A withdrawn opinion or application is a story a
     // person has to tell, and the watch report already flags the change.
     counts: (r) => ISO.test(r.eventDate) && /^positive opinion\b/i.test(r.status),
-    stage: "Regulatory approval (SRA)",
+    stage: "Stringent Regulatory Approval (SRA)",
     sourceId: "ema",
     sentence: (rows, first) => {
       const named = uniq(rows.map((r) => `${r.productName.split(" — ")[0]} (${r.refId})`)).join(", ");
