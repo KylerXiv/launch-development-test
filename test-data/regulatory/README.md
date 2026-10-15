@@ -7,7 +7,7 @@ so in its name and its reference.
 | File | Invented rows | The source watcher should |
 |---|---|---|
 | `who-pq-ganlum-listed.csv` | `TEST-0001`: WHO lists GanLum, 15 Sep 2026 | propose GanLum · WHO PQ listing done |
-| `ema-ganlum-opinion.csv` | `TEST-EMA-0001`: EMA positive EU-M4all opinion for GanLum, 18 Sep 2026. `TEST-EMA-0002`: ALAQ application withdrawn | propose GanLum · Regulatory approval (SRA) done, with its next step cleared; leave the withdrawn ALAQ row for a person |
+| `ema-ganlum-opinion.csv` | `TEST-EMA-0001`: EMA positive EU-M4all opinion for GanLum, 18 Sep 2026. `TEST-EMA-0002`: ALAQ application withdrawn | propose GanLum · Stringent Regulatory Approval (SRA) done, with its next step cleared; leave the withdrawn ALAQ row for a person |
 
 With the real list, the watcher proposes nothing:
 - **WHO PQ:** GanLum and ALAQ are not prequalified, and ASPY and DHA–PPQ

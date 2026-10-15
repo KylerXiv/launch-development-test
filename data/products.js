@@ -46,8 +46,8 @@ window.LAUNCH_DATA =
     "host": "RBM Partnership to End Malaria"
   },
   "stages": [
-    "R&D & clinical",
-    "Regulatory approval (SRA)",
+    "R&D and Clinical",
+    "Stringent Regulatory Approval (SRA)",
     "WHO recommendation",
     "WHO PQ listing",
     "Country registration",

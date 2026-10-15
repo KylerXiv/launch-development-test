@@ -7,7 +7,7 @@ in both, so the date line a proposal would write says so.
 
 | File | Invented values | The trial watcher should |
 |---|---|---|
-| `alaq-primary-completion.csv` | Active, not recruiting; primary completion 15 Sep 2026, **actual** | propose ALAQ · R&D & clinical, date line "Phase III FD-TACT-TEST (NCT05951595) reached primary completion on 15 Sep 2026 (ClinicalTrials.gov)" |
+| `alaq-primary-completion.csv` | Active, not recruiting; primary completion 15 Sep 2026, **actual** | propose ALAQ · R&D and Clinical, date line "Phase III FD-TACT-TEST (NCT05951595) reached primary completion on 15 Sep 2026 (ClinicalTrials.gov)" |
 | `alaq-estimate-moved.csv` | Still recruiting; primary completion **estimated** Jun 2027 | propose the date line "Phase III FD-TACT-TEST (NCT05951595): primary completion expected Jun 2027 (ClinicalTrials.gov estimate)" |
 
 With the real list, the watcher proposes nothing:
