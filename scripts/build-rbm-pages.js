@@ -53,7 +53,6 @@ const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
 const { applySkin } = require("./rbm-skin");
-const { prerenderSources, readSources } = require("./prerender-sources");
 const { LOCALES, BUILT, MANIFEST, fingerprint, manifestOf } = require("./rbm-manifest");
 
 const ROOT = path.resolve(__dirname, "..");
@@ -247,11 +246,7 @@ function main() {
   fs.rmSync(OUT, { recursive: true, force: true });
   const sources = Object.fromEntries(LOCALES.map((l) => [l, l === "en" ? path.join(ROOT, PAGE) : path.join(ROOT, "dist", "locale", l, PAGE)]));
   for (const lang of LOCALES) {
-    // the Sources list in the HTML itself, for readers that run no script; the
-    // page still redraws it from dashboard.json (scripts/prerender-sources.js)
-    const srcFile = lang === "en" ? path.join(ROOT, "data", "sources.js") : path.join(ROOT, "dist", "locale", lang, "data", "sources.js");
-    const page = prerenderSources(fs.readFileSync(sources[lang], "utf8"), readSources(srcFile));
-    const { html, removed, deferred } = transform(page, lang);
+    const { html, removed, deferred } = transform(fs.readFileSync(sources[lang], "utf8"), lang);
     fs.mkdirSync(path.join(OUT, lang), { recursive: true });
     fs.writeFileSync(path.join(OUT, lang, "index.html"), html, "utf8");
     // this language's own map files and feedback widget

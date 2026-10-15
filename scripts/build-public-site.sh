@@ -57,14 +57,6 @@ for loc in $LOCALES; do
   cp -R "dist/locale/$loc/." "$OUT/$loc/"
 done
 
-# The Sources list goes into each illustrated journey page's HTML, so it is
-# there for readers that do not run scripts (partner feedback, 15 Oct 2026).
-# The page's own renderSources() draws it, from that language's sources file.
-node scripts/prerender-sources.js "$OUT/illustrated-journey-dashboard.html" data/sources.js
-for loc in $LOCALES; do
-  node scripts/prerender-sources.js "$OUT/$loc/illustrated-journey-dashboard.html" "$OUT/$loc/data/sources.js"
-done
-
 # Switch the language menu on. assets/site-nav.js lists French, Portuguese and
 # Spanish as "coming soon" by default, because the repo served as it is (a local
 # server, GitHub Pages) has no fr/, pt/ or es/ folders to link to. This build has just
