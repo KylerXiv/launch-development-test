@@ -814,6 +814,7 @@
   .card p { margin: 0; font-size: 15px; color: var(--ink); }
   .kv { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; padding: 4px 0; border-bottom: 1px dashed var(--line); }
   .kv:last-child { border-bottom: 0; }
+  .kv.sub span:first-child { padding-left: 14px; }
   .kv span:first-child { color: var(--ink-2); }
   .kv span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
   .mtable-box { overflow-x: auto; margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
@@ -1939,6 +1940,32 @@
     if (e) return `<span class="pathexp"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></svg><b>${yrsText(e.years)}</b> expected</span>`;
     return "";
   }
+  // The Country access card. Where a medicine has a country list (the one the
+  // map is painted from), every count comes from it, so the card, the map
+  // legend and the stage 4-5 cells cannot disagree (partner feedback, 15 Oct
+  // 2026): countries on the map, split by the furthest stage each has reached,
+  // and how many of them a national medicines register confirms. A category is
+  // compared in slug form so the literal is not collected for translation (the
+  // sources' categories stay English on every page).
+  function countryAccessKv(d) {
+    const list = d.countries && Array.isArray(d.countries.list) ? d.countries.list : null;
+    if (!list) return `
+              <div class="kv"><span>Registered</span><span>${esc(d.country.registered)}</span></div>
+              <div class="kv"><span>In national guidelines</span><span>${esc(d.country.inGuidelines)}</span></div>
+              <div class="kv"><span>In MFT plans</span><span>${esc(d.country.inMft)}</span></div>`;
+    const c = { registered: 0, guidelines: 0, mft: 0 };
+    list.forEach(e => { if (e.level in c) c[e.level]++; });
+    const cat = {};
+    ((window.LAUNCH_SOURCES || {}).sources || []).forEach(s => { cat[s.id] = String(s.category || "").toLowerCase().replace(/\s+/g, "-"); });
+    const reg = list.filter(e => (e.sources || []).some(id => cat[id] === "national-register")).length;
+    return `
+              <div class="kv"><span>Countries on the map</span><span>${list.length}</span></div>
+              <div class="kv sub"><span>In MFT plans</span><span>${c.mft}</span></div>
+              <div class="kv sub"><span>In national guidelines</span><span>${c.guidelines}</span></div>
+              <div class="kv sub"><span>Registered</span><span>${c.registered}</span></div>` +
+      (Object.keys(cat).length ? `
+              <div class="kv"><span>Confirmed in national registers</span><span>${reg}</span></div>` : "");
+  }
   function miniJourney(p) {
     const done = p.stages.filter(st => st.status === "done").length;
     const dot = i => `<i class="md ${p.stages[i].status}" title="${esc(STAGES[i])}: ${LABEL[p.stages[i].status]}"></i>`;
@@ -2214,9 +2241,7 @@
             </div>
             <div class="card">
               <h3>Country access</h3>
-              <div class="kv"><span>Registered</span><span>${esc(d.country.registered)}</span></div>
-              <div class="kv"><span>In national guidelines</span><span>${esc(d.country.inGuidelines)}</span></div>
-              <div class="kv"><span>In MFT plans</span><span>${esc(d.country.inMft)}</span></div>
+              ${countryAccessKv(d)}
               <div class="kv"><span>Forecast demand</span><span>${esc(d.country.forecastDemand)}</span></div>
             </div>
             <div class="card">

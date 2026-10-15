@@ -69,6 +69,17 @@ if (!process.argv[2]) {
         if (!s) errors.push(`product ${p.id}: countries ${e.iso3} cites "${sid}", which is not in data/sources.js`);
         else if (!s.public) errors.push(`product ${p.id}: countries ${e.iso3} cites "${sid}", which is not public in data/sources.js`);
       }));
+      // The hand-kept counts in detail.country must be the list's own counts
+      // (each country once, at its furthest stage), so no view can show a
+      // headline that the country records do not support (feedback, 15 Oct 2026).
+      const country = (p.detail || {}).country;
+      if (list.length && country) {
+        const n = (lvl) => list.filter((e) => e.level === lvl).length;
+        [["registered", "registered"], ["inGuidelines", "guidelines"], ["inMft", "mft"]].forEach(([k, lvl]) => {
+          if (country[k] !== n(lvl))
+            errors.push(`product ${p.id}: detail.country.${k} is ${JSON.stringify(country[k])}, but the countries list has ${n(lvl)} at level "${lvl}"`);
+        });
+      }
     });
   }
 
