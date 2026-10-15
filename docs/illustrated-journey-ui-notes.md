@@ -2020,6 +2020,83 @@ Rejected:
 - Letting the board scroll sideways. That hides the barrier, which is the
   column people come for.
 
+### 3.42 Prototype pill, draft banner, two Subscribe sentences and the first two step labels removed (15 Oct 2026)
+
+Branch `feedback/banners-subscribe`, off `main` at `3321dca`. From the
+partners' feedback sheet of 15 Oct 2026, rows 1–5, 7 and 8. Rows 6 and 9
+(renaming the first two stages) are a separate PR; row 10 is deferred by the
+owner.
+
+| Where | Was | Now |
+| --- | --- | --- |
+| Pill after the title (`.proto-badge`) | Prototype — data presented here may not be accurate | removed, with its CSS |
+| Draft banner (`BANNERS.draft`) | ⚠ Draft figures — not yet verified. Read the disclaimer | removed: data marked draft shows no banner |
+| Subscribe box, intro | Get an email when the data on this page is updated — new milestones, corrected figures and newly verified country registrations. | Receive an email when product information is updated. |
+| Subscribe box, under "Notify me" | Your details go to the LAUNCH team and are used only to email you about updates to this page. Every email has an unsubscribe link. | the second sentence removed |
+| Under steps 1 and 2 (`pathExpHtml`) | Before the clock · Clock starts here | nothing |
+| Welcome email (`api/subscribe.js`) | We'll email you when its data is updated: new milestones, corrected figures and newly verified country registrations. | We'll email you when product information is updated. |
+
+The welcome email is not in the sheet: the owner asked for it to match the
+new Subscribe sentence.
+
+**Hide the banner; keep the data `draft`.** Rejected: setting
+`meta.dataStatus` to `live`, which would also remove the banner. About 50
+files read that field, among them the feedback form, `dashboard.json`'s
+`data_status`, Power BI and the ontology. `live` would tell RBM's file and
+every page that the figures are verified, and nobody has signed them off. The
+`illustrative` banner stays, so synthetic or mock-up data still says so.
+
+**The data contract asks for a notice.** `public-data/v1/schema.json` says of
+`data_status`: "Pages should show a notice unless live." With the pill and the
+banner gone, the footer disclaimer is the page's only notice ("Users should
+not consider the LAUNCH dashboard a complete and authoritative source…"). The
+owner accepted that on 15 Oct; the schema text is unchanged. When the figures
+are signed off, set `dataStatus` to `live`.
+
+**"Keep the display methodology section intact"** (the sheet's note on row 2)
+is read as the footer's "About the data" ("The LAUNCH dashboard displays
+publicly available information only…"). It is unchanged, and so is the
+disclaimer. The banner's "Read the disclaimer" was the only link to the
+disclaimer; it is still at the foot of the page.
+
+**Row 7 removes the whole "Before the clock" label.** The sheet says to delete
+"the label/word before the clock icon", but step 1 has no clock icon: its
+label is plain text. The `.pathexp.none` CSS is kept for the final timeline
+wording, which the sheet says is still to come from the partners.
+
+**Row 5 keeps the page's own wording** of the privacy sentence. The sheet
+quotes it loosely ("will only email you about updates on the page"). The
+emails themselves still carry the unsubscribe link and List-Unsubscribe
+headers.
+
+**Scope: this page only**, and what is built from it (`/fr`, `/pt`, `/es`,
+RBM's copies), by the owner's choice. The same pill remains on `pipeline.html`
+and `story.html`, which are on the site menu, and on `index.html`,
+`option-b.html` and their `unitaid/` and `synthetic/` copies.
+
+**No changelog line**, as in §3.37: these are wording changes to the page,
+not to the data.
+
+**Translation.** `assemble-content.js` counts 2 strings added or changed and
+7 removed or changed. `translate.yml` translates them after the merge. Until
+then the plain `node scripts/test-build-dataset.js` in CLAUDE.md's verify
+block stops early with "i18n/content.en.json is OUT OF DATE". That is
+expected on any PR that changes page text; run as CI runs it
+(`--allow-stale`), it passes.
+
+**Checked:** the verify block gave 0 errors, 1 warning; 0 / 0; preview built;
+`test-build-dataset.js --allow-stale` 30 / 0; country names cover all 252.
+Also `test-source-watchers.js` 61 / 0, `build-locale-pages.js` all checks
+passed, `test-build-rbm-pages.js` 33 / 0, `test-copy-rbm-pages.js` 20 / 0,
+`test-rbm-release.js` 17 / 0, `test-notify-subscribers.js` 67 / 0,
+`test-mail-api.js` 194 / 0. In WebKit at 1440px and as an iPhone 13: no page
+errors, no pill, the banner hidden, no `.pathexp.none` left, and the
+Subscribe box reads the new text.
+
+**After merge:** `translate.yml` runs, then `release-rbm-pages.yml` makes the
+next `rbm-v` release. The robot in `launch-rbm-test` applies it within a day;
+run it by hand to apply it at once.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
