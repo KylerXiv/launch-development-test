@@ -21,16 +21,16 @@ rm -rf "$OUT"
 mkdir -p "$OUT/data" "$OUT/assets/journey-icons" "$OUT/unitaid/assets" "$OUT/synthetic"
 
 # Root pages
-cp index.html explainer.html option-b.html pipeline.html story.html \
+cp index.html explainer.html option-b.html pipeline.html \
    widget.html illustrated-journey-dashboard.html feed.xml "$OUT/"
 
 # unitaid/ edition
-cp unitaid/index.html unitaid/option-b.html unitaid/pipeline.html unitaid/story.html "$OUT/unitaid/"
+cp unitaid/index.html unitaid/option-b.html unitaid/pipeline.html "$OUT/unitaid/"
 cp unitaid/assets/unitaid-logo.svg "$OUT/unitaid/assets/"
 
 # synthetic/ edition
 cp synthetic/index.html synthetic/option-b.html synthetic/pipeline.html \
-   synthetic/story.html synthetic/widget.html "$OUT/synthetic/"
+   synthetic/widget.html "$OUT/synthetic/"
 
 # Shared data
 cp data/products.js data/products.synthetic.js data/world-map.js \
