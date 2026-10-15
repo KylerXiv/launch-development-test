@@ -2207,6 +2207,70 @@ Google key (§3.42 and source-proposals-notes.md: "API Key not found" since
 13 Oct). Until then the new text is in English on `/fr`, `/pt` and `/es`. No
 RBM release is made either, and "Publish now" also waits.
 
+### 3.44 GanLum's status, the glossary, and procurement figures by presentation (15 Oct 2026)
+
+Branch `feedback/ganlum-glossary-procurement`, off `main` at `edcb5d0`. From
+the partners' "Oct 15 Feedback Emails" rows 50–58. Done here: rows 50 and
+52–56. Not done: row 51 (claims audit; research is in progress, for review
+first), row 57 (needs Jan's statement) and row 58 (needs Unitaid's brand
+guide). The owner said to "do what you can" on 15 Oct, after reading the
+drafts below.
+
+**Row 50, GanLum: a status change, not only wording.**
+- **Status.** Stringent Regulatory Approval (SRA) moves from `prog` to `idle`,
+  and the medicines table shows "Not started · Regulatory submission in
+  preparation" (from the stage's `date`). There is no "in preparation"
+  status. Adding one was rejected, because the status enum (`done`, `prog`,
+  `late`, `idle`) is part of RBM's data contract (`public-data/v1/schema.json`).
+- **Public record.** Novartis said in Nov 2025 that it would seek approval,
+  first through Swissmedic, and expected availability in 12–18 months.
+  Searching on 15 Oct 2026 found no announced filing or decision, so
+  "in preparation" matches it. `asOf` is 2026-10-15.
+- **Use case.** Now "Non-artemisinin combination in late-stage development.
+  Novartis positions it for settings with artemisinin partial resistance and
+  for MFT strategies." Removed: "kills resistant parasites and blocks
+  transmission" and the "first major innovation… (Novartis)" quote. The access
+  line loses "— no separate paediatric development needed".
+- **Barrier.** "No barrier recorded" was the page default for every medicine
+  without a barrier. It now reads "No publicly documented barrier
+  identified", for ALAQ as well as GanLum. A GanLum-only wording would have
+  needed a special case. A `barrier` text would also have been drawn as a real
+  barrier. The entry in `i18n/reviewed-strings.json` that names this text
+  moved with it; `assemble-content.js` refuses to run when an entry no longer
+  matches the code.
+
+**Rows 54–56, glossary** (`data/products.js` `glossary`):
+- **MFT:** the sheet's definition.
+- **EU-M4all:** replaces the `Article 58` key: "EU-Medicines for all,
+  formerly the Article 58 procedure — …". Step 2's explanation now says
+  "EMA's EU-M4all procedure (formerly Article 58)". ASPY's 2012 milestone keeps
+  "Article 58", the procedure's name at the time.
+- **SRA:** called the older term that WHO is replacing with WHO-Listed
+  Authorities. Source: WHO's WLA Q&A; existing SRAs are treated as WHO-listed
+  during the transition. The step keeps the name "Stringent Regulatory
+  Approval (SRA)", as the earlier sheet asked (§ source-proposals-notes.md).
+- **PQ:** the sheet's "supports eligibility under the QA and procurement
+  policies of UN agencies and major funders; specific policies and exceptions
+  may differ", with QA spelled out. Step 4's explanation, written that morning
+  (§3.43, row 18) as "allows UN agencies and the Global Fund to purchase", now
+  uses the same hedge, so the two do not disagree.
+- **AMA:** "the African Union's continental medicines agency, based in
+  Kigali, set up to harmonise regulation across the member states that have
+  ratified its treaty and to evaluate selected priority products. National
+  regulators still grant marketing authorisation." Checked against a
+  July 2026 interview with its Director General (33 of 55 states ratified)
+  and earlier reports. Its start date is reported as either late 2024 or
+  October 2025, so no date is given.
+- **GMP:** nothing to do. "GMP" means Good Manufacturing Practice everywhere
+  on the page. The Global Malaria Programme was always written out, and #110
+  replaced it.
+
+**Changelog: two entries dated 2026-10-15,** one for GanLum and one for the
+glossary (the procurement change is added to the second). The plan the
+owner approved ("do what you can") said these would go out in one
+subscriber email. `history-continues.js`
+accepts them as "a later change on 2026-10-15".
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
