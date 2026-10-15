@@ -170,7 +170,7 @@
   <header>
     <div class="brand">
       <h1><span>LAUNCH</span> Pipeline Poster <span class="proto-badge">Prototype — data presented here may not be accurate</span></h1>
-      <p>Every tracked product placed at its current development phase — the portfolio at a glance, MMV-poster style. Select a product for its full journey.</p>
+      <p>Every tracked product placed at its current development phase.</p>
     </div>
     <div class="meta">
       <b>To be hosted by the RBM Partnership to End Malaria</b><br>
@@ -189,9 +189,7 @@
   <footer>
     <b>About the data.</b> The LAUNCH dashboard displays publicly available information only. Product-specific details
     appear solely where the manufacturer has confirmed in writing that they may be shared.
-    Hover a card for the use case and next milestone; select it to open the full profile on the journey board.<br>
-    <b>Format.</b> Layout follows the convention of MMV's antimalarial pipeline poster (phase columns, categorised
-    project cards); content is LAUNCH's own tracked portfolio. A LAUNCH initiative of Unitaid partners.
+    Hover a card for the use case and next milestone; select it to open the full profile on the journey board.
       <br><b>Spotted an error?</b> <a class="report-link" href="#report-issue" data-report-issue>Report an issue or contact the LAUNCH team</a> — corrections from country teams, manufacturers and partners are welcome.
   </footer>
 </div>
@@ -219,8 +217,7 @@
     dt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
   const status = DATA.meta.dataStatus;
   const BANNERS = {
-    illustrative: "<b>Design mockup.</b> All statuses, dates, prices and volumes below are illustrative placeholders for layout review — not real programme data.",
-    draft: "<b>Draft data.</b> Compiled from public sources and pending LAUNCH team verification and manufacturer written confirmation. Unverified values are shown as TBC, never estimated."
+    illustrative: "<b>Design mockup.</b> All statuses, dates, prices and volumes below are illustrative placeholders for layout review — not real programme data."
   };
   if (BANNERS[status]) { banner.hidden = false; banner.innerHTML = BANNERS[status]; }
   document.getElementById("meta-note").textContent =
