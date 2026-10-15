@@ -2097,6 +2097,116 @@ Subscribe box reads the new text.
 next `rbm-v` release. The robot in `launch-rbm-test` applies it within a day;
 run it by hand to apply it at once.
 
+### 3.43 Step explanations, the disclaimer, "About the data", a map line and the feedback intro reworded (15 Oct 2026)
+
+Branch `feedback/popup-and-page-wording`, off `main` at `7337456`. From the
+partners' feedback sheet, rows 16–26. Row 16 is the row 10 that was cut off
+in the first screenshot (§3.42).
+
+**Applied as the sheet words them:**
+- WHO recommendation, what happens: "A WHO expert group weighs clinical
+  evidence and decides whether the medicine is included in WHO guidelines for
+  malaria." The sentence on countries writing their own guidelines is
+  deleted (row 16).
+- Country registration: "are meant to" became "are intended to" (row 19).
+- National policy adoption: "Ministries of Health include the medicine in
+  national treatment guidelines." The middle sentence is kept, and "A WHO
+  recommendation does not automatically become national policy." is deleted
+  (row 20).
+- Map, *P. vivax* line: "Listed as treatment in national policy" (row 23).
+- Disclaimer: "In particular," is deleted. The last sentence now ends "may
+  require information that is not in this dashboard." (row 24). Its first ask,
+  manufacturer confirmation in writing, was already in the first paragraph.
+- Feedback dialog intro, this page only, through `LAUNCH_FEEDBACK_COPY.intro`:
+  "Does something look wrong or out of date? Tell us what you are seeing."
+  (row 26). A final full stop was added. The widget's own intro stays on the
+  other pages.
+
+**Drafted, because the sheet gives the intent but not the words; approved by
+the owner on 15 Oct:**
+- WHO PQ listing, row 18: the first sentence is kept, then "Prequalification
+  allows UN agencies and the Global Fund to purchase the medicine.
+  Manufacturers are invited to apply through a WHO Expression of Interest
+  (EOI)."
+- Procurement, row 21. What happens now starts "Public funders, such as the
+  Global Fund, other donors and national governments, run tenders…", and
+  "Someone has to pay." is dropped. It also ends "Private commercial channels
+  are not included." Who decides is "The Global Fund, other donors, UNICEF and
+  national governments". The source is "Global Fund price and quality
+  reporting", without PMI.
+- In-country delivery, row 22: "Supply from port to health facility,
+  health-worker training, and pharmacovigilance once the medicine is in use."
+- About the data, row 25: "Health authority reviews may take place at any
+  stage of development, and their status is generally not public, so…"
+
+**WHO's department name (row 17) follows WHO, not the sheet.** The sheet
+asks for "WHO Department of Control of Neglected Tropical Diseases and
+Malaria". WHO's own pages name the department formed in 2025 from the Global
+Malaria Programme and the NTD programme "Malaria and Neglected Tropical
+Diseases Department (MNT)". Two examples: the STAG-NTD meeting page (April
+2026) and the call for experts for the vector-control GDG (22 May 2026). The
+sheet's name appears in no WHO source found; it looks like the old NTD
+department's name with malaria added. WHO's term "Guidelines Development
+Group" is also kept over the sheet's "guidelines expert review group". Who
+decides now reads "WHO Malaria and Neglected Tropical Diseases Department and
+its Guidelines Development Group". The owner agreed; Unitaid is to be told
+why.
+
+**Readings of ambiguous rows (owner's choices):**
+- Row 23's phrase is on the *P. vivax* line (`#7A4B00`, dotted). The sheet's
+  note says "orange, first-line", which fits the *P. falciparum* line
+  (`#D55E00`, solid), but that line's text is "First-line for confirmed
+  (tested) cases in national policy" and has no such phrase. Changed: the
+  *P. vivax* line.
+- Row 19's "trailing punctuation across decision bullet points" is read as
+  the "Who decides" line on all eight steps. They lose their final full stop,
+  as "Source" lines have none. "Why it can stall" is unchanged.
+  "Ministries of health" becomes "Ministries of Health", to match row 20.
+- Row 25's hyphen ("Health-authority") was also in step 2's explanation, and
+  is fixed there too.
+- PMI is removed from the procurement explanation only. Still there, on
+  purpose: PMI's entry in the Sources list (`data/sources.js`), the glossary
+  entry `PMI`, and the procurement source lines of ASPY and DHA–PPQ ("US PMI
+  data unavailable post-2025"). Those are provenance notes, not scope.
+
+**A changelog line, because of the date.** The step explanations are in
+`data/products.js`, so the data changed. `meta.lastUpdated` was already
+2026-10-15, set by #109 that morning. `publish.yml` accepts a second change
+on the same day only when that day's changelog entries change
+(`history-continues.js`). Without a new entry it would refuse, as it did
+after #108. Every new entry is emailed to subscribers, `plain` or not
+(`notify-subscribers.js` falls back to `change`). So the only way to avoid an
+email was to merge on a later day with a new date. This PR adds one line,
+dated 2026-10-15, covering this PR and #108's renames. It is put to the owner
+in the PR. If they would rather send no email, drop the line and set
+`lastUpdated` to the day of the merge.
+Its `plain` text: "We reworded the explanations of the steps on the pathway
+after partner feedback, and renamed the first two steps "R&D and Clinical"
+and "Stringent Regulatory Approval (SRA)". No dates, statuses or figures
+changed." A dry run of `notify-subscribers.js --since 7337456` produces one
+email with that line and sends nothing.
+`history-continues.js` against `history/products-2026-10-15.js` answers "a
+later change on 2026-10-15 (1 changelog entry added)".
+
+**Checked:** the verify block gave the treatment policy byte-identical;
+0 errors, 1 warning; 0 / 0; preview built; `test-build-dataset.js
+--allow-stale` 30 / 0; country names cover all 252. Also `test-source-watchers.js`
+62 / 0, `proposal-lib.js selftest` 58 / 0, `test-import.js` 128 / 0,
+`test-dataset-diff.js` 11 / 0, `test-serializer.js` 0 failures,
+`build-locale-pages.js` all passed, `test-build-rbm-pages.js` 33 / 0,
+`test-copy-rbm-pages.js` 20 / 0, `test-rbm-release.js` 17 / 0,
+`test-mail-api.js` 194 / 0, `test-notify-subscribers.js` 67 / 0. In WebKit
+at 1440px: no page errors, "Last updated 15 Oct 2026", and the panels for
+steps 3–8, the disclaimer, About the data and the feedback dialog read back
+the new text, with no "Listed for treatment" left. `build-rbm-pages.js`
+still finds the one `LAUNCH_FEEDBACK_COPY` block and turns `connected` off.
+
+**After merge:** `publish.yml` replaces today's snapshot, and the subscriber
+email goes out at the next scheduled send. Translation waits for a valid
+Google key (§3.42 and source-proposals-notes.md: "API Key not found" since
+13 Oct). Until then the new text is in English on `/fr`, `/pt` and `/es`. No
+RBM release is made either, and "Publish now" also waits.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
