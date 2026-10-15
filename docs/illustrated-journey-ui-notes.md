@@ -2207,6 +2207,194 @@ Google key (§3.42 and source-proposals-notes.md: "API Key not found" since
 13 Oct). Until then the new text is in English on `/fr`, `/pt` and `/es`. No
 RBM release is made either, and "Publish now" also waits.
 
+### 3.44 GanLum's status, the glossary, and procurement figures by presentation (15 Oct 2026)
+
+Branch `feedback/ganlum-glossary-procurement`, off `main` at `edcb5d0`. From
+the partners' "Oct 15 Feedback Emails" rows 50–58. Done here: rows 50 and
+52–56, and row 51 (the claims audit, `docs/claims-audit-2026-10.md`). Row 51
+was added at the owner's request so the team can compare this PR's preview
+with the live site, and the PR is not to be merged yet. Not done: row 57
+(needs Jan's statement) and row 58 (needs Unitaid's brand guide). The owner
+said to "do what you can" on 15 Oct, after reading the drafts below.
+
+**Row 50, GanLum: a status change, not only wording.**
+- **Status.** Stringent Regulatory Approval (SRA) moves from `prog` to `idle`,
+  and the medicines table shows "Not started · Regulatory submission in
+  preparation" (from the stage's `date`). There is no "in preparation"
+  status. Adding one was rejected, because the status enum (`done`, `prog`,
+  `late`, `idle`) is part of RBM's data contract (`public-data/v1/schema.json`).
+- **Public record.** Novartis said in Nov 2025 that it would seek approval,
+  first through Swissmedic, and expected availability in 12–18 months.
+  Searching on 15 Oct 2026 found no announced filing or decision, so
+  "in preparation" matches it. `asOf` is 2026-10-15.
+- **Use case.** Now "Non-artemisinin combination in late-stage development.
+  Novartis presents it as having the potential to combat antimalarial drug
+  resistance; LAUNCH tracks it as a candidate for settings with artemisinin
+  partial resistance and for multiple first-line therapy (MFT) strategies."
+  Removed: "kills resistant parasites and blocks transmission" and the "first
+  major innovation… (Novartis)" quote, which dropped Novartis's own "if
+  approved". The access line loses "— no separate paediatric development
+  needed".
+  - **Corrected the same day.** The first version, the draft the owner
+    approved, said "Novartis positions it … for MFT strategies". The row 51
+    research found no MFT in Novartis's or MMV's material, and a re-read of
+    Novartis's 12 Nov 2025 release confirmed it on 15 Oct. The release does
+    say "potential to combat antimalarial resistance", "highly effective
+    against mutant malaria parasites associated with partial drug
+    resistance", and "potential to … block transmission". MFT is LAUNCH's
+    framing, so it is attributed to LAUNCH.
+  - **Row 51, the claims audit.** It is in `docs/claims-audit-2026-10.md`:
+    about 40 claims across the four medicines, each categorised, sourced and
+    given proposed wording. Its proposals are applied below ("Row 51,
+    applied").
+- **Barrier.** "No barrier recorded" was the page default for every medicine
+  without a barrier. It now reads "No publicly documented barrier
+  identified", for ALAQ as well as GanLum. A GanLum-only wording would have
+  needed a special case. A `barrier` text would also have been drawn as a real
+  barrier. The entry in `i18n/reviewed-strings.json` that names this text
+  moved with it; `assemble-content.js` refuses to run when an entry no longer
+  matches the code.
+
+**Rows 54–56, glossary** (`data/products.js` `glossary`):
+- **MFT:** the sheet's definition.
+- **EU-M4all:** replaces the `Article 58` key: "EU-Medicines for all,
+  formerly the Article 58 procedure — …". Step 2's explanation now says
+  "EMA's EU-M4all procedure (formerly Article 58)". ASPY's 2012 milestone keeps
+  "Article 58", the procedure's name at the time.
+- **SRA:** called the older term that WHO is replacing with WHO-Listed
+  Authorities. Source: WHO's WLA Q&A; existing SRAs are treated as WHO-listed
+  during the transition. The step keeps the name "Stringent Regulatory
+  Approval (SRA)", as the earlier sheet asked (§ source-proposals-notes.md).
+- **PQ:** the sheet's "supports eligibility under the QA and procurement
+  policies of UN agencies and major funders; specific policies and exceptions
+  may differ", with QA spelled out. Step 4's explanation, written that morning
+  (§3.43, row 18) as "allows UN agencies and the Global Fund to purchase", now
+  uses the same hedge, so the two do not disagree.
+- **AMA:** "the African Union's continental medicines agency, based in
+  Kigali, set up to harmonise regulation across the member states that have
+  ratified its treaty and to evaluate selected priority products. National
+  regulators still grant marketing authorisation." Checked against a
+  July 2026 interview with its Director General (33 of 55 states ratified)
+  and earlier reports. Its start date is reported as either late 2024 or
+  October 2025, so no date is given.
+- **GMP:** nothing to do. "GMP" means Good Manufacturing Practice everywhere
+  on the page. The Global Malaria Programme was always written out, and #110
+  replaced it.
+
+**Rows 52–53, procurement: what the reviewer saw is real.** The card was
+headed "Treatments procured through public channels" but counted packs. For
+DHA–PPQ, "11,493,039 packs" added 12 kinds of pack as one each: a blister of
+3 tablets, and a box of 25 blisters of 9 (225 tablets). ASPY's packs hold 90
+tablets or 90 sachets.
+- **New script, `scripts/build-procurement-summary.js`.** It reads the PQR
+  extract (`sourcing/staging/procurement_transactions.csv`, 12,151 rows) and
+  writes each product's `detail.volume`:
+  - `total` is now transactions and value: "68 transactions · US$14.5m
+    (2018–2025)" and "234 transactions · US$41.5m (2008–2026)".
+  - `period` keeps the 2025 value and the top three buyers by value.
+  - `byPresentation` holds, per pack, the label, transactions, packs and
+    courses.
+  - `coursesRule` says how courses were counted.
+  The totals reproduce the old ones exactly (940,111 and 11,493,039 packs;
+  US$14,519,230 and US$41,491,395; the same 2025 values and buyers), so only
+  the way they are shown changed. `--check` exits 1 when `data/products.js`
+  no longer matches the extract. A presentation missing from its `LABELS`
+  table stops the script, so a person names every new pack.
+- **"Transactions" means PQR rows** (68 and 234). These are the "orders" the
+  old text counted. One purchase order can have several rows: there are 45
+  and 97 distinct purchase-order numbers.
+- **The course rule comes from the extract itself, not from a dosing
+  assumption.** Global Fund product names give the tablets in one course after
+  a dash: artemether–lumefantrine's adult course is "20mg+120mg - 24" in the
+  same file, and DHA–PPQ's largest is "40mg+320mg - 9". So courses = packs ×
+  (tablets per pack ÷ tablets per course).
+  - **No estimate (null)** where the name has no dash, or the pack does not
+    divide evenly. That covers the three "40mg+320mg | dispers tab" packs,
+    and "40mg+320mg - 3" in a "Blister-8", which is inconsistent in the
+    extract.
+  - **DHA–PPQ:** 24,223,797 courses from 8,114,772 of 11,493,039 packs.
+  - **ASPY:** none, because its names state no course and its courses depend
+    on body weight.
+  - **Rejected:** one course per pack (wrong for boxes of 25 blisters), and
+    weight-band dosing ranges (a 90-tablet ASPY pack is 7.5 to 30 courses).
+- **The page.** The card is headed "Procurement through public channels"
+  (also its `i18n/reviewed-strings.json` entry). Its table lists Presentation,
+  Transactions, Packs and Treatment courses (est.), with "not estimated" where
+  null, and the rule under it. With a table, the card spans the whole row
+  (`.card-wide`); at ~300px wide it cut off two columns. On phones each
+  presentation is a block, its name and then three labelled figures. The
+  table borrows `.ystable`'s look, but that table's phone rule hides columns
+  2–3 (Expected and Actual), which here are Transactions and Packs, so it is
+  overridden.
+- **Row 53.** A single 100% channel from the PQR is now the sheet's sentence,
+  "100% of transactions in the dataset shown are from Global Fund PQR; this is
+  not the product's total global procurement.", instead of a full-width bar.
+  `split` stays in the data, because the validator requires it and RBM's file
+  carries it. More than one channel would draw the bar as before.
+- **Translation and RBM.** The new text fields (`byPresentation[].label`,
+  `coursesRule`) were added to the three lists that carry data text:
+  `assemble-content.js`, `build-locale-pages.js` and `build-dataset.js`'s
+  `TEXT_PATHS`. A built `dashboard.json` has them in all four languages,
+  English until the bot runs. The validator now checks `byPresentation`:
+  labels, whole numbers, courses a number or null, and a `coursesRule`. Each
+  of three deliberate breaks was refused.
+- **Checked in WebKit,** at 1440px and as an iPhone 13: no page errors, and
+  DHA–PPQ's 12 rows and ASPY's 2 rows fit with no sideways scroll. GanLum's row
+  reads "Not started · Regulatory submission in preparation · No publicly
+  documented barrier identified", and the glossary lists EU-M4all.
+
+**Row 51, applied.** On 15 Oct the owner asked: "change everything into
+#111", and do not merge yet. 32 field edits went in through a one-off script.
+Each one checked the exact text it replaced, so a stale expectation would
+have stopped the run.
+- **What changed, in the cards.** Every line of `docs/claims-audit-2026-10.md`
+  whose action is reword or remove now uses the proposed wording, for all
+  four medicines (Target use case, Access & supply commitments, Adoption
+  requirements, Operational research). The same goes for GanLum's R&D step
+  note: comparator 94.0%, "company-reported; not yet peer-reviewed".
+- **Fixed for consistency, beyond the audit's table.** The same wrong facts
+  were repeated in other fields:
+  - ALAQ's `manufacturer` ("MORU / DeTACT partnership"), its R&D step note
+    ("successor to the DeTACT programme", "child-friendly"), and its research
+    lead and geographies. These now name FD-TACT and the sites GHIT lists.
+  - ASPY's SRA step note and the "Label update — pregnancy" milestone source:
+    the pregnancy wording, EMA's 5 Jun and 6 Aug 2025 dates, and MMV's news
+    item of 20 Aug 2025, not 31 Jul.
+  - ASPY's national policy step and the "National guideline inclusion"
+    milestone. "Ghana only" became the verified list's 11 countries. The
+    step's `date` puts "11 countries by Oct 2026" first, because the table
+    shows its first clause. This step is `late`, so `stageYear` ignores it
+    and the yardstick does not move.
+  - DHA–PPQ's WHO PQ step note: "real supply security" dropped, requalified
+    on 8 and 20 Jan 2025, and the single-source finding added.
+  - Two procurement step notes and ASPY's procurement milestone that still
+    gave pack totals now give transactions (the row 52 rule).
+- **Not applied, on purpose.**
+  - Category labels on the cards: the owner's decision is still open. The
+    wording carries the attribution ("Novartis presents…", "LAUNCH
+    assessment"), and the two barrier texts stay as they were until then.
+  - ASPY's Tanzania registration year (2017 or 2022): to be confirmed by a
+    person.
+  - ALAQ's SRA step source, "DeTACT partnership statements", behind the
+    "approval by ~2027" target: the audit did not check it.
+- **A third changelog line** dated 2026-10-15 says what was corrected, in
+  plain words.
+- **Checked:** the verify block gave 0 errors, 1 warning; 0 / 0; preview
+  built; `test-build-dataset.js --allow-stale` 30 / 0; country names cover
+  all 252. Also `build-procurement-summary.js --check` matches,
+  `test-source-watchers.js` 62 / 0 (it reads ALAQ's trial note),
+  `proposal-lib.js selftest` 58 / 0, `test-import.js` 128 / 0, and the rest
+  as above. In WebKit: no page errors, ASPY's row reads "11 countries by
+  Oct 2026" with its yardstick unchanged, and the ALAQ and DHA–PPQ access
+  cards show the new text.
+
+**Changelog: three entries dated 2026-10-15:** GanLum; the glossary and
+procurement; and the row 51 corrections. The plan the owner approved ("do
+what you can") said these would go out in one subscriber email.
+`history-continues.js` accepts them as "a later change on 2026-10-15". If
+the PR is merged on a later day, move the three entries and
+`meta.lastUpdated` to that day.
+
 ## 4. Newly discovered, deferred, or left alone
 
 ### Deferred with the fork rework (10 Sep 2026)
