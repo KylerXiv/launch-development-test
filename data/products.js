@@ -103,6 +103,7 @@ window.LAUNCH_DATA =
     "GMP": "Good Manufacturing Practice — quality standard verified by inspection of manufacturing sites."
   },
   "changelog": [
+    { "date": "2026-10-15", "product": "All", "change": "Medicine cards: every claim checked against its source (partner feedback, row 51; docs/claims-audit-2026-10.md). GanLum: the Phase III result gives its comparator (97.4% vs 94.0% for Coartem) and says it is company-reported, not yet peer-reviewed; access, adoption and research lines reworded. ALAQ: marked investigational; the partnership is FD-TACT (GHIT Fund, with MMV and Marubeni), not DeTACT; \"child-friendly\" removed. ASPY: the 2025 pregnancy label change stated as it is (2nd and 3rd trimesters when the benefit outweighs the risk); liver-disease contraindication added; national guideline inclusion matches the verified country list (11 countries), not \"Ghana only\". DHA–PPQ: \"No single-source dependency\" and \"Established API supply chains\" removed (WHO PQ records list one dihydroartemisinin source for 8 of 9 presentations); ECG and chemoprevention lines corrected. Procurement step notes and an ASPY milestone give transactions instead of pack totals.", "plain": "We checked every claim on the medicine pages against its source. Claims that no published result supports were removed or reworded, and some statements were corrected: ASPY is in national guidelines or MFT plans in 11 countries, not only Ghana; most DHA–PPQ presentations rely on a single supplier of the main ingredient; and the ALAQ development partnership is now named correctly." },
     { "date": "2026-10-15", "product": "GanLum", "change": "Stringent Regulatory Approval (SRA) stage: status changed from In progress to Not started, shown with the line \"Regulatory submission in preparation\" (partner feedback, 15 Oct 2026). Novartis said in Nov 2025 that it would seek approval, first through Swissmedic; no filing had been announced as of 15 Oct 2026. Use case reworded to \"Non-artemisinin combination in late-stage development. Novartis presents it as having the potential to combat antimalarial drug resistance; LAUNCH tracks it as a candidate for settings with artemisinin partial resistance and for multiple first-line therapy (MFT) strategies.\", which removes the unattributed claims \"kills resistant parasites and blocks transmission\" and the \"first major innovation\" quote; \"no separate paediatric development needed\" removed from access.", "plain": "The regulatory approval step now reads \"Not started\": a submission is being prepared, but none has been announced. We also removed some claims that were not attributed to a source." },
     { "date": "2026-10-15", "product": "All", "change": "Glossary, from partner feedback (15 Oct 2026): MFT, SRA, PQ and AMA definitions updated; \"Article 58\" is now listed as EU-M4all, formerly the Article 58 procedure. The SRA and WHO PQ step explanations follow (EU-M4all; prequalification supports eligibility under the quality assurance and procurement policies of UN agencies and major funders). Medicines without a recorded barrier now read \"No publicly documented barrier identified\". Procurement (ASPY, DHA–PPQ): the headline is now transactions and value (68 transactions · US$14.5m; 234 transactions · US$41.5m) instead of a packs total that added packs of 3 to 225 tablets as one each; packs are listed by presentation, with treatment courses estimated only where the Global Fund's product name states the tablets per course (DHA–PPQ: 24,223,797 courses from 8,114,772 of 11,493,039 packs; ASPY: not estimated). The \"Global Fund 100%\" bar is replaced by a sentence saying the figures are Global Fund PQR transactions only, not total global procurement. No figure in the PQR extract changed.", "plain": "We updated several definitions in the glossary, including multiple first-line therapies (MFT) and WHO prequalification, to match current WHO and EMA terminology. Procurement is now shown as transactions and value, with packs listed by presentation and treatment courses only where they can be counted; the figures cover Global Fund-recorded purchases only." },
     { "date": "2026-10-15", "product": "All", "change": "Illustrated journey dashboard, wording from partner feedback (15 Oct 2026). The first two steps are renamed \"R&D and Clinical\" (was \"R&D & clinical\") and \"Stringent Regulatory Approval (SRA)\" (was \"Regulatory approval (SRA)\"). Step explanations reworded: WHO recommendation (shorter; decided by the WHO Malaria and Neglected Tropical Diseases Department, which the Global Malaria Programme merged into in 2025, and its Guidelines Development Group); WHO PQ listing; country registration; national policy adoption (Ministries of Health); procurement (public funders: the Global Fund, other donors and national governments; private commercial channels excluded; PMI no longer named); in-country delivery (pharmacovigilance). \"Who decides\" lines lose their final full stop. No status, date or figure changed.", "plain": "We reworded the explanations of the steps on the pathway after partner feedback, and renamed the first two steps \"R&D and Clinical\" and \"Stringent Regulatory Approval (SRA)\". No dates, statuses or figures changed." },
@@ -145,7 +146,7 @@ window.LAUNCH_DATA =
       "currentStage": 1,
       "flag": null,
       "stages": [
-        { "status": "done", "note": "Phase III (KALUMA, NCT05842954) met primary endpoint: 97.4% PCR-corrected cure rate; registry records 1,720 participants and trial completion 25 Nov 2025 (34 sites, 12 African countries)", "date": "Announced 12 Nov 2025; trial completed 25 Nov 2025", "next": "", "nextDate": "", "source": "Novartis / MMV press releases, 12 Nov 2025; ClinicalTrials.gov NCT05842954", "asOf": "2026-08-22" },
+        { "status": "done", "note": "Met its Phase III primary endpoint in KALUMA (NCT05842954): 97.4% PCR-corrected cure at Day 29 vs 94.0% for artemether–lumefantrine (Coartem), in adults and children ≥10 kg. Company-reported; not yet peer-reviewed. Registry: 1,720 participants, 12 African countries, completed 25 Nov 2025.", "date": "Announced 12 Nov 2025; trial completed 25 Nov 2025", "next": "", "nextDate": "", "source": "Novartis / MMV press releases, 12 Nov 2025; ClinicalTrials.gov NCT05842954", "asOf": "2026-08-22" },
         { "status": "idle", "note": "Regulatory submission in preparation following Phase III success; no filing announced as of 15 Oct 2026", "date": "Regulatory submission in preparation", "next": "Dossier submission (SRA pathway)", "nextDate": "TBC", "source": "Novartis announcement, Nov 2025", "asOf": "2026-10-15" },
         { "status": "idle", "note": "Not started", "date": "", "next": "GDG engagement expected alongside regulatory review", "nextDate": "" },
         { "status": "idle", "note": "Not on the WHO PQ EOI list yet (24th malaria EOI, 27 Feb 2026, checked)", "date": "", "next": "", "nextDate": "", "source": "WHO PQ EOI list (24th edition)", "asOf": "2026-08-22" },
@@ -158,14 +159,14 @@ window.LAUNCH_DATA =
         "price": { "value": "TBC", "note": "Pricing not yet public — will be shown once confirmed by manufacturer", "source": "", "confirmedInWriting": false, "asOf": "2026-08-14" },
         "useCase": "Non-artemisinin combination in late-stage development. Novartis presents it as having the potential to combat antimalarial drug resistance; LAUNCH tracks it as a candidate for settings with artemisinin partial resistance and for multiple first-line therapy (MFT) strategies.",
         "access": [
-          "Access and affordability provisions under discussion",
-          "Once-daily, 3-day granule sachet"
+          "Price not public. MMV has said it will be supplied on a \"largely not-for-profit\" basis in low- and middle-income countries (reported Nov 2025).",
+          "In Phase III: granules in a sachet, once daily for 3 days with a light meal, for adults and children ≥10 kg. Final product presentation subject to approval."
         ],
         "adoption": [
-          "New chemical class — pharmacovigilance planning required",
+          "New chemical class (imidazolopiperazine). Safety monitoring after approval will need planning (LAUNCH assessment).",
           "Health-worker training on new regimen"
         ],
-        "research": { "lead": "Novartis", "geographies": "12 African countries (KALUMA trial sites)", "timeline": "Phase III complete Nov 2025", "question": "Efficacy against resistant parasites and transmission blocking" },
+        "research": { "lead": "Novartis", "geographies": "12 African countries (KALUMA trial sites)", "timeline": "Phase III complete Nov 2025", "question": "Does it cure infections carrying artemisinin partial-resistance (kelch13) mutations as well as other infections? (KALUMA subgroup not yet published.) Does faster gametocyte clearance reduce infection of mosquitoes? (Not yet measured.)" },
         "country": { "registered": 0, "inGuidelines": 0, "inMft": 0, "forecastDemand": "—" },
         "volume": null,
         "volumeNote": "Pre-launch — no procurement yet",
@@ -181,14 +182,14 @@ window.LAUNCH_DATA =
       "id": "alaq",
       "name": "ALAQ",
       "inn": "Artemether–lumefantrine–amodiaquine (triple ACT)",
-      "manufacturer": "Fosun Pharma · MORU / DeTACT partnership",
+      "manufacturer": "Fosun Pharma · MORU (FD-TACT)",
       "class": "pipeline",
       "classLabel": "Pipeline · triple ACT",
       "phase": "phase3",
       "currentStage": 0,
       "flag": null,
       "stages": [
-        { "status": "prog", "note": "Co-formulated fixed-dose triple ACT in pivotal Phase III (FD-TACT, successor to the DeTACT programme; first patient Sep 2025); dose-optimization published 2025; child-friendly dispersible formulation", "date": "Phase III targeted completion 2025–26", "next": "Phase III results, then dossier preparation", "nextDate": "TBC", "source": "MORU / FD-TACT; Clin Pharmacol Ther 2025; WHO PADO malaria, Jun 2025", "asOf": "2026-08-23" },
+        { "status": "prog", "note": "Co-formulated fixed-dose triple ACT in pivotal Phase III (FD-TACT, NCT05951595; started 11 Sep 2025); dose optimisation published 2025; paediatric dispersible tablet in the trial", "date": "Phase III targeted completion 2025–26", "next": "Phase III results, then dossier preparation", "nextDate": "TBC", "source": "MORU / FD-TACT; Clin Pharmacol Ther 2025; WHO PADO malaria, Jun 2025", "asOf": "2026-08-23" },
         { "status": "idle", "note": "Not started", "date": "", "next": "SRA/WLA submission — partnership targets approval by ~2027", "nextDate": "~2027", "source": "DeTACT partnership statements" },
         { "status": "idle", "note": "Not started", "date": "", "next": "", "nextDate": "" },
         { "status": "idle", "note": "Not yet included in WHO PQ Expression of Interest list (24th malaria EOI, 27 Feb 2026, checked)", "date": "", "next": "PQ targeted by ~2027 per partnership", "nextDate": "~2027", "source": "WHO PADO malaria, Jun 2025; WHO PQ EOI list (24th edition)", "asOf": "2026-08-22" },
@@ -199,17 +200,17 @@ window.LAUNCH_DATA =
       ],
       "detail": {
         "price": { "value": "TBC", "note": "Pricing not yet public — will be shown once confirmed by manufacturer", "source": "", "confirmedInWriting": false, "asOf": "2026-08-14" },
-        "useCase": "Triple ACT to protect artemisinin partner drugs — MFT component and first-line option where artemisinin partial resistance is confirmed.",
+        "useCase": "Investigational fixed-dose triple ACT; not yet approved or WHO-recommended. Developers aim to delay resistance to artemisinin and its partner drugs. Use within MFT or where artemisinin partial resistance is confirmed is a plan, not policy. In earlier trials, AL plus amodiaquine as separate tablets cured 98% vs 97% for AL (42 days, 8 countries).",
         "access": [
-          "Developed through MORU-led DeTACT partnership with Fosun Pharma",
-          "Designed for affordability in endemic-country public sectors",
-          "Child-friendly dispersible formulation"
+          "Fixed-dose combination developed and made by Fosun Pharma. Pivotal trial (FD-TACT) run by MORU/University of Oxford with MMV and Marubeni, funded by the GHIT Fund.",
+          "Fosun Pharma has committed to make it \"accessible and affordable for malaria-endemic countries\". No price published.",
+          "Paediatric dispersible tablet (20/120/40 mg) being tested in FD-TACT."
         ],
         "adoption": [
           "Updated treatment guidelines and job aids",
-          "Health-worker training (3-drug regimen)"
+          "Training on a new co-formulated product (same 6-dose, 3-day schedule as AL)."
         ],
-        "research": { "lead": "MORU / DeTACT consortium", "geographies": "Multi-site, Africa and Asia (DeTACT / FD-TACT trials)", "timeline": "Phase III → 2025–26", "question": "Safety, efficacy and adherence of co-formulated ALAQ at scale" },
+        "research": { "lead": "MORU / University of Oxford (FD-TACT), with Fosun Pharma", "geographies": "Rwanda, Uganda, Angola, Nigeria and Thailand (FD-TACT sites named by the GHIT Fund; the registry lists Rwanda so far)", "timeline": "Phase III → 2025–26", "question": "Is fixed-dose ALAQ as effective as AL and ASAQ (28-day cure, FD-TACT), and safe? Adherence outside supervised treatment and use at scale are not yet studied." },
         "country": { "registered": 0, "inGuidelines": 0, "inMft": 0, "forecastDemand": "—" },
         "volume": null,
         "volumeNote": "Pre-launch — no procurement yet",
@@ -234,25 +235,25 @@ window.LAUNCH_DATA =
       "barrier": "National guideline inclusion is limited",
       "stages": [
         { "status": "done", "note": "Development complete (Shin Poong / MMV co-development)", "date": "", "next": "", "nextDate": "", "source": "MMV", "asOf": "2026-08-14" },
-        { "status": "done", "note": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); label updated 2025 to include treatment of pregnant women (EMA outcome 5 Jun 2025; announced 31 Jul 2025)", "date": "2012 (label update 2025)", "next": "", "nextDate": "", "source": "EMA EU-M4all opinions table; MMV, 31 Jul 2025", "asOf": "2026-08-22" },
+        { "status": "done", "note": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); 2025 label update: tablets may be used in the 2nd and 3rd trimesters when the benefit outweighs the risk (EMA opinion 5 Jun 2025; product information updated 6 Aug 2025)", "date": "2012 (label update 2025)", "next": "", "nextDate": "", "source": "EMA EU-M4all opinions table; EMA product information, 6 Aug 2025; MMV, 20 Aug 2025", "asOf": "2026-08-22" },
         { "status": "done", "note": "Strong recommendation in revised WHO Guidelines for malaria", "date": "2022", "next": "", "nextDate": "", "source": "WHO Guidelines for malaria; MMV", "asOf": "2026-08-14" },
         { "status": "done", "note": "WHO PQ list carries tablets and granules as EMA-Art.-58 alternative listings (refs H-W-2319-2/-3)", "date": "2012–2016", "next": "", "nextDate": "", "source": "WHO PQ list of prequalified medicines (extract 22 Aug 2026)", "asOf": "2026-08-22" },
         { "status": "prog", "note": "Confirmed in five national registers so far: Tanzania — 2 registrations (TMDA, issued 8 Mar 2022, Registered/Compliant); Nigeria — granules B4-9425 (NAFDAC Greenbook, approved 28 Feb 2024, Active); Rwanda — tablets and granules (Rwanda FDA, 17 Aug 2024, valid); Zambia — tablets ZAMRA-HM-25-239 (11 Jul 2025, Registered/Compliant); Viet Nam — 2 registrations (DAV, first 27 Dec 2013, valid)", "date": "Rolling", "next": "Verify remaining countries against national registers", "nextDate": "TBC", "source": "NAFDAC, TMDA, Rwanda FDA, ZAMRA and DAV registers", "asOf": "2026-10-05" },
-        { "status": "late", "note": "National guideline inclusion lags WHO's 2022 strong recommendation — Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (its third, alongside AS-AQ and AL), but this remains the only confirmed national guideline adoption found; broader inclusion is the core adoption gap LAUNCH is tracking", "date": "Ghana only (2022)", "next": "Country guideline committee reviews", "nextDate": "TBC", "source": "Peer-reviewed therapeutic-efficacy study, Ghana 2023 (published 2026); LAUNCH assessment (draft)", "asOf": "2026-09-08" },
-        { "status": "prog", "note": "Global Fund procurement 2018–2025: 940,111 packs / US$14.5m — modest overall, but US$11.6m of it landed in 2025 (led by Uganda and Burkina Faso), a sharp uptick consistent with early MFT rollouts", "date": "Since 2018", "next": "Verify 2025 surge holds in next quarterly PQR extract", "nextDate": "Q4 2026", "source": "Global Fund PQR Transaction Summary (extract 23 Aug 2026)", "asOf": "2026-08-23" },
+        { "status": "late", "note": "National guideline inclusion lags WHO's 2022 strong recommendation. Ghana introduced artesunate-pyronaridine as an alternate first-line ACT in 2022 (its third, alongside AS-AQ and AL). LAUNCH's verified country list (6 Oct 2026) has 11 countries with it in national guidelines or MFT plans; broader inclusion is the core adoption gap LAUNCH is tracking", "date": "11 countries by Oct 2026; Ghana first, 2022", "next": "Country guideline committee reviews", "nextDate": "TBC", "source": "Peer-reviewed therapeutic-efficacy study, Ghana 2023 (published 2026); LAUNCH assessment (draft)", "asOf": "2026-09-08" },
+        { "status": "prog", "note": "Global Fund procurement 2018–2025: 68 transactions, US$14.5m — modest overall, but US$11.6m of it landed in 2025 (led by Uganda and Burkina Faso), a sharp uptick consistent with early MFT rollouts", "date": "Since 2018", "next": "Verify 2025 surge holds in next quarterly PQR extract", "nextDate": "Q4 2026", "source": "Global Fund PQR Transaction Summary (extract 23 Aug 2026)", "asOf": "2026-08-23" },
         { "status": "idle", "note": "Routine delivery limited; concentrated in pilot and study settings", "date": "", "next": "", "nextDate": "" }
       ],
       "detail": {
         "price": { "value": "TBC", "note": "Global Fund reference pricing to be displayed once confirmed for release; PQR transaction prices vary by pack presentation", "source": "", "confirmedInWriting": false, "asOf": "2026-08-23" },
-        "useCase": "First-line diversification / MFT component; paediatric granules available; label includes pregnant women (2025 update).",
+        "useCase": "Option for diversifying first-line treatment; used in MFT in Rwanda and in pilots in Burkina Faso and Kenya. Granules for children 5 to <20 kg (EMA opinion, Nov 2015). 2025 EMA label update: tablets may be used in the 2nd and 3rd trimesters when the benefit outweighs the risk; not recommended in the 1st trimester when alternatives exist.",
         "access": [
-          "WHO PQ held for tablets and paediatric granules",
+          "On the WHO list of prequalified medicines (tablets and granules), through the EMA EU-M4all (Article 58) route.",
           "Registration confirmed in five national registers so far: Nigeria, Rwanda, Tanzania, Viet Nam and Zambia",
-          "Co-developed with MMV under access-oriented partnership"
+          "Co-developed by Shin Poong and MMV."
         ],
         "adoption": [
           "Guideline inclusion and case-management training",
-          "No cold chain or special administration needs"
+          "No cold chain (store below 30°C). Once daily for 3 days, with or without food. Not for people with liver disease."
         ],
         "research": { "lead": "MMV and partners", "geographies": "Ghana, Vietnam, Burkina Faso and others (efficacy studies)", "timeline": "Ongoing", "question": "MFT deployment models with pyronaridine–artesunate" },
         "country": { "registered": 13, "inGuidelines": 11, "inMft": 4, "forecastDemand": "TBC" },
@@ -299,10 +300,10 @@ window.LAUNCH_DATA =
           { "milestone": "SRA approval (EMA Art. 58)", "status": "done", "label": "Complete", "date": "16 Feb 2012", "next": "—", "anticipated": "—", "source": "EMA EU-M4all opinions table" },
           { "milestone": "WHO PQ listing", "status": "done", "label": "Complete", "date": "2012–2016", "next": "—", "anticipated": "—", "source": "WHO PQ list" },
           { "milestone": "WHO recommendation (strong)", "status": "done", "label": "Complete", "date": "2022", "next": "—", "anticipated": "—", "source": "WHO Guidelines for malaria" },
-          { "milestone": "Label update — pregnancy", "status": "done", "label": "Complete", "date": "EMA outcome 5 Jun 2025", "next": "—", "anticipated": "—", "source": "EMA EU-M4all opinions table; MMV, 31 Jul 2025" },
+          { "milestone": "Label update — pregnancy", "status": "done", "label": "Complete", "date": "EMA outcome 5 Jun 2025", "next": "—", "anticipated": "—", "source": "EMA EU-M4all opinions table; EMA product information, 6 Aug 2025; MMV, 20 Aug 2025" },
           { "milestone": "Country registrations", "status": "prog", "label": "5 countries register-confirmed", "date": "Rolling (VNM 2013, TZA 2022, NGA 2024, RWA 2024, ZMB 2025)", "next": "Verify remaining countries against national registers", "anticipated": "TBC", "source": "NAFDAC, TMDA, Rwanda FDA, ZAMRA and DAV registers (5 Oct 2026)" },
-          { "milestone": "National guideline inclusion", "status": "late", "label": "Ghana only — 1 country confirmed", "date": "Ghana, 2022", "next": "Committee reviews in other endemic countries", "anticipated": "TBC", "source": "Peer-reviewed therapeutic-efficacy study, Ghana 2023 (published 2026)" },
-          { "milestone": "Procurement scale-up", "status": "prog", "label": "940k packs (GF, to 2025)", "date": "US$11.6m in 2025", "next": "Verify surge in next PQR extract", "anticipated": "Q4 2026", "source": "Global Fund PQR (extract 23 Aug 2026)" }
+          { "milestone": "National guideline inclusion", "status": "late", "label": "11 countries in guidelines or MFT plans", "date": "Ghana first, 2022; 11 by Oct 2026", "next": "Committee reviews in other endemic countries", "anticipated": "TBC", "source": "Peer-reviewed therapeutic-efficacy study, Ghana 2023 (published 2026); LAUNCH verified country list, 6 Oct 2026" },
+          { "milestone": "Procurement scale-up", "status": "prog", "label": "US$14.5m, 68 transactions (GF, to 2025)", "date": "US$11.6m in 2025", "next": "Verify surge in next PQR extract", "anticipated": "Q4 2026", "source": "Global Fund PQR (extract 23 Aug 2026)" }
         ]
       }
     },
@@ -321,23 +322,21 @@ window.LAUNCH_DATA =
         { "status": "done", "note": "Development complete", "date": "", "next": "", "nextDate": "", "source": "MMV", "asOf": "2026-08-14" },
         { "status": "done", "note": "EMA approval (Eurartesim)", "date": "2011", "next": "", "nextDate": "", "source": "EMA register", "asOf": "2026-08-14" },
         { "status": "done", "note": "WHO-recommended ACT for uncomplicated malaria — added as the fifth recommended ACT in the 2010 second-edition treatment guidelines; reaffirmed 2015", "date": "2010 guidelines (2nd ed.)", "next": "", "nextDate": "", "source": "WHO Guidelines for the treatment of malaria, 2nd ed. (2010); WHO news, 10 Dec 2010", "asOf": "2026-08-23" },
-        { "status": "done", "note": "Nine PQ'd presentations across three manufacturers — Alfasigma (2015, requal. Jan 2025), Guilin (2019–2020, incl. dispersible paediatric), Beijing Holley (2023) — real supply security", "date": "2015–2023; requal. 20 Jan 2025", "next": "", "nextDate": "", "source": "WHO PQ list of prequalified medicines (extract 22 Aug 2026)", "asOf": "2026-08-22" },
+        { "status": "done", "note": "Nine WHO-prequalified presentations from three companies: Alfasigma (2015; requalified 8 and 20 Jan 2025), Guilin (2019–2020, including 3 dispersible) and Beijing Holley (2023). WHO records list one site as the only dihydroartemisinin ingredient source for 8 of the 9.", "date": "2015–2023; requalified Jan 2025", "next": "", "nextDate": "", "source": "WHO PQ list of prequalified medicines (extract 22 Aug 2026)", "asOf": "2026-08-22" },
         { "status": "done", "note": "Registered widely; adopted as first-line in several Southeast Asian countries. Register-verified so far: Tanzania — 10 presentations across four manufacturers (Guilin D-ARTEPP incl. paediatric dispersible, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), all Registered/Compliant; Nigeria — 47 presentations, but only 26 Active (22 lapsed — registrations not being maintained, itself an underuse signal)", "date": "Rolling", "next": "Verify remaining countries against national registers", "nextDate": "TBC", "source": "MMV / WHO; NAFDAC Greenbook + TMDA IMIS2 registers (extracts 23 Aug 2026)", "asOf": "2026-08-23" },
         { "status": "prog", "note": "First-line in several SE Asian countries; consideration in African MFT strategies growing; verified country counts pending", "date": "", "next": "MFT strategy decisions", "nextDate": "TBC", "source": "LAUNCH assessment (draft)", "asOf": "2026-08-14" },
-        { "status": "late", "note": "Global Fund procurement held at 0.9–4.5% of antimalarial spend 2022–24 (US$41.5m / 11.5m packs cumulative since 2008) — chronic underuse; 2025 shows a sharp uptick (US$15.3m, led by Uganda, Madagascar, Mozambique) that needs confirming as reporting completes", "date": "Since 2008", "next": "Verify 2025 surge holds in next quarterly PQR extract", "nextDate": "Q4 2026", "source": "Global Fund PQR Transaction Summary (extract 23 Aug 2026)", "asOf": "2026-08-23" },
+        { "status": "late", "note": "Global Fund procurement held at 0.9–4.5% of antimalarial spend 2022–24 (US$41.5m over 234 transactions since 2008) — chronic underuse; 2025 shows a sharp uptick (US$15.3m, led by Uganda, Madagascar, Mozambique) that needs confirming as reporting completes", "date": "Since 2008", "next": "Verify 2025 surge holds in next quarterly PQR extract", "nextDate": "Q4 2026", "source": "Global Fund PQR Transaction Summary (extract 23 Aug 2026)", "asOf": "2026-08-23" },
         { "status": "prog", "note": "Routine use concentrated in Southeast Asia and chemoprevention niches", "date": "", "next": "", "nextDate": "", "source": "LAUNCH assessment (draft)", "asOf": "2026-08-14" }
       ],
       "detail": {
         "price": { "value": "TBC", "note": "Pooled procurement reference pricing to be displayed once confirmed for release; PQR median pack price ≈ US$1.70 across presentations (indicative only — pack sizes vary)", "source": "", "confirmedInWriting": false, "asOf": "2026-08-23" },
-        "useCase": "MFT rotation partner; mass drug administration and chemoprevention niches; once-daily dosing.",
+        "useCase": "Used in MFT in Rwanda and in pilots in Burkina Faso and Kenya. Studied for mass drug administration and post-discharge chemoprevention. WHO advises not using a country's first-line treatment for chemoprevention or MDA, and the EU label allows at most two courses in 12 months. Once daily for 3 days.",
         "access": [
-          "Nine PQ'd presentations across three manufacturers (Alfasigma, Guilin, Beijing Holley) — supply security via diversity",
-          "No single-source dependency",
-          "Established API supply chains"
+          "Nine WHO-prequalified presentations from three companies: Alfasigma (2), Guilin (6, including 3 dispersible) and Beijing Holley (1)."
         ],
         "adoption": [
-          "ECG guidance for specific risk groups in some guidelines",
-          "Otherwise standard ACT case-management training"
+          "Prolongs the QT interval. Not for people with QT prolongation or on QT-prolonging medicines (WHO; EU label). The EU label advises an ECG during treatment; WHO says one is not needed before prescribing.",
+          "Standard ACT training, plus food timing and the QT contraindications."
         ],
         "research": { "lead": "Multiple academic consortia", "geographies": "Ghana, Mozambique, SE Asia (efficacy and MFT studies)", "timeline": "Ongoing", "question": "MFT rotation sequencing and resistance impact" },
         "country": { "registered": 15, "inGuidelines": 13, "inMft": 4, "forecastDemand": "TBC" },

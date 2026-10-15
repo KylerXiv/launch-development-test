@@ -2211,10 +2211,11 @@ RBM release is made either, and "Publish now" also waits.
 
 Branch `feedback/ganlum-glossary-procurement`, off `main` at `edcb5d0`. From
 the partners' "Oct 15 Feedback Emails" rows 50–58. Done here: rows 50 and
-52–56. Row 51 (claims audit) is researched, in `docs/claims-audit-2026-10.md`,
-for review before any page change. Not done: row 57 (needs Jan's statement)
-and row 58 (needs Unitaid's brand guide). The owner said to "do what you can" on 15 Oct, after reading the
-drafts below.
+52–56, and row 51 (the claims audit, `docs/claims-audit-2026-10.md`). Row 51
+was added at the owner's request so the team can compare this PR's preview
+with the live site, and the PR is not to be merged yet. Not done: row 57
+(needs Jan's statement) and row 58 (needs Unitaid's brand guide). The owner
+said to "do what you can" on 15 Oct, after reading the drafts below.
 
 **Row 50, GanLum: a status change, not only wording.**
 - **Status.** Stringent Regulatory Approval (SRA) moves from `prog` to `idle`,
@@ -2242,9 +2243,10 @@ drafts below.
     against mutant malaria parasites associated with partial drug
     resistance", and "potential to … block transmission". MFT is LAUNCH's
     framing, so it is attributed to LAUNCH.
-  - **Row 51, the claims audit.** It is in `docs/claims-audit-2026-10.md`,
-    for review: about 40 claims across the four medicines, each categorised,
-    sourced and given proposed wording. Nothing else in it is applied yet.
+  - **Row 51, the claims audit.** It is in `docs/claims-audit-2026-10.md`:
+    about 40 claims across the four medicines, each categorised, sourced and
+    given proposed wording. Its proposals are applied below ("Row 51,
+    applied").
 - **Barrier.** "No barrier recorded" was the page default for every medicine
   without a barrier. It now reads "No publicly documented barrier
   identified", for ALAQ as well as GanLum. A GanLum-only wording would have
@@ -2341,11 +2343,57 @@ tablets or 90 sachets.
   reads "Not started · Regulatory submission in preparation · No publicly
   documented barrier identified", and the glossary lists EU-M4all.
 
-**Changelog: two entries dated 2026-10-15,** one for GanLum and one for the
-glossary and procurement. The plan the
-owner approved ("do what you can") said these would go out in one
-subscriber email. `history-continues.js`
-accepts them as "a later change on 2026-10-15".
+**Row 51, applied.** On 15 Oct the owner asked: "change everything into
+#111", and do not merge yet. 32 field edits went in through a one-off script.
+Each one checked the exact text it replaced, so a stale expectation would
+have stopped the run.
+- **What changed, in the cards.** Every line of `docs/claims-audit-2026-10.md`
+  whose action is reword or remove now uses the proposed wording, for all
+  four medicines (Target use case, Access & supply commitments, Adoption
+  requirements, Operational research). The same goes for GanLum's R&D step
+  note: comparator 94.0%, "company-reported; not yet peer-reviewed".
+- **Fixed for consistency, beyond the audit's table.** The same wrong facts
+  were repeated in other fields:
+  - ALAQ's `manufacturer` ("MORU / DeTACT partnership"), its R&D step note
+    ("successor to the DeTACT programme", "child-friendly"), and its research
+    lead and geographies. These now name FD-TACT and the sites GHIT lists.
+  - ASPY's SRA step note and the "Label update — pregnancy" milestone source:
+    the pregnancy wording, EMA's 5 Jun and 6 Aug 2025 dates, and MMV's news
+    item of 20 Aug 2025, not 31 Jul.
+  - ASPY's national policy step and the "National guideline inclusion"
+    milestone. "Ghana only" became the verified list's 11 countries. The
+    step's `date` puts "11 countries by Oct 2026" first, because the table
+    shows its first clause. This step is `late`, so `stageYear` ignores it
+    and the yardstick does not move.
+  - DHA–PPQ's WHO PQ step note: "real supply security" dropped, requalified
+    on 8 and 20 Jan 2025, and the single-source finding added.
+  - Two procurement step notes and ASPY's procurement milestone that still
+    gave pack totals now give transactions (the row 52 rule).
+- **Not applied, on purpose.**
+  - Category labels on the cards: the owner's decision is still open. The
+    wording carries the attribution ("Novartis presents…", "LAUNCH
+    assessment"), and the two barrier texts stay as they were until then.
+  - ASPY's Tanzania registration year (2017 or 2022): to be confirmed by a
+    person.
+  - ALAQ's SRA step source, "DeTACT partnership statements", behind the
+    "approval by ~2027" target: the audit did not check it.
+- **A third changelog line** dated 2026-10-15 says what was corrected, in
+  plain words.
+- **Checked:** the verify block gave 0 errors, 1 warning; 0 / 0; preview
+  built; `test-build-dataset.js --allow-stale` 30 / 0; country names cover
+  all 252. Also `build-procurement-summary.js --check` matches,
+  `test-source-watchers.js` 62 / 0 (it reads ALAQ's trial note),
+  `proposal-lib.js selftest` 58 / 0, `test-import.js` 128 / 0, and the rest
+  as above. In WebKit: no page errors, ASPY's row reads "11 countries by
+  Oct 2026" with its yardstick unchanged, and the ALAQ and DHA–PPQ access
+  cards show the new text.
+
+**Changelog: three entries dated 2026-10-15:** GanLum; the glossary and
+procurement; and the row 51 corrections. The plan the owner approved ("do
+what you can") said these would go out in one subscriber email.
+`history-continues.js` accepts them as "a later change on 2026-10-15". If
+the PR is merged on a later day, move the three entries and
+`meta.lastUpdated` to that day.
 
 ## 4. Newly discovered, deferred, or left alone
 

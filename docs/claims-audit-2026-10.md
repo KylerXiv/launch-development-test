@@ -2,7 +2,7 @@
 
 Prepared 15 October 2026 for the LAUNCH team and the reviewer who asked for it (partner feedback, "Oct 15 Feedback Emails", row 51).
 
-**Status: for review. Nothing here has been applied to the page, with one exception.** The one exception, in PR #111 (`docs/illustrated-journey-ui-notes.md` §3.44): GanLum's use case no longer says "Novartis positions it… for MFT strategies". Novartis's 12 Nov 2025 release mentions no MFT, which was rechecked on 15 Oct 2026. The MFT framing is now attributed to LAUNCH. Every other "Proposed wording" below waits for a decision. Each claim is either reworded as proposed, or labelled with its category on the page, or both. That second choice is open.
+**Status: applied in PR #111, which is not merged yet.** On 15 Oct 2026 the owner asked for every proposal to go into PR #111. The team can then compare its preview with the live site before deciding. Every "Reword" and "Remove" below is applied, with one exception: GanLum's use case keeps the opening that the sheet's row 50 asked for ("Non-artemisinin combination in late-stage development…") and takes the audit's attribution. The same wrong facts repeated in other fields are fixed too (`docs/illustrated-journey-ui-notes.md` §3.44, "Row 51, applied"). Not applied: category labels on the cards (a decision still open), the Tanzania registration year (to confirm), and the source behind ALAQ's "approval by ~2027" target (not checked).
 
 Method: one research pass, 15 Oct 2026, reading primary sources (trial registries, journals, EMA, WHO PQ, company and MMV releases). "Verified" means that source was opened that day. "Carried" means the figure comes from this repo's own extracts and was not re-fetched.
 
