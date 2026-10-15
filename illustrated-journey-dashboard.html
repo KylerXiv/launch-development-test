@@ -759,6 +759,7 @@
     .gw-head .gp-close { order: 2; flex: none; }
     .gw-sum { order: 3; flex-basis: 100%; margin-left: 52px; }
   }
+  .gw-par { margin: -4px 0 12px; font-size: 14px; color: var(--ink-2); }
   .gw-band { background: var(--surface-2); border-radius: 10px; padding: 14px 16px 16px; }
   .gw-band h4 { margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
   .gw-band > p { margin: 0; font-size: 15.5px; color: var(--ink); max-width: 110ch; }
@@ -1435,7 +1436,7 @@
 
   <div class="demo-banner" id="banner" hidden></div>
 
-  <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway. Choose a step to see what happens there and where each medicine is" hidden></div>
+  <div class="pathway" id="pathway" role="group" aria-label="The access pathway: eight milestones across seven stages. WHO recommendation and WHO PQ listing are parallel milestones within stage 3. Choose a stage to see what happens there and where each medicine is" hidden></div>
 
   <div class="gatewrap" id="gatewrap" hidden></div>
 
@@ -1588,7 +1589,7 @@
   const ICON = { done: "✓", prog: "›", late: "!", idle: "" };
   const LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
   // What "Delayed" means, shown from the i beside it in the medicines table.
-  const LATE_DEF = "this step is not moving as fast as expected.";
+  const LATE_DEF = "this stage is not moving as fast as expected.";
   const lateInfo = () => `<button type="button" class="info" data-tip="${esc(LABEL.late + ": " + LATE_DEF)}" aria-label="${esc(LABEL.late + ": " + LATE_DEF)}">i</button>`;
   // Illustrated stage glyphs (assets/journey-icons/icons.js), one per stage in
   // stage order. Injected once as a sprite; each marker references it by <use>,
@@ -1923,7 +1924,7 @@
       return h + row(esc(STAGES[s.i]), s);
     }).join("");
     return `<div class="cscroll"><table class="ystable">
-      <thead><tr><th scope="col">Step</th><th scope="col">Expected</th><th scope="col">Actual</th><th scope="col">Variance</th></tr></thead>
+      <thead><tr><th scope="col">Stage</th><th scope="col">Expected</th><th scope="col">Actual</th><th scope="col">Variance</th></tr></thead>
       <tbody>${body}</tbody>
       <tfoot>${row("Whole journey", y.whole, true)}</tfoot>
     </table></div>${yardNote()}`;
@@ -1941,7 +1942,7 @@
   function miniJourney(p) {
     const done = p.stages.filter(st => st.status === "done").length;
     const dot = i => `<i class="md ${p.stages[i].status}" title="${esc(STAGES[i])}: ${LABEL[p.stages[i].status]}"></i>`;
-    return `<div class="mini" role="img" aria-label="${done} of ${p.stages.length} stages complete">` +
+    return `<div class="mini" role="img" aria-label="${done} of ${p.stages.length} milestones complete">` +
       STAGE_COLUMNS.map((col, c) => `<span class="jcell" data-c="${c}">` +
         (col.stages.length === 1 ? dot(col.stages[0]) : `<span class="mp">${col.stages.map(dot).join("")}</span>`) +
         `</span>`).join('<i class="ln"></i>') + `</div>`;
@@ -2059,7 +2060,7 @@
     const phase = stacked ? "" : ` data-phase="${phaseOf(i)}"`;
     const exp = YARD && YARD.expected[i] ? ", expected " + yrsText(YARD.expected[i].years) : "";
     return `<button class="pathnode${stacked ? " pathnode-sm" : ""}" type="button" aria-expanded="false" aria-controls="gatewrap"
-      data-gate="${i}"${phase} aria-label="Step ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ? ", " + n + " delayed" : ""}.">` +
+      data-gate="${i}"${phase} aria-label="Stage ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ? ", " + n + " delayed" : ""}.">` +
       `<span class="pill">${stageIconImg(i, "")}<span class="nb" aria-hidden="true">${stepNo(i)}</span></span><span class="plabel">${esc(s)}</span>${pathExpHtml(i)}</button>`;
   }
 
@@ -2592,15 +2593,21 @@
         </div>
       </div>` : "";
     const wrap = document.getElementById("gatewrap");
-    wrap.setAttribute("aria-label", "Step " + stepNo(i) + ": " + STAGES[i]);
+    // A stage holding two milestones (WHO recommendation and WHO PQ listing)
+    // says so: they run in parallel, so eight milestones fit in seven stages.
+    const col = STAGE_COLUMNS.find(c => c.stages.includes(i));
+    const par = col && col.stages.length === 2
+      ? `<p class="gw-par">${esc(`${STAGES[col.stages[0]]} and ${STAGES[col.stages[1]]} are parallel milestones within stage ${stepNo(i)}.`)}</p>`
+      : "";
+    wrap.setAttribute("aria-label", "Stage " + stepNo(i) + ": " + STAGES[i]);
     wrap.innerHTML = `
       <div class="gw-head">
         <span class="gw-ico">${stageIconImg(i, "")}</span>
-        <div><div class="gw-step">Step ${stepNo(i)} of ${STAGE_COLUMNS.length}</div><h3>${esc(STAGES[i])}</h3></div>
-        <span class="gw-sum" aria-label="Status of the ${tracked.length} medicines at this step">${chips}</span>
+        <div><div class="gw-step">Stage ${stepNo(i)} of ${STAGE_COLUMNS.length}</div><h3>${esc(STAGES[i])}</h3></div>
+        <span class="gw-sum" aria-label="Status of the ${tracked.length} medicines at this stage">${chips}</span>
         <button class="gp-close" type="button" data-close="gate">Close</button>
       </div>
-      ${band}`;
+      ${par}${band}`;
     wrap.hidden = false;
     btn.setAttribute("aria-expanded", "true");
     openGate = btn;

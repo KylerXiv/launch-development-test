@@ -31,7 +31,7 @@
   "use strict";
 
   var PAGES = [
-    { id: "illustrated", href: "illustrated-journey-dashboard.html", name: "Illustrated journey", desc: "Follow each medicine through the seven steps to patients." },
+    { id: "illustrated", href: "illustrated-journey-dashboard.html", name: "Illustrated journey", desc: "Follow each medicine through the seven stages to patients." },
     { id: "pipeline", href: "pipeline.html", name: "Pipeline", desc: "Where each product is, trial to launch." }
   ];
 
