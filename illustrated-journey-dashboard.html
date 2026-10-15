@@ -3227,7 +3227,8 @@
       { id: "vivax",  short: "Recommended for P. vivax", label: "Recommended for Plasmodium vivax malaria", why: "Listed as treatment in national policy" },
     ];
     const MFT_TXT = { show: "Show on map", count: "No. of countries", use: "Country recommended use", group: "Group", stage: "Access stage", tickHint: "Tick a group to draw its borders on the map.", tickLeft: "Tick a group on the left to see its countries.",
-                      noPolicy: (n) => `No national treatment policy lists ${n} yet.`, notListed: "not listed" };
+                      noPolicy: (n) => `No national treatment policy lists ${n} yet.`, notListed: "not listed",
+                      sources: "Sources for this access stage:", checked: "Checked on" };
     // Colour and line pattern belong to the POLICY GROUP, never to the medicine:
     // every medicine draws first-line as the same solid vermilion line, and so on.
     // The four colours stay separable under protan, deutan and tritan vision, and
@@ -3268,6 +3269,22 @@
     const mftSource = () => {
       const m = (TP && TP.meta) || {};
       return `Source: WHO ${esc(m.edition || "World Malaria Report")}, Annex 4B (${esc(String(m.policyYear || ""))} policy).`;
+    };
+    // The sources behind one country's access stage for the selected medicine:
+    // the ids its entry in detail.countries.list cites, named and linked as in
+    // the Sources list, with the date they were checked (partner feedback,
+    // 15 Oct 2026: attach sources to individual claims, not only a master list).
+    const countrySources = (iso3) => {
+      const p = curProduct();
+      const e = (((p && p.detail && p.detail.countries) || {}).list || []).find((x) => x.iso3 === iso3);
+      const reg = {};
+      ((window.LAUNCH_SOURCES || {}).sources || []).forEach((s) => { reg[s.id] = s; });
+      const items = ((e && e.sources) || []).map((id) => reg[id]).filter(Boolean).map((s) => s.url
+        ? `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label || s.title)}</a>`
+        : esc(s.label || s.title));
+      if (!items.length) return "";
+      return `<p class="mft-note">${esc(MFT_TXT.sources)} ${items.join("; ")}.` +
+        (e.checked ? ` ${esc(MFT_TXT.checked)} ${esc(shortDate(e.checked))}.` : "") + `</p>`;
     };
 
     function mftTipLine(iso3) {
@@ -3442,6 +3459,7 @@
       h += `<div class="det-card"><div class="det-top"><b>${esc(p.name)}</b>${stagePill(st.lvl)}</div>` +
         `<div class="det-trk">${[1, 2, 3].map((n) => `<i${lv >= n ? ` style="background:${stageVar(STAGE_KEYS[lv - 1])}"` : ""}></i>`).join("")}</div>` +
         `<div class="det-trkl"><span>Registered</span><span>In guidelines</span><span>In MFT plans</span></div>` +
+        countrySources(iso3) +
         (gl.length ? gl.map((gm) => `<div class="det-gline">${mftLineSvg(gm.id)}<b>${esc(gm.short)}</b><span class="det-small">in WHO policy ${esc(String((TP && TP.meta && TP.meta.policyYear) || ""))}</span></div>`).join("")
             : `<div class="det-gline det-small">Not listed in national treatment policy</div>`) +
         (gl.length ? `<div class="mft-grp">${esc(MFT_TXT.use)}</div><div class="mft-chips">` +
