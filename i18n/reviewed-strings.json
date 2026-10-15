@@ -12,7 +12,7 @@
     { "file": "illustrated-journey-dashboard.html", "src": ": \"Under 1 year\";", "en": "Under 1 year" },
     { "file": "illustrated-journey-dashboard.html", "src": "aria-label=\"${done} of ${p.stages.length} milestones complete\"", "en": "${done} of ${p.stages.length} milestones complete" },
     { "file": "illustrated-journey-dashboard.html", "src": "<i>today</i>", "en": "today" },
-    { "file": "illustrated-journey-dashboard.html", "src": "\"ssince\">since ${since} · ${yrsText(hi - since)}<", "en": "since ${since} · ${yrsText(hi - since)}" },
+    { "file": "illustrated-journey-dashboard.html", "src": "\"ssince\">since ${esc(from.label)} (${since}) · ${yrsText(hi - since)}<", "en": "since ${esc(from.label)} (${since}) · ${yrsText(hi - since)}" },
     { "file": "illustrated-journey-dashboard.html", "src": "=== \"late\" ? \"delayed\" :", "en": "delayed" },
     { "file": "illustrated-journey-dashboard.html", "src": ": \"ongoing\"}</span>", "en": "ongoing" },
     { "file": "illustrated-journey-dashboard.html", "src": "\"unone\">None<", "en": "None" },

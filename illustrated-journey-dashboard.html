@@ -1787,19 +1787,26 @@
   // The year the current gate has been waiting since. Uses the same journey
   // milestones the gate panel's "Pending since" line reads, so the two agree;
   // when a product has no journey (GanLum, ALAQ) it falls back to the latest
-  // year among the gates in the column before the current one.
-  function sinceFor(p) {
+  // year among the gates in the column before the current one. sinceFrom also
+  // names that milestone, so the timeline can say what it counts from: DHA–PPQ
+  // read "since 2015" beside Global Fund orders "since 2008" (feedback, 15 Oct
+  // 2026); it now reads "since WHO PQ listing (2015)".
+  function sinceFrom(p) {
     const j = p.detail && p.detail.journey;
     if (Array.isArray(j) && j.length > 1 && j[j.length - 1].year === "TBC") {
       const last = [...j].reverse().find(g => Number.isInteger(g.year));
-      if (last) return last.year;
+      if (last) return { year: last.year, label: last.label };
     }
     const c = STAGE_COLUMNS.findIndex(col => col.stages.includes(p.currentStage));
     if (c > 0) {
-      const ys = STAGE_COLUMNS[c - 1].stages.map(i => stageYear(p.stages[i])).filter(y => y != null);
-      if (ys.length) return Math.max(...ys);
+      const ys = STAGE_COLUMNS[c - 1].stages.map(i => ({ year: stageYear(p.stages[i]), label: STAGES[i] })).filter(s => s.year != null);
+      if (ys.length) return ys.reduce((a, b) => (b.year > a.year ? b : a));
     }
     return null;
+  }
+  function sinceFor(p) {
+    const s = sinceFrom(p);
+    return s ? s.year : null;
   }
 
   // ---- yardstick: expected time against time taken (7 Oct 2026) -------------
@@ -1994,7 +2001,7 @@
   // at today, with a bar back to the year it has been waiting since. Gates with
   // no year are listed on the right instead of being given an invented date.
   function journeyTime(p) {
-    const since = sinceFor(p);
+    const from = sinceFrom(p), since = from ? from.year : null;
     const ys = p.stages.map(stageYear).filter(y => y != null);
     if (since != null) ys.push(since);
     let lo = ys.length ? Math.min(...ys) : ASOF_YEAR - 1;
@@ -2030,7 +2037,7 @@
       const st = p.stages[it.i], top = TOP + it.tier * TH;
       const sub = it.cur
         ? `<div class="snow ${st.status}">${LABEL[st.status]}</div>` +
-          (since != null && since < hi ? `<div class="ssince">since ${since} · ${yrsText(hi - since)}</div>` : "")
+          (since != null && since < hi ? `<div class="ssince">since ${esc(from.label)} (${since}) · ${yrsText(hi - since)}</div>` : "")
         : `<div class="syear">${stageYear(st)}</div>`;
       h += `<i class="stem" style="left:${it.x}%;height:${top - 32}px"></i>` +
         `<i class="pt${it.cur ? " " + st.status : ""}" style="left:${it.x}%"></i>` +
