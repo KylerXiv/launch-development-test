@@ -71,9 +71,9 @@ Nothing remaining. ✅
   `index.html`) vs Option B (comparison matrix, `option-b.html`), both live and
   cross-linked. Then: delete the losing option and port Option A's extra
   features (glossary, CSV, print, pathway timing) into the winner if B is chosen.
-- [ ] 🤝 **Engage RBM's web team** — share the live link; decide between
-  (a) RBM hosts the static files, (b) RBM embeds the Pages URL via iframe,
-  (c) repo transfer to an RBM GitHub org. Options in the README.
+- [x] 🤝 **Engage RBM's web team** — decided: RBM hosts a copy of the static
+  files (en/ fr/ pt/ es/ assets/) and shows each language in an iframe. No repo
+  goes to RBM. See [rbm/README.md](../rbm/README.md).
 - [ ] 🧑‍💻🤝 **Restyle to RBM brand** — one CSS token block change once their
   brand guidelines (colors/fonts) are shared.
 - [ ] 🤝 **Custom domain** (optional) — e.g. a subdomain under endmalaria.org

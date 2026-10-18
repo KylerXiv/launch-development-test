@@ -23,7 +23,8 @@ Host these, side by side, exactly as they are:
 - `en/`, `fr/`, `pt/`, `es/`: the four pages, each with its own `data/` (map
   shapes and country names, not the dashboard's data) and feedback form;
 - `assets/`: the icons and logos every page loads from `../assets/`. Without
-  it, the pages lose their icons;
+  it, the pages lose their icons.
+
 That is 38 files: HTML, JavaScript, SVG and PNG. The styles are inside each
 page, so there are no separate CSS files, and there is no build step or server
 code.
@@ -129,6 +130,9 @@ https://codebyjackson.github.io/launch-rbm-test/iframe-test.html
 
 **Data:** nothing to do. The pages read the newest approved `dashboard.json`
 every time they open.
+
+**Pages:** no changes are planned after handover. If Unitaid asks for one, the
+LAUNCH team sends you an updated set of files to replace the old ones.
 
 **Please do not edit the hosted files by hand.** They are built from the same
 page as the LAUNCH site, so a change made only here never reaches the LAUNCH
