@@ -23,7 +23,8 @@ Host these, side by side, exactly as they are:
 - `en/`, `fr/`, `pt/`, `es/`: the four pages, each with its own `data/` (map
   shapes and country names, not the dashboard's data) and feedback form;
 - `assets/`: the icons and logos every page loads from `../assets/`. Without
-  it, the pages lose their icons;
+  it, the pages lose their icons.
+
 That is 38 files: HTML, JavaScript, SVG and PNG. The styles are inside each
 page, so there are no separate CSS files, and there is no build step or server
 code.
