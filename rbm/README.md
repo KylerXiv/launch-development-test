@@ -29,7 +29,7 @@ page, so there are no separate CSS files, and there is no build step or server
 code.
 
 Not needed: `index.html`, `iframe-test.html`, `rbm-shell/`,
-`build-manifest.json`, `launch-release.json` and `.github/` in the LAUNCH test
+and `build-manifest.json` in the LAUNCH test
 copy are for development and testing only.
 
 The dashboard's data is **not** in these files. Each page loads it from the
@@ -140,10 +140,8 @@ The current data address stays live in the meantime.
 ### For the LAUNCH team (development stage only)
 
 `node scripts/build-rbm-pages.js` builds these pages; `--api-url` sets where
-the two forms post, and `--api-url none` builds them switched off. During
-development, every page change is published as a release (`rbm-v1`, `rbm-v2`,
-…), and the test copy `codebyjackson/launch-rbm-test` applies each one by
-itself with `.github/workflows/launch-update.yml`. **That workflow is for the
-development stage only and will be removed from `launch-rbm-test` before
-handover.** Each release's `rbm-pages.tar.gz` holds exactly the files listed
-under "What to host".
+the two forms post, and `--api-url none` builds them switched off.
+`node scripts/copy-rbm-pages.js --to <checkout of launch-rbm-test>` copies a
+build into the test copy `codebyjackson/launch-rbm-test`; commit and push
+there by hand. The copy replaces exactly the files listed under "What to
+host".

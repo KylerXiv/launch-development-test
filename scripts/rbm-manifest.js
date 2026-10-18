@@ -1,11 +1,9 @@
 // The RBM pages' build manifest: what a build of the pages wrote, and the
 // checks made before those pages are copied anywhere.
 //
-// Used by scripts/build-rbm-pages.js (writes the manifest),
-// scripts/copy-rbm-pages.js (checks it before a copy) and
-// scripts/rbm-release.js (compares two builds). It needs nothing but Node, so
-// each release ships it beside copy-rbm-pages.js, and the robot in
-// launch-rbm-test runs the very same checks without this repository.
+// Used by scripts/build-rbm-pages.js (writes the manifest) and
+// scripts/copy-rbm-pages.js (checks it before a copy). It needs nothing but
+// Node.
 "use strict";
 const fs = require("fs");
 const path = require("path");
@@ -63,16 +61,4 @@ function drift(dir, was) {
   return { changed, missing, added };
 }
 
-// How two manifests' file lists differ: what a release would change.
-function compare(before, after) {
-  const a = (before && before.files) || {}, b = (after && after.files) || {};
-  const changed = [], added = [], removed = [];
-  for (const rel of Object.keys(b)) {
-    if (!(rel in a)) added.push(rel);
-    else if (a[rel] !== b[rel]) changed.push(rel);
-  }
-  for (const rel of Object.keys(a)) if (!(rel in b)) removed.push(rel);
-  return { changed, added, removed, same: !changed.length && !added.length && !removed.length };
-}
-
-module.exports = { LOCALES, BUILT, MANIFEST, fingerprint, manifestOf, buildProblems, drift, compare };
+module.exports = { LOCALES, BUILT, MANIFEST, fingerprint, manifestOf, buildProblems, drift };

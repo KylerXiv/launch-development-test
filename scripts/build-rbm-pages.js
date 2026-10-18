@@ -84,8 +84,8 @@ const REPLACED = ["data/products.js", "data/sources.js", "data/treatment-policy.
 const PER_LANGUAGE = ["data/world-map.js", "data/world-map-geo.js", "assets/report-issue.js"];
 
 // The folders a build fills (BUILT), the manifest's name, and the
-// fingerprints in it come from scripts/rbm-manifest.js, which releases ship
-// beside copy-rbm-pages.js so the copy's checks run anywhere.
+// fingerprints in it come from scripts/rbm-manifest.js, which
+// copy-rbm-pages.js shares.
 
 // Reader-facing messages. Only the English is written here: French, Portuguese
 // and Spanish come from the translation memory, like every other text on the
