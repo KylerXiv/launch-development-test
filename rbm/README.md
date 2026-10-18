@@ -130,6 +130,9 @@ https://codebyjackson.github.io/launch-rbm-test/iframe-test.html
 **Data:** nothing to do. The pages read the newest approved `dashboard.json`
 every time they open.
 
+**Pages:** no changes are planned after handover. If Unitaid asks for one, the
+LAUNCH team sends you an updated set of files to replace the old ones.
+
 **Please do not edit the hosted files by hand.** They are built from the same
 page as the LAUNCH site, so a change made only here never reaches the LAUNCH
 site or the translations. Ask the LAUNCH team for the change instead.
