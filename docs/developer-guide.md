@@ -222,16 +222,16 @@ No test framework by design; two layers instead:
 - **RBM**: decided 23 Sep 2026, RBM embeds the page in an iframe served from
   this site's own origin, and receives the data as `dashboard.json` through
   `publish-dataset.yml`. `scripts/build-rbm-pages.js` builds RBM's own copies
-  of the page. When those copies change, `release-rbm-pages.yml` publishes
-  them as a release (`rbm-v1`, `rbm-v2`, …), and the robot in
-  `codebyjackson/launch-rbm-test` applies each release by itself once a day
-  ([rbm/README.md](../rbm/README.md), "How updates arrive";
-  [jackson/rbm-releases.md](jackson/rbm-releases.md)). Building and copying
-  by hand (`copy-rbm-pages.js --to`) still works when needed. After handover,
+  of the page. When those copies change, build them and copy them into a
+  checkout of `codebyjackson/launch-rbm-test` by hand
+  (`node scripts/build-rbm-pages.js`, then
+  `node scripts/copy-rbm-pages.js --to ../launch-rbm-test`), and commit there
+  ([rbm/README.md](../rbm/README.md), "For the LAUNCH team"). The automatic
+  releases (`rbm-vN`) and the daily robot in `launch-rbm-test` were removed
+  on 18 Oct 2026. After handover,
   Unitaid owns this repository and the data repository, and RBM receives a
   copy of the files it embeds ([rbm/README.md](../rbm/README.md), "What to
-  host"). The release robot is for the development stage only, and is
-  removed from `launch-rbm-test` before handover. See
+  host"). See
   [rbm-handover-notes.md](rbm-handover-notes.md) and
   [Handoff_Kyler.md](Handoff_Kyler/Handoff_Kyler.md). The `feed.xml` URL
   still points at the old GitHub Pages site: update `SITE` in

@@ -7,7 +7,7 @@
 //   node scripts/copy-rbm-pages.js --to ../launch-rbm-test
 //   node scripts/copy-rbm-pages.js --to ../launch-rbm-test --first-copy   # it has no build-manifest.json yet
 //   node scripts/copy-rbm-pages.js --to ../launch-rbm-test --force        # replace hand edits, once they are in this repo
-//   node copy-rbm-pages.js --from <unpacked release> --to .               # from a release (the robot in launch-rbm-test)
+//   node scripts/copy-rbm-pages.js --from <build folder> --to <checkout>  # a build kept elsewhere than dist/rbm
 //
 // WHY. The pages in launch-rbm-test are built from this repository. On 8 Oct
 // 2026, 12 commits were made to them there, by hand, and the next rebuild would
@@ -35,9 +35,6 @@
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
-// rbm-manifest.js, not build-rbm-pages.js: a release ships the two files
-// together, so this script also runs where the builder is not (the robot in
-// launch-rbm-test, .github/workflows/launch-update.yml there).
 const { BUILT, MANIFEST, buildProblems, drift } = require("./rbm-manifest");
 
 const ROOT = path.resolve(__dirname, "..");
