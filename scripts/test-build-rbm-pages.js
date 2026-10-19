@@ -47,12 +47,15 @@ const plain = (html.match(/<script>/g) || []).length;
 ok(app === plain - 1 && app > 0, "every other inline script of the page waits for the data");
 ok(out.indexOf("var DATA_URL") < out.indexOf('<script type="text/x-launch-app">'), "the loader comes before the page's scripts");
 ok(/s\.public = true/.test(out), "sources are marked public for the page's filter");
-// the RBM look: after the page's own stylesheet, so its tokens win
-ok(out.indexOf('<style id="rbm-skin">') > out.indexOf("</style>") && /--accent: #2563EB/.test(out), "the RBM skin comes after the page's CSS, with RBM Blue as the accent");
+// the Unitaid look (RBM's own until 19 Oct 2026): after the page's own
+// stylesheet, so its tokens win
+ok(out.indexOf('<style id="rbm-skin">') > out.indexOf("</style>") && /--accent: #0066FF/.test(out) && /--ink: #212E92/.test(out),
+   "the Unitaid skin comes after the page's CSS, with Unitaid Blue as the accent and Unitaid Navy as the ink");
 { const skin = out.slice(out.indexOf('<style id="rbm-skin">'), out.indexOf("</style>", out.indexOf('<style id="rbm-skin">')));
-  ok(skin.length > 0 && !/--map/.test(skin), "the country access map keeps LAUNCH's own colours"); }
-ok(/fonts\.googleapis\.com\/css2\?family=Poppins[^"]*Roboto/.test(out), "Roboto and Poppins load");
-ok(!/#14657E/.test(out) && /const shades = \["#033FAF"/.test(out), "no teal left in the script colours");
+  ok(skin.length > 0 && !/--map/.test(skin), "the country access map keeps LAUNCH's own colours");
+  ok(!/#2563EB|Roboto|Poppins/.test(skin), "nothing of the RBM look is left in the skin"); }
+ok(/fonts\.googleapis\.com\/css2\?family=Source\+Sans\+3/.test(out) && !/family=(Poppins|Roboto)/.test(out), "Source Sans 3 loads, and RBM's fonts do not");
+ok(!/#14657E/.test(out) && /const shades = \["#212E92", "#0066FF"/.test(out), "no teal left in the script colours");
 
 // a page that no longer loads products.js the expected way must stop the build
 let threw = false;
@@ -60,7 +63,7 @@ try { transform(html.replace('<script src="data/products.js"></script>', ""), "e
 ok(threw, "a page that changed how it loads its data stops the build");
 threw = false;
 try { transform(html.replace('const shades = ["#14657E"', 'const shades = ["#000000"'), "en"); } catch (e) { threw = true; }
-ok(threw, "a page whose script colours changed stops the build, so no teal is left in the RBM look");
+ok(threw, "a page whose script colours changed stops the build, so no teal is left in the Unitaid look");
 threw = false;
 try { transform(html.replace('fetch("/api/subscribe"', 'fetch("/api/join"'), "en", { apiUrl: API }); } catch (e) { threw = true; }
 ok(threw, "a page that no longer posts to /api/subscribe stops the build, rather than leave Subscribe pointing nowhere");
