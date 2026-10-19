@@ -315,6 +315,10 @@ function applyProposal(data, proposal, today) {
   if (fields.length) {
     stage.source = proposal.evidence.srcLabel + (proposal.evidence.ref ? " (" + proposal.evidence.ref + ")" : "");
     stage.asOf = proposal.evidence.asOf;
+    // The linked citation follows it (19 Oct 2026): the page links a stage's
+    // "sources" ids, so they must name the new evidence, not the old.
+    if (proposal.evidence.src) stage.sources = [proposal.evidence.src];
+    else delete stage.sources;
   }
   if (proposal.countries) {
     if (!p.detail.countries) p.detail.countries = { status: "draft", note: NEW_MAP_NOTE, list: [] };
@@ -688,6 +692,7 @@ function selftest() {
     ok("a medicine with no map gets one, as a draft with its warning", g.detail.countries.status === "draft" && g.detail.countries.note === NEW_MAP_NOTE && g.detail.countries.list.length === 1);
     ok("its registered count rises from 0 to 1", g.detail.country.registered === 1 && first.proposal.registeredCount.was === 0);
     ok("the stage carries the register's citation", g.stages[4].status === "prog" && /^Tanzania: TMDA register/.test(g.stages[4].source));
+    ok("and its linked citation is the register's id", JSON.stringify(g.stages[4].sources) === JSON.stringify(["tmda"]), g.stages[4].sources);
     ok("the first-registration result passes the rules", fres.errors.length === 0, fres.errors.join("; "));
     // Approved after another register's proposal drew a country first, it
     // counts both, whatever its snapshot said.
