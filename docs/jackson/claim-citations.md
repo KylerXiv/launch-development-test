@@ -75,7 +75,10 @@ by hand into launch-rbm-test (see Status).
    | `whopar-ma093` | WHO assessment report for Eurartesim (listing and requalification dates) |
 
    The Sources list grows from 30 to 44 entries; the new ones are
-   documents, so they appear under "Key documents".
+   documents, so they appear under "Key documents". A follow-up PR moved the
+   14 entries into the file's A–Z order (whole blocks, nothing inside an
+   entry changed) and regenerated the proposal form's Source dropdown
+   (`docs/source-registry-notes.md` §6), so a proposal can cite them.
 
 5. **Wording follows the references.** Where a reference did not support
    the sentence, the sentence changed, not the citation (agreed with the
