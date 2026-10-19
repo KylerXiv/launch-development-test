@@ -323,6 +323,20 @@
             if (Math.abs(sum - 100) > 1) err(`${tag}: detail.volume.split percentages sum to ${sum}, expected 100`);
             d.volume.split.forEach((s) => { if (!s.channel) err(`${tag}: every volume split entry needs a "channel"`); });
           }
+          // Packs by presentation (15 Oct 2026), written by
+          // scripts/build-procurement-summary.js. Courses are a count or null
+          // ("not estimated"), never a guess filled in by hand.
+          if (d.volume.byPresentation !== undefined) {
+            if (!Array.isArray(d.volume.byPresentation)) err(`${tag}: detail.volume.byPresentation must be an array`);
+            else d.volume.byPresentation.forEach((b, j) => {
+              const at = `${tag}: detail.volume.byPresentation[${j}]`;
+              if (!b || typeof b.label !== "string" || !b.label.trim()) { err(`${at} needs a "label"`); return; }
+              ["transactions", "packs"].forEach((k) => { if (!Number.isInteger(b[k]) || b[k] < 0) err(`${at}.${k} must be a whole number ≥ 0`); });
+              if (b.courses !== null && (!Number.isInteger(b.courses) || b.courses < 0)) err(`${at}.courses must be a whole number or null`);
+            });
+            if (Array.isArray(d.volume.byPresentation) && d.volume.byPresentation.length && !d.volume.coursesRule)
+              err(`${tag}: detail.volume.byPresentation needs a "coursesRule" saying how courses were counted`);
+          }
         }
         if (d.milestones != null && !Array.isArray(d.milestones)) {
           err(`${tag}: detail.milestones must be an array`);

@@ -180,6 +180,8 @@ function localiseProducts(D, loc) {
     if (d.volume) {
       ["total", "period"].forEach((k) => { if (d.volume[k]) d.volume[k] = T(d.volume[k]); });
       (d.volume.split || []).forEach((s) => { if (s.channel) s.channel = T(s.channel); });
+      (d.volume.byPresentation || []).forEach((r) => { if (r.label) r.label = T(r.label); });
+      if (d.volume.coursesRule) d.volume.coursesRule = T(d.volume.coursesRule);
     }
     // the price guard — an unconfirmed note is never translated and never moves
     if (d.price && d.price.confirmedInWriting === true && d.price.note) d.price.note = T(d.price.note);

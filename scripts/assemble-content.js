@@ -107,12 +107,15 @@ function collect() {
     if (d.research) {
       ["question", "lead", "geographies", "timeline"].forEach((k) => add("data", d.research[k], `${b}.detail.research.${k}`));
     }
-    // procurement: the total and period are prose ("940,111 packs · US$14.5m
+    // procurement: the total and period are prose ("68 transactions · US$14.5m
     // (2018–2025)"); `source` is the citation and stays English
     if (d.volume) {
       add("data", d.volume.total, `${b}.detail.volume.total`);
       add("data", d.volume.period, `${b}.detail.volume.period`);
       (d.volume.split || []).forEach((s, j) => add("data", s.channel, `${b}.detail.volume.split[${j}].channel`));
+      // packs by presentation (15 Oct 2026): each label, and how courses were counted
+      (d.volume.byPresentation || []).forEach((r, j) => add("data", r.label, `${b}.detail.volume.byPresentation[${j}].label`));
+      add("data", d.volume.coursesRule, `${b}.detail.volume.coursesRule`);
     }
     // price notes are excluded unless confirmed in writing — the guard, kept here
     if (d.price && d.price.confirmedInWriting === true) add("data", d.price.note, `${b}.detail.price.note`);
