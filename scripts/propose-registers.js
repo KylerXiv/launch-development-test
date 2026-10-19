@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // The source watcher for the national medicine registers: Nigeria's NAFDAC
-// Green Book (sourcing/staging/nafdac_registrations.csv) and Tanzania's TMDA
-// register (sourcing/staging/tmda_registrations.csv). When a register lists a
+// Green Book (sourcing/staging/nafdac_registrations.csv), Tanzania's TMDA
+// register (sourcing/staging/tmda_registrations.csv), and since 19 Oct 2026
+// Zambia's ZAMRA, Zimbabwe's MCAZ, Viet Nam's DAV and the Rwanda FDA
+// registers (sourcing/staging/{zamra,mcaz,dav,rwanda}_registrations.csv). When a register lists a
 // portfolio medicine as currently registered in its country, and the
 // dashboard's country map does not show that country, it writes a proposal in
 // the issue form's own layout, so intake, the pull request, the preview and
@@ -68,6 +70,48 @@ const REGISTERS = [
     holder: (r) => r.registrant || r.manufacturer,
     since: (r) => r.issueDate,
   },
+  // Zambia, Zimbabwe, Viet Nam and Rwanda (19 Oct 2026): the four fetchers
+  // stage the same columns, so one shape serves all four.
+  {
+    name: "ZAMRA",
+    country: "ZMB",
+    sourceId: "zamra",
+    fetched: "sourcing/staging/zamra_registrations.csv",
+    current: (r) => /^registered/i.test(r.status),
+    ref: (r) => r.registrationNo,
+    holder: (r) => r.holder || r.manufacturer,
+    since: (r) => r.issueDate,
+  },
+  {
+    name: "MCAZ",
+    country: "ZWE",
+    sourceId: "mcaz",
+    fetched: "sourcing/staging/mcaz_registrations.csv",
+    current: (r) => /^registered/i.test(r.status),
+    ref: (r) => r.registrationNo,
+    holder: (r) => r.holder || r.manufacturer,
+    since: (r) => r.issueDate,
+  },
+  {
+    name: "DAV",
+    country: "VNM",
+    sourceId: "dav",
+    fetched: "sourcing/staging/dav_registrations.csv",
+    current: (r) => /^valid$/i.test(r.status),
+    ref: (r) => r.registrationNo,
+    holder: (r) => r.holder || r.manufacturer,
+    since: (r) => r.issueDate,
+  },
+  {
+    name: "RWANDA",
+    country: "RWA",
+    sourceId: "rwanda-fda",
+    fetched: "sourcing/staging/rwanda_registrations.csv",
+    current: (r) => /^valid$/i.test(r.status),
+    ref: (r) => r.registrationNo,
+    holder: (r) => r.holder || r.manufacturer,
+    since: (r) => r.issueDate,
+  },
 ];
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -96,6 +140,9 @@ function main(argv) {
     if (only && w.name !== only) continue;
     const key = w.name.toLowerCase();
     const file = arg("--" + key) || w.fetched;
+    // A register whose monthly fetch has not run yet has nothing to read:
+    // say so and go on, so it never holds up the others.
+    if (!fs.existsSync(path.resolve(ROOT, file))) { log.push(`${w.name}: not fetched yet (${file}) — nothing to read.`); continue; }
     const rows = parseCsv(read(file)).filter((r) => r.iso3 === w.country);
     const prev = arg("--previous-" + key);
     if (prev) {

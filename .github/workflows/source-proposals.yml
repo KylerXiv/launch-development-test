@@ -9,8 +9,9 @@ name: Propose changes from public sources
 #   scripts/propose-trials.js      ClinicalTrials.gov: the trial a medicine in
 #                                  development is waiting on reaching primary
 #                                  completion, or its estimate moving
-#   scripts/propose-registers.js   Nigeria's NAFDAC and Tanzania's TMDA
-#                                  registers: a medicine currently registered
+#   scripts/propose-registers.js   the NAFDAC (Nigeria), TMDA (Tanzania), ZAMRA
+#                                  (Zambia), MCAZ (Zimbabwe), DAV (Viet Nam)
+#                                  and Rwanda FDA registers: a medicine currently registered
 #                                  in a country its map does not show
 # Anything that needs judgement stays in the watch report and the run summary
 # for a person.
@@ -119,7 +120,11 @@ jobs:
               watch trials scripts/propose-trials.js ${P:+--previous "$P"}
               P=$(previous sourcing/staging/nafdac_registrations.csv)
               Q=$(previous sourcing/staging/tmda_registrations.csv)
-              watch registers scripts/propose-registers.js ${P:+--previous-nafdac "$P"} ${Q:+--previous-tmda "$Q"}
+              Z=$(previous sourcing/staging/zamra_registrations.csv)
+              M=$(previous sourcing/staging/mcaz_registrations.csv)
+              D=$(previous sourcing/staging/dav_registrations.csv)
+              R=$(previous sourcing/staging/rwanda_registrations.csv)
+              watch registers scripts/propose-registers.js ${P:+--previous-nafdac "$P"} ${Q:+--previous-tmda "$Q"} \n                ${Z:+--previous-zamra "$Z"} ${M:+--previous-mcaz "$M"} ${D:+--previous-dav "$D"} ${R:+--previous-rwanda "$R"}
               ;;
             test-data/regulatory/*.csv) watch regulatory scripts/propose-regulatory.js --staging "$STAGING" ;;
             test-data/trials/*.csv)     watch trials scripts/propose-trials.js --staging "$STAGING" ;;
