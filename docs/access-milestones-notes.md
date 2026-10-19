@@ -17,7 +17,8 @@ years since the first dated milestone, with no end. That column now reports
 each phase on its own.
 
 The "Delayed" half of the comment is §2. It is a separate commit, so either
-change can be dropped without the other.
+change can be dropped without the other. §3 is sheet row 57, an "About LAUNCH"
+statement, and the changelog line for all three.
 
 ---
 
@@ -184,22 +185,98 @@ The definition is in one place (`LATE_DEF`) plus its entry in
 
 ---
 
-## 3. Deferred, or found in passing
+## 3. About LAUNCH (sheet row 57), and the changelog line
 
-- **No changelog line.** The change alters what the table says, and the 8 Oct
-  yardstick change had a line. A line here means a subscriber email. Its date
-  must be the merge day, with `meta.lastUpdated` moved to match. That is the
-  owner's call.
+Row 57 asked for "Jan's strategic proof-of-concept statement articulating
+LAUNCH's mandate". It should explain the focus on four initial antimalarials
+for MFT transparency, without implying product endorsement, with the scope
+open to expansion. Jan's own text never arrived. On 19 Oct the owner said not
+to wait for Jan and to write it. **The text below is the LAUNCH team's
+wording, not Jan's, and Jan has not reviewed it.** It is a new footer section,
+`#about-launch`, between the disclaimer and "About the data":
+
+> LAUNCH, funded by Unitaid, is a proof of concept for making the access
+> pathway of new antimalarial medicines transparent. It brings public
+> information on each medicine together in one place, from development and
+> regulatory approval through WHO recommendation and prequalification to
+> registration, policy, procurement and delivery in countries, so that
+> partners can see where access is held up and act on it.
+>
+> It starts with four medicines relevant to multiple first-line therapy (MFT)
+> strategies, which use more than one first-line treatment in a population to
+> reduce the risk of drug resistance. Two are already recommended by WHO but
+> underused: artesunate–pyronaridine (ASPY) and dihydroartemisinin–piperaquine
+> (DHA–PPQ). Two are in late-stage development: ganaplacide–lumefantrine
+> (GanLum) and artemether–lumefantrine–amodiaquine (ALAQ). Together they cover
+> both halves of the pathway: approval for the medicines in development, and
+> adoption and procurement for those already recommended.
+>
+> Tracking a medicine here does not mean that LAUNCH or Unitaid endorses it or
+> recommends it for any use. The dashboard reports where each medicine stands
+> on the access pathway, not whether it should be used. For this proof of
+> concept the scope is these four medicines; it may later expand to other
+> medicines and malaria tools.
+
+### Decisions
+
+1. **Every claim comes from something already in the repo.** "Unitaid-funded"
+   and "make the whole board visible" come from
+   [domain-primer.md](domain-primer.md) §1. The two pairs, one testing the
+   regulatory half and one the adoption half, are §4 there. "Underused"
+   matches the page's own "Recommended · Underutilized" label. MFT follows the
+   glossary. *Rejected:* the primer's older details, "DeTACT" and "registered
+   in 25+ countries". The row 51 claims audit and #112 corrected both.
+2. **The reason for the four is the paired design,** which the primer
+   documents, not a judgement of the medicines. That keeps the endorsement
+   sentence true.
+3. **"LAUNCH or Unitaid" in the endorsement sentence.** The disclaimer already
+   speaks for Unitaid on accuracy. A visitor could read inclusion as a funder's
+   preference, so both are named.
+4. **"Other medicines and malaria tools"** leaves room for the spatial
+   emanators row, which is pending funder approval (primer §4), without naming
+   it.
+5. **In the footer, not the header.** The sheet files it under "Strategic
+   Framing / About", and the footer already holds the disclaimer and "About
+   the data". `.ft-sec p + p` gives the three paragraphs 8px between them,
+   because `.ft-sec p` zeroes margins.
+
+### The changelog line
+
+There is one entry dated 2026-10-19, for all three changes: the access
+milestones, "Delayed", and About LAUNCH. *Why a line:* "On pathway: 14 years"
+changes to "Reached in 2022 · 4 years so far", and a reader who saw the old
+figure deserves to know why. The 8 Oct yardstick change set the precedent.
+`meta.lastUpdated` is already 2026-10-19 (#117). `history-continues.js
+history/products-2026-10-19.js data/products.js 2026-10-19` says "a later
+change on 2026-10-19 (1 changelog entry added)", so publish.yml may replace
+today's snapshot. Subscribers get it in the same daily email as #117's entry
+(notify-subscribers, 15:00 UTC).
+
+### The open points, settled without Jan
+
+At the owner's instruction (19 Oct), these were settled without Jan:
+
+- "Country Access" stays (§1, decision 2).
+- "Significant volumes" stays in Jan's words, with no number (§1, decision 6).
+- The new "Delayed" definition goes in (§2).
+
+---
+
+## 4. Deferred, or found in passing
+
 - **RBM.** The RBM copy is built from this page and released by hand since
   #113. After a merge: rebuild, push and check the live iframe
   ([rbm/README.md, "How updates arrive"](../rbm/README.md#how-updates-arrive)).
-- **Jan's proof-of-concept statement (sheet row 57)** is not on this branch.
-  The text has not arrived.
+- **Translation is skipped.** The Google key is not set up yet (owner, 19
+  Oct). Everything new, including About LAUNCH, is English on `/fr`, `/pt`
+  and `/es` until it is.
 - **PR #111 conflicts with `main`.** It is 35 commits behind, with 10
   conflicts in `data/products.js` and 1 in this page. Rows 47–49 (#112) and
   the claim citations (#117) edited the same claims as #111's row 51. Its
   preview is built on the old base, so it also shows the yardstick badges that
-  `main` hides. This branch does not touch it.
+  `main` hides. This branch does not touch it. It is resolved after this
+  branch merges, so it is resolved once against the final `main`; that work is
+  recorded on #111's own notes.
 - **Resolved here:** [illustrated-journey-ui-notes.md](illustrated-journey-ui-notes.md)
   §4 listed "'On pathway' counts from the first cleared gate. The label
   doesn't say so, and ALAQ shows '—'". Both points are gone with the column.
@@ -207,12 +284,14 @@ The definition is in one place (`LATE_DEF`) plus its entry in
 
 ---
 
-## 4. Status
+## 5. Status
 
-- Branch `feedback/jan-access-milestones`, from `main` `783f6d9`. Local, not
-  pushed, no PR.
+- Branch `feedback/jan-access-milestones`, from `main` `783f6d9`. Three
+  commits: access milestones, "Delayed", About LAUNCH with the changelog line.
+  Pushed and opened as a PR on 19 Oct, to merge once CI passes (owner's
+  instruction). The PR records the CI result.
 - Files: `illustrated-journey-dashboard.html`, `i18n/reviewed-strings.json`,
-  this document.
+  `data/products.js` (one changelog entry), this document.
 - Verify block (CLAUDE.md): treatment policy regenerated byte-identical;
   validator 0 errors, 1 warning; synthetic 0 and 0; `make-preview.js` ran;
   country names "covers all 252". `test-build-dataset.js` exits 1 on the stale

@@ -902,6 +902,7 @@
   .ft-sec { background: var(--surface); border-radius: 8px; box-shadow: var(--shadow); padding: 14px 20px 16px; }
   .ft-sec h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; color: var(--ink); }
   .ft-sec p { margin: 0; }
+  .ft-sec p + p { margin-top: 8px; }
   .disclaimer { background: var(--accent-soft); border: 1px solid var(--line); border-left: 5px solid var(--accent);
                 border-radius: 10px; padding: 14px 18px; color: var(--ink); scroll-margin-top: 16px; }
   .disclaimer:focus { outline: none; }
@@ -1558,6 +1559,24 @@
       <p>Unitaid does not accept legal responsibility for the accuracy of the data. Unitaid does not guarantee that it is complete, up to date or fit for a specific purpose. <span id="disc-countries"></span>Users should carry out their own country-level checks before making any decision based on this data.</p>
       <p>A full understanding of a medicine's access situation in any country may require information that is not in this dashboard.</p>
     </div>
+    <!-- LAUNCH's mandate (partner feedback, row 57, 19 Oct 2026): why these
+         four medicines, no endorsement, and the scope. Facts as in
+         docs/domain-primer.md §1 and §4; see docs/access-milestones-notes.md. -->
+    <section class="ft-sec" id="about-launch">
+      <h3>About LAUNCH</h3>
+      <p>LAUNCH, funded by Unitaid, is a proof of concept for making the access pathway of new antimalarial medicines transparent.
+        It brings public information on each medicine together in one place, from development and regulatory approval through
+        WHO recommendation and prequalification to registration, policy, procurement and delivery in countries, so that partners
+        can see where access is held up and act on it.</p>
+      <p>It starts with four medicines relevant to multiple first-line therapy (MFT) strategies, which use more than one first-line
+        treatment in a population to reduce the risk of drug resistance. Two are already recommended by WHO but underused:
+        artesunate–pyronaridine (ASPY) and dihydroartemisinin–piperaquine (DHA–PPQ). Two are in late-stage development:
+        ganaplacide–lumefantrine (GanLum) and artemether–lumefantrine–amodiaquine (ALAQ). Together they cover both halves of
+        the pathway: approval for the medicines in development, and adoption and procurement for those already recommended.</p>
+      <p>Tracking a medicine here does not mean that LAUNCH or Unitaid endorses it or recommends it for any use. The dashboard
+        reports where each medicine stands on the access pathway, not whether it should be used. For this proof of concept the
+        scope is these four medicines; it may later expand to other medicines and malaria tools.</p>
+    </section>
     <section class="ft-sec">
       <h3>About the data</h3>
       <p>The LAUNCH dashboard displays publicly available information only. Product-specific details
