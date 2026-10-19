@@ -1640,7 +1640,10 @@
   const ICON = { done: "✓", prog: "›", late: "!", idle: "" };
   const LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
   // What "Delayed" means, shown from the i beside it in the medicines table.
-  const LATE_DEF = "this stage is not moving as fast as expected.";
+  // It said "not moving as fast as expected", which named no expectation; a
+  // partner asked what Delayed refers to (19 Oct 2026). It is the hand-set
+  // `late` status (docs/data-analyst-guide.md), not a measured comparison.
+  const LATE_DEF = "the medicine's current stage has stalled or is moving unusually slowly, in LAUNCH's judgement from public evidence. The main barrier gives the reason. It is not measured against a set deadline.";
   const lateInfo = () => `<button type="button" class="info" data-tip="${esc(LABEL.late + ": " + LATE_DEF)}" aria-label="${esc(LABEL.late + ": " + LATE_DEF)}">i</button>`;
   // Illustrated stage glyphs (assets/journey-icons/icons.js), one per stage in
   // stage order. Injected once as a sprite; each marker references it by <use>,

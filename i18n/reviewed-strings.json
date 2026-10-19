@@ -4,7 +4,7 @@
   "entries": [
     { "file": "illustrated-journey-dashboard.html", "src": "done: \"Complete\"", "en": "Complete" },
     { "file": "illustrated-journey-dashboard.html", "src": "late: \"Delayed\"", "en": "Delayed" },
-    { "file": "illustrated-journey-dashboard.html", "src": "LATE_DEF = \"this stage is not moving as fast as expected.\"", "en": "this stage is not moving as fast as expected." },
+    { "file": "illustrated-journey-dashboard.html", "src": "LATE_DEF = \"the medicine's current stage has stalled or is moving unusually slowly, in LAUNCH's judgement from public evidence. The main barrier gives the reason. It is not measured against a set deadline.\"", "en": "the medicine's current stage has stalled or is moving unusually slowly, in LAUNCH's judgement from public evidence. The main barrier gives the reason. It is not measured against a set deadline." },
     { "file": "illustrated-journey-dashboard.html", "src": "? \" year\" :", "en": "year" },
     { "file": "illustrated-journey-dashboard.html", "src": ": \" years\");", "en": "years" },
     { "file": "illustrated-journey-dashboard.html", "src": "? `${yrsText(n)} so far` :", "en": "${yrsText(n)} so far" },

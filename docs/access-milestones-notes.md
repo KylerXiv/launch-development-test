@@ -16,7 +16,8 @@ steps, as its two phases, Market Access (stages 1–3) and Country Access
 years since the first dated milestone, with no end. That column now reports
 each phase on its own.
 
-The "Delayed" half of the comment is §2.
+The "Delayed" half of the comment is §2. It is a separate commit, so either
+change can be dropped without the other.
 
 ---
 
@@ -142,6 +143,44 @@ translate bot, as #112 did.
 16:58 UTC to 19 Oct 06:17 UTC. The latest says "Translation failed for: fr pt
 es"; the other three were not opened. Until the engine works again, `/fr`, `/pt` and `/es` show the new text in
 English. That holds for every PR, not only this one.
+
+---
+
+## 2. What "Delayed" means
+
+Jan asked what "Delayed" refers to. The i beside it said "Delayed: this stage
+is not moving as fast as expected." That names no expectation. Since row 45
+hid the yardstick, the page shows no expected time a reader could compare
+against. "Delayed" is the hand-set `late` status:
+[data-analyst-guide.md](data-analyst-guide.md) says "Stuck, slipped, or moving
+abnormally slowly", a judgement call with a written reason. The i now says:
+
+> Delayed: the medicine's current stage has stalled or is moving unusually
+> slowly, in LAUNCH's judgement from public evidence. The main barrier gives
+> the reason. It is not measured against a set deadline.
+
+### Decisions
+
+1. **"Current stage", not "the stage named above".** On phones the stage name
+   is hidden in the summary row (`.c-stage .stg` is `display: none` at 680px
+   and below), so a word about position would point at nothing.
+2. **"The main barrier gives the reason"** holds for both Delayed medicines.
+   A `late` stage requires a product `flag` (data rules), and the barrier
+   cell shows `barrier || flag`. ASPY, national policy adoption: "National
+   guideline inclusion is limited". DHA–PPQ, procurement: "Only 0.9–4.5% of
+   Global Fund antimalarial orders by value, 2022–24". The barrier is shown on
+   phones too, as the row's third line.
+3. **The label stays "Delayed".** The owner chose on 15 Oct to keep the status
+   (row 45 of the email asked to remove "expected", "variance" and
+   "delayed"). *Rejected:* renaming it, for example to "Stalled". That reopens
+   the owner's decision, and the definition is what Jan asked about.
+4. **This rewrites the definition the owner chose to keep.** On 15 Oct the
+   owner kept "the red Delayed status and its definition as they are". So
+   this is its own commit, to be dropped if the owner says no. The new wording
+   also loses the word "expected", which the row 45 email objected to.
+
+The definition is in one place (`LATE_DEF`) plus its entry in
+`i18n/reviewed-strings.json`, updated together.
 
 ---
 
