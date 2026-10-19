@@ -147,7 +147,12 @@ group("Registers: the real NAFDAC and TMDA lists");
 const regs = watcher("propose-registers.js", []);
 ok("exits 0 and proposes nothing", regs.code === 0 && regs.manifest && regs.manifest.length === 0, regs.stdout);
 ok("Nigeria and Tanzania are already on the map for ASPY and DHA–PPQ",
-  (regs.stdout.match(/already on the map/g) || []).length === 4, regs.stdout);
+  (regs.stdout.match(/(NAFDAC|TMDA) · [^:]+: \S+ already on the map/g) || []).length === 4, regs.stdout);
+// Zambia, Zimbabwe, Viet Nam and Rwanda (19 Oct 2026): each register is read
+// (or, before its first monthly fetch, skipped), and none proposes anything
+// the map already shows.
+for (const n of ["ZAMRA", "MCAZ", "DAV", "RWANDA"])
+  ok(n + " is read, or skipped until its first fetch", new RegExp("- " + n + ": (\\d+ portfolio rows|not fetched yet)").test(regs.stdout), regs.stdout);
 
 group("Registers: test-data/registers/nafdac-ganlum-registered.csv");
 const nf = watcher("propose-registers.js", ["--only", "NAFDAC", "--nafdac", "test-data/registers/nafdac-ganlum-registered.csv"]);
