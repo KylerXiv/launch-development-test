@@ -173,15 +173,19 @@
   .pathexp b { font-weight: 700; color: var(--exp-ink); font-variant-numeric: tabular-nums; }
   .pathnode .pathexp svg { width: 13px; height: 13px; margin: 0; display: inline-block; color: var(--exp-ink); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .pathexp.none { border-color: transparent; background: var(--surface); color: var(--ink-3); padding-inline: 8px; }
-  /* Phones: the tag wraps between its parts, never inside them (9 Oct 2026).
-     The WHO pair's column is 66px inside its bracket, but the tag could not
-     shrink below 112px (clock, "2 years" and "expected" side by side), so it
-     ran 18px past the column and 4px past the card. Now "expected" drops to a
-     second line under the clock and the number. */
+  /* The tag wraps between its parts, never inside them (9 Oct 2026, phones;
+     every width since 19 Oct 2026). The WHO pair's column is 66px inside its
+     bracket on a phone, but the tag could not shrink below 112px (clock,
+     "2 years" and "expected" side by side), so it ran past the column and the
+     card. At tablet widths, and in RBM's iframe beside its sidebar, the same
+     tag ran past the bracket and was cut off ("1.5 years expecte"). Now
+     "expected" drops to a second line whenever the column is too narrow, and
+     the tag stays on one line when it fits. */
+  .pathexp { white-space: normal; text-align: center; justify-content: center;
+             flex-wrap: wrap; column-gap: 3px; max-width: 100%; box-sizing: border-box; }
+  .pathexp b { white-space: nowrap; }
   @media (max-width: 640px) {
-    .pathexp { white-space: normal; text-align: center; justify-content: center;
-               flex-wrap: wrap; column-gap: 3px; max-width: 100%; box-sizing: border-box; padding: 2px 5px; }
-    .pathexp b { white-space: nowrap; }
+    .pathexp { padding: 2px 5px; }
   }
   /* Market Access / Country Access: two white cards on the canvas,
      each with a gray title strip and half the width (8 Oct 2026). The card, its
@@ -258,7 +262,7 @@
   .product.l1-open > .srow { background: var(--surface-2); }
   .srow {
     display: grid; column-gap: 30px; align-items: center; padding: 10px 18px; min-height: 58px;
-    grid-template-columns: 34px minmax(150px, 1.6fr) 214px minmax(170px, 1.2fr) 100px minmax(150px, 1.2fr);
+    grid-template-columns: 34px minmax(150px, 1.6fr) 214px minmax(170px, 1.2fr) 112px minmax(150px, 1.2fr);
   }
   .srow.hd {
     min-height: 34px; padding-block: 6px; background: var(--surface-2); border-bottom: 1px solid var(--line);
@@ -358,6 +362,16 @@
      as red "late": the wording is neutral on purpose (8 Oct 2026). Green means
      no difference, grey has nothing to compare. See docs/jackson/yardstick.md. */
   .srow .c-path { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  /* Access milestones (partner feedback, 19 Oct 2026): the column that was
+     "On pathway" names the two phases, each with what it has reached. */
+  .acc { display: grid; gap: 1px; font-size: 12.5px; line-height: 1.3; }
+  .acc small { font-size: 11px; color: var(--ink-3); }
+  .acc small + small, .acc b + small { margin-top: 4px; }
+  .acc b { font-weight: 700; color: var(--ink); }
+  .acc b.ok { color: var(--good-text); }
+  .acc .none { color: var(--ink-3); }
+  .srow.hd .c-path { display: flex; flex-direction: row; align-items: center; gap: 5px; }
+  .srow.hd .info { text-transform: none; }
   .ysp { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 650; line-height: 1.4; border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
   .ysp i { font-style: normal; font-weight: 500; }
   .ysp.sm { font-size: 11.5px; padding: 1px 8px; }
@@ -423,6 +437,12 @@
   @media (max-width: 1040px) {
     .srow { column-gap: 20px; grid-template-columns: 34px minmax(130px, 1.4fr) 200px minmax(150px, 1fr) minmax(120px, 1fr); }
     .srow .c-path { display: none; }
+  }
+  /* Just above that (19 Oct 2026): the fixed minimums and 30px gaps add up to
+     more than the board, which ran 28px past its edge at 1041px, and 52px once
+     the access column grew. Tighter gaps and minimums fit it. */
+  @media (min-width: 1041px) and (max-width: 1180px) {
+    .srow { column-gap: 18px; grid-template-columns: 34px minmax(130px, 1.4fr) 214px minmax(160px, 1.2fr) 112px minmax(140px, 1.2fr); }
   }
   @media (max-width: 680px) {
     .srow { column-gap: 14px; grid-template-columns: 34px 1fr auto; row-gap: 6px; }
@@ -759,6 +779,7 @@
     .gw-head .gp-close { order: 2; flex: none; }
     .gw-sum { order: 3; flex-basis: 100%; margin-left: 52px; }
   }
+  .gw-par { margin: -4px 0 12px; font-size: 14px; color: var(--ink-2); }
   .gw-band { background: var(--surface-2); border-radius: 10px; padding: 14px 16px 16px; }
   .gw-band h4 { margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
   .gw-band > p { margin: 0; font-size: 15.5px; color: var(--ink); max-width: 110ch; }
@@ -808,11 +829,18 @@
   .card .big { font-size: 24px; font-weight: 750; font-variant-numeric: tabular-nums; }
   .card .sub { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
   .card .prov { font-size: 12.5px; color: var(--ink-3); margin-top: 6px; overflow-wrap: anywhere; }
+  /* Citations on each claim (15 Oct feedback, 19 Oct 2026): the reference's
+     name from the Sources list, linked to the reference itself. They wrap
+     inside their panel or cell, never past it. */
+  a.cite { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+  a.cite .ext { font-size: .85em; margin-left: 2px; text-decoration: none; display: inline-block; }
+  .mcite { display: block; margin-top: 3px; font-size: 12px; font-weight: 400; line-height: 1.4; color: var(--ink-3); overflow-wrap: anywhere; }
   .card ul { margin: 0; padding-left: 18px; font-size: 15px; color: var(--ink); }
   .card ul li { margin: 3px 0; }
   .card p { margin: 0; font-size: 15px; color: var(--ink); }
   .kv { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; padding: 4px 0; border-bottom: 1px dashed var(--line); }
   .kv:last-child { border-bottom: 0; }
+  .kv.sub span:first-child { padding-left: 14px; }
   .kv span:first-child { color: var(--ink-2); }
   .kv span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
   .mtable-box { overflow-x: auto; margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
@@ -895,6 +923,7 @@
   .ft-sec { background: var(--surface); border-radius: 8px; box-shadow: var(--shadow); padding: 14px 20px 16px; }
   .ft-sec h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; color: var(--ink); }
   .ft-sec p { margin: 0; }
+  .ft-sec p + p { margin-top: 8px; }
   .disclaimer { background: var(--accent-soft); border: 1px solid var(--line); border-left: 5px solid var(--accent);
                 border-radius: 10px; padding: 14px 18px; color: var(--ink); scroll-margin-top: 16px; }
   .disclaimer:focus { outline: none; }
@@ -1386,10 +1415,26 @@
      sideways, and measured it is no wider than before. After the 760px block
      on purpose: that block sets .pathnode { min-width: 72px } at the same
      specificity. */
+  /* Every width since 19 Oct 2026: between 641 and 760px the old rule still
+     split "recommenda-tion" (an iPad mini showing RBM's iframe). */
+  .pathnode .plabel { overflow-wrap: normal; hyphens: manual; }
+  .pathnode { flex: 1 0 72px; min-width: min-content; }
+  .pathgroup { flex: 1 0 84px; min-width: min-content; }
+  /* Market Access above Country Access (19 Oct 2026). Side by side, the two
+     cards need about 1,150px in English and more in French; anything
+     narrower, a tablet or RBM's iframe beside its 270px sidebar, cut Country
+     Access off at the edge and left it to a sideways scroll nobody saw.
+     fitPathway() measures, so the switch follows the language and the fonts
+     rather than a fixed breakpoint, and stacks the cards full width with the
+     arrow turned down. A card still too narrow for its steps (Country Access
+     on a small phone) scrolls inside itself. */
+  .pathway.stack { flex-direction: column; }
+  .pathway.stack .phase { flex: none; min-width: 0; }
+  .pathway.stack .phase-body { overflow-x: auto; }
+  /* stacked, only the card holding the WHO pair needs the room it is lifted into */
+  .pathway.stack .phase-body:not(:has(.pathgroup)) { padding-top: 8px; }
+  .pathway.stack .patharrow.phasegap { width: auto; margin: 2px 0; transform: rotate(90deg); }
   @media (max-width: 640px) {
-    .pathnode .plabel { overflow-wrap: normal; hyphens: manual; }
-    .pathnode { flex: 1 0 72px; min-width: min-content; }
-    .pathgroup { flex: 1 0 84px; min-width: min-content; }
     /* Safari (10 Oct 2026): WebKit sizes each card (.phase, min-width:
        min-content) from its steps' min-content alone and leaves out their
        72px flex-basis, so a step with short words ("R&D & clinical") was
@@ -1398,6 +1443,14 @@
        bracket. With the label at least 72px, a step's min-content is never
        below its basis, so both engines agree. Chrome was never affected. */
     .pathnode .plabel { min-width: 72px; box-sizing: border-box; }
+    /* Stacked on a phone, each card has the whole width, so it gives its
+       steps the room its padding and arrows took: four Country Access steps
+       then fit at 375px in English. Step and label minimums move together,
+       for the Safari reason above. */
+    .pathway.stack .phase-body { padding-left: 4px; padding-right: 4px; gap: 0; }
+    .pathway.stack .phase-body > .patharrow { font-size: 12px; }
+    .pathway.stack .pathnode { flex-basis: 64px; }
+    .pathway.stack .pathnode .plabel { min-width: 64px; }
   }
 </style>
 
@@ -1456,7 +1509,7 @@
 
   <div class="demo-banner" id="banner" hidden></div>
 
-  <div class="pathway" id="pathway" role="group" aria-label="The eight-stage access pathway. Choose a step to see what happens there and where each medicine is" hidden></div>
+  <div class="pathway" id="pathway" role="group" aria-label="The access pathway: eight milestones across seven stages. WHO recommendation and WHO PQ listing are parallel milestones within stage 3. Choose a stage to see what happens there and where each medicine is" hidden></div>
 
   <div class="gatewrap" id="gatewrap" hidden></div>
 
@@ -1527,6 +1580,24 @@
       <p>Unitaid does not accept legal responsibility for the accuracy of the data. Unitaid does not guarantee that it is complete, up to date or fit for a specific purpose. <span id="disc-countries"></span>Users should carry out their own country-level checks before making any decision based on this data.</p>
       <p>A full understanding of a medicine's access situation in any country may require information that is not in this dashboard.</p>
     </div>
+    <!-- LAUNCH's mandate (partner feedback, row 57, 19 Oct 2026): why these
+         four medicines, no endorsement, and the scope. Facts as in
+         docs/domain-primer.md §1 and §4; see docs/access-milestones-notes.md. -->
+    <section class="ft-sec" id="about-launch">
+      <h3>About LAUNCH</h3>
+      <p>LAUNCH, funded by Unitaid, is a proof of concept for making the access pathway of new antimalarial medicines transparent.
+        It brings public information on each medicine together in one place, from development and regulatory approval through
+        WHO recommendation and prequalification to registration, policy, procurement and delivery in countries, so that partners
+        can see where access is held up and act on it.</p>
+      <p>It starts with four medicines relevant to multiple first-line therapy (MFT) strategies, which use more than one first-line
+        treatment in a population to reduce the risk of drug resistance. Two are already recommended by WHO but underused:
+        artesunate–pyronaridine (ASPY) and dihydroartemisinin–piperaquine (DHA–PPQ). Two are in late-stage development:
+        ganaplacide–lumefantrine (GanLum) and artemether–lumefantrine–amodiaquine (ALAQ). Together they cover both halves of
+        the pathway: approval for the medicines in development, and adoption and procurement for those already recommended.</p>
+      <p>Tracking a medicine here does not mean that LAUNCH or Unitaid endorses it or recommends it for any use. The dashboard
+        reports where each medicine stands on the access pathway, not whether it should be used. For this proof of concept the
+        scope is these four medicines; it may later expand to other medicines and malaria tools.</p>
+    </section>
     <section class="ft-sec">
       <h3>About the data</h3>
       <p>The LAUNCH dashboard displays publicly available information only. Product-specific details
@@ -1609,7 +1680,10 @@
   const ICON = { done: "✓", prog: "›", late: "!", idle: "" };
   const LABEL = { done: "Complete", prog: "In progress", late: "Delayed", idle: "Not started" };
   // What "Delayed" means, shown from the i beside it in the medicines table.
-  const LATE_DEF = "this step is not moving as fast as expected.";
+  // It said "not moving as fast as expected", which named no expectation; a
+  // partner asked what Delayed refers to (19 Oct 2026). It is the hand-set
+  // `late` status (docs/data-analyst-guide.md), not a measured comparison.
+  const LATE_DEF = "the medicine's current stage has stalled or is moving unusually slowly, in LAUNCH's judgement from public evidence. The main barrier gives the reason. It is not measured against a set deadline.";
   const lateInfo = () => `<button type="button" class="info" data-tip="${esc(LABEL.late + ": " + LATE_DEF)}" aria-label="${esc(LABEL.late + ": " + LATE_DEF)}">i</button>`;
   // Illustrated stage glyphs (assets/journey-icons/icons.js), one per stage in
   // stage order. Injected once as a sprite; each marker references it by <use>,
@@ -1674,17 +1748,18 @@
     .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
 
   // schema.org structured data for search engines and knowledge-graph crawlers.
-  // Derived from the data at render time, never stored; @id ties each product to
-  // its canonical node in ontology/launch-data.jsonld (which carries the ATC and
-  // Wikidata alignments). Skipped for synthetic datasets so fictional products
-  // can never be indexed as real medicines.
+  // Derived from the data at render time, never stored. SITE is the LAUNCH site
+  // (until 18 Oct 2026 an old, retired copy of the site, which RBM's pages
+  // would otherwise have carried); the download is the published dashboard.json.
+  // Skipped for synthetic datasets so fictional products can never be indexed
+  // as real medicines.
   if (!DATA.meta.synthetic) {
-    const SITE = "https://kochrisdev.github.io/launch-transparency-dashboard";
+    const SITE = "https://launch-development-test.vercel.app";
     const ld = {
       "@context": "https://schema.org",
       "@graph": [{
         "@type": "Dataset",
-        "@id": SITE + "/ontology/launch-data.jsonld#dataset",
+        "@id": SITE + "/#dataset",
         "name": "LAUNCH Transparency Dashboard dataset",
         "description": "Access-pathway status of new antimalarial medicines — stages, milestones, country access and procurement — with public-source provenance on every figure.",
         "url": SITE + "/",
@@ -1692,12 +1767,12 @@
         "creativeWorkStatus": DATA.meta.dataStatus,
         "distribution": [{
           "@type": "DataDownload",
-          "encodingFormat": "application/ld+json",
-          "contentUrl": SITE + "/ontology/launch-data.jsonld"
+          "encodingFormat": "application/json",
+          "contentUrl": "https://codebyjackson.github.io/launch-data-test/v1/dashboard.json"
         }]
       }].concat(tracked.map(p => ({
         "@type": "Drug",
-        "@id": SITE + "/ontology/launch-data.jsonld#product-" + p.id,
+        "@id": SITE + "/#product-" + p.id,
         "name": p.name,
         "nonProprietaryName": p.inn,
         "manufacturer": { "@type": "Organization", "name": p.manufacturer },
@@ -1712,6 +1787,23 @@
 
   function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
   function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+  // Citations (15 Oct feedback, 19 Oct 2026). A claim's "sources" are ids in
+  // data/sources.js: each is shown where the claim is, by its name in the
+  // Sources list (so it is translated with that list) and linked to the
+  // reference itself. A claim with no ids falls back to its free-text
+  // "source". Looked up on first use, as the RBM pages set LAUNCH_SOURCES
+  // from the dataset before this runs but after this file is parsed.
+  let SRC_BY_ID = null;
+  function citeLinks(ids) {
+    if (!SRC_BY_ID) {
+      SRC_BY_ID = {};
+      ((window.LAUNCH_SOURCES || {}).sources || []).forEach(s => { SRC_BY_ID[s.id] = s; });
+    }
+    return (ids || []).map(id => SRC_BY_ID[id]).filter(Boolean).map(s => s.url
+      ? `<a class="cite" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label || s.title)}<span class="ext" aria-hidden="true">↗</span></a>`
+      : esc(s.label || s.title)).join(" · ");
+  }
+  function citeHtml(ids, text) { return citeLinks(ids) || esc(text || ""); }
   // "2026-08-25" → "25 August 2026" — spelled out, so the changes list reads
   // as prose rather than as a database column.
   function readableDate(iso) {
@@ -1791,34 +1883,67 @@
     const ys = p.stages.map(stageYear).filter(y => y != null);
     return ys.length ? Math.min(...ys) : null;
   }
-  function onPathwayShort(p) {
-    const y = firstYear(p);
-    if (y == null) return "—";
-    const n = ASOF_YEAR - y;
-    return n > 0 ? yrsText(n) : "< 1 year";
+  // ---- access milestones: market access, then country access ----------------
+  // The table used to give one figure, "On pathway": years since the first
+  // dated milestone, with no end. A partner asked where that pathway ends and
+  // suggested two steps in sequence instead (feedback, 19 Oct 2026): market
+  // access, reached once a medicine is WHO-prequalified and WHO-recommended,
+  // then access in countries (in-country processes and procurement of
+  // significant volumes). Those are the page's two phases (PHASES below), so
+  // each phase reports on its own. A phase is reached when every stage in it
+  // is complete, in the year of its latest dated stage. Country Access counts
+  // from the year Market Access was reached, not from earlier country steps
+  // (ASPY was registered in Viet Nam in 2013, before WHO recommended it).
+  function phaseReached(p, k) {
+    const idx = p.stages.map((_, i) => i).filter(i => phaseOf(i) === k);
+    if (!idx.every(i => p.stages[i].status === "done")) return null;
+    const ys = idx.map(i => stageYear(p.stages[i])).filter(y => y != null);
+    return { year: ys.length ? Math.max(...ys) : null };
   }
-  function onPathwayLong(p) {
-    const y = firstYear(p);
-    if (y == null) return "Not yet dated";
-    const n = ASOF_YEAR - y;
-    return n > 0 ? yrsText(n) + ", ongoing" : "Under 1 year";
+  const reachedText = y => (y != null ? `Reached in ${y}` : "Reached, year not recorded");
+  const soFarText = n => (n > 0 ? `${yrsText(n)} so far` : "Under 1 year so far");
+  // [phase name, figure, tone] for each phase shown. Country Access appears
+  // only once Market Access is reached, because it counts from there.
+  function accessParts(p) {
+    const m = phaseReached(p, 0);
+    if (!m) return [[PHASES[0].name, "Not yet reached", "none"]];
+    const c = phaseReached(p, 1);
+    const country = c ? [reachedText(c.year), "ok"]
+      : m.year != null ? [soFarText(ASOF_YEAR - m.year), ""]
+      : [LABEL.prog, ""];
+    return [[PHASES[0].name, reachedText(m.year), "ok"], [PHASES[1].name, ...country]];
   }
+  // What the two figures mean, from the i beside them.
+  const ACCESS_DEF = "Market Access is reached when a medicine is both recommended by WHO and WHO-prequalified. Country Access runs from then until national registration, policy adoption, procurement in significant volumes and in-country delivery are all complete.";
+  const accessInfo = () => `<button type="button" class="info" data-tip="${esc(ACCESS_DEF)}" aria-label="${esc(ACCESS_DEF)}">i</button>`;
+  // the medicines table: each phase name above its figure
+  const accessCell = p => `<span class="acc">` + accessParts(p).map(([name, t, tone]) => `<small>${esc(name)}</small>` +
+    (tone === "none" ? `<span class="none">${esc(t)}</span>` : `<b${tone ? ` class="${tone}"` : ""}>${esc(t)}</b>`)).join("") + `</span>`;
+  // the open row, in one line: "Market Access: Reached in 2022 · Country Access: 4 years so far"
+  const accessLine = p => accessParts(p).map(([name, t]) => `${esc(name)}: ${esc(t)}`).join(" · ");
   // The year the current gate has been waiting since. Uses the same journey
   // milestones the gate panel's "Pending since" line reads, so the two agree;
   // when a product has no journey (GanLum, ALAQ) it falls back to the latest
-  // year among the gates in the column before the current one.
-  function sinceFor(p) {
+  // year among the gates in the column before the current one. sinceFrom also
+  // names that milestone, so the timeline can say what it counts from: DHA–PPQ
+  // read "since 2015" beside Global Fund orders "since 2008" (feedback, 15 Oct
+  // 2026); it now reads "since WHO PQ listing (2015)".
+  function sinceFrom(p) {
     const j = p.detail && p.detail.journey;
     if (Array.isArray(j) && j.length > 1 && j[j.length - 1].year === "TBC") {
       const last = [...j].reverse().find(g => Number.isInteger(g.year));
-      if (last) return last.year;
+      if (last) return { year: last.year, label: last.label };
     }
     const c = STAGE_COLUMNS.findIndex(col => col.stages.includes(p.currentStage));
     if (c > 0) {
-      const ys = STAGE_COLUMNS[c - 1].stages.map(i => stageYear(p.stages[i])).filter(y => y != null);
-      if (ys.length) return Math.max(...ys);
+      const ys = STAGE_COLUMNS[c - 1].stages.map(i => ({ year: stageYear(p.stages[i]), label: STAGES[i] })).filter(s => s.year != null);
+      if (ys.length) return ys.reduce((a, b) => (b.year > a.year ? b : a));
     }
     return null;
+  }
+  function sinceFor(p) {
+    const s = sinceFrom(p);
+    return s ? s.year : null;
   }
 
   // ---- yardstick: expected time against time taken (7 Oct 2026) -------------
@@ -1833,6 +1958,12 @@
   // Years only, read with the page's own rules (stageYear): see
   // docs/jackson/yardstick.md for the choices behind each.
   const YARD = DATA.yardstick || null;
+  // The comparison with each medicine's own dates (the years-late badge, the
+  // box at the top of an open row, and the Time taken view with its Variance
+  // column) is hidden at the partners' request (feedback email, 15 Oct 2026)
+  // until the benchmark method is agreed. The expected time under each stage
+  // on the pathway strip stays (owner's choice). true brings all three back.
+  const YARD_COMPARE = false;
   // How far a step ran past its expected time, as a plain signed number.
   const varianceText = n => "+" + yrsText(n);
   // Market Access is every stage before country registration; Country
@@ -1852,7 +1983,7 @@
     return m ? +m[1] : null;
   }
   function yardstick(p) {
-    if (!YARD) return null;
+    if (!YARD || !YARD_COMPARE) return null;
     const start = firstYear(p);
     if (start == null || stageYear(p.stages[1]) == null) return { approved: false };
     const recYear = stageYear(p.stages[2]);
@@ -1904,7 +2035,7 @@
     const est = line("Expected times from LAUNCH's working estimates, still to be agreed:", by("estimate"));
     return `<p class="ysnote">${pub}${est}</p>`;
   };
-  // under "On pathway" in the medicines table
+  // under the access milestones in the medicines table (was "On pathway")
   function yardBadge(p) {
     const y = yardstick(p);
     if (!y) return "";
@@ -1944,7 +2075,7 @@
       return h + row(esc(STAGES[s.i]), s);
     }).join("");
     return `<div class="cscroll"><table class="ystable">
-      <thead><tr><th scope="col">Step</th><th scope="col">Expected</th><th scope="col">Actual</th><th scope="col">Variance</th></tr></thead>
+      <thead><tr><th scope="col">Stage</th><th scope="col">Expected</th><th scope="col">Actual</th><th scope="col">Variance</th></tr></thead>
       <tbody>${body}</tbody>
       <tfoot>${row("Whole journey", y.whole, true)}</tfoot>
     </table></div>${yardNote()}`;
@@ -1959,10 +2090,36 @@
     if (e) return `<span class="pathexp"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></svg><b>${yrsText(e.years)}</b> expected</span>`;
     return "";
   }
+  // The Country access card. Where a medicine has a country list (the one the
+  // map is painted from), every count comes from it, so the card, the map
+  // legend and the stage 4-5 cells cannot disagree (partner feedback, 15 Oct
+  // 2026): countries on the map, split by the furthest stage each has reached,
+  // and how many of them a national medicines register confirms. A category is
+  // compared in slug form so the literal is not collected for translation (the
+  // sources' categories stay English on every page).
+  function countryAccessKv(d) {
+    const list = d.countries && Array.isArray(d.countries.list) ? d.countries.list : null;
+    if (!list) return `
+              <div class="kv"><span>Registered</span><span>${esc(d.country.registered)}</span></div>
+              <div class="kv"><span>In national guidelines</span><span>${esc(d.country.inGuidelines)}</span></div>
+              <div class="kv"><span>In MFT plans</span><span>${esc(d.country.inMft)}</span></div>`;
+    const c = { registered: 0, guidelines: 0, mft: 0 };
+    list.forEach(e => { if (e.level in c) c[e.level]++; });
+    const cat = {};
+    ((window.LAUNCH_SOURCES || {}).sources || []).forEach(s => { cat[s.id] = String(s.category || "").toLowerCase().replace(/\s+/g, "-"); });
+    const reg = list.filter(e => (e.sources || []).some(id => cat[id] === "national-register")).length;
+    return `
+              <div class="kv"><span>Countries on the map</span><span>${list.length}</span></div>
+              <div class="kv sub"><span>In MFT plans</span><span>${c.mft}</span></div>
+              <div class="kv sub"><span>In national guidelines</span><span>${c.guidelines}</span></div>
+              <div class="kv sub"><span>Registered</span><span>${c.registered}</span></div>` +
+      (Object.keys(cat).length ? `
+              <div class="kv"><span>Confirmed in national registers</span><span>${reg}</span></div>` : "");
+  }
   function miniJourney(p) {
     const done = p.stages.filter(st => st.status === "done").length;
     const dot = i => `<i class="md ${p.stages[i].status}" title="${esc(STAGES[i])}: ${LABEL[p.stages[i].status]}"></i>`;
-    return `<div class="mini" role="img" aria-label="${done} of ${p.stages.length} stages complete">` +
+    return `<div class="mini" role="img" aria-label="${done} of ${p.stages.length} milestones complete">` +
       STAGE_COLUMNS.map((col, c) => `<span class="jcell" data-c="${c}">` +
         (col.stages.length === 1 ? dot(col.stages[0]) : `<span class="mp">${col.stages.map(dot).join("")}</span>`) +
         `</span>`).join('<i class="ln"></i>') + `</div>`;
@@ -1987,7 +2144,7 @@
   // at today, with a bar back to the year it has been waiting since. Gates with
   // no year are listed on the right instead of being given an invented date.
   function journeyTime(p) {
-    const since = sinceFor(p);
+    const from = sinceFrom(p), since = from ? from.year : null;
     const ys = p.stages.map(stageYear).filter(y => y != null);
     if (since != null) ys.push(since);
     let lo = ys.length ? Math.min(...ys) : ASOF_YEAR - 1;
@@ -2023,7 +2180,7 @@
       const st = p.stages[it.i], top = TOP + it.tier * TH;
       const sub = it.cur
         ? `<div class="snow ${st.status}">${LABEL[st.status]}</div>` +
-          (since != null && since < hi ? `<div class="ssince">since ${since} · ${yrsText(hi - since)}</div>` : "")
+          (since != null && since < hi ? `<div class="ssince">since ${esc(from.label)} (${since}) · ${yrsText(hi - since)}</div>` : "")
         : `<div class="syear">${stageYear(st)}</div>`;
       h += `<i class="stem" style="left:${it.x}%;height:${top - 32}px"></i>` +
         `<i class="pt${it.cur ? " " + st.status : ""}" style="left:${it.x}%"></i>` +
@@ -2080,7 +2237,7 @@
     const phase = stacked ? "" : ` data-phase="${phaseOf(i)}"`;
     const exp = YARD && YARD.expected[i] ? ", expected " + yrsText(YARD.expected[i].years) : "";
     return `<button class="pathnode${stacked ? " pathnode-sm" : ""}" type="button" aria-expanded="false" aria-controls="gatewrap"
-      data-gate="${i}"${phase} aria-label="Step ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ? ", " + n + " delayed" : ""}.">` +
+      data-gate="${i}"${phase} aria-label="Stage ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ? ", " + n + " delayed" : ""}.">` +
       `<span class="pill">${stageIconImg(i, "")}<span class="nb" aria-hidden="true">${stepNo(i)}</span></span><span class="plabel">${esc(s)}</span>${pathExpHtml(i)}</button>`;
   }
 
@@ -2100,7 +2257,7 @@
 
   board.insertAdjacentHTML("afterbegin",
     `<div class="srow hd" role="presentation"><span></span><span>Medicine</span><span class="c-mini">Journey</span>` +
-    `<span class="c-stage">Current stage · Status</span><span class="c-path">On pathway</span><span class="c-bar">Main barrier</span></div>`);
+    `<span class="c-stage">Current stage · Status</span><span class="c-path">Access ${accessInfo()}</span><span class="c-bar">Main barrier</span></div>`);
 
   // "Delayed" carries an i with its definition: hover, focus or tap shows it.
   (function () {
@@ -2196,7 +2353,7 @@
           ${d.volume.split.map((s, i) => `<span class="key"><span class="sw" style="background:${shades[i % shades.length]}"></span>${esc(s.channel)} ${s.pct}%</span>`).join("")}
         </div>`}
         ${byPres}
-        ${d.volume.source ? `<div class="prov">Source: ${esc(d.volume.source)}</div>` : ""}
+        ${(d.volume.source || (d.volume.sources || []).length) ? `<div class="prov">Source: ${citeHtml(d.volume.sources, d.volume.source)}</div>` : ""}
       </div>` : `
       <div class="card">
         <h3>Procurement through public channels</h3>
@@ -2212,25 +2369,25 @@
           <div class="nm"><b>${esc(p.name)}</b><small>${esc(p.inn)}</small></div>
           <div class="c-mini">${miniJourney(p)}</div>
           <span class="c-stage"><span class="stg">${esc(STAGES[p.currentStage])}</span><span class="light ${p.stages[p.currentStage].status}"><i></i>${LABEL[p.stages[p.currentStage].status]}${p.stages[p.currentStage].status === "late" ? lateInfo() : ""}</span>${firstClause(p.stages[p.currentStage].date) ? `<span class="note">${esc(firstClause(p.stages[p.currentStage].date))}</span>` : ""}</span>
-          <span class="cell num c-path">${onPathwayShort(p)}${yardBadge(p)}</span>
+          <span class="cell c-path">${accessCell(p)}${yardBadge(p)}</span>
           <div class="c-bar${p.barrier || p.flag ? "" : " none"}">${p.barrier || p.flag ? esc(p.barrier || p.flag) : "No publicly documented barrier identified"}</div>
         </div>
         <div class="l1" id="${esc(p.id)}-l1">
           <div class="l1in">
             <div class="l1h">
               <div class="l1id"><span>${esc(p.manufacturer)}</span><span class="chip ${p.class === "pipeline" ? "pipeline" : ""}">${esc(p.classLabel)}</span></div>
-              <div class="l1ctl"><span class="l1t">On pathway: ${onPathwayLong(p)}</span>
+              <div class="l1ctl"><span class="l1t">${accessLine(p)} ${accessInfo()}</span>
                 <div class="swg" role="group" aria-label="Journey view">
                   <button type="button" data-v="time" aria-pressed="true">Actual timeline</button>
                   <button type="button" data-v="path" aria-pressed="false">Pathway order</button>
-                  ${YARD ? `<button type="button" data-v="taken" aria-pressed="false">Time taken</button>` : ""}
+                  ${YARD && YARD_COMPARE ? `<button type="button" data-v="taken" aria-pressed="false">Time taken</button>` : ""}
                 </div></div>
             </div>
             ${yardBox(p)}
             <div class="views">
               <div class="view" data-v="time">${journeyTime(p)}</div>
               <div class="view" data-v="path" hidden><div class="trackbox"><div class="track">${stagesHtml}</div></div></div>
-              ${YARD ? `<div class="view" data-v="taken" hidden>${yardTable(p)}</div>` : ""}
+              ${YARD && YARD_COMPARE ? `<div class="view" data-v="taken" hidden>${yardTable(p)}</div>` : ""}
             </div>
             <div class="gatepanel" id="${esc(p.id)}-gate" hidden></div>
             ${p.flag ? `<div class="flagnote"><span>${esc(p.flag)}</span></div>` : ""}
@@ -2251,9 +2408,7 @@
             </div>
             <div class="card">
               <h3>Country access</h3>
-              <div class="kv"><span>Registered</span><span>${esc(d.country.registered)}</span></div>
-              <div class="kv"><span>In national guidelines</span><span>${esc(d.country.inGuidelines)}</span></div>
-              <div class="kv"><span>In MFT plans</span><span>${esc(d.country.inMft)}</span></div>
+              ${countryAccessKv(d)}
               <div class="kv"><span>Forecast demand</span><span>${esc(d.country.forecastDemand)}</span></div>
             </div>
             <div class="card">
@@ -2272,7 +2427,7 @@
               <tbody>
                 ${d.milestones.map(m => `
                   <tr>
-                    <td>${esc(m.milestone)}</td>
+                    <td>${esc(m.milestone)}${(m.sources || []).length ? `<span class="mcite">Source: ${citeLinks(m.sources)}</span>` : ""}</td>
                     <td><span class="pill ${m.status}">${ICON[m.status] ? ICON[m.status] + " " : ""}${esc(m.label)}</span></td>
                     <td>${esc(m.date)}</td>
                     <td>${esc(m.next)}</td>
@@ -2398,9 +2553,16 @@
     pathway.style.setProperty("--pg-lift", lift.toFixed(2) + "px");
   }
 
+  // Side by side when both cards fit, stacked when they do not (see .stack).
+  // Measured with the class off, so a wider window can go back side by side.
+  function fitPathway() {
+    pathway.classList.remove("stack");
+    if (pathway.scrollWidth > pathway.clientWidth + 1) pathway.classList.add("stack");
+  }
+
   // align first, then draw — each pass depends on the one before it
   function layoutJourney() {
-    alignStageForks(); drawStageForks(); alignPathGroup();
+    fitPathway(); alignStageForks(); drawStageForks(); alignPathGroup();
   }
 
   layoutJourney();
@@ -2542,7 +2704,7 @@
     }
 
     const prov = [
-      st.source ? "Source: " + esc(st.source) : "",
+      (st.source || (st.sources || []).length) ? "Source: " + citeHtml(st.sources, st.source) : "",
       st.asOf ? "verified " + esc(shortDate(st.asOf)) : "",
       (i === 4 || i === 5) && p.detail.countries && p.detail.countries.status !== "verified"
         // the status is a key ("illustrative"); spelled out whole so the sentence translates as one
@@ -2630,15 +2792,21 @@
         </div>
       </div>` : "";
     const wrap = document.getElementById("gatewrap");
-    wrap.setAttribute("aria-label", "Step " + stepNo(i) + ": " + STAGES[i]);
+    // A stage holding two milestones (WHO recommendation and WHO PQ listing)
+    // says so: they run in parallel, so eight milestones fit in seven stages.
+    const col = STAGE_COLUMNS.find(c => c.stages.includes(i));
+    const par = col && col.stages.length === 2
+      ? `<p class="gw-par">${esc(`${STAGES[col.stages[0]]} and ${STAGES[col.stages[1]]} are parallel milestones within stage ${stepNo(i)}.`)}</p>`
+      : "";
+    wrap.setAttribute("aria-label", "Stage " + stepNo(i) + ": " + STAGES[i]);
     wrap.innerHTML = `
       <div class="gw-head">
         <span class="gw-ico">${stageIconImg(i, "")}</span>
-        <div><div class="gw-step">Step ${stepNo(i)} of ${STAGE_COLUMNS.length}</div><h3>${esc(STAGES[i])}</h3></div>
-        <span class="gw-sum" aria-label="Status of the ${tracked.length} medicines at this step">${chips}</span>
+        <div><div class="gw-step">Stage ${stepNo(i)} of ${STAGE_COLUMNS.length}</div><h3>${esc(STAGES[i])}</h3></div>
+        <span class="gw-sum" aria-label="Status of the ${tracked.length} medicines at this stage">${chips}</span>
         <button class="gp-close" type="button" data-close="gate">Close</button>
       </div>
-      ${band}`;
+      ${par}${band}`;
     wrap.hidden = false;
     btn.setAttribute("aria-expanded", "true");
     openGate = btn;
@@ -3233,7 +3401,8 @@
       { id: "vivax",  short: "Recommended for P. vivax", label: "Recommended for Plasmodium vivax malaria", why: "Listed as treatment in national policy" },
     ];
     const MFT_TXT = { show: "Show on map", count: "No. of countries", use: "Country recommended use", group: "Group", stage: "Access stage", tickHint: "Tick a group to draw its borders on the map.", tickLeft: "Tick a group on the left to see its countries.",
-                      noPolicy: (n) => `No national treatment policy lists ${n} yet.`, notListed: "not listed" };
+                      noPolicy: (n) => `No national treatment policy lists ${n} yet.`, notListed: "not listed",
+                      sources: "Sources for this access stage:", checked: "Checked on" };
     // Colour and line pattern belong to the POLICY GROUP, never to the medicine:
     // every medicine draws first-line as the same solid vermilion line, and so on.
     // The four colours stay separable under protan, deutan and tritan vision, and
@@ -3274,6 +3443,22 @@
     const mftSource = () => {
       const m = (TP && TP.meta) || {};
       return `Source: WHO ${esc(m.edition || "World Malaria Report")}, Annex 4B (${esc(String(m.policyYear || ""))} policy).`;
+    };
+    // The sources behind one country's access stage for the selected medicine:
+    // the ids its entry in detail.countries.list cites, named and linked as in
+    // the Sources list, with the date they were checked (partner feedback,
+    // 15 Oct 2026: attach sources to individual claims, not only a master list).
+    const countrySources = (iso3) => {
+      const p = curProduct();
+      const e = (((p && p.detail && p.detail.countries) || {}).list || []).find((x) => x.iso3 === iso3);
+      const reg = {};
+      ((window.LAUNCH_SOURCES || {}).sources || []).forEach((s) => { reg[s.id] = s; });
+      const items = ((e && e.sources) || []).map((id) => reg[id]).filter(Boolean).map((s) => s.url
+        ? `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label || s.title)}</a>`
+        : esc(s.label || s.title));
+      if (!items.length) return "";
+      return `<p class="mft-note">${esc(MFT_TXT.sources)} ${items.join("; ")}.` +
+        (e.checked ? ` ${esc(MFT_TXT.checked)} ${esc(shortDate(e.checked))}.` : "") + `</p>`;
     };
 
     function mftTipLine(iso3) {
@@ -3448,6 +3633,7 @@
       h += `<div class="det-card"><div class="det-top"><b>${esc(p.name)}</b>${stagePill(st.lvl)}</div>` +
         `<div class="det-trk">${[1, 2, 3].map((n) => `<i${lv >= n ? ` style="background:${stageVar(STAGE_KEYS[lv - 1])}"` : ""}></i>`).join("")}</div>` +
         `<div class="det-trkl"><span>Registered</span><span>In guidelines</span><span>In MFT plans</span></div>` +
+        countrySources(iso3) +
         (gl.length ? gl.map((gm) => `<div class="det-gline">${mftLineSvg(gm.id)}<b>${esc(gm.short)}</b><span class="det-small">in WHO policy ${esc(String((TP && TP.meta && TP.meta.policyYear) || ""))}</span></div>`).join("")
             : `<div class="det-gline det-small">Not listed in national treatment policy</div>`) +
         (gl.length ? `<div class="mft-grp">${esc(MFT_TXT.use)}</div><div class="mft-chips">` +

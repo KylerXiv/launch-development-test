@@ -23,13 +23,14 @@ Host these, side by side, exactly as they are:
 - `en/`, `fr/`, `pt/`, `es/`: the four pages, each with its own `data/` (map
   shapes and country names, not the dashboard's data) and feedback form;
 - `assets/`: the icons and logos every page loads from `../assets/`. Without
-  it, the pages lose their icons;
+  it, the pages lose their icons.
+
 That is 38 files: HTML, JavaScript, SVG and PNG. The styles are inside each
 page, so there are no separate CSS files, and there is no build step or server
 code.
 
 Not needed: `index.html`, `iframe-test.html`, `rbm-shell/`,
-`build-manifest.json`, `launch-release.json` and `.github/` in the LAUNCH test
+and `build-manifest.json` in the LAUNCH test
 copy are for development and testing only.
 
 The dashboard's data is **not** in these files. Each page loads it from the
@@ -130,6 +131,9 @@ https://codebyjackson.github.io/launch-rbm-test/iframe-test.html
 **Data:** nothing to do. The pages read the newest approved `dashboard.json`
 every time they open.
 
+**Pages:** no changes are planned after handover. If Unitaid asks for one, the
+LAUNCH team sends you an updated set of files to replace the old ones.
+
 **Please do not edit the hosted files by hand.** They are built from the same
 page as the LAUNCH site, so a change made only here never reaches the LAUNCH
 site or the translations. Ask the LAUNCH team for the change instead.
@@ -140,10 +144,8 @@ The current data address stays live in the meantime.
 ### For the LAUNCH team (development stage only)
 
 `node scripts/build-rbm-pages.js` builds these pages; `--api-url` sets where
-the two forms post, and `--api-url none` builds them switched off. During
-development, every page change is published as a release (`rbm-v1`, `rbm-v2`,
-…), and the test copy `codebyjackson/launch-rbm-test` applies each one by
-itself with `.github/workflows/launch-update.yml`. **That workflow is for the
-development stage only and will be removed from `launch-rbm-test` before
-handover.** Each release's `rbm-pages.tar.gz` holds exactly the files listed
-under "What to host".
+the two forms post, and `--api-url none` builds them switched off.
+`node scripts/copy-rbm-pages.js --to <checkout of launch-rbm-test>` copies a
+build into the test copy `codebyjackson/launch-rbm-test`; commit and push
+there by hand. The copy replaces exactly the files listed under "What to
+host".
