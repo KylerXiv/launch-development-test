@@ -41,9 +41,10 @@
 //      project (--api-url), whose api/ lists RBM's host as a partner, since
 //      RBM's static host has no api/ of its own. With --api-url none,
 //      Subscribe is hidden and Send feedback is not connected instead.
-//   5. the RBM look goes on top (scripts/rbm-skin.js, from RBM's design
-//      guidelines): colours, fonts and components. The page's own CSS is
-//      unchanged, so the LAUNCH site keeps its look.
+//   5. the Unitaid look goes on top (scripts/rbm-skin.js, from Unitaid's brand
+//      guidelines; RBM's own look until 19 Oct 2026): colours, fonts and
+//      components. The page's own CSS is unchanged, so the LAUNCH site keeps
+//      its look.
 // If dashboard.json cannot be fetched, or its schema_version is not 1, the page
 // says so in its banner and draws nothing, rather than a half-rendered chart.
 //
@@ -219,7 +220,7 @@ function transform(html, lang, { apiUrl = API_URL } = {}) {
   // the loader runs before the deferred scripts, right after the map/icon libraries
   const firstApp = out.indexOf('<script type="text/x-launch-app">');
   out = out.slice(0, firstApp) + loader(lang, apiUrl) + out.slice(firstApp);
-  // the RBM look, after the page's own stylesheet
+  // the Unitaid look, after the page's own stylesheet
   out = applySkin(out, lang);
   return { html: out, removed, deferred };
 }
