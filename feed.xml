@@ -7,6 +7,27 @@
     <language>en</language>
     <lastBuildDate>Mon, 19 Oct 2026 12:00:00 GMT</lastBuildDate>
     <item>
+      <title>All: Medicine cards: every claim checked against its source (partner feedback, row…</title>
+      <description>Medicine cards: every claim checked against its source (partner feedback, row 51; docs/claims-audit-2026-10.md). Where the partners' own wording from the 15 Oct email is already live (the ALAQ, ASPY and DHA–PPQ use cases and ASPY's country counts), it is kept. GanLum: the Phase III result gives its comparator (97.4% vs 94.0% for Coartem) and says it is company-reported, not yet peer-reviewed; access, adoption and research lines reworded. ALAQ: the partnership is FD-TACT (GHIT Fund, with MMV and Marubeni), not DeTACT, in the developer, access and research lines; the R&amp;D stage cites the trial record (NCT05951595, started 11 Sep 2025); "child-friendly" removed. ASPY: the 2025 pregnancy label change stated as it is (2nd and 3rd trimesters when the benefit outweighs the risk) and dated as EMA records it (opinion 5 Jun 2025, product information updated 6 Aug 2025; MMV gives 31 Jul 2025); liver-disease contraindication added. DHA–PPQ: "No single-source dependency" and "Established API supply chains" removed (WHO PQ records list one dihydroartemisinin source for 8 of 9 presentations); ECG line corrected. Procurement step notes and an ASPY milestone give transactions instead of pack totals.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-10-19:All:Medicine cards: every claim checked agai</guid>
+      <pubDate>Mon, 19 Oct 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>GanLum: Stringent Regulatory Approval (SRA) stage: status changed from In progress to…</title>
+      <description>Stringent Regulatory Approval (SRA) stage: status changed from In progress to Not started, shown with the line "Regulatory submission in preparation" (partner feedback, 15 Oct 2026). Novartis said in Nov 2025 that it would seek approval, first through Swissmedic; no filing had been announced as of 15 Oct 2026. Use case reworded to "Non-artemisinin combination in late-stage development. Novartis presents it as having the potential to combat antimalarial drug resistance; LAUNCH tracks it as a candidate for settings with artemisinin partial resistance and for multiple first-line therapy (MFT) strategies.", which removes the unattributed claims "kills resistant parasites and blocks transmission" and the "first major innovation" quote; "no separate paediatric development needed" removed from access.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-10-19:GanLum:Stringent Regulatory Approval (SRA) stag</guid>
+      <pubDate>Mon, 19 Oct 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>All: Glossary, from partner feedback (15 Oct 2026): MFT, SRA, PQ and AMA definitio…</title>
+      <description>Glossary, from partner feedback (15 Oct 2026): MFT, SRA, PQ and AMA definitions updated; "Article 58" is now listed as EU-M4all, formerly the Article 58 procedure. The SRA and WHO PQ step explanations follow (EU-M4all; prequalification supports eligibility under the quality assurance and procurement policies of UN agencies and major funders). Medicines without a recorded barrier now read "No publicly documented barrier identified". Procurement (ASPY, DHA–PPQ): the headline is now transactions and value (68 transactions · US$14.5m; 234 transactions · US$41.5m) instead of a packs total that added packs of 3 to 225 tablets as one each; packs are listed by presentation, with treatment courses estimated only where the Global Fund's product name states the tablets per course (DHA–PPQ: 24,223,797 courses from 8,114,772 of 11,493,039 packs; ASPY: not estimated). The "Global Fund 100%" bar is replaced by a sentence saying the figures are Global Fund PQR transactions only, not total global procurement. No figure in the PQR extract changed.</description>
+      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
+      <guid isPermaLink="false">2026-10-19:All:Glossary, from partner feedback (15 Oct </guid>
+      <pubDate>Mon, 19 Oct 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
       <title>All: Illustrated journey dashboard, from partner feedback (15 Oct sheet). The medi…</title>
       <description>Illustrated journey dashboard, from partner feedback (15 Oct sheet). The medicines table's "On pathway" column (years since a medicine's first dated milestone, with no end) is replaced by "Access": Market Access, reached when every stage up to WHO recommendation and WHO PQ listing is complete, then Country Access, counted in years from that point until registration, national policy adoption, procurement in significant volumes and in-country delivery are all complete. ASPY: market access reached in 2022, 4 years in country access so far (was "14 years"). DHA–PPQ: 2015 and 11 years (was "16 years"). GanLum and ALAQ: market access not yet reached. The explanation of "Delayed" now says it is LAUNCH's judgement from public evidence that a medicine's current stage has stalled, with the reason given as the main barrier, not a comparison with a set deadline. A new "About LAUNCH" section gives the initiative's purpose, why it follows these four medicines, that tracking a medicine is not an endorsement, and that the scope may expand. No stage data changed.</description>
       <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
@@ -193,20 +214,6 @@
       <description>EMA Article 58 date corrected to 2012; July 2025 pregnancy label update added to milestones.</description>
       <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
       <guid isPermaLink="false">2026-08-14:ASPY:EMA Article 58 date corrected to 2012; J</guid>
-      <pubDate>Fri, 14 Aug 2026 12:00:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>DHA–PPQ: Eurartesim WHO PQ requalification (Jan 2025) recorded; unknown counts set to …</title>
-      <description>Eurartesim WHO PQ requalification (Jan 2025) recorded; unknown counts set to TBC pending verification.</description>
-      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
-      <guid isPermaLink="false">2026-08-14:DHA–PPQ:Eurartesim WHO PQ requalification (Jan 2</guid>
-      <pubDate>Fri, 14 Aug 2026 12:00:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>All: Dashboard moved from illustrative placeholders to draft public-source data. P…</title>
-      <description>Dashboard moved from illustrative placeholders to draft public-source data. Prices and volumes shown as TBC until confirmed.</description>
-      <link>https://kochrisdev.github.io/launch-transparency-dashboard/</link>
-      <guid isPermaLink="false">2026-08-14:All:Dashboard moved from illustrative placeh</guid>
       <pubDate>Fri, 14 Aug 2026 12:00:00 GMT</pubDate>
     </item>
   </channel>
