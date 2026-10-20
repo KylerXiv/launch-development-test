@@ -100,6 +100,49 @@ stage panel's "Recorded" row and the CSV. No data or translated strings
 changed (`contentHash` unchanged). Checked headless: 4 stage cells, each with
 its stage name and status word only.
 
+**Status gets its own column again; a dash where it is hidden (owner, 20 Oct
+2026).** The medicines table's "Current stage · Status" cell (one cell since
+8 Oct) is now two columns: "Current stage" (the stage name) and "Status" (the
+status word, or "—"). ASPY and DHA–PPQ have their "Delayed" hidden by v1.0's
+`SHOW_PROGRESS`, so they show the dash. ALAQ ("In progress") and GanLum ("Not
+started") show their word. Four options went to the owner. The recommended
+one was "4 of 8 stages complete", a plain count with no judgement in it. The
+others were the count on every row, and status word plus count. The owner
+chose the dash. Two more were rejected before the question was asked:
+- **"Next step":** DHA–PPQ's reads "Verify 2025 surge holds in next quarterly
+  PQR extract", an analyst note.
+- **"Ongoing" or "Under way":** "In progress" in other words, which is what
+  the partners asked to drop.
+
+The dash is `aria-hidden`, so a screen reader reads nothing where no status
+is shown, rather than "em dash".
+
+Layout. Each `.srow` is its own grid, so the status track is a fixed width:
+112px, or 104px at 681–860px. Both grid sets, the live `.nobar` and the one
+used when `SHOW_BARRIERS` is true, gained the track at every breakpoint. The
+stage track's minimum went down by 10–20px to make room. On phones (≤680px)
+the stage cell is hidden, as its name already was, and the status or dash
+sits where it did before, beside the medicine name. Status words now wrap
+inside the column: French "Pas encore commencé" is wider than 104–112px, and
+unwrapped it ran into the Access column at 1100px and past the board's edge
+at 700px. Checked in headless Chrome:
+- English at 1440, 1100 and 1000px
+- French at 1100 and 700px
+- English and French at 390px, in an iframe (headless Chrome on Windows
+  will not make a window that narrow)
+- with `SHOW_BARRIERS` flipped in a throwaway copy, at 1440, 1100 and 1000px
+
+Translation. Both headers were already translated: "Current stage" (Stade
+actuel, Estágio atual, Etapa actual) and "Status" (Statut, Estatuto, Estado).
+"Status" only reaches the new header through a new
+`i18n/reviewed-strings.json` entry, `<span class="c-stat">Status</span>`.
+Without it, fr, pt and es showed "Status" in English. No new strings need
+translating. One string went: "Current stage · Status". `content.en.json` was
+regenerated, so `contentHash` moved from `e9fa14d1…` to `da61980a…`, the same
+change the translate bot would make. The French headers now say "Stade
+actuel" where the combined header said "Étape actuelle". That is the
+existing translation of "Current stage", not a new one.
+
 ## 2. Deferred, or left alone on purpose
 
 - `data/sources.js` line 7 and `data/products.synthetic.js` lines 11-12 still
@@ -122,9 +165,48 @@ its stage name and status word only.
   (`"host"` line). It fails the same way on a clean `main` (checked in a
   worktree at `27e434e`) and is not in CI. Not touched.
 
-## 3. Status
+## 3. The three repositories after this branch (checked 20 Oct 2026)
 
-- Branch `feat/dashboard-at-index`, not committed or pushed yet.
+Checked against the data-flow note "Three repositories, one direction"
+(20 Oct 2026): workspace → `launch-data-test` → `launch-rbm-test`.
+
+- **launch-data-test (the public data file): nothing to do.**
+  - `v1/dashboard.json` holds data only, no page labels. Nothing in that repo
+    names a page, so the move to `index.html` does not reach it.
+  - A build from this branch gives a `data` block identical to the published
+    one (4 products, 44 sources, 32 changelog entries, same translation
+    coverage).
+  - Only the envelope's `content_hash` differs, because it hashes the page's
+    English text too. `dataset-diff.js` compares `data` alone, so a publish
+    reports "Nothing to publish". The published hash catches up at the next
+    real data approval.
+  - `publish-dataset.yml` runs without `--allow-stale`, so it would stop on a
+    stale `content.en.json`. This branch commits it current.
+- **launch-rbm-test (RBM's pages): needs the by-hand design copy.**
+  - Its `main` was built from `27e434e`, today's `main`, so it has v1.0 but
+    none of this branch's three table and pathway changes.
+  - The pages check only `schema_version` (1) of `dashboard.json`, so no
+    data-side change is needed.
+  - The copy is `build-rbm-pages.js` then `copy-rbm-pages.js --to
+    ../launch-rbm-test`. It refuses a build that is uncommitted, a test build,
+    or one made before the translate bot caught up.
+  - Its README named `illustrated-journey-dashboard.html` as the source page;
+    corrected there.
+  - The local checkout was on `feat/expected-time-access-groups`, merged as
+    PR #5 on 8 Oct and 52 commits behind `main`. That branch's hand edits
+    introduced the expected-time tags, the merged stage/status cell and the
+    step note; this branch now changes all three at the source.
+- **Translation: complete.**
+  - `build-locale-pages.js` in strict mode, as the bot runs it: fr 760, pt
+    759, es 759 strings translated, 0 left in English, 100%.
+  - The bot runs on the merge (`index.html` and `i18n/reviewed-strings.json`
+    are in its path filter). It should find nothing new to translate, because
+    `content.en.json` is committed current here.
+
+## 4. Status
+
+- Branch `feat/dashboard-at-index`, four commits (move to `index.html`,
+  expected time, grey line, Status column), pushed for a PR into `main`.
 - Verify block: treatment policy byte-identical. Validator: 0 errors, 1
   warning (GUF). Synthetic: 0/0. `make-preview` OK.
   `test-build-dataset` 30/0. Country names cover all 252.

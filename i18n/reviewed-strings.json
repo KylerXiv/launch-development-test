@@ -77,6 +77,7 @@
     { "file": "index.html", "src": "aria-label=\"Previous country\"", "en": "Previous country" },
     { "file": "index.html", "src": "aria-label=\"Next country\"", "en": "Next country" },
     { "file": "index.html", "src": "<th>Status</th>", "en": "Status" },
+    { "file": "index.html", "src": "<span class=\"c-stat\">Status</span>", "en": "Status" },
     { "file": "index.html", "src": "? \"lists \" :", "en": "lists" },
     { "file": "index.html", "src": ": \"does not list \"}", "en": "does not list" },
     { "file": "index.html", "src": "\"det-small\">in WHO policy ${", "en": "in WHO policy" },
