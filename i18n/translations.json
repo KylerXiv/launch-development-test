@@ -100,7 +100,9 @@
       "en": "Multiple first-line therapies — the deliberate, managed use of two or more effective ACTs in a population for treatment of uncomplicated malaria, either simultaneously or in rotation.",
       "where": "products.glossary.MFT",
       "bucket": "data",
-      "es": "Múltiples terapias de primera línea: el uso deliberado y controlado de dos o más ACTs eficaces en una población para el tratamiento de la malaria no complicada, ya sea simultáneamente o en rotación."
+      "es": "Múltiples terapias de primera línea: el uso deliberado y controlado de dos o más ACTs eficaces en una población para el tratamiento de la malaria no complicada, ya sea simultáneamente o en rotación.",
+      "fr": "Traitements de première ligne multiples — l’utilisation délibérée et contrôlée de deux ou plusieurs ACTs efficaces dans une population pour le traitement du paludisme non compliqué, soit simultanément, soit en rotation.",
+      "pt": "Terapias múltiplas de primeira linha — a utilização deliberada e gerida de duas ou mais ACTs eficazes numa população para o tratamento da malária não complicada, quer em simultâneo, quer em rotação."
     },
     "03f667dfdf5c70c1": {
       "en": "A study of an MFT pilot planned in Kaya district, Burkina Faso, using three treatments.",
@@ -343,7 +345,8 @@
       "where": "products.changelog[0].plain",
       "bucket": "data",
       "pt": "Verificamos cada alegação nas páginas dos medicamentos em relação à sua fonte. As alegações que não são sustentadas por quaisquer resultados publicados foram removidas ou reformuladas, e algumas declarações foram corrigidas: a maioria das apresentações de DHA-PPQ depende de um único fornecedor do ingrediente principal, o folheto informativo do ASPY para a gravidez em 2025 abrange o segundo e o terceiro trimestres, e a parceria de desenvolvimento ALAQ está agora corretamente nomeada.",
-      "es": "Verificamos cada afirmación en las páginas de medicamentos con su fuente. Las afirmaciones que no contaban con el respaldo de resultados publicados fueron eliminadas o reformuladas, y algunas declaraciones fueron corregidas: la mayoría de las presentaciones de DHA-PPQ dependen de un único proveedor del ingrediente principal, la etiqueta de embarazo de ASPY de 2025 cubre el segundo y tercer trimestre, y la asociación de desarrollo ALAQ ahora está nombrada correctamente."
+      "es": "Verificamos cada afirmación en las páginas de medicamentos con su fuente. Las afirmaciones que no contaban con el respaldo de resultados publicados fueron eliminadas o reformuladas, y algunas declaraciones fueron corregidas: la mayoría de las presentaciones de DHA-PPQ dependen de un único proveedor del ingrediente principal, la etiqueta de embarazo de ASPY de 2025 cubre el segundo y tercer trimestre, y la asociación de desarrollo ALAQ ahora está nombrada correctamente.",
+      "fr": "Nous avons vérifié chaque allégation figurant sur les pages des médicaments en la comparant à sa source. Les allégations non étayées par des résultats publiés ont été supprimées ou reformulées, et certaines déclarations ont été corrigées : la plupart des présentations concernant le DHA-PPQ s’appuient sur un seul fournisseur de l’ingrédient principal, l’indication grossesse 2025 de l’ASPY couvre les deuxième et troisième trimestres, et le nom du partenariat de développement ALAQ est désormais correct."
     },
     "0c6a7bfcb8a4ea16": {
       "en": "Verify remaining countries against national registers",
@@ -2389,7 +2392,8 @@
       "where": "products.products[2].stages[5].note",
       "bucket": "data",
       "pt": "Nas orientações nacionais de 7 países no mapa de acesso por país e nos planos MFT de mais 4, cada país é citado numa publicação da OMS ou num artigo revisto por pares. O Gana adicionou o artesunato-pironaridina como alternativa de primeira linha ACT em 2022, juntamente com o AS-AQ e o AL.",
-      "es": "En las directrices nacionales de 7 países del mapa de acceso por país, y en los planes MFT de 4 más; cada país cita una publicación de la OMS o un artículo revisado por pares. Ghana añadió artesunato-pironaridina como una alternativa de primera línea ACT en 2022, junto con AS-AQ y AL"
+      "es": "En las directrices nacionales de 7 países del mapa de acceso por país, y en los planes MFT de 4 más; cada país cita una publicación de la OMS o un artículo revisado por pares. Ghana añadió artesunato-pironaridina como una alternativa de primera línea ACT en 2022, junto con AS-AQ y AL",
+      "fr": "Dans les directives nationales de sept pays figurant sur la carte d'accès aux traitements, et dans les plans de MFT de quatre autres pays, chaque pays cite une publication de l'OMS ou un article évalué par des pairs. Le Ghana a ajouté l'artésunate-pyronaridine comme ACT de première intention alternatif en 2022, aux côtés de l'AS-AQ et de l'AL"
     },
     "4dd79e5db3bfd9cb": {
       "en": "Click for details ›",
@@ -3454,7 +3458,8 @@
       "where": "products.products[3].detail.research.geographies",
       "bucket": "data",
       "pt": "Gana, Moçambique, Sudeste Asiático (estudos de eficácia e MFT)",
-      "es": "Ghana, Mozambique, Sudeste Asiático (estudios de eficacia y MFT)"
+      "es": "Ghana, Mozambique, Sudeste Asiático (estudios de eficacia y MFT)",
+      "fr": "Ghana, Mozambique, Asie du Sud-Est (études d'efficacité et de thérapie MFT)"
     },
     "6da03101cfa3a1c5": {
       "en": "Draft — not yet verified. These figures come from public sources and are still being checked. Manufacturer-specific details appear only once that manufacturer confirms in writing that they may be shown.",
@@ -4555,7 +4560,8 @@
       "where": "products.products[0].stages[3].note",
       "bucket": "data",
       "fr": "Pas encore sur la liste des déclarations d'intérêt de l'OMS PQ (24e déclaration d'intérêt pour le paludisme, mise à jour le 27 février 2026, vérifiée)",
-      "pt": "Ainda não consta da lista de Manifestações de Interesse (EOI) da OMS PQ (24ª EOI sobre malária, atualizada a 27 de fevereiro de 2026, verificada)"
+      "pt": "Ainda não consta da lista de Manifestações de Interesse (EOI) da OMS PQ (24ª EOI sobre malária, atualizada a 27 de fevereiro de 2026, verificada)",
+      "es": "Aún no figura en la lista de expresiones PQ (EOI) de la OMS (24.ª EOI sobre malaria, actualizada el 27 de febrero de 2026, verificada)."
     },
     "91a14ca078da0bfa": {
       "en": "The manufacturer, often with a product development partnership such as MMV.",
@@ -5856,7 +5862,8 @@
       "where": "products.products[1].stages[3].note",
       "bucket": "data",
       "fr": "Non encore inclus dans la liste des manifestations d'intérêt de l'OMS PQ (24e manifestation d'intérêt sur le paludisme, mise à jour le 27 février 2026, vérifiée)",
-      "pt": "Ainda não incluído na lista de Manifestações de Interesse da OMS PQ (24ª Manifestação de Interesse sobre a malária, atualizada a 27 de fevereiro de 2026, verificada)"
+      "pt": "Ainda não incluído na lista de Manifestações de Interesse da OMS PQ (24ª Manifestação de Interesse sobre a malária, atualizada a 27 de fevereiro de 2026, verificada)",
+      "es": "Aún no está incluido en la lista de expresiones de PQ de la OMS (24.ª EOI sobre malaria, actualizada el 27 de febrero de 2026, verificada)."
     },
     "c3feeae30938dcfd": {
       "en": "Country recommended use",
@@ -7337,7 +7344,8 @@
       "where": "products.products[1].stages[0].note",
       "bucket": "data",
       "fr": "Triple dose fixe co-formulée ACT en phase III pivotale (FD-TACT, NCT05951595 ; débutée le 11 septembre 2025) ; optimisation de la dose publiée en 2025 ; comprimé dispersible pédiatrique dans l’essai",
-      "pt": "Formulação conjunta de dose fixa tripla ACT num estudo pivotal de Fase III (FD-TACT, NCT05951595; iniciado a 11 de setembro de 2025); otimização da dose publicada em 2025; comprimido dispersível pediátrico em estudo."
+      "pt": "Formulação conjunta de dose fixa tripla ACT num estudo pivotal de Fase III (FD-TACT, NCT05951595; iniciado a 11 de setembro de 2025); otimização da dose publicada em 2025; comprimido dispersível pediátrico em estudo.",
+      "es": "Terapia combinada de dosis fija triple ACT en fase III pivotal (FD-TACT, NCT05951595; iniciada el 11 de septiembre de 2025); optimización de la dosis publicada en 2025; comprimido dispersable pediátrico en el ensayo."
     },
     "ed7aff1ae9fa57c2": {
       "en": "is pre-launch — no country access yet.",
@@ -7444,7 +7452,8 @@
       "where": "products.products[0].stages[0].note",
       "bucket": "data",
       "pt": "Atingiu o objetivo primário da Fase III em KALUMA (NCT05842954): 97,4% de cura corrigida para PCR no Dia 29 vs 94,0% para artemeter-lumefantrina (Coartem), em adultos e crianças ≥10 kg. Relatado pela empresa; ainda não revisto por pares. Registo: 1.720 participantes, 33 centros, 12 países africanos, concluído a 25 de novembro de 2025.",
-      "es": "Cumplió su criterio de valoración principal de fase III en KALUMA (NCT05842954): 97,4 % de curación corregida PCR en el día 29 frente al 94,0 % para artemeter-lumefantrina (Coartem), en adultos y niños ≥10 kg. Informado por la empresa; aún no revisado por pares. Registro: 1720 participantes, 33 centros, 12 países africanos, completado el 25 de noviembre de 2025."
+      "es": "Cumplió su criterio de valoración principal de fase III en KALUMA (NCT05842954): 97,4 % de curación corregida PCR en el día 29 frente al 94,0 % para artemeter-lumefantrina (Coartem), en adultos y niños ≥10 kg. Informado por la empresa; aún no revisado por pares. Registro: 1720 participantes, 33 centros, 12 países africanos, completado el 25 de noviembre de 2025.",
+      "fr": "L’étude KALUMA (NCT05842954), de phase III, a atteint son critère d’évaluation principal : un taux de guérison corrigé PCR de 97,4 % au jour 29, contre 94,0 % pour l’artéméther-luméfantrine (Coartem), chez les adultes et les enfants de 10 kg et plus. Données communiquées par l’entreprise ; non encore évaluées par les pairs. Registre : 1 720 participants, 33 centres, 12 pays africains, clôture le 25 novembre 2025."
     },
     "f0ea22a14fb2608c": {
       "en": "${esc(STAGES[b])} was reached ${yrs} yr${yrs === 1 ? \"\" : \"s\"} before ${esc(STAGES[a])} — these gates were not cleared in pathway order.",
@@ -7660,7 +7669,8 @@
       "where": "static @aria-label",
       "bucket": "markup",
       "fr": "Le parcours d'accès : huit étapes clés réparties en sept phases. La recommandation de l'OMS et l'inscription de l'OMS sur la liste PQ sont des étapes clés parallèles au sein de la phase 3. Choisissez une phase pour découvrir ce qui s'y passe et où se trouve chaque médicament.",
-      "es": "La vía de acceso: ocho hitos a lo largo de siete etapas. La recomendación de la OMS y la inclusión en la lista PQ de la OMS son hitos paralelos dentro de la etapa 3. Elija una etapa para ver qué sucede allí y dónde se encuentra cada medicamento."
+      "es": "La vía de acceso: ocho hitos a lo largo de siete etapas. La recomendación de la OMS y la inclusión en la lista PQ de la OMS son hitos paralelos dentro de la etapa 3. Elija una etapa para ver qué sucede allí y dónde se encuentra cada medicamento.",
+      "pt": "O caminho de acesso: oito marcos em sete etapas. A recomendação da OMS e a inclusão na lista PQ da OMS são marcos paralelos dentro do passo 3. Escolha um passo para ver o que acontece nele e onde se encontra cada medicamento."
     },
     "f8b776e7f71956a4": {
       "en": "Global Fund price and quality reporting, PMI",
@@ -7778,7 +7788,8 @@
       "where": "sources.sources[9].plain",
       "bucket": "data",
       "fr": "Description du bailleur de fonds du projet ALAQ Phase III : partenaires, objectifs et itinéraire prévu vers l'OMS.",
-      "pt": "Descrição do financiador sobre o projeto ALAQ Fase III: parceiros, objetivos e roteiro planeado para a OMS."
+      "pt": "Descrição do financiador sobre o projeto ALAQ Fase III: parceiros, objetivos e roteiro planeado para a OMS.",
+      "es": "Descripción del proyecto ALAQ Fase III por parte del financiador: socios, objetivos y ruta prevista hacia la OMS."
     },
     "fce63bfb9ebaba3d": {
       "en": "(prefers-reduced-motion: reduce)",
