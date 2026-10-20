@@ -169,7 +169,7 @@ function localiseProducts(D, loc) {
   if (D.glossary) for (const k of Object.keys(D.glossary)) D.glossary[k] = T(D.glossary[k]);
   (D.changelog || []).forEach((c) => { c.plain = T(c.plain); c.summary = T(c.summary); });
   (D.products || []).forEach((p) => {
-    ["note", "next", "flag", "classLabel", "barrier"].forEach((k) => { if (p[k]) p[k] = T(p[k]); });
+    ["note", "next", "flag", "classLabel", "barrier", "acknowledgement"].forEach((k) => { if (p[k]) p[k] = T(p[k]); });
     const d = p.detail || {};
     if (d.useCase) d.useCase = T(d.useCase);
     if (d.volumeNote) d.volumeNote = T(d.volumeNote);

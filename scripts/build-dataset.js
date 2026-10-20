@@ -63,6 +63,7 @@ const TEXT_PATHS = {
     "glossary.*",
     "changelog[].plain",
     "products[].classLabel", "products[].flag", "products[].barrier", "products[].note", "products[].next",
+    "products[].acknowledgement",
     "products[].stages[].note", "products[].stages[].next",
     "products[].stages[].date", "products[].stages[].nextDate",
     "products[].detail.useCase", "products[].detail.access[]", "products[].detail.adoption[]",
