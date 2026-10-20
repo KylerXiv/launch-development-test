@@ -1,6 +1,14 @@
 {
   "schema": 1,
   "entries": {
+    "0048937723511d62": {
+      "en": "We reworded the explanations of the steps on the pathway after partner feedback, and renamed the first two steps \"R&D and Clinical\" and \"Stringent Regulatory Approval (SRA)\". No dates, statuses or figures changed.",
+      "where": "products.changelog[6].plain",
+      "bucket": "data",
+      "fr": "Suite aux commentaires de nos partenaires, nous avons reformulé les explications des étapes du processus et renommé les deux premières « R&D et essais cliniques » et « Approbation réglementaire rigoureuse (SRA) ». Aucune date, aucun statut ni aucun chiffre n'ont été modifiés.",
+      "pt": "Reformulámos as explicações das etapas do processo após recebermos feedback dos parceiros e renomeámos as duas primeiras etapas para \"I&D e Clínica\" e \"Aprovação Regulamentar Rigorosa (SRA)\". Nenhuma data, estado ou número foi alterado.",
+      "es": "Tras recibir comentarios de nuestros socios, reformulamos las explicaciones de los pasos del proceso y renombramos los dos primeros pasos como «I+D y Clínica» y «Aprobación Regulatoria Estricta (SRA)». No se modificaron fechas, estados ni cifras."
+    },
     "0059798b7f7023e4": {
       "en": "(optional)",
       "where": "static text",
@@ -48,6 +56,14 @@
       "pt": "Entrega no país",
       "es": "Entrega dentro del país"
     },
+    "023e2ff137360cf2": {
+      "en": "LAUNCH, funded by Unitaid, is a proof of concept for making the access pathway of new antimalarial medicines transparent. It brings public information on each medicine together in one place, from development and regulatory approval through WHO recommendation and prequalification to registration, policy, procurement and delivery in countries, so that partners can see where access is held up and act on it.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Le projet LAUNCH, financé par Unitaid, est une preuve de concept visant à rendre transparent le parcours d'accès aux nouveaux médicaments antipaludiques. Il centralise les informations publiques relatives à chaque médicament, depuis son développement et son approbation réglementaire jusqu'à la recommandation et la préqualification de l'OMS, en passant par l'enregistrement, les politiques, l'approvisionnement et la distribution dans les pays. Ainsi, les partenaires peuvent identifier les obstacles à l'accès et agir en conséquence.",
+      "pt": "O projeto LAUNCH, financiado pelo Unitaid, é uma prova de conceito para tornar transparente o acesso a novos medicamentos antimaláricos. Reúne informação pública sobre cada medicamento num só local, desde o desenvolvimento e aprovação regulamentar, passando pela recomendação e pré-qualificação da OMS, até ao registo, políticas, aquisição e distribuição nos países, para que os parceiros possam identificar onde o acesso está a ser dificultado e agir para resolver o problema.",
+      "es": "El proyecto LAUNCH, financiado por Unitaid, es una prueba de concepto para transparentar el proceso de acceso a nuevos medicamentos antipalúdicos. Reúne información pública sobre cada medicamento en un solo lugar, desde su desarrollo y aprobación regulatoria, pasando por la recomendación y precalificación de la OMS, hasta el registro, las políticas, la adquisición y la distribución en los países, para que los socios puedan identificar los obstáculos al acceso y tomar medidas al respecto."
+    },
     "02ae78fc2bb62522": {
       "en": "EMA, or another stringent regulator such as the US FDA.",
       "where": "products.stageInfo[1].who",
@@ -64,6 +80,14 @@
       "pt": "Maior variação:",
       "es": "Mayor variación:"
     },
+    "03432fa47d998925": {
+      "en": "The regulatory approval step now reads \"Not started\": a submission is being prepared, but none has been announced. We also removed some claims that were not attributed to a source.",
+      "where": "products.changelog[1].plain",
+      "bucket": "data",
+      "fr": "L'étape d'approbation réglementaire affiche désormais « Non commencée » : une demande est en cours de préparation, mais aucune annonce n'a été faite. Nous avons également supprimé certaines allégations qui n'étaient pas sourcées.",
+      "pt": "A etapa de aprovação regulamentar indica agora \"Não iniciada\": um pedido está a ser preparado, mas ainda não foi divulgado. Também removemos algumas alegações que não foram atribuídas a uma fonte.",
+      "es": "El paso de aprobación regulatoria ahora indica \"No iniciado\": se está preparando una solicitud, pero aún no se ha anunciado ninguna. También eliminamos algunas afirmaciones que no estaban atribuidas a una fuente."
+    },
     "036ac56e007c2946": {
       "en": "National medicines regulators.",
       "where": "products.stageInfo[4].who",
@@ -71,6 +95,12 @@
       "fr": "Organismes nationaux de réglementation des médicaments.",
       "pt": "Organismos reguladores nacionais de medicamentos.",
       "es": "Organismos reguladores nacionales de medicamentos."
+    },
+    "0396aa2b19c4d636": {
+      "en": "Multiple first-line therapies — the deliberate, managed use of two or more effective ACTs in a population for treatment of uncomplicated malaria, either simultaneously or in rotation.",
+      "where": "products.glossary.MFT",
+      "bucket": "data",
+      "es": "Múltiples terapias de primera línea: el uso deliberado y controlado de dos o más ACTs eficaces en una población para el tratamiento de la malaria no complicada, ya sea simultáneamente o en rotación."
     },
     "03f667dfdf5c70c1": {
       "en": "A study of an MFT pilot planned in Kaya district, Burkina Faso, using three treatments.",
@@ -249,6 +279,14 @@
       "pt": "· até agora",
       "es": "· hasta ahora"
     },
+    "09c1aebb40c884b9": {
+      "en": "ClinicalTrials.gov: FD-TACT trial",
+      "where": "sources.sources[3].label",
+      "bucket": "data",
+      "fr": "ClinicalTrials.gov : essai FD-TACT",
+      "pt": "ClinicalTrials.gov: Ensaio FD-TACT",
+      "es": "ClinicalTrials.gov: Ensayo FD-TACT"
+    },
     "0a8787a41b1d29db": {
       "en": "' + L().unit + '",
       "where": "line 3069 (in markup)",
@@ -299,6 +337,13 @@
       "bucket": "data",
       "fr": "Cambodge",
       "pt": "Camboja"
+    },
+    "0c66de65aed54e68": {
+      "en": "We checked every claim on the medicine pages against its source. Claims that no published result supports were removed or reworded, and some statements were corrected: most DHA–PPQ presentations rely on a single supplier of the main ingredient, ASPY's 2025 pregnancy label covers the second and third trimesters, and the ALAQ development partnership is now named correctly.",
+      "where": "products.changelog[0].plain",
+      "bucket": "data",
+      "pt": "Verificamos cada alegação nas páginas dos medicamentos em relação à sua fonte. As alegações que não são sustentadas por quaisquer resultados publicados foram removidas ou reformuladas, e algumas declarações foram corrigidas: a maioria das apresentações de DHA-PPQ depende de um único fornecedor do ingrediente principal, o folheto informativo do ASPY para a gravidez em 2025 abrange o segundo e o terceiro trimestres, e a parceria de desenvolvimento ALAQ está agora corretamente nomeada.",
+      "es": "Verificamos cada afirmación en las páginas de medicamentos con su fuente. Las afirmaciones que no contaban con el respaldo de resultados publicados fueron eliminadas o reformuladas, y algunas declaraciones fueron corregidas: la mayoría de las presentaciones de DHA-PPQ dependen de un único proveedor del ingrediente principal, la etiqueta de embarazo de ASPY de 2025 cubre el segundo y tercer trimestre, y la asociación de desarrollo ALAQ ahora está nombrada correctamente."
     },
     "0c6a7bfcb8a4ea16": {
       "en": "Verify remaining countries against national registers",
@@ -354,6 +399,14 @@
       "pt": "Lista de Medicamentos Essenciais da OMS",
       "es": "Lista de medicamentos esenciales de la OMS"
     },
+    "0f04c9f38fb9d015": {
+      "en": "WHO PQ: 24th malaria EOI invitation, 2025",
+      "where": "sources.sources[37].label",
+      "bucket": "data",
+      "fr": "OMS PQ : 24e invitation à manifester un intérêt pour le paludisme, 2025",
+      "pt": "OMS PQ: 24º convite para manifestação de interesse sobre a malária, 2025",
+      "es": "OMS PQ: 24.ª convocatoria de expresiones de interés sobre malaria, 2025"
+    },
     "0f22b4040172d35f": {
       "en": "Country guideline committee reviews",
       "where": "products.products[2].stages[5].next",
@@ -385,6 +438,14 @@
       "fr": "Chiffres d'achat ajoutés : le Fonds mondial a acheté 11,5 millions de boîtes (41,5 millions de dollars US) depuis 2008, avec une forte augmentation en 2025. Neuf versions du médicament ont passé les contrôles de qualité de l'Organisation mondiale de la santé.",
       "pt": "Dados de compras adicionados: o Fundo Global comprou 11,5 milhões de embalagens (41,5 milhões de dólares) desde 2008, com um aumento acentuado em 2025. Nove versões do medicamento passaram pelos controlos de qualidade da Organização Mundial de Saúde.",
       "es": "Se han añadido cifras de compra: el Fondo Mundial ha adquirido 11,5 millones de paquetes (41,5 millones de dólares estadounidenses) desde 2008, con un fuerte aumento en 2025. Nueve versiones del medicamento han superado los controles de calidad de la Organización Mundial de la Salud."
+    },
+    "101c48c72793b1f0": {
+      "en": "Global Fund orders go back to 2008 (US$41.5m over 234 transactions, 2008–2026), but have stayed small: 0.9–4.5% of the value of all antimalarial medicines the Global Fund ordered each year in 2022–24 (4.4% in 2022, 0.9% in 2023, 4.5% in 2024, by order date). The timeline counts from WHO prequalification in 2015. 2025 shows a sharp uptick (US$15.3m, led by Uganda, Madagascar, Mozambique) that needs confirming as reporting completes",
+      "where": "products.products[3].stages[6].note",
+      "bucket": "data",
+      "fr": "Les commandes du Fonds mondial remontent à 2008 (41,5 millions de dollars US répartis sur 234 transactions, 2008-2026), mais sont restées modestes : de 0,9 % à 4,5 % de la valeur totale des médicaments antipaludiques commandés par le Fonds mondial chaque année entre 2022 et 2024 (4,4 % en 2022, 0,9 % en 2023 et 4,5 % en 2024, par date de commande). Ce calendrier court à partir de la préqualification par l’OMS en 2015. Une forte hausse est observée en 2025 (15,3 millions de dollars US, principalement grâce à l’Ouganda, Madagascar et le Mozambique), qui reste à confirmer une fois les rapports finalisés.",
+      "pt": "As encomendas do Fundo Global remontam a 2008 (41,5 milhões de dólares em 234 transações, entre 2008 e 2026), mas mantiveram-se modestas: entre 0,9% e 4,5% do valor total dos medicamentos antimaláricos encomendados pelo Fundo Global em cada ano, entre 2022 e 2024 (4,4% em 2022, 0,9% em 2023 e 4,5% em 2024, por data da encomenda). O período analisado inicia-se com a pré-qualificação pela OMS em 2015. Em 2025, observa-se um aumento acentuado (15,3 milhões de dólares, impulsionado pelo Uganda, Madagáscar e Moçambique), que necessita de ser confirmado após a conclusão dos relatórios.",
+      "es": "Los pedidos del Fondo Mundial se remontan a 2008 (US$41,5 millones en 234 transacciones, 2008–2026), pero se han mantenido pequeños: entre el 0,9 % y el 4,5 % del valor total de los medicamentos antipalúdicos que el Fondo Mundial solicitó cada año entre 2022 y 2024 (4,4 % en 2022, 0,9 % en 2023 y 4,5 % en 2024, según la fecha del pedido). El cronograma comienza con la precalificación de la OMS en 2015. En 2025 se observa un fuerte repunte (US$15,3 millones, liderado por Uganda, Madagascar y Mozambique) que debe confirmarse una vez finalizada la presentación de informes."
     },
     "10436829032f361a": {
       "en": "China",
@@ -595,6 +656,14 @@
       "pt": "O registo nacional de todos os medicamentos aprovados para venda na Tanzânia.",
       "es": "El registro nacional de todos los medicamentos autorizados para su venta en Tanzania."
     },
+    "1660b111df8c7be8": {
+      "en": "Your details go to the LAUNCH team and are used only to email you about updates to this page.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Vos coordonnées sont transmises à l'équipe LAUNCH et ne sont utilisées que pour vous envoyer des e-mails concernant les mises à jour de cette page.",
+      "pt": "Os seus dados serão enviados à equipa LAUNCH e utilizados apenas para lhe enviar emails sobre atualizações desta página.",
+      "es": "Tus datos van al equipo de LAUNCH y se utilizan únicamente para enviarte correos electrónicos sobre actualizaciones de esta página."
+    },
     "1672f60c3a9ae94f": {
       "en": "Botswana",
       "where": "markers.dict.country[4]",
@@ -634,6 +703,14 @@
       "pt": "Todo o painel de controlo",
       "es": "Todo el panel de control"
     },
+    "17892f9ea9386cfa": {
+      "en": "Standard ACT training, plus food timing and the QT contraindications.",
+      "where": "products.products[3].detail.adoption[1]",
+      "bucket": "data",
+      "fr": "Formation standard ACT, plus horaires des repas et contre-indications QT.",
+      "pt": "Treino padrão ACT, para além do horário das refeições e das contraindicações do intervalo QT.",
+      "es": "Entrenamiento estándar ACT, además de la sincronización de las comidas y las contraindicaciones del QT."
+    },
     "17aa62b663966e62": {
       "en": "Artemisinin (all ACTs)",
       "where": "markers.meta.markerDrug[\"Pfkelch13\"]",
@@ -648,6 +725,14 @@
       "fr": "12 pays africains (KALUMA sites pilotes)",
       "pt": "12 países africanos (KALUMA locais de teste)",
       "es": "12 países africanos (KALUMA sitios de ensayo)"
+    },
+    "17d4d6d90f37e222": {
+      "en": "The Global Fund, other donors, UNICEF and national governments",
+      "where": "products.stageInfo[6].who",
+      "bucket": "data",
+      "fr": "Le Fonds mondial, d'autres donateurs, l'UNICEF et les gouvernements nationaux",
+      "pt": "O Fundo Global, outros doadores, a UNICEF e os governos nacionais.",
+      "es": "El Fondo Mundial, otros donantes, UNICEF y los gobiernos nacionales."
     },
     "180e12dbab442661": {
       "en": "MFT rotation partner; mass drug administration and chemoprevention niches; once-daily dosing.",
@@ -704,6 +789,22 @@
       "fr": "Échec du traitement (selon le protocole), % des patients évaluables",
       "pt": "Falha do tratamento (por protocolo), % de doentes avaliáveis"
     },
+    "19eeb2cbda9314a3": {
+      "en": "40/320 mg dispersible tablets · box of 25 blisters of 3",
+      "where": "products.products[3].detail.volume.byPresentation[11].label",
+      "bucket": "data",
+      "fr": "Comprimés dispersibles 40/320 mg · boîte de 25 plaquettes thermoformées de 3",
+      "pt": "Comprimidos dispersíveis de 40/320 mg · caixa de 25 blisters de 3 comprimidos",
+      "es": "Comprimidos dispersables de 40/320 mg · caja de 25 blísteres de 3"
+    },
+    "19f35f3188ed6bbd": {
+      "en": "the medicine's current stage has stalled or is moving unusually slowly, in LAUNCH's judgement from public evidence. The main barrier gives the reason. It is not measured against a set deadline.",
+      "where": "line 1686",
+      "bucket": "js",
+      "fr": "Le développement du médicament est actuellement au point mort ou progresse anormalement lentement, selon l'évaluation de LAUNCH basée sur des informations publiques. Le principal obstacle en est la raison. Il n'est pas assorti d'un délai précis.",
+      "pt": "O estado atual do medicamento estagnou ou está a avançar de forma excecionalmente lenta, na avaliação de LAUNCH com base em evidência pública. A principal barreira explica o motivo. Não existe um prazo definido para a sua avaliação.",
+      "es": "La fase actual del medicamento se ha estancado o avanza con inusual lentitud, según el criterio de LAUNCH basado en la información pública. El principal obstáculo explica la razón. No se mide con respecto a un plazo fijo."
+    },
     "1a01ca0044034abf": {
       "en": "In national guidelines",
       "where": "static text",
@@ -720,6 +821,22 @@
       "pt": "Este painel está a ser atualizado.",
       "es": "Este panel de control se está actualizando."
     },
+    "1a6bdb6f45090263": {
+      "en": "WHO prequalification planned after Phase III",
+      "where": "products.products[1].stages[3].next",
+      "bucket": "data",
+      "fr": "La préqualification de l'OMS est prévue après la phase III.",
+      "pt": "A pré-qualificação da OMS está prevista para depois da Fase III.",
+      "es": "Precalificación de la OMS prevista tras la Fase III"
+    },
+    "1a754a6f27d99ff6": {
+      "en": "WHO's 2010 treatment guidelines, which first recommended DHA–PPQ.",
+      "where": "sources.sources[33].plain",
+      "bucket": "data",
+      "fr": "Les recommandations de traitement de l'OMS de 2010, qui ont initialement recommandé le DHA-PPQ.",
+      "pt": "As orientações de tratamento da OMS de 2010, que recomendaram pela primeira vez o DHA-PPQ.",
+      "es": "Las directrices de tratamiento de la OMS de 2010, que recomendaron por primera vez el DHA-PPQ."
+    },
     "1b454b0a28d0323f": {
       "en": "Please describe the issue.",
       "where": "assets/report-issue.js",
@@ -727,6 +844,22 @@
       "fr": "Veuillez décrire le problème.",
       "pt": "Por favor, descreva o problema.",
       "es": "Por favor, describa el problema."
+    },
+    "1b8585292ae9872b": {
+      "en": "Global Fund PQR, 2018–2025 · US$11.6m in 2025 · top buyers Uganda, Burkina Faso, Ghana",
+      "where": "products.products[2].detail.volume.period",
+      "bucket": "data",
+      "fr": "Rapport trimestriel sur les investissements du Fonds mondial, 2018-2025 · 11,6 millions de dollars US en 2025 · Principaux acheteurs : Ouganda, Burkina Faso, Ghana",
+      "pt": "Relatório de Qualificação Parcial (PQR) do Fundo Global, 2018–2025 · 11,6 milhões de dólares em 2025 · principais compradores: Uganda, Burkina Faso, Gana",
+      "es": "Fondo Mundial PQR, 2018–2025 · US$11,6 millones en 2025 · principales compradores Uganda, Burkina Faso, Ghana"
+    },
+    "1b8e8a138f71058a": {
+      "en": "MMV: Eurartesim (DHA–PPQ) product page",
+      "where": "sources.sources[16].label",
+      "bucket": "data",
+      "fr": "MMV : Eurartesim (DHA – PPQ) page produit",
+      "pt": "MMV: Eurartesim (DHA – PPQ) página do produto",
+      "es": "MMV: Eurartesim (DHA–PPQ) página del producto"
     },
     "1bac3d7f1cfbbad7": {
       "en": "${esc(p.name)} · medicine facts",
@@ -760,6 +893,14 @@
       "pt": "verificado",
       "es": "verificado"
     },
+    "1c4cb65bc1fbf838": {
+      "en": "MMV's page for Pyramax: approved, who makes it, and where it stands on WHO lists.",
+      "where": "sources.sources[18].plain",
+      "bucket": "data",
+      "fr": "La page de MMV pour Pyramax : approuvé, qui le fabrique et où il se situe sur les listes de l'OMS.",
+      "pt": "Página de MMV para Pyramax: aprovado, quem o fabrica e a sua posição nas listas da OMS.",
+      "es": "Página de MMV para Pyramax: aprobado, quién lo fabrica y en qué posición se encuentra en las listas de la OMS."
+    },
     "1c50993b009c62dd": {
       "en": "years",
       "where": "illustrated-journey-dashboard.html",
@@ -791,6 +932,14 @@
       "pt": "Fonte: OMS ${esc(m.edition || \"World Malaria Report\")}, Anexo 4B (${esc(String(m.policyYear || \"\"))} política).",
       "es": "Fuente: OMS ${esc(m.edition || \"World Malaria Report\")}, Anexo 4B (${esc(String(m.policyYear || \"\"))} política)."
     },
+    "1ddd0396cb830580": {
+      "en": "68 transactions · US$14.5m (2018–2025)",
+      "where": "products.products[2].detail.volume.total",
+      "bucket": "data",
+      "fr": "68 transactions · 14,5 millions de dollars US (2018–2025)",
+      "pt": "68 transações · 14,5 milhões de dólares (2018–2025)",
+      "es": "68 transacciones · 14,5 millones de dólares estadounidenses (2018–2025)"
+    },
     "1e199b200fcfa3b9": {
       "en": "Global Fund price and quality reporting",
       "where": "static text",
@@ -798,6 +947,14 @@
       "fr": "Rapports sur les prix et la qualité du Fonds mondial",
       "pt": "Relatórios de preços e qualidade do Fundo Global",
       "es": "Informes sobre precios y calidad del Fondo Mundial"
+    },
+    "1ea6fca66a7f8819": {
+      "en": "Ghana 2022; WHO policy table 2024",
+      "where": "products.products[2].detail.milestones[5].date",
+      "bucket": "data",
+      "fr": "Ghana 2022 ; Tableau des politiques de l'OMS 2024",
+      "pt": "Gana 2022; Tabela de políticas da OMS 2024",
+      "es": "Ghana 2022; Tabla de políticas de la OMS 2024"
     },
     "1ee9a53a671c2e44": {
       "en": "[data-det-tab],[data-iso3],[data-back],[data-step]",
@@ -814,6 +971,14 @@
       "pt": "[LAUNCH] Falha na inscrição:",
       "es": "[LAUNCH] Error al suscribirse:"
     },
+    "202e848b27a348c3": {
+      "en": "Regulatory submission in preparation",
+      "where": "products.products[0].stages[1].date",
+      "bucket": "data",
+      "fr": "Dossier réglementaire en préparation",
+      "pt": "Submissão regulamentar em preparação.",
+      "es": "Presentación reglamentaria en preparación"
+    },
     "20afc9418dfd7d5b": {
       "en": "from expected",
       "where": "illustrated-journey-dashboard.html",
@@ -829,6 +994,14 @@
       "fr": "[LAUNCH] Le fichier data/products.js est manquant ou contient une erreur de syntaxe — exécutez node scripts/validate-data.js",
       "pt": "[LAUNCH] O ficheiro data/products.js está em falta ou contém um erro de sintaxe — execute o node scripts/validate-data.js",
       "es": "[LAUNCH] El archivo data/products.js no existe o contiene un error de sintaxis; ejecute node scripts/validate-data.js"
+    },
+    "20e00153bf027168": {
+      "en": "Europe's regulator's positive opinion on Pyramax for use outside Europe, with later label changes.",
+      "where": "sources.sources[6].plain",
+      "bucket": "data",
+      "fr": "L'avis positif du régulateur européen sur Pyramax pour une utilisation hors d'Europe, avec des modifications d'étiquetage ultérieures.",
+      "pt": "Parecer favorável do regulador europeu sobre o Pyramax para utilização fora da Europa, com alterações posteriores à rotulagem.",
+      "es": "El regulador europeo opinó positivamente sobre el uso de Pyramax fuera de Europa, con cambios posteriores en el etiquetado."
     },
     "213134a28cca8506": {
       "en": "Sorry — we could not add you just now. Please try again in a moment.",
@@ -915,6 +1088,14 @@
       "pt": "Acompanhamento dos novos medicamentos antimaláricos ao longo do processo de acesso ao mercado.",
       "es": "Seguimiento de los nuevos medicamentos antipalúdicos a lo largo del proceso de acceso al mercado."
     },
+    "24fc9172794447a4": {
+      "en": "EMA: Pyramax opinion, 2012",
+      "where": "sources.sources[6].label",
+      "bucket": "data",
+      "fr": "EMA : Pyramax opinion, 2012",
+      "pt": "EMA: Pyramax parecer, 2012",
+      "es": "EMA: Opinión Pyramax, 2012"
+    },
     "25464f74dbb99fe6": {
       "en": "An independent overview of which malaria medicines exist and who makes them.",
       "where": "sources.sources[16].plain",
@@ -954,6 +1135,14 @@
       "fr": "${nS} sites dans ${nM} marques — zoom avant pour séparer.",
       "pt": "${nS} locais em marcas ${nM} — ampliar para separar."
     },
+    "271bec5ee5907371": {
+      "en": "ClinicalTrials.gov: KALUMA trial",
+      "where": "sources.sources[4].label",
+      "bucket": "data",
+      "fr": "ClinicalTrials.gov : KALUMA essai",
+      "pt": "ClinicalTrials.gov: KALUMA ensaio",
+      "es": "ClinicalTrials.gov: KALUMA ensayo"
+    },
     "279154303e9dc853": {
       "en": "MFT policy",
       "where": "static text",
@@ -961,6 +1150,14 @@
       "fr": "MFT politique",
       "pt": "MFT política",
       "es": "Política MFT"
+    },
+    "279eb6a95d02e037": {
+      "en": "Confirmed in six national registers so far: Nigeria, Rwanda, Tanzania, Viet Nam, Zambia and Zimbabwe. Register detail: Tanzania — 10 presentations across four manufacturers (Guilin D-ARTEPP incl. paediatric dispersible, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), all Registered/Compliant; Nigeria — 47 presentations, of which 25 are active and 22 have lapsed (registrations not being maintained, itself an underuse signal)",
+      "where": "products.products[3].stages[4].note",
+      "bucket": "data",
+      "fr": "Confirmé dans six registres nationaux à ce jour : Nigéria, Rwanda, Tanzanie, Vietnam, Zambie et Zimbabwe. Détails des registres : Tanzanie — 10 présentations de quatre fabricants (Guilin D-ARTEPP, y compris la version pédiatrique dispersible, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), toutes enregistrées et conformes ; Nigéria — 47 présentations, dont 25 sont actives et 22 ont expiré (les enregistrements n’étant pas maintenus, ce qui constitue en soi un signe de sous-utilisation).",
+      "pt": "Confirmado em seis registos nacionais até à data: Nigéria, Ruanda, Tanzânia, Vietname, Zâmbia e Zimbabué. Detalhes do registo: Tanzânia — 10 apresentações de quatro fabricantes (Guilin D-ARTEPP, incluindo a versão pediátrica dispersível; KBN-Zhejiang Duo-Cotecxin; Ajanta Ridmal), todas registadas/em conformidade; Nigéria — 47 apresentações, das quais 25 estão ativas e 22 expiraram (não estão a ser mantidos registos, o que por si só indica subutilização).",
+      "es": "Confirmado hasta el momento en seis registros nacionales: Nigeria, Ruanda, Tanzania, Vietnam, Zambia y Zimbabue. Detalles del registro: Tanzania: 10 presentaciones de cuatro fabricantes (Guilin D-ARTEPP, incluyendo la presentación pediátrica dispersable, KBN-Zhejiang Duo-Cotecxin, Ajanta Ridmal), todas registradas y conformes; Nigeria: 47 presentaciones, de las cuales 25 están activas y 22 han caducado (registros que no se mantienen, lo que constituye una señal de subutilización)."
     },
     "27ba1653113af170": {
       "en": "Please try again in a few minutes.",
@@ -986,6 +1183,14 @@
       "pt": "de",
       "es": "de"
     },
+    "28a9767749f057b0": {
+      "en": "National medicines regulators",
+      "where": "products.stageInfo[4].who",
+      "bucket": "data",
+      "fr": "organismes nationaux de réglementation des médicaments",
+      "pt": "reguladores nacionais do medicamento",
+      "es": "organismos reguladores nacionales de medicamentos"
+    },
     "298a9207a732a11d": {
       "en": "Next step",
       "where": "line 2043",
@@ -1009,6 +1214,22 @@
       "fr": "Variance",
       "pt": "Variância",
       "es": "Diferencia"
+    },
+    "2a32a50c5e14e505": {
+      "en": "since ${esc(from.label)} (${since}) · ${yrsText(hi - since)}",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "depuis ${esc(from.label)} (${since}) · ${yrsText(hi - since)}",
+      "pt": "desde ${esc(from.label)} (${since}) · ${yrsText(hi - since)}",
+      "es": "desde ${esc(from.label)} (${since}) · ${yrsText(hi - since)}"
+    },
+    "2a7c71578e58f7ba": {
+      "en": "The official trial record for the Phase III study of the single-tablet ALAQ.",
+      "where": "sources.sources[3].plain",
+      "bucket": "data",
+      "fr": "Le compte rendu officiel de l’essai de phase III du comprimé unique ALAQ.",
+      "pt": "Registo oficial do ensaio clínico de Fase III do comprimido único ALAQ.",
+      "es": "Registro oficial del ensayo de fase III del estudio de comprimido único ALAQ."
     },
     "2b457cd87edb3758": {
       "en": "French Guiana",
@@ -1071,6 +1292,14 @@
       "fr": "Niger",
       "pt": "Níger"
     },
+    "2cd7148e212bfa18": {
+      "en": "MMV's joint announcement with Novartis of GanLum's Phase III results.",
+      "where": "sources.sources[17].plain",
+      "bucket": "data",
+      "fr": "l'annonce conjointe de MMV avec Novartis des résultats de la phase III de GanLum.",
+      "pt": "Anúncio conjunto de MMV com Novartis dos resultados da Fase III de GanLum.",
+      "es": "Anuncio conjunto de MMV con Novartis de los resultados de la Fase III de GanLum."
+    },
     "2cdbba6522e29b79": {
       "en": "Where each product is, trial to launch.",
       "where": "assets/site-nav.js",
@@ -1086,6 +1315,14 @@
       "fr": "Amériques",
       "pt": "Américas",
       "es": "América"
+    },
+    "2d5b8f169854e746": {
+      "en": "Public funders, such as the Global Fund, other donors and national governments, run tenders, agree reference prices and forecast demand. A medicine can be recommended, registered and in the guidelines and still be barely bought. This step covers public channels only: the figures shown are Global Fund-financed procurement. Private commercial channels are not included.",
+      "where": "products.stageInfo[6].what",
+      "bucket": "data",
+      "fr": "Les organismes publics de financement, tels que le Fonds mondial, d'autres donateurs et les gouvernements nationaux, lancent des appels d'offres, fixent des prix de référence et prévoient la demande. Un médicament peut être recommandé, enregistré et figurer dans les directives, et pourtant être très peu acheté. Cette étape ne concerne que les circuits publics : les chiffres présentés correspondent aux achats financés par le Fonds mondial. Les circuits commerciaux privés ne sont pas inclus.",
+      "pt": "Os financiadores públicos, como o Fundo Global, outros doadores e governos nacionais, realizam concursos, acordam preços de referência e prevêem a procura. Um medicamento pode ser recomendado, registado e constar das guidelines, e ainda assim ser pouco procurado. Esta etapa abrange apenas os canais públicos: os valores apresentados referem-se às aquisições financiadas pelo Fundo Global. Os canais comerciais privados não estão incluídos.",
+      "es": "Los financiadores públicos, como el Fondo Mundial, otros donantes y los gobiernos nacionales, realizan licitaciones, acuerdan precios de referencia y pronostican la demanda. Un medicamento puede estar recomendado, registrado e incluido en las guías clínicas y, aun así, tener escasa demanda. Este análisis abarca únicamente los canales públicos: las cifras mostradas corresponden a adquisiciones financiadas por el Fondo Mundial. Los canales comerciales privados no están incluidos."
     },
     "2d894fcf5f1859ee": {
       "en": "Each dot is the most recent study year for that country, drug and species, averaged across every site studied that year and weighted by the number of patients — so a large study counts for more than a small one. No study is excluded; click a dot to see all of them.",
@@ -1140,12 +1377,28 @@
       "fr": "Bangladesh",
       "pt": "Bangladesh"
     },
+    "2f4afe5260d139a2": {
+      "en": "Europe's approval record for Eurartesim, the first stringent-authority approval of DHA–PPQ.",
+      "where": "sources.sources[5].plain",
+      "bucket": "data",
+      "fr": "Le bilan des approbations en Europe pour Eurartesim, la première approbation rigoureuse du DHA-PPQ par une autorité compétente.",
+      "pt": "O registo de aprovação na Europa para Eurartesim, a primeira aprovação rigorosa de autoridade para DHA–PPQ.",
+      "es": "El récord europeo de aprobación para Eurartesim, la primera aprobación de DHA–PPQ por una autoridad rigurosa."
+    },
     "2fef055f28856592": {
       "en": "studies here,",
       "where": "line 3128",
       "bucket": "js",
       "fr": "des études ici,",
       "pt": "estudos aqui,"
+    },
+    "30d6f358e13d3721": {
+      "en": "40/320 mg tablets · recorded as 3 per course, in a blister of 8",
+      "where": "products.products[3].detail.volume.byPresentation[8].label",
+      "bucket": "data",
+      "fr": "Comprimés de 40/320 mg · conditionnés à raison de 3 par traitement, sous blister de 8",
+      "pt": "Comprimidos de 40/320 mg · 3 comprimidos por tratamento, em blister de 8 unidades",
+      "es": "Comprimidos de 40/320 mg · registrados como 3 por tratamiento, en un blíster de 8"
     },
     "310f41f80f3895d1": {
       "en": "Since 2018",
@@ -1154,6 +1407,14 @@
       "fr": "Depuis 2018",
       "pt": "Desde 2018",
       "es": "Desde 2018"
+    },
+    "313baf4c5587f0c3": {
+      "en": "New chemical class (imidazolopiperazine). Safety monitoring after approval will need planning (LAUNCH assessment).",
+      "where": "products.products[0].detail.adoption[0]",
+      "bucket": "data",
+      "fr": "Nouvelle classe chimique (imidazolopipérazine). Un suivi de sécurité après approbation sera nécessaire (évaluation LAUNCH).",
+      "pt": "Nova classe química (imidazolopiperazina). A monitorização da segurança após a aprovação exigirá planeamento (LAUNCH avaliação).",
+      "es": "Nueva clase química (imidazolopiperazina). El seguimiento de seguridad posterior a la aprobación requerirá planificación (evaluación LAUNCH)."
     },
     "315cb8cd90c62651": {
       "en": "Someone has to pay. Funders and governments run tenders, agree reference prices and forecast demand. A medicine can be recommended, registered and in the guidelines and still be barely bought.",
@@ -1199,6 +1460,14 @@
       "bucket": "js",
       "fr": "On y est presque ! Nous vous avons envoyé un lien par courriel. Cliquez dessus pour confirmer votre abonnement.",
       "pt": "Quase a chegar! Enviamos um link para o seu e-mail. Clique nele para confirmar a sua inscrição."
+    },
+    "33104453877a95f7": {
+      "en": "Price not public. MMV has said it will be supplied on a \"largely not-for-profit\" basis in low- and middle-income countries (reported Nov 2025).",
+      "where": "products.products[0].detail.access[0]",
+      "bucket": "data",
+      "fr": "Prix non public. MMV a déclaré qu'il serait fourni sur une base « largement non lucrative » dans les pays à revenu faible et intermédiaire (information rapportée en novembre 2025).",
+      "pt": "Preço não divulgado. A MMV afirmou que o produto será fornecido \"em grande parte sem fins lucrativos\" em países de baixo e médio rendimento (informação divulgada em novembro de 2025).",
+      "es": "Precio no público. MMV ha dicho que se suministrará \"en gran medida sin ánimo de lucro\" en países de ingresos bajos y medios (informado en noviembre de 2025)."
     },
     "332383ce1ce107ac": {
       "en": "Country access",
@@ -1308,6 +1577,14 @@
       "fr": "adoption de la politique nationale",
       "pt": "Adoção de política nacional",
       "es": "Adopción de políticas nacionales"
+    },
+    "3710efb723965f98": {
+      "en": "Regulatory submission after Phase III results",
+      "where": "products.products[1].stages[1].next",
+      "bucket": "data",
+      "fr": "Soumission réglementaire après les résultats de la phase III",
+      "pt": "Submissão regulatória após resultados da Fase III",
+      "es": "Presentación regulatoria tras los resultados de la Fase III"
     },
     "3721ddd922cbe4c1": {
       "en": "Country registration",
@@ -1466,6 +1743,14 @@
       "pt": "Países neste mapa, em formato de lista.",
       "es": "Países en este mapa, formato de lista"
     },
+    "3b043f6216485a5a": {
+      "en": "Governments and implementing partners",
+      "where": "products.stageInfo[7].who",
+      "bucket": "data",
+      "fr": "Gouvernements et partenaires de mise en œuvre",
+      "pt": "Governos e parceiros de implementação",
+      "es": "Gobiernos y socios implementadores"
+    },
     "3b41ba9c7cb8c5d6": {
       "en": "No data",
       "where": "static text",
@@ -1513,6 +1798,14 @@
       "pt": "Aguarda convites para a ronda de visitas, e depois as inspecções.",
       "es": "A la espera de una ronda de invitaciones y, posteriormente, de las inspecciones."
     },
+    "3c56b2e9f977a617": {
+      "en": "Treatment courses (est.)",
+      "where": "line 2339 (in markup)",
+      "bucket": "js",
+      "fr": "Durée du traitement (estimation)",
+      "pt": "Cursos de tratamento (est.)",
+      "es": "Cursos de tratamiento (est.)"
+    },
     "3c789ada0794de04": {
       "en": "Zoom in to separate them\" + \"",
       "where": "line 3155 (in markup)",
@@ -1551,6 +1844,22 @@
       "fr": "Afrique du Sud",
       "pt": "África do Sul"
     },
+    "3e3f75f3f884c081": {
+      "en": "No cold chain (store below 30°C). Once daily for 3 days, with or without food. Not for people with liver disease.",
+      "where": "products.products[2].detail.adoption[1]",
+      "bucket": "data",
+      "fr": "Ne pas conserver au froid (à conserver à une température inférieure à 30 °C). Prendre une fois par jour pendant 3 jours, avec ou sans nourriture. Déconseillé aux personnes atteintes d'une maladie du foie.",
+      "pt": "Não necessita de refrigeração (conservar abaixo dos 30°C). Uma vez por dia, durante 3 dias, com ou sem alimentos. Não indicado para pessoas com doença hepática.",
+      "es": "No requiere cadena de frío (conservar a menos de 30 °C). Tomar una vez al día durante 3 días, con o sin alimentos. No apto para personas con enfermedades hepáticas."
+    },
+    "3e9fd3995c3bb348": {
+      "en": "Co-developed by Shin Poong and MMV.",
+      "where": "products.products[2].detail.access[2]",
+      "bucket": "data",
+      "fr": "Co-développé par Shin Poong et MMV.",
+      "pt": "Desenvolvido em conjunto por Shin Poong e MMV.",
+      "es": "Desarrollado conjuntamente por Shin Poong y MMV."
+    },
     "3eb56367b966992c": {
       "en": "Treatments procured through public channels",
       "where": "line 1800 (in markup)",
@@ -1575,6 +1884,14 @@
       "pt": "O grupo reúne-se de acordo com o seu próprio calendário, pelo que é difícil prever o horário.",
       "es": "El grupo se reúne según su propio calendario, por lo que es difícil predecir las fechas."
     },
+    "3f6798816506357d": {
+      "en": "A full understanding of a medicine's access situation in any country may require information that is not in this dashboard.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Pour bien comprendre la situation d'accès à un médicament dans un pays donné, il peut être nécessaire de se renseigner sur des informations qui ne figurent pas sur ce tableau de bord.",
+      "pt": "Para compreender plenamente a situação de acesso a um medicamento em qualquer país, poderá ser necessário obter informações que não constem deste painel.",
+      "es": "Para comprender plenamente la situación de acceso a un medicamento en cualquier país, puede ser necesario contar con información que no se encuentra en este panel de control."
+    },
     "3f852b016c12264a": {
       "en": "SRA/WLA submission",
       "where": "products.products[1].detail.milestones[2].milestone",
@@ -1589,6 +1906,14 @@
       "bucket": "markup",
       "fr": "Votre adresse e-mail",
       "pt": "O seu endereço de email"
+    },
+    "4020d4c0cece4022": {
+      "en": "WHO's record of when Eurartesim was prequalified and when it passed its re-check.",
+      "where": "sources.sources[29].plain",
+      "bucket": "data",
+      "fr": "Le registre de l'OMS indiquant quand Eurartesim a été préqualifié et quand il a réussi sa revérification.",
+      "pt": "Registo da OMS de quando Eurartesim foi pré-qualificado e quando passou na reavaliação.",
+      "es": "Registro de la OMS sobre cuándo Eurartesim fue precalificado y cuándo pasó su nueva verificación."
     },
     "40386f928a53a5e1": {
       "en": "Under 1 year",
@@ -1645,6 +1970,14 @@
       "pt": "O uso de rotina concentra-se no Sudeste Asiático e em nichos de quimioprevenção.",
       "es": "Su uso rutinario se concentra en el sudeste asiático y en nichos de quimioprevención."
     },
+    "41765f122b96a0ca": {
+      "en": "Checked on",
+      "where": "line 3405",
+      "bucket": "js",
+      "fr": "Vérifié",
+      "pt": "Verificado em",
+      "es": "Comprobado"
+    },
     "41b15759a97e3679": {
       "en": "\" + esc(where) + \"",
       "where": "line 3137 (in markup)",
@@ -1690,6 +2023,14 @@
       "fr": "5 pays enregistrés",
       "pt": "5 países com registo confirmado",
       "es": "5 países registrados-confirmados"
+    },
+    "449c1e984b288858": {
+      "en": "A modelling study that set the doses for the single-tablet ALAQ across body-weight bands.",
+      "where": "sources.sources[1].plain",
+      "bucket": "data",
+      "fr": "Une étude de modélisation qui a établi les doses pour le comprimé unique ALAQ selon les tranches de poids corporel.",
+      "pt": "Um estudo de modelação que definiu as doses para o comprimido único ALAQ em diferentes intervalos de peso corporal.",
+      "es": "Un estudio de modelización que estableció las dosis para la tableta única ALAQ en diferentes rangos de peso corporal."
     },
     "44a14cedefb794e3": {
       "en": "Only 0.9–4.5% of Global Fund spend, 2022–24",
@@ -1754,12 +2095,28 @@
       "pt": "Verificação do registo (NGA, TZA)",
       "es": "Verificación de registro (NGA, TZA)"
     },
+    "4641ce6fbb724744": {
+      "en": "Tracking a medicine here does not mean that LAUNCH or Unitaid endorses it or recommends it for any use. The dashboard reports where each medicine stands on the access pathway, not whether it should be used. For this proof of concept the scope is these four medicines; it may later expand to other medicines and malaria tools.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Le suivi d'un médicament ici ne signifie pas que LAUNCH ou Unitaid l'approuvent ou le recommandent pour quelque usage que ce soit. Le tableau de bord indique la position de chaque médicament dans le processus d'accès, et non s'il doit être utilisé. Pour cette preuve de concept, le périmètre se limite à ces quatre médicaments ; il pourrait être étendu ultérieurement à d'autres médicaments et outils de lutte contre le paludisme.",
+      "pt": "O facto de um medicamento estar aqui listado não significa que o LAUNCH ou o Unitaid o endossem ou o recomendem para qualquer utilização. O painel informa a posição de cada medicamento no processo de acesso, e não se deve ser utilizado. Para esta prova de conceito, o âmbito limita-se a estes quatro medicamentos; posteriormente, poderá ser alargado a outros medicamentos e ferramentas de combate à malária.",
+      "es": "El seguimiento de un medicamento aquí no implica que LAUNCH o Unitaid lo avalen o recomienden para ningún uso. El panel de control informa sobre la posición de cada medicamento en el proceso de acceso, no sobre si debe utilizarse. Para esta prueba de concepto, el alcance se limita a estos cuatro medicamentos; posteriormente, podría ampliarse a otros medicamentos y herramientas para el tratamiento de la malaria."
+    },
     "4678a57b30912b23": {
       "en": "Djibouti",
       "where": "resistance.dict.country[20]",
       "bucket": "data",
       "fr": "Djibouti",
       "pt": "Djibuti"
+    },
+    "46c6f6d2fe3e2a87": {
+      "en": "EMA: Eurartesim authorisation, 2011",
+      "where": "sources.sources[5].label",
+      "bucket": "data",
+      "fr": "EMA : Eurartesim autorisation, 2011",
+      "pt": "EMA: Eurartesim autorização, 2011",
+      "es": "EMA: Autorización Eurartesim, 2011"
     },
     "4722d06dafe89927": {
       "en": "· still going",
@@ -1776,6 +2133,14 @@
       "fr": "Délais prévus d'après le calendrier publié :",
       "pt": "Horários previstos com base num cronograma publicado:",
       "es": "Tiempos previstos según un cronograma publicado:"
+    },
+    "47c924e75d89bd12": {
+      "en": "Reached in ${y}",
+      "where": "line 1903",
+      "bucket": "js",
+      "fr": "Atteint en ${y}",
+      "pt": "Alcançado em ${y}",
+      "es": "Llegado en ${y}"
     },
     "47d2f7b20b006500": {
       "en": "Health-worker training on new regimen",
@@ -1880,6 +2245,14 @@
       "pt": "Ainda não tem data.",
       "es": "Aún no tiene fecha"
     },
+    "4a7d2774ae9b2a4b": {
+      "en": "A separate WHO check of quality and manufacturing, including factory inspections. Prequalification supports eligibility for purchase under the quality assurance and procurement policies of UN agencies and major funders such as the Global Fund; specific policies and exceptions may differ. Manufacturers are invited to apply through a WHO Expression of Interest (EOI).",
+      "where": "products.stageInfo[3].what",
+      "bucket": "data",
+      "fr": "Un contrôle distinct de la qualité et de la fabrication, mené par l'OMS et comprenant des inspections d'usines, est requis. La préqualification permet de bénéficier des politiques d'assurance qualité et d'approvisionnement des agences des Nations Unies et des principaux bailleurs de fonds, tels que le Fonds mondial ; les politiques et exceptions spécifiques peuvent varier. Les fabricants sont invités à soumettre une manifestation d'intérêt (MI) auprès de l'OMS.",
+      "pt": "Uma verificação independente da OMS sobre a qualidade e o fabrico, incluindo inspeções nas fábricas. A pré-qualificação garante a elegibilidade para compras de acordo com as políticas de garantia de qualidade e aquisição das agências da ONU e dos principais financiadores, como o Fundo Global; políticas e exceções específicas podem variar. Os fabricantes são convidados a candidatar-se através de uma Manifestação de Interesse (EOI) da OMS.",
+      "es": "La OMS realiza una verificación independiente de calidad y fabricación, que incluye inspecciones de fábrica. La precalificación respalda la elegibilidad para la compra conforme a las políticas de garantía de calidad y adquisiciones de los organismos de la ONU y los principales financiadores, como el Fondo Mundial; las políticas y excepciones específicas pueden variar. Se invita a los fabricantes a presentar su solicitud mediante una Expresión de Interés (EOI) de la OMS."
+    },
     "4b59d6f059966858": {
       "en": "EMA approval (Eurartesim)",
       "where": "products.products[3].stages[1].note",
@@ -1963,6 +2336,22 @@
       "fr": "Présence enregistrée : plus de 25 pays et en expansion",
       "pt": "Presença registada: mais de 25 países e em expansão."
     },
+    "4d3c512e8b161239": {
+      "en": "Stringent Regulatory Authority — the older WHO term for an advanced regulator such as EMA or the US FDA. WHO is replacing it with WHO-Listed Authorities (WLA), regulators assessed against WHO's performance indicators; existing SRAs are treated as WHO-listed during the transition.",
+      "where": "products.glossary.SRA",
+      "bucket": "data",
+      "fr": "Autorité réglementaire rigoureuse (ARR) — l'ancien terme utilisé par l'OMS pour désigner un organisme de réglementation de haut niveau comme l'EMA ou la FDA américaine. L'OMS le remplace par les Autorités listées par l'OMS (ALO), organismes de réglementation évalués selon les indicateurs de performance de l'OMS ; les ARR existantes sont considérées comme listées par l'OMS pendant la transition.",
+      "pt": "Autoridade Reguladora Rigorosa — o termo antigo da OMS para um organismo regulador avançado, como a EMA ou a FDA dos EUA. A OMS está a substituí-lo pelas Autoridades Listadas pela OMS (WLA, na sigla em inglês), organismos reguladores avaliados de acordo com os indicadores de desempenho da OMS; as Autoridades Reguladoras Rigorosas existentes são tratadas como listadas pela OMS durante o período de transição.",
+      "es": "Autoridad Reguladora Estricta (SRA, por sus siglas en inglés): término antiguo de la OMS para un organismo regulador avanzado como la EMA o la FDA de EE. UU. La OMS lo está reemplazando por Autoridades Listadas por la OMS (WLA, por sus siglas en inglés), organismos reguladores evaluados según los indicadores de desempeño de la OMS; las SRA existentes se consideran incluidas en la lista de la OMS durante la transición."
+    },
+    "4d4d133d29b81ccf": {
+      "en": "WHO Department of Malaria and Neglected Tropical Diseases (MNT) and its Guidelines Development Group",
+      "where": "products.stageInfo[2].who",
+      "bucket": "data",
+      "fr": "Département du paludisme et des maladies tropicales négligées (MNT) de l'OMS et son Groupe d'élaboration des lignes directrices",
+      "pt": "Departamento de Malária e Doenças Tropicais Negligenciadas (MNT) da OMS e o seu Grupo de Desenvolvimento de Orientações",
+      "es": "Departamento de Malaria y Enfermedades Tropicales Desatendidas (MNT) de la OMS y su Grupo de Desarrollo de Directrices"
+    },
     "4d52c75662577498": {
       "en": "PQ targeted by ~2027 per partnership",
       "where": "products.products[1].stages[3].next",
@@ -1979,6 +2368,14 @@
       "pt": "Resultados agrupados de vários estudos independentes sobre a eficácia contínua dos antimaláricos.",
       "es": "Resultados combinados de numerosos estudios independientes sobre la eficacia actual de los antipalúdicos."
     },
+    "4d86adbe3a0a5422": {
+      "en": "MMV: Pyramax pregnancy label update, 2025",
+      "where": "sources.sources[19].label",
+      "bucket": "data",
+      "fr": "MMV : Mise à jour de l'étiquetage de grossesse Pyramax, 2025",
+      "pt": "MMV: Pyramax atualização do rótulo de gravidez, 2025",
+      "es": "MMV: Pyramax Actualización de la etiqueta de embarazo, 2025"
+    },
     "4dbfa5c5efd9a433": {
       "en": "The national register of every medicine approved for sale in Nigeria.",
       "where": "static text",
@@ -1987,6 +2384,13 @@
       "pt": "O registo nacional de todos os medicamentos aprovados para venda na Nigéria.",
       "es": "El registro nacional de todos los medicamentos aprobados para su venta en Nigeria."
     },
+    "4dd0eaaffc75877c": {
+      "en": "In national guidelines in 7 countries on the country access map, and in MFT plans in 4 more; each country is cited to a WHO publication or a peer-reviewed paper. Ghana added artesunate–pyronaridine as an alternate first-line ACT in 2022, alongside AS-AQ and AL",
+      "where": "products.products[2].stages[5].note",
+      "bucket": "data",
+      "pt": "Nas orientações nacionais de 7 países no mapa de acesso por país e nos planos MFT de mais 4, cada país é citado numa publicação da OMS ou num artigo revisto por pares. O Gana adicionou o artesunato-pironaridina como alternativa de primeira linha ACT em 2022, juntamente com o AS-AQ e o AL.",
+      "es": "En las directrices nacionales de 7 países del mapa de acceso por país, y en los planes MFT de 4 más; cada país cita una publicación de la OMS o un artículo revisado por pares. Ghana añadió artesunato-pironaridina como una alternativa de primera línea ACT en 2022, junto con AS-AQ y AL"
+    },
     "4dd79e5db3bfd9cb": {
       "en": "Click for details ›",
       "where": "line 3188 (in markup)",
@@ -1994,6 +2398,14 @@
       "fr": "Cliquez pour plus de détails ›",
       "pt": "Clique para mais detalhes ›",
       "es": "Haz clic para obtener más detalles ›"
+    },
+    "4df4ef64a5714059": {
+      "en": "US$14.5m, 68 transactions (GF, to 2025)",
+      "where": "products.products[2].detail.milestones[6].label",
+      "bucket": "data",
+      "fr": "14,5 millions de dollars US, 68 transactions (GF, jusqu'en 2025)",
+      "pt": "14,5 milhões de dólares, 68 transações (GF, até 2025)",
+      "es": "14,5 millones de dólares estadounidenses, 68 transacciones (saldo bruto, hasta 2025)"
     },
     "4e2967c1258181c4": {
       "en": "Each figure reflects its cited public source; manufacturer-specific details are shown only where release was confirmed in writing.",
@@ -2009,6 +2421,14 @@
       "fr": "Fonds mondial (enregistré par PQR)",
       "pt": "Fundo Global (registado pela PQR)",
       "es": "Fondo Mundial (grabado en PQR)"
+    },
+    "4e74c70e8bd214f4": {
+      "en": "20/160 mg dispersible tablets · box of 25 blisters of 3",
+      "where": "products.products[3].detail.volume.byPresentation[3].label",
+      "bucket": "data",
+      "fr": "Comprimés dispersibles 20/160 mg · boîte de 25 plaquettes thermoformées de 3",
+      "pt": "Comprimidos dispersíveis de 20/160 mg · caixa de 25 blisters de 3 comprimidos",
+      "es": "Comprimidos dispersables de 20/160 mg · caja de 25 blísteres de 3"
     },
     "4e93f1dc7bd9bfba": {
       "en": "so far",
@@ -2078,6 +2498,14 @@
       "fr": "${siteCount} ${siteCount === 1 ? \"site\" : \"sites\"}, ${lo === hi ? lo : lo + \"–\" + hi}",
       "pt": "${siteCount} ${siteCount === 1 ? \"site\" : \"sites\"}, ${lo === hi ? lo : lo + \"–\" + hi}"
     },
+    "50fbe664111a9608": {
+      "en": "A stringent regulator reviews the full evidence on quality, safety and effectiveness. For malaria medicines this is usually the European Medicines Agency (EMA) EU-M4all procedure (formerly Article 58), which covers medicines meant for use outside Europe. Every later step builds on this opinion. Health authority review status is generally not public, so this step changes only when a regulator or the manufacturer announces an outcome.",
+      "where": "products.stageInfo[1].what",
+      "bucket": "data",
+      "fr": "Un organisme de réglementation rigoureux examine l'ensemble des données probantes relatives à la qualité, à la sécurité et à l'efficacité des médicaments. Pour les médicaments antipaludiques, il s'agit généralement de la procédure EU-M4all de l'Agence européenne des médicaments (EMA) (anciennement article 58), qui concerne les médicaments destinés à être utilisés hors d'Europe. Chaque étape ultérieure s'appuie sur cet avis. Le statut de l'examen par les autorités sanitaires n'est généralement pas public ; cette étape n'évolue donc que lorsqu'un organisme de réglementation ou le fabricant annonce une décision.",
+      "pt": "Uma entidade reguladora rigorosa analisa todas as evidências sobre a qualidade, segurança e eficácia. No caso dos medicamentos contra a malária, esta análise é geralmente feita pela Agência Europeia do Medicamento (EMA), através do procedimento EU-M4all (anterior Artigo 58), que abrange os medicamentos destinados a serem utilizados fora da Europa. Cada etapa subsequente baseia-se nesse parecer. O estado da análise da autoridade sanitária não é geralmente público, pelo que esta etapa só se altera quando uma entidade reguladora ou o fabricante anuncia um resultado.",
+      "es": "Un organismo regulador riguroso revisa exhaustivamente la evidencia sobre calidad, seguridad y eficacia. En el caso de los medicamentos contra la malaria, este procedimiento suele ser el EU-M4all de la Agencia Europea de Medicamentos (EMA) (anteriormente Artículo 58), que abarca los medicamentos destinados a ser utilizados fuera de Europa. Cada paso posterior se basa en esta opinión. El estado de la revisión por parte de la autoridad sanitaria generalmente no es público, por lo que este paso solo cambia cuando un organismo regulador o el fabricante anuncian un resultado."
+    },
     "514e67ee208e9322": {
       "en": "+${peers.length - 24} more in the Countries tab",
       "where": "illustrated-journey-dashboard.html",
@@ -2085,6 +2513,22 @@
       "fr": "+${peers.length - 24} Plus d'informations dans l'onglet Pays",
       "pt": "+${peers.length - 24} mais no separador Países",
       "es": "+${peers.length - 24} más en la pestaña Países"
+    },
+    "51928835fe16a412": {
+      "en": "Prolongs the QT interval. Not for people with QT prolongation or on QT-prolonging medicines (WHO; EU label). The EU label advises an ECG during treatment; WHO says one is not needed before prescribing.",
+      "where": "products.products[3].detail.adoption[0]",
+      "bucket": "data",
+      "fr": "Prolonge l'intervalle QT. Contre-indiqué chez les patients présentant un allongement de l'intervalle QT ou prenant des médicaments allongeant l'intervalle QT (OMS ; notice européenne). La notice européenne recommande un ECG pendant le traitement ; l'OMS indique qu'il n'est pas nécessaire avant la prescription.",
+      "pt": "Prolonga o intervalo QT. Não indicado para pessoas com prolongamento do intervalo QT ou que estejam a tomar medicamentos que prolongam o intervalo QT (OMS; bula da UE). A bula da UE recomenda um ECG durante o tratamento; a OMS refere que não é necessário um ECG antes da prescrição.",
+      "es": "Prolonga el intervalo QT. No apto para personas con prolongación del intervalo QT ni para quienes toman medicamentos que lo prolongan (OMS; ficha técnica de la UE). La ficha técnica de la UE recomienda realizar un electrocardiograma durante el tratamiento; la OMS indica que no es necesario antes de prescribirlo."
+    },
+    "519b8fa611f38766": {
+      "en": "Listed as treatment in national policy",
+      "where": "line 3401",
+      "bucket": "js",
+      "fr": "Inscrit comme traitement dans la politique nationale",
+      "pt": "Listado como tratamento na política nacional",
+      "es": "Incluido como tratamiento en la política nacional."
     },
     "51ad3c5a7078f688": {
       "en": "No. of countries",
@@ -2125,6 +2569,14 @@
       "fr": "Roulement",
       "pt": "Rolante",
       "es": "Laminación"
+    },
+    "525c31bdbabbc2c9": {
+      "en": "Confirmed in national registers",
+      "where": "line 2117 (in markup)",
+      "bucket": "js",
+      "fr": "Confirmé dans les registres nationaux",
+      "pt": "Confirmado nos registos nacionais",
+      "es": "Confirmado en los registros nacionales"
     },
     "5293e854ab993a1e": {
       "en": "Drag to pan · Ctrl + scroll or double-click to zoom · arrow keys pan when the map has focus",
@@ -2344,6 +2796,14 @@
       "pt": "Mediterrâneo Oriental",
       "es": "Mediterráneo oriental"
     },
+    "58abd242e93edbfa": {
+      "en": "Unitaid does not accept legal responsibility for the accuracy of the data. Unitaid does not guarantee that it is complete, up to date or fit for a specific purpose.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Unitaid décline toute responsabilité quant à l'exactitude des données. Unitaid ne garantit pas que ces données soient complètes, à jour ou adaptées à un usage particulier.",
+      "pt": "Unitaid não assume responsabilidade legal pela exatidão dos dados. Unitaid não garante que os dados estejam completos, atualizados ou adequados a uma finalidade específica.",
+      "es": "Unitaid no acepta responsabilidad legal por la exactitud de los datos. Unitaid no garantiza que sean completos, estén actualizados o sean adecuados para un propósito específico."
+    },
     "590b09dfbd9f5858": {
       "en": "Resistance-associated genotype, % of samples genotyped",
       "where": "markers.meta.metric",
@@ -2358,6 +2818,14 @@
       "fr": "Également dans la politique mais non représenté sur cette carte : ${esc(und.join(\", \"))}.",
       "pt": "Também na política, mas não desenhado neste mapa: ${esc(und.join(\", \"))}.",
       "es": "También en la política pero no dibujado en este mapa: ${esc(und.join(\", \"))}."
+    },
+    "5922e04f00c8964c": {
+      "en": "MMV's page for Eurartesim: approved, who makes it, and its approvals so far.",
+      "where": "sources.sources[16].plain",
+      "bucket": "data",
+      "fr": "La page de MMV pour Eurartesim : approuvé, qui le fabrique et ses approbations jusqu'à présent.",
+      "pt": "Página de MMV para Eurartesim: aprovado, quem o faz e as suas aprovações até à data.",
+      "es": "Página de MMV para Eurartesim: aprobado, quién lo hace y sus aprobaciones hasta el momento."
     },
     "5929613a6054931a": {
       "en": "SRA approval (EMA, Eurartesim)",
@@ -2374,6 +2842,14 @@
       "fr": "Nous commençons la comparaison une fois que le médicament a reçu une autorisation de mise sur le marché datée.",
       "pt": "Começamos a comparar assim que o medicamento tem uma aprovação regulamentar com data de expiração.",
       "es": "Comenzamos a comparar una vez que el medicamento tiene una aprobación regulatoria con fecha."
+    },
+    "59e5d16835139e72": {
+      "en": "WHO's list of child-friendly malaria medicines that most need developing, from a June 2025 meeting.",
+      "where": "sources.sources[40].plain",
+      "bucket": "data",
+      "fr": "Liste de l'OMS des médicaments antipaludiques adaptés aux enfants qui nécessitent le plus de développement, issue d'une réunion de juin 2025.",
+      "pt": "Lista da OMS de medicamentos antimaláricos adequados para crianças que mais precisam de ser desenvolvidos, de uma reunião de junho de 2025.",
+      "es": "Lista de la OMS de medicamentos contra la malaria aptos para niños que más necesitan desarrollarse, elaborada en una reunión de junio de 2025."
     },
     "5a2e3032ca42d712": {
       "en": "Manufacturer-confirmed in writing",
@@ -2453,6 +2929,14 @@
       "pt": "A inclusão de orientações nacionais está atrasada em relação à forte recomendação da OMS de 2022 — o Gana introduziu o artesunato-pironaridina como alternativa de primeira linha ACT em 2022 (a sua terceira, juntamente com a AS-AQ e a AL), mas esta continua a ser a única adoção de orientações nacionais confirmada; uma inclusão mais ampla é a principal lacuna de adoção que a LAUNCH está a monitorizar.",
       "es": "La inclusión de directrices nacionales se queda rezagada con respecto a la recomendación firme de la OMS de 2022: Ghana introdujo artesunato-pironaridina como tratamiento alternativo de primera línea ACT en 2022 (su tercer tratamiento, junto con AS-AQ y AL), pero esta sigue siendo la única adopción de directrices nacionales confirmada; la inclusión más amplia es la principal brecha de adopción que LAUNCH está siguiendo."
     },
+    "5d5516cbc4f48c40": {
+      "en": "The official trial record for GanLum's Phase III study: size, sites, and when it finished.",
+      "where": "sources.sources[4].plain",
+      "bucket": "data",
+      "fr": "Le compte rendu officiel de l'essai de phase III de GanLum : taille, sites et date de fin.",
+      "pt": "Registo oficial do ensaio clínico de Fase III do GanLum: tamanho da amostra, locais de recolha de dados e data de fim.",
+      "es": "Registro oficial del ensayo clínico de fase III de GanLum: tamaño, centros participantes y fecha de finalización."
+    },
     "5d910c4915fd86e6": {
       "en": "Supply chain readiness and health-worker training.",
       "where": "products.stageInfo[7].stall",
@@ -2475,6 +2959,14 @@
       "fr": "Afghanistan",
       "pt": "Afeganistão"
     },
+    "5e168e2d281f59eb": {
+      "en": "WHO assessment report: Eurartesim",
+      "where": "sources.sources[29].label",
+      "bucket": "data",
+      "fr": "Rapport d'évaluation de l'OMS : Eurartesim",
+      "pt": "Relatório de avaliação da OMS: Eurartesim",
+      "es": "Informe de evaluación de la OMS: Eurartesim"
+    },
     "5e28eda83dbeee21": {
       "en": "Please check back shortly.",
       "where": "scripts/build-rbm-pages.js",
@@ -2491,12 +2983,36 @@
       "pt": "Novartis",
       "es": "Novartis"
     },
+    "5e8fd648da016379": {
+      "en": "The LAUNCH dashboard displays publicly available information only. Product-specific details appear solely where the manufacturer has confirmed in writing that they may be shared. Health authority reviews may take place at any stage of development, and their status is generally not public, so regulatory steps change only when a regulator or the manufacturer announces an outcome. Procurement figures cover public channels only. Hover any stage for status detail; select a medicine to open its full profile.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Le tableau de bord LAUNCH affiche uniquement les informations publiques. Les détails spécifiques à un produit apparaissent uniquement lorsque le fabricant a confirmé par écrit qu'ils pouvaient être partagés. Les évaluations des autorités sanitaires peuvent intervenir à n'importe quel stade du développement et leur statut n'est généralement pas public ; les procédures réglementaires ne changent donc que lorsqu'un organisme de réglementation ou le fabricant annonce une décision. Les données d'approvisionnement concernent uniquement les canaux publics. Survolez une étape pour afficher son statut détaillé ; sélectionnez un médicament pour ouvrir son profil complet.",
+      "pt": "O painel LAUNCH apenas apresenta informações publicamente disponíveis. Os detalhes específicos do produto aparecem apenas quando o fabricante confirma por escrito que podem ser partilhados. As análises das autoridades de saúde podem ocorrer em qualquer fase do desenvolvimento e o seu estado não é geralmente público, pelo que as etapas regulamentares só mudam quando um organismo regulador ou o fabricante anuncia um resultado. Os dados de aquisição abrangem apenas os canais públicos. Passe o cursor sobre qualquer passo para obter detalhes do estado; selecione um medicamento para abrir o seu perfil completo.",
+      "es": "El panel LAUNCH muestra únicamente información disponible públicamente. Los detalles específicos del producto aparecen solo cuando el fabricante ha confirmado por escrito que pueden compartirse. Las revisiones de las autoridades sanitarias pueden tener lugar en cualquier etapa del desarrollo, y su estado generalmente no es público, por lo que los pasos regulatorios solo cambian cuando un regulador o el fabricante anuncian un resultado. Las cifras de adquisición cubren únicamente los canales públicos. Pase el cursor sobre cualquier etapa para ver los detalles del estado; seleccione un medicamento para abrir su perfil completo."
+    },
     "5e95cab879f3837b": {
       "en": "Mock only — Subscribe for updates isn't connected yet.",
       "where": "static text",
       "bucket": "markup",
       "fr": "Version fictive uniquement — L'abonnement aux mises à jour n'est pas encore activé.",
       "pt": "Apenas simulação — A opção \"Subscrever atualizações\" ainda não está ativada."
+    },
+    "5ea92ecf3bd5798c": {
+      "en": "The guidelines (PDF)",
+      "where": "sources.sources[33].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Les directives (PDF)",
+      "pt": "As orientações (PDF)",
+      "es": "Las directrices (PDF)"
+    },
+    "5ed76700ab3c213f": {
+      "en": "Under 1 year so far",
+      "where": "line 1904",
+      "bucket": "js",
+      "fr": "Moins d'un an jusqu'à présent",
+      "pt": "Menos de 1 ano até agora",
+      "es": "Menos de 1 año hasta ahora"
     },
     "5ee26e7e05ffa7c9": {
       "en": "yr",
@@ -2512,6 +3028,14 @@
       "bucket": "js",
       "fr": "' + hist + pic + \"",
       "pt": "' + hist + pico + \""
+    },
+    "5f667fdd8f02686f": {
+      "en": "Extracts 31 Aug 2026",
+      "where": "products.products[3].detail.milestones[5].date",
+      "bucket": "data",
+      "fr": "Extraits du 31 août 2026",
+      "pt": "Extratos de 31 de agosto de 2026",
+      "es": "Extractos del 31 de agosto de 2026"
     },
     "5f80e956d8b92cb7": {
       "en": "EMA outcome 5 Jun 2025",
@@ -2574,6 +3098,14 @@
       "pt": "e",
       "es": "y"
     },
+    "6239d8f1a37e1b2a": {
+      "en": "We updated the name of WHO's malaria department to the Department of Malaria and Neglected Tropical Diseases (MNT). The country counts for ASPY and DHA–PPQ now match the country access map, and we show how many countries a national medicines register confirms. We removed the years-late figures until the way they are worked out is agreed; the expected time for each stage stays. ALAQ's description now says it is still in clinical development and that its future role depends on trial results, regulators, WHO and countries. ASPY's description now says that registration and adoption vary by country and that LAUNCH is checking them country by country. For DHA–PPQ we explain what the 0.9–4.5% is a share of, describe its uses more carefully, and corrected Nigeria's count of active registrations from 26 to 25. No dates or statuses changed.",
+      "where": "products.changelog[5].plain",
+      "bucket": "data",
+      "fr": "Nous avons mis à jour le nom du département du paludisme de l'OMS, qui s'appelle désormais Département du paludisme et des maladies tropicales négligées (MNT). Le nombre de pays où ASPY et DHA-PPQ sont disponibles correspond maintenant à la carte d'accès aux médicaments, et nous indiquons le nombre de pays pour lesquels un registre national des médicaments est confirmé. Nous avons supprimé les chiffres relatifs aux années de retard en attendant de définir leur mode de calcul ; la durée prévue pour chaque étape est conservée. La description du médicament ALAQ indique maintenant qu'il est toujours en développement clinique et que son rôle futur dépend des résultats des essais, des autorités réglementaires, de l'OMS et des pays. La description d'ASPY précise que l'enregistrement et l'adoption varient selon les pays et que LAUNCH les vérifie pays par pays. Concernant DHA-PPQ, nous expliquons à quoi correspond la part de 0,9 % à 4,5 %, décrivons plus précisément ses utilisations et avons corrigé le nombre d'enregistrements actifs au Nigéria, qui est passé de 26 à 25. Aucune date ni aucun statut n'ont été modifiés.",
+      "pt": "Atualizámos o nome do departamento de malária da OMS para Departamento de Malária e Doenças Tropicais Negligenciadas (MNT). A contagem de países para ASPY e DHA-PPQ corresponde agora ao mapa de acesso por país, e mostramos quantos países um registo nacional de medicamentos confirma. Removemos os dados com anos de atraso até que a forma de cálculo esteja definida; o tempo previsto para cada etapa mantém-se o mesmo. A descrição do ALAQ indica agora que o medicamento ainda está em desenvolvimento clínico e que o seu papel futuro depende dos resultados dos ensaios, das agências reguladoras, da OMS e dos países. A descrição de ASPY indica agora que o registo e a adoção variam de acordo com o país e que LAUNCH está a verificá-los país a país. Para o DHA-PPQ, explicámos o que representa a percentagem de 0,9–4,5%, descrevemos as suas utilizações com mais detalhe e corrigimos a contagem de registos ativos da Nigéria de 26 para 25. Nenhuma data ou estado foi alterado.",
+      "es": "Actualizamos el nombre del departamento de malaria de la OMS a Departamento de Malaria y Enfermedades Tropicales Desatendidas (MNT). Los recuentos de países para ASPY y DHA-PPQ ahora coinciden con el mapa de acceso por país, y mostramos cuántos países confirma un registro nacional de medicamentos. Eliminamos las cifras con años de retraso hasta que se acuerde la forma en que se calculan; el tiempo esperado para cada etapa se mantiene. La descripción de ALAQ ahora dice que todavía está en desarrollo clínico y que su función futura depende de los resultados de los ensayos, los reguladores, la OMS y los países. La descripción de ASPY ahora dice que el registro y la adopción varían según el país y que LAUNCH los está verificando país por país. Para DHA-PPQ explicamos qué es la proporción del 0,9–4,5 %, describimos sus usos con más detalle y corregimos el recuento de registros activos de Nigeria de 26 a 25. No se cambiaron fechas ni estados."
+    },
     "624bde0efdfc821d": {
       "en": "Phase III complete Nov 2025",
       "where": "products.products[0].detail.research.timeline",
@@ -2627,6 +3159,14 @@
       "pt": "Apenas simulação — o envio de feedback ainda não está ligado.",
       "es": "Solo simulaciones: la función de enviar comentarios aún no está conectada."
     },
+    "6370baf0ecd12b32": {
+      "en": "Not yet reached",
+      "where": "line 1909",
+      "bucket": "js",
+      "fr": "Pas encore atteint",
+      "pt": "Ainda não alcançado",
+      "es": "Aún no se ha alcanzado"
+    },
     "637676305f047e01": {
       "en": "Procurement (public channels)",
       "where": "products.stages[6]",
@@ -2634,6 +3174,14 @@
       "fr": "Achats (voies publiques)",
       "pt": "Concursos (canais públicos)",
       "es": "Adquisiciones (canales públicos)"
+    },
+    "6377426bf163c625": {
+      "en": "${STAGES[col.stages[0]]} and ${STAGES[col.stages[1]]} are parallel milestones within stage ${stepNo(i)}.",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "${STAGES[col.stages[0]]} et ${STAGES[col.stages[1]]} sont des étapes parallèles au sein de l'étape ${stepNo(i)}.",
+      "pt": "${STAGES[col.stages[0]]} e ${STAGES[col.stages[1]]} são marcos paralelos dentro do estádio ${stepNo(i)}.",
+      "es": "${STAGES[col.stages[0]]} y ${STAGES[col.stages[1]]} son hitos paralelos dentro de la etapa ${stepNo(i)}."
     },
     "63903d2630cae975": {
       "en": "Expected times from LAUNCH's working estimates, still to be agreed:",
@@ -2722,6 +3270,14 @@
       "pt": "Estudos individuais, avaliações e comunicados sobre medicamentos específicos.",
       "es": "Estudios individuales, evaluaciones y comunicados sobre medicamentos específicos."
     },
+    "67404a14613d20c0": {
+      "en": "WHO-recommended ACT with verified registration and adoption varying by country. LAUNCH is validating country-level registration, guideline inclusion, MFT positioning, procurement and routine-use information.",
+      "where": "products.products[2].detail.useCase",
+      "bucket": "data",
+      "fr": "Recommandé par l'OMS ACT avec enregistrement vérifié et adoption variable selon les pays. LAUNCH en cours de validation de l'enregistrement au niveau national, de l'inclusion dans les lignes directrices, MFT du positionnement, de l'approvisionnement et des informations sur l'utilisation courante.",
+      "pt": "A recomendação da OMS ACT, com registo e adoção verificados, varia consoante o país. LAUNCH consiste na validação do registo a nível nacional, inclusão nas guidelines, MFT posicionamento, aquisição e informação sobre o uso de rotina.",
+      "es": "Recomendado por la OMS ACT con registro verificado y adopción que varía según el país. LAUNCH es validación del registro a nivel nacional, inclusión en la guía, MFT posicionamiento, adquisición e información de uso rutinario."
+    },
     "6757f7074197e349": {
       "en": "in WHO policy",
       "where": "illustrated-journey-dashboard.html",
@@ -2737,6 +3293,14 @@
       "fr": "Asie du Sud-Est",
       "pt": "Sudeste Asiático",
       "es": "Sudeste asiático"
+    },
+    "680a998ee7995319": {
+      "en": "Only 0.9–4.5% of Global Fund antimalarial orders by value, 2022–24",
+      "where": "products.products[3].barrier",
+      "bucket": "data",
+      "fr": "Seulement 0,9 à 4,5 % des commandes d'antipaludiques du Fonds mondial en valeur, 2022-2024",
+      "pt": "Apenas 0,9–4,5% dos pedidos de medicamentos antimaláricos do Fundo Global, em valor, 2022–2024.",
+      "es": "Solo entre el 0,9 % y el 4,5 % de los pedidos de antipalúdicos del Fondo Mundial por valor, 2022-2024"
     },
     "68105eb6ae21e541": {
       "en": "MMV and partners",
@@ -2776,6 +3340,14 @@
       "fr": "Gouvernements et partenaires de mise en œuvre.",
       "pt": "Governos e parceiros de implementação.",
       "es": "Gobiernos y socios implementadores."
+    },
+    "697f4b05513e4dde": {
+      "en": "Does it cure infections carrying artemisinin partial-resistance (kelch13) mutations as well as other infections? (KALUMA subgroup not yet published.) Does faster gametocyte clearance reduce infection of mosquitoes? (Not yet measured.)",
+      "where": "products.products[0].detail.research.question",
+      "bucket": "data",
+      "fr": "Ce traitement guérit-il les infections porteuses de mutations de résistance partielle à l'artémisinine (kelch13) ainsi que d'autres infections ? (Sous-groupe KALUMA non encore publié.) Une élimination plus rapide des gamétocytes réduit-elle l'infection des moustiques ? (Non mesuré pour l'instant.)",
+      "pt": "Será que cura as infeções portadoras de mutações de resistência parcial à artemisinina (kelch13), bem como outras infeções? (KALUMA subgrupo ainda não publicado.) A eliminação mais rápida dos gametócitos reduz a infeção dos mosquitos? (Ainda não medido.)",
+      "es": "¿Cura las infecciones que presentan mutaciones de resistencia parcial a la artemisinina (kelch13), así como otras infecciones? (Subgrupo KALUMA aún no publicado). ¿Reduce la eliminación más rápida de gametocitos la infección de los mosquitos? (Aún no medido)."
     },
     "69d0a7b84cd1d5d0": {
       "en": "Benin",
@@ -2830,6 +3402,14 @@
       "fr": "Ajout de définitions en langage clair, d'un bouton de téléchargement, d'un aperçu avant impression et de l'indication du temps écoulé entre les étapes.",
       "pt": "Foram adicionadas definições em linguagem simples, um botão de download, uma pré-visualização para impressão e o tempo decorrido entre os passos.",
       "es": "Se añadieron definiciones en lenguaje sencillo, un botón de descarga, una vista previa para imprimir y el tiempo transcurrido entre cada paso."
+    },
+    "6b4b7ab274ac9a07": {
+      "en": "Steps taken since the opinion (PDF)",
+      "where": "sources.sources[6].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Mesures prises depuis l'avis (PDF)",
+      "pt": "Medidas tomadas desde o parecer (PDF)",
+      "es": "Medidas adoptadas desde la emisión del dictamen (PDF)"
     },
     "6b615adb1300c116": {
       "en": "Colombia",
@@ -2920,6 +3500,14 @@
       "fr": "Résultat",
       "pt": "Resultado",
       "es": "Resultado"
+    },
+    "6f5ce652507f5e7e": {
+      "en": "Global Fund procurement 2018–2025: 68 transactions, US$14.5m — modest overall, but US$11.6m of it landed in 2025 (led by Uganda and Burkina Faso), a sharp uptick consistent with early MFT rollouts",
+      "where": "products.products[2].stages[6].note",
+      "bucket": "data",
+      "fr": "Acquisitions du Fonds mondial 2018-2025 : 68 transactions, 14,5 millions de dollars US — un montant modeste dans l’ensemble, mais dont 11,6 millions de dollars US ont été alloués en 2025 (principalement par l’Ouganda et le Burkina Faso), une forte hausse conforme aux premiers déploiements du programme MFT",
+      "pt": "Aquisições do Fundo Global 2018–2025: 68 transações, 14,5 milhões de dólares — um valor modesto no geral, mas 11,6 milhões de dólares deste montante foram alocados a 2025 (liderados pelo Uganda e Burkina Faso), um aumento acentuado consistente com as primeiras implementações do MFT",
+      "es": "Adquisiciones del Fondo Mundial 2018–2025: 68 transacciones, US$14,5 millones — modesto en general, pero US$11,6 millones llegaron en 2025 (encabezados por Uganda y Burkina Faso), un fuerte repunte consistente con los primeros lanzamientos de MFT"
     },
     "700afd3338233b24": {
       "en": "MFT policy groups · ${esc(p.name)}",
@@ -3065,6 +3653,14 @@
       "pt": "Legenda",
       "es": "Leyenda"
     },
+    "74852626fd58f392": {
+      "en": "EMA positive scientific opinion (Article 58/EU-M4all, 16 Feb 2012); 2025 label update: tablets may be used in the 2nd and 3rd trimesters when the benefit outweighs the risk (EMA opinion 5 Jun 2025; product information updated 6 Aug 2025)",
+      "where": "products.products[2].stages[1].note",
+      "bucket": "data",
+      "fr": "Avis scientifique positif de l'EMA (Article 58/EU-M4all, 16 février 2012) ; mise à jour de l'étiquetage en 2025 : les comprimés peuvent être utilisés au cours des 2e et 3e trimestres lorsque le bénéfice est supérieur au risque (avis de l'EMA du 5 juin 2025 ; informations sur le produit mises à jour le 6 août 2025).",
+      "pt": "Parecer científico positivo da EMA (Artigo 58/EU-M4all, 16 de fevereiro de 2012); atualização da bula em 2025: os comprimidos podem ser utilizados no segundo e terceiro trimestres da gravidez quando o benefício supera o risco (parecer da EMA de 5 de junho de 2025; informação do produto atualizada em 6 de agosto de 2025).",
+      "es": "Dictamen científico positivo de la EMA (Artículo 58/EU-M4all, 16 de febrero de 2012); actualización de la etiqueta de 2025: los comprimidos pueden utilizarse en el segundo y tercer trimestre cuando el beneficio supera el riesgo (Dictamen de la EMA, 5 de junio de 2025; información del producto actualizada el 6 de agosto de 2025)."
+    },
     "74e1891dc615b22f": {
       "en": "Kenya",
       "where": "resistance.dict.country[33]",
@@ -3087,6 +3683,14 @@
       "fr": "Pays suivant",
       "pt": "Próximo país",
       "es": "Siguiente país"
+    },
+    "757064875d4f821f": {
+      "en": "40/320 mg tablets · box of 25 blisters of 9",
+      "where": "products.products[3].detail.volume.byPresentation[4].label",
+      "bucket": "data",
+      "fr": "Comprimés de 40/320 mg · boîte de 25 plaquettes thermoformées de 9",
+      "pt": "Comprimidos de 40/320 mg · caixa de 25 blisters de 9 comprimidos",
+      "es": "Comprimidos de 40/320 mg · caja de 25 blísteres de 9"
     },
     "75e49a9a3f0599ca": {
       "en": "Close study list",
@@ -3172,6 +3776,14 @@
       "pt": "Consultámos os registos oficiais de medicamentos: a Tanzânia aprovou este medicamento em 2022 e a Nigéria aprovou uma versão para crianças em fevereiro de 2024. Ambos já estão confirmados no mapa.",
       "es": "Hemos consultado los registros oficiales de medicamentos: Tanzania aprobó este medicamento en 2022, y Nigeria aprobó una versión para niños en febrero de 2024. Ambos ya aparecen confirmados en el mapa."
     },
+    "790c98fa2ad81c96": {
+      "en": "Treatment courses are estimated only where the Global Fund's product name states the tablets in one course (\"40mg+320mg - 9\" is 9 tablets): courses = tablets in the pack ÷ tablets per course. Packs whose name does not state it, or does not divide evenly, are not estimated.",
+      "where": "products.products[3].detail.volume.coursesRule",
+      "bucket": "data",
+      "fr": "Le nombre de traitements n'est estimé que lorsque le nom du produit du Fonds mondial indique le nombre de comprimés par traitement (« 40 mg + 320 mg - 9 » correspond à 9 comprimés) : nombre de traitements = nombre de comprimés dans la boîte ÷ nombre de comprimés par traitement. Les boîtes dont le nom ne le précise pas ou dont le nombre de comprimés n'est pas divisible par 9 ne sont pas prises en compte.",
+      "pt": "Os ciclos de tratamento são estimados apenas quando o nome do produto do Fundo Global indica o número de comprimidos num ciclo (\"40 mg + 320 mg - 9\" corresponde a 9 comprimidos): ciclos = número de comprimidos na embalagem ÷ número de comprimidos por ciclo. As embalagens cujo nome não indique esta informação, ou cujo resultado não seja divisível por um número exato, não são consideradas para estimativa.",
+      "es": "Los tratamientos se estiman únicamente cuando el nombre del producto del Fondo Mundial indica la cantidad de comprimidos por tratamiento (\"40 mg + 320 mg - 9\" equivale a 9 comprimidos): tratamiento = comprimidos del envase ÷ comprimidos por tratamiento. Los envases cuyo nombre no lo indique o no permita una división exacta no se tienen en cuenta."
+    },
     "79446083e7bb6715": {
       "en": "WHO PQ listing",
       "where": "products.stages[3]",
@@ -3186,6 +3798,14 @@
       "bucket": "data",
       "fr": "Inscriptions en cours ; vérifier les pays restants auprès des registres nationaux.",
       "pt": "Registos pendentes; verificar os restantes países nos registos nacionais."
+    },
+    "79cf6e281a3fb69d": {
+      "en": "Ministries of Health include the medicine in national treatment guidelines. These decide what health workers prescribe and what the public sector buys.",
+      "where": "products.stageInfo[5].what",
+      "bucket": "data",
+      "fr": "Les ministères de la Santé intègrent ces médicaments dans les recommandations nationales de traitement. Celles-ci déterminent les prescriptions des professionnels de santé et les achats du secteur public.",
+      "pt": "Os Ministérios da Saúde incluem o medicamento nas orientações nacionais de tratamento. São eles que definem o que os profissionais de saúde prescrevem e o que o setor público compra.",
+      "es": "Los Ministerios de Salud incluyen el medicamento en las guías nacionales de tratamiento. Estas guías determinan qué medicamentos prescriben los profesionales sanitarios y cuáles compra el sector público."
     },
     "7a5c00e2e131c008": {
       "en": "MMV pipeline: ganaplacide–lumefantrine",
@@ -3259,6 +3879,22 @@
       "pt": "Agora, cada medicamento aprovado mostra quantos anos de atraso tem em relação ao tempo previsto para cada etapa, com uma nova tabela de Tempo Decorrido. Os tempos previstos são estimativas de trabalho da LAUNCH, exceto para o registo em cada país, e ainda estão sujeitos a aprovação.",
       "es": "Ahora, cada medicamento aprobado muestra cuántos años de retraso tiene en comparación con el tiempo estimado para cada paso, con una nueva tabla de tiempos estimados. Los tiempos estimados son estimaciones de trabajo de LAUNCH, excepto el registro en cada país, y aún están pendientes de aprobación."
     },
+    "7c1de31df126b9ba": {
+      "en": "Fixed-dose combination developed and made by Fosun Pharma. Pivotal trial (FD-TACT) run by MORU/University of Oxford with MMV and Marubeni, funded by the GHIT Fund.",
+      "where": "products.products[1].detail.access[0]",
+      "bucket": "data",
+      "fr": "Association à dose fixe développée et fabriquée par Fosun Pharma. Essai pivot (FD-TACT) mené par MORU/Université d'Oxford avec MMV et Marubeni, financé par le GHIT Fund.",
+      "pt": "Combinação de dose fixa desenvolvida e fabricada pela Fosun Pharma. Estudo pivotal (FD-TACT) conduzido pela MORU/Universidade de Oxford com a MMV e a Marubeni, financiado pelo Fundo GHIT.",
+      "es": "Combinación de dosis fija desarrollada y fabricada por Fosun Pharma. Ensayo clínico pivotal (FD-TACT) realizado por MORU/Universidad de Oxford con MMV y Marubeni, financiado por el Fondo GHIT."
+    },
+    "7c98da7c986b0b8d": {
+      "en": "WHO prequalification — the quality, safety and efficacy assessment whose outcome, a listing on the WHO prequalified-products list, supports eligibility under the quality assurance (QA) and procurement policies of UN agencies and major funders; specific policies and exceptions may differ.",
+      "where": "products.glossary.PQ",
+      "bucket": "data",
+      "fr": "Préqualification de l'OMS — l'évaluation de la qualité, de la sécurité et de l'efficacité dont le résultat, une inscription sur la liste des produits préqualifiés de l'OMS, soutient l'admissibilité aux politiques d'assurance qualité (AQ) et d'approvisionnement des agences des Nations Unies et des principaux bailleurs de fonds ; les politiques et exceptions spécifiques peuvent différer.",
+      "pt": "Pré-qualificação da OMS — a avaliação da qualidade, segurança e eficácia cujo resultado, a inclusão na lista de produtos pré-qualificados da OMS, garante a elegibilidade de acordo com as políticas de garantia de qualidade (GQ) e de aquisição das agências da ONU e dos principais financiadores; as políticas e exceções específicas podem variar.",
+      "es": "Precalificación de la OMS: evaluación de la calidad, seguridad y eficacia cuyo resultado, la inclusión en la lista de productos precalificados de la OMS, respalda la elegibilidad según las políticas de garantía de calidad y adquisición de los organismos de la ONU y los principales financiadores; las políticas y excepciones específicas pueden variar."
+    },
     "7d3e67eafcb0ffb3": {
       "en": "Health-worker training (3-drug regimen)",
       "where": "products.products[1].detail.adoption[1]",
@@ -3297,6 +3933,14 @@
       "fr": "Fermer",
       "pt": "Perto",
       "es": "Cerca"
+    },
+    "7daab93261a958ea": {
+      "en": "Fosun Pharma has committed to make it \"accessible and affordable for malaria-endemic countries\". No price published.",
+      "where": "products.products[1].detail.access[1]",
+      "bucket": "data",
+      "fr": "Fosun Pharma s'est engagée à rendre ce traitement « accessible et abordable pour les pays où le paludisme est endémique ». Aucun prix n'a été communiqué.",
+      "pt": "A Fosun Pharma comprometeu-se a tornar o medicamento \"acessível e com um preço acessível para os países onde a malária é endémica\". O preço não foi divulgado.",
+      "es": "Fosun Pharma se ha comprometido a que sea \"accesible y asequible para los países donde la malaria es endémica\". No se ha publicado el precio."
     },
     "7dcb76e13d4fffb7": {
       "en": "Multi-site, Africa and Asia (DeTACT / FD-TACT trials)",
@@ -3344,6 +3988,14 @@
       "pt": "país por grupo de doentes",
       "es": "país por grupo de pacientes"
     },
+    "8155f785fe007bfd": {
+      "en": "Status of the ${tracked.length} medicines at this stage",
+      "where": "line 2806",
+      "bucket": "js",
+      "fr": "État des médicaments ${tracked.length} à ce stade",
+      "pt": "Situação dos medicamentos ${tracked.length} nesta fase",
+      "es": "Estado de los medicamentos ${tracked.length} en esta etapa"
+    },
     "822041757fc756e5": {
       "en": "Sao Tome and Principe",
       "where": "resistance.dict.country[51]",
@@ -3358,6 +4010,30 @@
       "fr": "Envoyer des commentaires",
       "pt": "Enviar feedback",
       "es": "Enviar comentarios"
+    },
+    "827581af04d2f85c": {
+      "en": "40/320 mg tablets · blister of 9",
+      "where": "products.products[3].detail.volume.byPresentation[0].label",
+      "bucket": "data",
+      "fr": "Comprimés de 40/320 mg · plaquette de 9",
+      "pt": "Comprimidos de 40/320 mg · blister com 9 comprimidos",
+      "es": "Comprimidos de 40/320 mg · blíster de 9"
+    },
+    "82b872d7c09a4108": {
+      "en": "7 countries, plus 4 with MFT plans",
+      "where": "products.products[2].detail.milestones[5].label",
+      "bucket": "data",
+      "fr": "7 pays, plus 4 avec des forfaits MFT",
+      "pt": "7 países, mais 4 com planos MFT",
+      "es": "7 países, más 4 con planes MFT"
+    },
+    "82d6cf7751dd4418": {
+      "en": "Register detail: Tanzania and Nigeria",
+      "where": "products.products[3].detail.milestones[5].milestone",
+      "bucket": "data",
+      "fr": "Détails d'inscription : Tanzanie et Nigéria",
+      "pt": "Detalhes do registo: Tanzânia e Nigéria",
+      "es": "Detalles del registro: Tanzania y Nigeria"
     },
     "82f51d6a5a7a55c7": {
       "en": "Select Plasmodium species for the resistance overlay",
@@ -3413,6 +4089,14 @@
       "pt": "É necessária uma verificação independente da OMS sobre a qualidade e o fabrico, incluindo inspeções nas fábricas. A inclusão na lista de pré-qualificados permite às agências da ONU e ao Fundo Global comprar o medicamento. O produto deve ser primeiro convidado através da lista de Manifestação de Interesse (EOI) da OMS.",
       "es": "La OMS realiza una verificación independiente de la calidad y la fabricación, que incluye inspecciones de fábrica. Estar en la lista de precalificados permite que las agencias de la ONU y el Fondo Mundial adquieran el medicamento. El producto debe ser invitado previamente a través de la lista de Expresiones de Interés (EOI) de la OMS."
     },
+    "840000d283f666cc": {
+      "en": "We updated several definitions in the glossary, including multiple first-line therapies (MFT) and WHO prequalification, to match current WHO and EMA terminology. Procurement is now shown as transactions and value, with packs listed by presentation and treatment courses only where they can be counted; the figures cover Global Fund-recorded purchases only.",
+      "where": "products.changelog[2].plain",
+      "bucket": "data",
+      "fr": "Nous avons mis à jour plusieurs définitions du glossaire, notamment celles relatives aux traitements de première intention multiples (MFT) et à la préqualification de l'OMS, afin de les aligner sur la terminologie actuelle de l'OMS et de l'EMA. Les achats sont désormais présentés sous forme de transactions et de valeur, les conditionnements étant listés par présentation et par cycle de traitement uniquement lorsqu'ils peuvent être comptabilisés ; les chiffres ne concernent que les achats enregistrés par le Fonds mondial.",
+      "pt": "Atualizámos diversas definições no glossário, incluindo múltiplas terapêuticas de primeira linha (MFT) e pré-qualificação da OMS, para corresponder à terminologia atual da OMS e da EMA. As aquisições são agora apresentadas em termos de transações e valor, sendo as embalagens listadas por apresentação e ciclos de tratamento apenas quando é possível contabilizá-los; os números abrangem apenas as compras registadas pelo Fundo Global.",
+      "es": "Actualizamos varias definiciones del glosario, incluidas las de terapias múltiples de primera línea (MFT) y precalificación de la OMS, para que coincidan con la terminología actual de la OMS y la EMA. La adquisición ahora se muestra como transacciones y valor, y los paquetes se enumeran por presentación y cursos de tratamiento solo cuando se pueden contabilizar; las cifras solo incluyen las compras registradas por el Fondo Mundial."
+    },
     "843170953174e409": {
       "en": "Who decides",
       "where": "line 2276 (in markup)",
@@ -3428,6 +4112,22 @@
       "fr": "Envoyez plus de commentaires",
       "pt": "Enviar mais comentários",
       "es": "Enviar más comentarios"
+    },
+    "84e02b6f0c0c5309": {
+      "en": "Market Access is reached when a medicine is both recommended by WHO and WHO-prequalified. Country Access runs from then until national registration, policy adoption, procurement in significant volumes and in-country delivery are all complete.",
+      "where": "line 1917",
+      "bucket": "js",
+      "fr": "L’accès au marché est accordé lorsqu’un médicament est à la fois recommandé par l’OMS et préqualifié par celle-ci. L’accès au pays intervient ensuite jusqu’à ce que l’enregistrement national, l’adoption de politiques de santé, l’approvisionnement en volumes importants et la distribution dans le pays soient achevés.",
+      "pt": "O acesso ao mercado é conseguido quando um medicamento é recomendado pela OMS e pré-qualificado por esta. O acesso no país estende-se a partir desse momento até que o registo nacional, a adoção de políticas, a aquisição em volumes significativos e a distribuição no país estejam concluídos.",
+      "es": "El acceso al mercado se alcanza cuando un medicamento es recomendado y precalificado por la OMS. El acceso al país se extiende desde ese momento hasta que se completan el registro nacional, la adopción de políticas, la adquisición en volúmenes significativos y la distribución en el país."
+    },
+    "84e03f6ec9665044": {
+      "en": "No publicly documented barrier identified",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Aucun obstacle documenté publiquement n'a été identifié.",
+      "pt": "Nenhuma barreira publicamente documentada foi identificada.",
+      "es": "No se ha identificado ninguna barrera documentada públicamente."
     },
     "850b457aa24ea8f6": {
       "en": "25+ countries",
@@ -3451,6 +4151,14 @@
       "fr": "Nous passons d'un pays à l'autre, chacun avec sa propre file d'attente.",
       "pt": "Indo país a país, cada um com a sua fila.",
       "es": "Recorriendo país por país, cada uno con su propia cola."
+    },
+    "858101a8c42932ee": {
+      "en": "Countries on the map",
+      "where": "line 2112 (in markup)",
+      "bucket": "js",
+      "fr": "Pays sur la carte",
+      "pt": "Países no mapa",
+      "es": "Países en el mapa"
     },
     "8616921aafc93230": {
       "en": "Ministries of health and national malaria programmes.",
@@ -3622,6 +4330,14 @@
       "pt": "Pipeline · triplo ACT",
       "es": "Tubería · triple ACT"
     },
+    "8b36e5ff54f38149": {
+      "en": "It starts with four medicines relevant to multiple first-line therapy (MFT) strategies, which use more than one first-line treatment in a population to reduce the risk of drug resistance. Two are already recommended by WHO but underused: artesunate–pyronaridine (ASPY) and dihydroartemisinin–piperaquine (DHA–PPQ). Two are in late-stage development: ganaplacide–lumefantrine (GanLum) and artemether–lumefantrine–amodiaquine (ALAQ). Together they cover both halves of the pathway: approval for the medicines in development, and adoption and procurement for those already recommended.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Ce document présente quatre médicaments pertinents pour les stratégies de traitement de première ligne multiple (MFT), qui associent plusieurs traitements de première ligne au sein d'une même population afin de réduire le risque de résistance aux médicaments. Deux d'entre eux sont déjà recommandés par l'OMS mais sous-utilisés : l'artésunate-pyronaridine (ASPY) et la dihydroartémisinine-pipéraquine (DHA-PPQ). Deux autres sont en phase finale de développement : le ganaplacide-luméfantrine (GanLum) et l'artéméther-luméfantrine-amodiaquine (ALAQ). Ensemble, ils couvrent les deux étapes du processus : l'autorisation de mise sur le marché des médicaments en développement, ainsi que leur adoption et leur approvisionnement.",
+      "pt": "Começa com quatro medicamentos relevantes para estratégias de terapêutica de primeira linha múltipla (MFT), que utilizam mais do que um tratamento de primeira linha numa população para reduzir o risco de resistência aos medicamentos. Dois são já recomendados pela OMS, mas subutilizados: o artesunato-pironaridina (ASPY) e a di-hidroartemisinina-piperaquina (DHA-PPQ). Dois estão em fase final de desenvolvimento: a ganaplacida-lumefantrina (GanLum) e a arteméter-lumefantrina-amodiaquina (ALAQ). Juntos, abrangem ambas as metades do processo: aprovação para os medicamentos em desenvolvimento e adoção e aquisição para os já recomendados.",
+      "es": "Comienza con cuatro medicamentos relevantes para estrategias de terapia de primera línea múltiple (MFT), que utilizan más de un tratamiento de primera línea en una población para reducir el riesgo de resistencia a los medicamentos. Dos ya están recomendados por la OMS pero se utilizan poco: artesunato-pironaridina (ASPY) y dihidroartemisinina-piperaquina (DHA-PPQ). Dos están en fase avanzada de desarrollo: ganaplacida-lumefantrina (GanLum) y arteméter-lumefantrina-amodiaquina (ALAQ). En conjunto, cubren ambas partes del proceso: aprobación para los medicamentos en desarrollo y adopción y adquisición para los ya recomendados."
+    },
     "8b5e041285f0cf9e": {
       "en": "Multiple first-line therapies — deploying several first-line treatments in parallel to reduce drug pressure and slow resistance.",
       "where": "products.glossary.MFT",
@@ -3653,6 +4369,14 @@
       "fr": "Langue:",
       "pt": "Idioma:",
       "es": "Idioma:"
+    },
+    "8ca77cd6dffb94ad": {
+      "en": "20/160 mg dispersible tablets · box of 2 blisters of 3",
+      "where": "products.products[3].detail.volume.byPresentation[5].label",
+      "bucket": "data",
+      "fr": "Comprimés dispersibles 20/160 mg · boîte de 2 plaquettes thermoformées de 3",
+      "pt": "Comprimidos dispersíveis de 20/160 mg · caixa de 2 blisters de 3 comprimidos",
+      "es": "Comprimidos dispersables de 20/160 mg · caja de 2 blísteres de 3"
     },
     "8d11f7f3b359a9a0": {
       "en": "Submission",
@@ -3724,6 +4448,14 @@
       "pt": "A lista eletrónica atual",
       "es": "La lista electrónica actual"
     },
+    "8f075420a6ba3bfa": {
+      "en": "Each country's own regulator licenses the medicine before it can be sold or used there, usually one country at a time. Regional routes, such as the African Medicines Agency and WHO's collaborative registration (about 90 working days), are intended to speed this up.",
+      "where": "products.stageInfo[4].what",
+      "bucket": "data",
+      "fr": "Chaque organisme de réglementation national délivre une autorisation de mise sur le marché au médicament avant son utilisation, généralement un pays à la fois. Des procédures régionales, comme l'enregistrement conjoint de l'Agence africaine des médicaments et de l'OMS (environ 90 jours ouvrables), visent à accélérer ce processus.",
+      "pt": "Cada organismo regulador nacional licencia o medicamento antes de este poder ser vendido ou utilizado no seu território, geralmente um país de cada vez. Mecanismos regionais, como a Agência Africana do Medicamento e o registo colaborativo da OMS (cerca de 90 dias úteis), visam agilizar este processo.",
+      "es": "El organismo regulador de cada país autoriza el medicamento antes de que pueda venderse o utilizarse en su territorio, generalmente un país a la vez. Los procedimientos regionales, como el registro conjunto de la Agencia Africana de Medicamentos y la OMS (que tarda unos 90 días hábiles), tienen como objetivo agilizar este proceso."
+    },
     "8f38724c3c013172": {
       "en": "The dashboard moved from placeholder examples to real information gathered from public sources. Prices and volumes show as TBC until they are confirmed.",
       "where": "products.changelog[20].plain",
@@ -3771,6 +4503,14 @@
       "fr": "Soudan du Sud",
       "pt": "Sudão do Sul"
     },
+    "90181d41bd687c2f": {
+      "en": "20/160 mg tablets · blister of 3",
+      "where": "products.products[3].detail.volume.byPresentation[10].label",
+      "bucket": "data",
+      "fr": "Comprimés de 20/160 mg · plaquette de 3",
+      "pt": "Comprimidos de 20/160 mg · blister com 3 unidades",
+      "es": "Comprimidos de 20/160 mg · blíster de 3"
+    },
     "9031352a20d31416": {
       "en": "Rolling (TZA 2022, NGA 2024 register-verified)",
       "where": "products.products[2].detail.milestones[4].date",
@@ -3810,6 +4550,13 @@
       "pt": "Estágio atual",
       "es": "Etapa actual"
     },
+    "919a12a5ed3e79e7": {
+      "en": "Not on the WHO PQ EOI list yet (24th malaria EOI, updated 27 Feb 2026, checked)",
+      "where": "products.products[0].stages[3].note",
+      "bucket": "data",
+      "fr": "Pas encore sur la liste des déclarations d'intérêt de l'OMS PQ (24e déclaration d'intérêt pour le paludisme, mise à jour le 27 février 2026, vérifiée)",
+      "pt": "Ainda não consta da lista de Manifestações de Interesse (EOI) da OMS PQ (24ª EOI sobre malária, atualizada a 27 de fevereiro de 2026, verificada)"
+    },
     "91a14ca078da0bfa": {
       "en": "The manufacturer, often with a product development partnership such as MMV.",
       "where": "products.stageInfo[0].who",
@@ -3817,6 +4564,14 @@
       "fr": "Le fabricant, souvent avec un partenariat de développement de produit tel que MMV.",
       "pt": "O fabricante, muitas vezes com uma parceria de desenvolvimento de produtos como MMV.",
       "es": "El fabricante, a menudo con una asociación de desarrollo de productos como MMV."
+    },
+    "91bebbdc9c9c15fa": {
+      "en": "The manufacturer, often with a product development partnership such as MMV",
+      "where": "products.stageInfo[0].who",
+      "bucket": "data",
+      "fr": "Le fabricant, souvent dans le cadre d'un partenariat de développement de produits tel que MMV",
+      "pt": "O fabricante, geralmente em parceria para o desenvolvimento de produtos, como o MMV",
+      "es": "El fabricante, a menudo con una asociación de desarrollo de productos como MMV"
     },
     "920e413c7d411b61": {
       "en": "Status",
@@ -3881,6 +4636,14 @@
       "fr": "Examens par les comités dans d'autres pays endémiques",
       "pt": "Revisões do comité noutros países endémicos",
       "es": "Revisiones de comités en otros países endémicos"
+    },
+    "944be14ed47c8205": {
+      "en": "40/320 mg tablets · blister of 3",
+      "where": "products.products[3].detail.volume.byPresentation[6].label",
+      "bucket": "data",
+      "fr": "Comprimés de 40/320 mg · plaquette de 3",
+      "pt": "Comprimidos de 40/320 mg · blister com 3 unidades",
+      "es": "Comprimidos de 40/320 mg · blíster de 3"
     },
     "94e6bd574b6e3c55": {
       "en": "Nicaragua",
@@ -4034,6 +4797,14 @@
       "pt": "Data",
       "es": "Fecha"
     },
+    "99cf0c7a392870f5": {
+      "en": "Is fixed-dose ALAQ as effective as AL and ASAQ (28-day cure, FD-TACT), and safe? Adherence outside supervised treatment and use at scale are not yet studied.",
+      "where": "products.products[1].detail.research.question",
+      "bucket": "data",
+      "fr": "L’administration d’une dose fixe de ALAQ est-elle aussi efficace que l’AL et l’ASAQ (traitement de 28 jours, FD-TACT) et sûre ? L’observance en dehors d’un traitement supervisé et l’utilisation à grande échelle n’ont pas encore été étudiées.",
+      "pt": "A dose fixa de ALAQ é tão eficaz como a AL e a ASAQ (cura em 28 dias, FD-TACT) e segura? A adesão fora do tratamento supervisionado e a utilização em larga escala ainda não foram estudadas.",
+      "es": "¿Es la dosis fija de ALAQ tan eficaz como AL y ASAQ (curación en 28 días, FD-TACT) y segura? Aún no se ha estudiado la adherencia fuera del tratamiento supervisado ni su uso a gran escala."
+    },
     "9a383b7887d2c58a": {
       "en": "Country Access",
       "where": "line 1792",
@@ -4041,6 +4812,14 @@
       "fr": "Accès au pays",
       "pt": "Acesso ao país",
       "es": "Acceso al país"
+    },
+    "9a7657077e244429": {
+      "en": "The list of malaria medicines WHO currently invites manufacturers to submit for prequalification.",
+      "where": "sources.sources[37].plain",
+      "bucket": "data",
+      "fr": "Liste des médicaments contre le paludisme auxquels l'OMS invite actuellement les fabricants à soumettre une demande de préqualification.",
+      "pt": "A lista de medicamentos para a malária que a OMS convida actualmente os fabricantes a submeterem para pré-qualificação.",
+      "es": "La lista de medicamentos contra la malaria que la OMS invita actualmente a los fabricantes a presentar para su precalificación."
     },
     "9b0f1b10aff55228": {
       "en": "planned",
@@ -4098,6 +4877,14 @@
       "pt": "Próximo passo esperado",
       "es": "Siguiente paso previsto"
     },
+    "9ce5050b692db203": {
+      "en": "2015–2023; requalified Jan 2025",
+      "where": "products.products[3].stages[3].date",
+      "bucket": "data",
+      "fr": "2015–2023 ; requalifié en janvier 2025",
+      "pt": "2015–2023; requalificado em janeiro de 2025",
+      "es": "2015–2023; revalidado en enero de 2025."
+    },
     "9d548d91a2f20a93": {
       "en": "Registration confirmed in five national registers so far: Nigeria, Rwanda, Tanzania, Viet Nam and Zambia",
       "where": "products.products[2].detail.access[1]",
@@ -4120,6 +4907,14 @@
       "fr": "Ce formulaire n'est pas encore associé à une boîte de réception ; votre message est donc resté dans cet onglet. Dès que la connexion sera établie, l'équipe LAUNCH lira chaque message et, si vous nous avez indiqué une source publique valide, nous corrigerons les données lors de la prochaine mise à jour.",
       "pt": "Este formulário ainda não tem caixa de entrada associada, pelo que nada foi enviado — a sua mensagem permaneceu neste separador do browser. Assim que a ligação for estabelecida, a equipa do LAUNCH lerá todas as mensagens e, nos casos em que nos indicar uma fonte pública fidedigna, corrigiremos os dados na próxima atualização.",
       "es": "Este formulario aún no tiene una bandeja de entrada asociada, por lo que no se envió nada; su mensaje se quedó en esta pestaña del navegador. Una vez conectado, el equipo de LAUNCH leerá todos los mensajes y, si nos ha indicado una fuente pública verificada, corregiremos los datos en la próxima actualización."
+    },
+    "9db61229f070c670": {
+      "en": "A study of how artesunate–pyronaridine performed in ordinary clinical use across five African countries.",
+      "where": "sources.sources[22].plain",
+      "bucket": "data",
+      "fr": "Une étude sur les performances de l'artésunate-pyronaridine en usage clinique courant dans cinq pays africains.",
+      "pt": "Um estudo sobre o desempenho do sistema artesunato-pironaridina no uso clínico de rotina em cinco países africanos.",
+      "es": "Un estudio sobre el rendimiento de la combinación artesunato-pironaridina en el uso clínico habitual en cinco países africanos."
     },
     "9dcff98e275f0cb9": {
       "en": "Timeline",
@@ -4206,6 +5001,14 @@
       "fr": "Non encore inclus dans la liste des manifestations d'intérêt de l'OMS PQ (24e manifestation d'intérêt sur le paludisme, 27 février 2026, vérifiée)",
       "pt": "Ainda não incluído na lista de Manifestações de Interesse da OMS PQ (24ª Manifestação de Interesse sobre a malária, 27 de fevereiro de 2026, verificada)"
     },
+    "a3a6dfd2d5d2d9f6": {
+      "en": "MMV: GanLum Phase III results, 2025",
+      "where": "sources.sources[17].label",
+      "bucket": "data",
+      "fr": "MMV: GanLum Résultats de la phase III, 2025",
+      "pt": "MMV: GanLum Resultados da Fase III, 2025",
+      "es": "MMV: GanLum Resultados de la fase III, 2025"
+    },
     "a3b772e4eaf6082d": {
       "en": "The reference products a generic must be tested against before WHO will list it.",
       "where": "sources.sources[12].plain",
@@ -4213,6 +5016,14 @@
       "fr": "Il faut tester un médicament générique par rapport à des produits de référence avant que l'OMS ne l'inscrive sur sa liste.",
       "pt": "Os produtos de referência com os quais um medicamento genérico deve ser testado antes de a OMS o incluir na sua lista de produtos de referência.",
       "es": "Antes de que la OMS incluya un producto genérico en su lista de productos de referencia, este debe someterse a pruebas."
+    },
+    "a3df1d97e579353b": {
+      "en": "60/180 mg tablets · pack of 90",
+      "where": "products.products[2].detail.volume.byPresentation[0].label",
+      "bucket": "data",
+      "fr": "Comprimés de 60/180 mg · boîte de 90",
+      "pt": "Comprimidos de 60/180 mg · embalagem de 90 comprimidos",
+      "es": "Comprimidos de 60/180 mg · envase de 90"
     },
     "a4023b89022f326c": {
       "en": "Download CSV",
@@ -4261,6 +5072,14 @@
       "fr": "Burkina Faso",
       "pt": "Burkina Faso"
     },
+    "a57b6d200472d16f": {
+      "en": "Sources for this access stage:",
+      "where": "line 3405",
+      "bucket": "js",
+      "fr": "Sources pour cette étape d'accès :",
+      "pt": "Fontes para esta etapa de acesso:",
+      "es": "Fuentes para esta etapa de acceso:"
+    },
     "a5b3a74811e60623": {
       "en": "Notify me",
       "where": "static text",
@@ -4276,6 +5095,14 @@
       "fr": "Retardé",
       "pt": "Atrasado",
       "es": "Demorado"
+    },
+    "a61c03d7f75b4ce4": {
+      "en": "MFT deployment models with artesunate–pyronaridine",
+      "where": "products.products[2].detail.research.question",
+      "bucket": "data",
+      "fr": "MFT modèles de déploiement avec artésunate-pyronaridine",
+      "pt": "MFT modelos de implantação com artesunato-pironaridina",
+      "es": "MFT modelos de despliegue con artesunato-pironaridina"
     },
     "a634dd4e2c774f23": {
       "en": "Procurement scale-up",
@@ -4317,6 +5144,14 @@
       "pt": "ainda não é de uso rotineiro",
       "es": "aún no se utiliza de forma rutinaria"
     },
+    "a70cee3d95011aff": {
+      "en": "Reached, year not recorded",
+      "where": "line 1903",
+      "bucket": "js",
+      "fr": "Atteint, année non enregistrée",
+      "pt": "Atingido, ano não registado",
+      "es": "Alcanzado, año no registrado"
+    },
     "a7692387c3d3d29c": {
       "en": "Not started (stage glyph dimmed, no badge)",
       "where": "static text",
@@ -4340,6 +5175,14 @@
       "pt": "Contagem a confirmar",
       "es": "Recuentos por confirmar"
     },
+    "a8e67eb4cda6a5cd": {
+      "en": "MFT deployment (simultaneous, cycling or rotation) and resistance impact",
+      "where": "products.products[3].detail.research.question",
+      "bucket": "data",
+      "fr": "MFT déploiement (simultané, cyclique ou rotatif) et impact de résistance",
+      "pt": "MFT implantação (simultânea, cíclica ou rotativa) e impacto de resistência",
+      "es": "MFT despliegue (simultáneo, cíclico o rotacional) e impacto de resistencia"
+    },
     "a90620097624cae5": {
       "en": "Ongoing",
       "where": "products.products[2].detail.research.timeline",
@@ -4356,6 +5199,14 @@
       "pt": "Visão da viagem",
       "es": "Vista del viaje"
     },
+    "a930e3ee2fa57119": {
+      "en": "The granules for children",
+      "where": "sources.sources[18].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Les granulés pour enfants",
+      "pt": "Grânulos para crianças",
+      "es": "Los gránulos para niños"
+    },
     "a96384cbb9c2c50f": {
       "en": "Thank you — you are on the list.",
       "where": "line 3613",
@@ -4369,6 +5220,14 @@
       "bucket": "markup",
       "fr": "partenaires, qui seront accueillis par les",
       "pt": "parceiros, a acolher pelo"
+    },
+    "aaaff786e9b803c9": {
+      "en": "234 transactions · US$41.5m (2008–2026)",
+      "where": "products.products[3].detail.volume.total",
+      "bucket": "data",
+      "fr": "234 transactions · 41,5 millions de dollars US (2008–2026)",
+      "pt": "234 transações · 41,5 milhões de dólares (2008–2026)",
+      "es": "234 transacciones · 41,5 millones de dólares estadounidenses (2008–2026)"
     },
     "aab5d522f2cfd409": {
       "en": "Global Fund PQR transactions, 2008–2026 (234 orders; US$15.3m in 2025; top buyers Uganda, Madagascar, Mozambique)",
@@ -4416,6 +5275,14 @@
       "pt": "Por favor, introduza um endereço de e-mail para que possamos entrar em contacto consigo.",
       "es": "Por favor, introduzca una dirección de correo electrónico donde podamos ponernos en contacto con usted."
     },
+    "acc6b03321af1f4e": {
+      "en": "Receive an email when product information is updated.",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "Recevez un e-mail lorsque les informations sur le produit sont mises à jour.",
+      "pt": "Receba um e-mail quando as informações do produto forem atualizadas.",
+      "es": "Recibirás un correo electrónico cuando se actualice la información del producto."
+    },
     "acd0539e479dfb3f": {
       "en": "Since 2008",
       "where": "products.products[3].stages[6].date",
@@ -4430,6 +5297,14 @@
       "bucket": "js",
       "fr": "année d'études",
       "pt": "Ano letivo"
+    },
+    "add39e20825866fb": {
+      "en": "${yrsText(n)} so far",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "${yrsText(n)} jusqu'à présent",
+      "pt": "${yrsText(n)} até ao momento",
+      "es": "${yrsText(n)} hasta ahora"
     },
     "ae27aa0f646c95eb": {
       "en": "On track so far",
@@ -4533,6 +5408,14 @@
       "pt": "Sem correspondência de país.",
       "es": "No se encontraron coincidencias de país."
     },
+    "b3f76e6b6b106931": {
+      "en": "WHO: child malaria medicine priorities, 2025",
+      "where": "sources.sources[40].label",
+      "bucket": "data",
+      "fr": "OMS : priorités en matière de médicaments contre le paludisme infantile, 2025",
+      "pt": "OMS: prioridades para os medicamentos contra a malária infantil, 2025",
+      "es": "OMS: Prioridades en el tratamiento de la malaria infantil, 2025"
+    },
     "b42087db638977b3": {
       "en": "Untested only",
       "where": "line 3694",
@@ -4556,6 +5439,14 @@
       "fr": "Enregistré dans plus de 25 pays endémiques depuis 2014 ; autres demandes d’enregistrement en cours en Asie (Vietnam, Myanmar, Cambodge, Thaïlande). Enregistrements vérifiés à ce jour : Tanzanie — 2 enregistrements (TMDA, délivré le 8 mars 2022, Enregistré/Conforme) ; Nigéria — 1 enregistrement (Livre vert : granules B4-9425, approuvé le 28 février 2024, Actif).",
       "pt": "Registado em mais de 25 países endémicos desde 2014; novas submissões na Ásia (Vietname, Myanmar, Cambodja, Tailândia). Registos verificados até à data: Tanzânia — 2 registos (TMDA, emitido em 8 de março de 2022, Registado/Em Conformidade); Nigéria — 1 registo (Greenbook: grânulos B4-9425, aprovado em 28 de fevereiro de 2024, Ativo)."
     },
+    "b4f0b2a613f3c2cf": {
+      "en": "20/160 mg dispersible tablets · blister of 3",
+      "where": "products.products[3].detail.volume.byPresentation[9].label",
+      "bucket": "data",
+      "fr": "Comprimés dispersibles 20/160 mg · plaquette thermoformée de 3",
+      "pt": "Comprimidos dispersíveis de 20/160 mg · blister com 3 unidades",
+      "es": "Comprimidos dispersables de 20/160 mg · blíster de 3"
+    },
     "b5baf79774720e4a": {
       "en": "Each dot is one WHO study site, coloured by its most recent study there — the same unit WHO's own threat map uses.",
       "where": "line 2858",
@@ -4570,6 +5461,14 @@
       "fr": "Lignes directrices de 2010 (2e éd.)",
       "pt": "Guidelines de 2010 (2ª ed.)",
       "es": "Directrices de 2010 (2.ª ed.)"
+    },
+    "b5e02a1be3fd110c": {
+      "en": "Nine WHO-prequalified presentations from three companies: Alfasigma (2), Guilin (6, including 3 dispersible) and Beijing Holley (1).",
+      "where": "products.products[3].detail.access[0]",
+      "bucket": "data",
+      "fr": "Neuf présentations préqualifiées par l'OMS de trois sociétés : Alfasigma (2), Guilin (6, dont 3 dispersibles) et Beijing Holley (1).",
+      "pt": "Nove apresentações pré-qualificadas pela OMS de três empresas: Alfasigma (2), Guilin (6, incluindo 3 dispersíveis) e Beijing Holley (1).",
+      "es": "Nueve presentaciones precalificadas por la OMS de tres empresas: Alfasigma (2), Guilin (6, incluidas 3 dispersables) y Beijing Holley (1)."
     },
     "b5f9221ae041a8f8": {
       "en": "Zambia",
@@ -4623,6 +5522,14 @@
       "fr": "Honduras",
       "pt": "Honduras"
     },
+    "b7db94a168dea9e9": {
+      "en": "Each stage and milestone now links to the public source behind it, and we added 14 references to the Sources list. We removed ALAQ's target dates for approval and WHO prequalification, which no public source confirms, and corrected a few details to match the sources. No statuses changed.",
+      "where": "products.changelog[4].plain",
+      "bucket": "data",
+      "fr": "Chaque étape et jalon renvoie désormais à la source publique correspondante, et nous avons ajouté 14 références à la liste des sources. Nous avons supprimé les dates cibles d'approbation et de préqualification OMS de ALAQ, car aucune source publique ne les confirme, et corrigé quelques détails pour qu'ils correspondent aux sources. Aucun statut n'a été modifié.",
+      "pt": "Cada etapa e marco tem agora uma ligação para a fonte pública correspondente, e adicionámos 14 referências à lista de Fontes. Removemos as datas-alvo de aprovação e pré-qualificação da OMS de ALAQ, que nenhuma fonte pública confirma, e corrigimos alguns detalhes para que correspondam às fontes. Nenhum estado foi alterado.",
+      "es": "Ahora, cada etapa e hito enlaza con la fuente pública correspondiente, y hemos añadido 14 referencias a la lista de fuentes. Hemos eliminado las fechas límite de aprobación y precalificación de la OMS de ALAQ, que ninguna fuente pública confirma, y hemos corregido algunos detalles para que coincidan con las fuentes. No se han modificado los estados."
+    },
     "b7e7a5cebf7ff6b7": {
       "en": "Zambia: ZAMRA register",
       "where": "sources.sources[7].label",
@@ -4638,6 +5545,14 @@
       "fr": "MFT politique · ${esc(mftProductName())}",
       "pt": "Política MFT · ${esc(mftProductName())}",
       "es": "MFT política · ${esc(mftProductName())}"
+    },
+    "b8354c630ea8ad5a": {
+      "en": "Follow each medicine through the seven stages to patients.",
+      "where": "assets/site-nav.js",
+      "bucket": "reviewed",
+      "fr": "Suivre chaque médicament à travers les sept étapes chez les patients.",
+      "pt": "Acompanhe cada medicamento ao longo dos sete passos até que o doente esteja pronto para o utilizar.",
+      "es": "Siga cada medicamento a través de las siete etapas para los pacientes."
     },
     "b8ed5279e897be5d": {
       "en": "Sending…",
@@ -4684,6 +5599,14 @@
       "fr": "Engagement des DG de l'OMS",
       "pt": "Envolvimento do GDG da OMS",
       "es": "Participación de la OMS en el GDG"
+    },
+    "bb6ac30b9eac7262": {
+      "en": "20/60 mg granules · 90 sachets",
+      "where": "products.products[2].detail.volume.byPresentation[1].label",
+      "bucket": "data",
+      "fr": "Granulés 20/60 mg · 90 sachets",
+      "pt": "Grânulos de 20/60 mg · 90 saquetas",
+      "es": "Gránulos de 20/60 mg · 90 sobres"
     },
     "bba9b822a050ac5c": {
       "en": "Previous country",
@@ -4732,6 +5655,46 @@
       "pt": "Aquisições do Fundo Global 2018–2025: 940.111 pacotes / 14,5 milhões de dólares — um valor modesto no geral, mas 11,6 milhões de dólares deste montante foram entregues em 2025 (liderados pelo Uganda e Burkina Faso), um aumento acentuado consistente com as primeiras implementações do programa MFT.",
       "es": "Adquisiciones del Fondo Mundial 2018–2025: 940.111 paquetes / 14,5 millones de dólares estadounidenses: una cifra modesta en general, pero 11,6 millones de dólares estadounidenses llegaron en 2025 (encabezados por Uganda y Burkina Faso), un fuerte repunte coherente con los primeros lanzamientos de MFT."
     },
+    "bdbba29af793d721": {
+      "en": "A WHO expert group weighs clinical evidence and decides whether the medicine is included in WHO guidelines for malaria.",
+      "where": "products.stageInfo[2].what",
+      "bucket": "data",
+      "fr": "Un groupe d'experts de l'OMS évalue les données cliniques et décide si le médicament doit être inclus dans les directives de l'OMS relatives au paludisme.",
+      "pt": "Um grupo de peritos da OMS avalia as provas clínicas e decide se o medicamento será incluído nas orientações da OMS para o tratamento da malária.",
+      "es": "Un grupo de expertos de la OMS evalúa la evidencia clínica y decide si el medicamento se incluye en las directrices de la OMS para la malaria."
+    },
+    "bdd8490cd620d78e": {
+      "en": "Procurement through public channels",
+      "where": "line 2345 (in markup)",
+      "bucket": "js",
+      "fr": "Achats par voie publique",
+      "pt": "Contratação através de canais públicos",
+      "es": "Adquisiciones a través de canales públicos"
+    },
+    "be3f0b482011d317": {
+      "en": "MMV's news that Europe's regulator updated Pyramax's label for use in pregnancy.",
+      "where": "sources.sources[19].plain",
+      "bucket": "data",
+      "fr": "L'information de MMV selon laquelle l'organisme de réglementation européen a mis à jour l'étiquette de Pyramax pour une utilisation pendant la grossesse.",
+      "pt": "Notícias de MMV de que o regulador europeu atualizou a bula de Pyramax para utilização na gravidez.",
+      "es": "Noticias de MMV de que el regulador europeo actualizó la etiqueta de Pyramax para su uso durante el embarazo."
+    },
+    "becd52155af8e37d": {
+      "en": "The report itself (PDF)",
+      "where": "sources.sources[40].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Le rapport lui-même (PDF)",
+      "pt": "O próprio relatório (PDF)",
+      "es": "El informe en sí (PDF)"
+    },
+    "bf890953dee1ad01": {
+      "en": "WHO-recommended ACT used for treatment in a range of settings and potentially relevant to MFT strategies. Chemoprevention and mass drug administration are separate uses, each with its own indications, formulations, evidence and policy pathway.",
+      "where": "products.products[3].detail.useCase",
+      "bucket": "data",
+      "fr": "Recommandé par l’OMS ACT pour le traitement dans divers contextes et potentiellement pertinent pour les stratégies MFT. La chimioprévention et l’administration massive de médicaments sont des utilisations distinctes, chacune avec ses propres indications, formulations, données probantes et orientations politiques.",
+      "pt": "A OMS recomenda a utilização de ACT para tratamento em diversos contextos e é potencialmente relevante para estratégias de MFT. A quimioprevenção e a administração em massa de medicamentos são utilizações distintas, cada uma com as suas próprias indicações, formulações, provas e orientações políticas.",
+      "es": "ACT recomendado por la OMS para el tratamiento en diversos entornos y potencialmente relevante para las estrategias MFT. La quimioprevención y la administración masiva de fármacos son usos distintos, cada uno con sus propias indicaciones, formulaciones, evidencia y vía política."
+    },
     "bfb0c8d36f4aaa84": {
       "en": "Mauritania",
       "where": "resistance.dict.country[40]",
@@ -4762,6 +5725,14 @@
       "fr": "Toutes les informations de cette page proviennent des sources publiques ci-dessous. Chaque nom ouvre le site officiel de la source correspondante dans un nouvel onglet, vous permettant ainsi de vérifier chaque donnée par vous-même.",
       "pt": "Tudo o que está nesta página pode ser rastreado até uma das fontes públicas abaixo. Cada nome abre o site oficial da respetiva fonte num novo separador, para que possa verificar qualquer dado por si mesmo."
     },
+    "c09007a797265a3a": {
+      "en": "MORU / University of Oxford (FD-TACT), with Fosun Pharma",
+      "where": "products.products[1].detail.research.lead",
+      "bucket": "data",
+      "fr": "MORU / Université d'Oxford (FD-TACT), en collaboration avec Fosun Pharma",
+      "pt": "MORU / Universidade de Oxford (FD-TACT), com a Fosun Pharma",
+      "es": "MORU / Universidad de Oxford (FD-TACT), con Fosun Pharma"
+    },
     "c0c77d27f77fc45e": {
       "en": "WHO Prequalification Team.",
       "where": "products.stageInfo[3].who",
@@ -4770,6 +5741,14 @@
       "pt": "Equipa de Pré-qualificação da OMS.",
       "es": "Equipo de precalificación de la OMS."
     },
+    "c16b28daf92f575e": {
+      "en": "Stage ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ?",
+      "where": "line 2240",
+      "bucket": "js",
+      "fr": "Étape ${stepNo(i)}, ${esc(s)}${exp}. Indique ce qui se passe ici et où se trouve chaque médicament${n ?",
+      "pt": "Estágio ${stepNo(i)}, ${esc(s)}${exp}. Mostra o que acontece aqui e onde está cada medicamento${n ?",
+      "es": "Etapa ${stepNo(i)}, ${esc(s)}${exp}. Muestra lo que sucede aquí y dónde se encuentra cada medicamento${n ?"
+    },
     "c194f546632e59cc": {
       "en": "U.S. President's Malaria Initiative — a major bilateral funder and procurer of malaria commodities.",
       "where": "products.glossary.PMI",
@@ -4777,6 +5756,14 @@
       "fr": "Initiative du président américain contre le paludisme — un important bailleur de fonds bilatéral et acheteur de produits antipaludiques.",
       "pt": "Iniciativa Presidencial dos EUA contra a Malária — um importante financiador bilateral e adquirente de produtos para o combate à malária.",
       "es": "Iniciativa contra la Malaria del Presidente de los Estados Unidos: uno de los principales financiadores y compradores bilaterales de productos para combatir la malaria."
+    },
+    "c1b6e40cfba10bce": {
+      "en": "100% of transactions in the dataset shown are from Global Fund PQR; this is not the product's total global procurement.",
+      "where": "line 2348 (in markup)",
+      "bucket": "js",
+      "fr": "100 % des transactions figurant dans l'ensemble de données présenté proviennent du programme PQR du Fonds mondial ; il ne s'agit pas de l'ensemble des achats mondiaux du produit.",
+      "pt": "100% das transações do conjunto de dados apresentado são do Fundo Global PQR; este valor não representa o total das compras globais do produto.",
+      "es": "El 100% de las transacciones en el conjunto de datos mostrado provienen de Global Fund PQR; esto no representa el total de adquisiciones globales del producto."
     },
     "c1f88e9d6c4145cf": {
       "en": "In progress",
@@ -4833,6 +5820,14 @@
       "pt": "traço=\"${mftGroupColor(gid)}\" largura-do-traço=\"${p.w}\"${p.da ?",
       "es": "trazo=\"${mftGroupColor(gid)}\" ancho de trazo=\"${p.w}\"${p.da ?"
     },
+    "c30d01db3b6ae740": {
+      "en": "The invitation itself (PDF)",
+      "where": "sources.sources[37].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "L'invitation elle-même (PDF)",
+      "pt": "O convite propriamente dito (PDF)",
+      "es": "La invitación en sí (PDF)"
+    },
     "c335c4f7902f5e54": {
       "en": "Only P. vivax",
       "where": "line 3695",
@@ -4856,6 +5851,13 @@
       "fr": "Philippines",
       "pt": "Filipinas"
     },
+    "c3fe862fa7e982b1": {
+      "en": "Not yet included in WHO PQ Expression of Interest list (24th malaria EOI, updated 27 Feb 2026, checked)",
+      "where": "products.products[1].stages[3].note",
+      "bucket": "data",
+      "fr": "Non encore inclus dans la liste des manifestations d'intérêt de l'OMS PQ (24e manifestation d'intérêt sur le paludisme, mise à jour le 27 février 2026, vérifiée)",
+      "pt": "Ainda não incluído na lista de Manifestações de Interesse da OMS PQ (24ª Manifestação de Interesse sobre a malária, atualizada a 27 de fevereiro de 2026, verificada)"
+    },
     "c3feeae30938dcfd": {
       "en": "Country recommended use",
       "where": "line 3130",
@@ -4871,6 +5873,14 @@
       "fr": "Réel",
       "pt": "Real",
       "es": "Actual"
+    },
+    "c40abc534ac08ffa": {
+      "en": "In national guidelines in 9 countries on the country access map, and in MFT plans in 4 more; each country is cited to a WHO publication or a peer-reviewed paper",
+      "where": "products.products[3].stages[5].note",
+      "bucket": "data",
+      "fr": "Dans les directives nationales de 9 pays figurant sur la carte d'accès par pays, et dans les plans de MFT de 4 autres pays, chaque pays cite une publication de l'OMS ou un article évalué par des pairs.",
+      "pt": "Nas orientações nacionais de 9 países no mapa de acesso por país e nos planos MFT de mais 4; cada país é citado numa publicação da OMS ou num artigo revisto por pares.",
+      "es": "En las directrices nacionales de 9 países del mapa de acceso por país, y en los planes MFT de otros 4; cada país cita una publicación de la OMS o un artículo revisado por pares."
     },
     "c48a4e70808e5216": {
       "en": "A stringent regulator reviews the full evidence on quality, safety and effectiveness. For malaria medicines this is usually the European Medicines Agency (EMA) Article 58 procedure, which covers medicines meant for use outside Europe. Every later step builds on this opinion.",
@@ -5010,6 +6020,14 @@
       "pt": "940.111 embalagens · 14,5 milhões de dólares (2018–2025)",
       "es": "940.111 paquetes · 14,5 millones de dólares estadounidenses (2018–2025)"
     },
+    "c82654fdc0a5795c": {
+      "en": "Paediatric dispersible tablet (20/120/40 mg) being tested in FD-TACT.",
+      "where": "products.products[1].detail.access[2]",
+      "bucket": "data",
+      "fr": "Comprimé dispersible pédiatrique (20/120/40 mg) testé dans le cadre de l'étude FD-TACT.",
+      "pt": "Comprimido pediátrico dispersível (20/120/40 mg) em fase de testes no estudo FD-TACT.",
+      "es": "Comprimido dispersable pediátrico (20/120/40 mg) en fase de prueba en FD-TACT."
+    },
     "c835bd1c4578817f": {
       "en": "Burundi",
       "where": "resistance.dict.country[8]",
@@ -5085,6 +6103,14 @@
       "fr": "Désactivé",
       "pt": "Desligado"
     },
+    "ca8d1391f2a74deb": {
+      "en": "Nine WHO-prequalified presentations from three companies: Alfasigma (2015; requalified 8 and 20 Jan 2025), Guilin (2019–2020, including 3 dispersible) and Beijing Holley (2023). WHO records list one site as the only dihydroartemisinin ingredient source for 8 of the 9.",
+      "where": "products.products[3].stages[3].note",
+      "bucket": "data",
+      "fr": "Neuf présentations préqualifiées par l'OMS provenant de trois entreprises : Alfasigma (2015 ; requalifiée les 8 et 20 janvier 2025), Guilin (2019-2020, dont 3 dispersibles) et Beijing Holley (2023). Les données de l'OMS indiquent qu'un site est la seule source d'ingrédients à base de dihydroartémisinine pour 8 des 9 présentations.",
+      "pt": "Nove apresentações pré-qualificadas pela OMS de três empresas: Alfasigma (2015; requalificada a 8 e 20 de janeiro de 2025), Guilin (2019–2020, incluindo 3 dispersíveis) e Beijing Holley (2023). Os registos da OMS listam um local como a única fonte do ingrediente di-hidroartemisinina para 8 das 9 apresentações.",
+      "es": "Nueve presentaciones precalificadas por la OMS de tres empresas: Alfasigma (2015; recalificada el 8 y el 20 de enero de 2025), Guilin (2019-2020, incluyendo 3 dispersables) y Beijing Holley (2023). Los registros de la OMS indican que un sitio es la única fuente de ingrediente de dihidroartemisinina para 8 de las 9 presentaciones."
+    },
     "ca99b7f1b14ee2c0": {
       "en": "Expected",
       "where": "illustrated-journey-dashboard.html",
@@ -5131,6 +6157,14 @@
       "fr": "Triple ACT à dose fixe co-formulée en phase III pivotale (FD-TACT, successeur du programme DeTACT ; premier patient en septembre 2025) ; optimisation de la dose publiée en 2025 ; formulation dispersible adaptée aux enfants",
       "pt": "Formulação conjunta de dose fixa tripla ACT num estudo pivotal de Fase III (FD-TACT, sucessor do programa DeTACT; primeiro doente em setembro de 2025); otimização da dose publicada em 2025; formulação dispersível adequada para crianças.",
       "es": "Triple ACT de dosis fija coformulado en fase III pivotal (FD-TACT, sucesor del programa DeTACT; primer paciente en septiembre de 2025); optimización de la dosis publicada en 2025; formulación dispersable apta para niños."
+    },
+    "cc1859d75b3f5e35": {
+      "en": "Regulatory submission in preparation following Phase III success; no filing announced as of 15 Oct 2026",
+      "where": "products.products[0].stages[1].note",
+      "bucket": "data",
+      "fr": "Préparation d'un dossier réglementaire suite au succès de la phase III ; aucun dépôt annoncé au 15 octobre 2026",
+      "pt": "Submissão regulamentar em preparação após sucesso na Fase III; nenhum pedido anunciado até 15 de outubro de 2026.",
+      "es": "Presentación regulatoria en preparación tras el éxito de la Fase III; no se ha anunciado ninguna presentación hasta el 15 de octubre de 2026."
     },
     "cc72843144841a6f": {
       "en": "Something else",
@@ -5196,6 +6230,14 @@
       "pt": "Ordem do caminho",
       "es": "Orden de la vía"
     },
+    "ce2d08694f011fba": {
+      "en": "Stage ${stepNo(i)} of ${STAGE_COLUMNS.length}",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Étape ${stepNo(i)} sur ${STAGE_COLUMNS.length}",
+      "pt": "Etapa ${stepNo(i)} de ${STAGE_COLUMNS.length}",
+      "es": "Etapa ${stepNo(i)} de ${STAGE_COLUMNS.length}"
+    },
     "ce3161e4af981a18": {
       "en": "not listed",
       "where": "illustrated-journey-dashboard.html",
@@ -5203,6 +6245,22 @@
       "fr": "non répertorié",
       "pt": "não listado",
       "es": "no aparece en la lista"
+    },
+    "ce4a119214959cdc": {
+      "en": "Triple artemisinin-based combination therapy in clinical development. Its potential future role may include use within treatment-diversification or MFT strategies, subject to clinical results, regulatory assessment, WHO recommendations and country decisions.",
+      "where": "products.products[1].detail.useCase",
+      "bucket": "data",
+      "fr": "Une trithérapie à base d'artémisinine est en cours de développement clinique. Son utilisation future potentielle pourrait inclure des stratégies de diversification des traitements ou de MFT, sous réserve des résultats cliniques, de l'évaluation réglementaire, des recommandations de l'OMS et des décisions nationales.",
+      "pt": "Terapêutica combinada tripla à base de artemisinina em desenvolvimento clínico. O seu potencial papel futuro poderá incluir a utilização em estratégias de diversificação do tratamento ou MFT, sujeito a resultados clínicos, avaliação regulamentar, recomendações da OMS e decisões de cada país.",
+      "es": "Terapia combinada triple basada en artemisinina en desarrollo clínico. Su posible papel futuro podría incluir su uso en estrategias de diversificación de tratamientos o estrategias de MFT, sujeto a los resultados clínicos, la evaluación regulatoria, las recomendaciones de la OMS y las decisiones de cada país."
+    },
+    "ce5fcfd8acf7efe3": {
+      "en": "WHO Prequalification Team",
+      "where": "products.stageInfo[3].who",
+      "bucket": "data",
+      "fr": "Équipe de préqualification de l'OMS",
+      "pt": "Equipa de pré-qualificação da OMS",
+      "es": "Equipo de precalificación de la OMS"
     },
     "ce926714b6e64ed7": {
       "en": "Adoption is the current access barrier — strongly recommended by WHO since 2022 and registered in 25+ countries, but national guideline inclusion remains limited",
@@ -5264,6 +6322,14 @@
       "pt": "desde ${since} · ${yrsText(hi - since)}",
       "es": "desde ${since} · ${yrsText(hi - since)}"
     },
+    "d06a1e7f8d73f47b": {
+      "en": "Ministries of Health and national malaria programmes",
+      "where": "products.stageInfo[5].who",
+      "bucket": "data",
+      "fr": "Ministères de la Santé et programmes nationaux de lutte contre le paludisme",
+      "pt": "Ministérios da Saúde e programas nacionais de combate à malária",
+      "es": "Ministerios de Salud y programas nacionales contra la malaria"
+    },
     "d08b4a0f0dcdef11": {
       "en": "Mayotte",
       "where": "markers.dict.country[44]",
@@ -5293,6 +6359,14 @@
       "fr": "RBM Partenariat pour mettre fin au paludisme",
       "pt": "RBM Parceria para Acabar com a Malária"
     },
+    "d13ebe8881bec015": {
+      "en": "9 countries, plus 4 with MFT plans",
+      "where": "products.products[3].detail.milestones[6].label",
+      "bucket": "data",
+      "fr": "9 pays, plus 4 avec des forfaits MFT",
+      "pt": "9 países, mais 4 com planos MFT",
+      "es": "9 países, más 4 con planes MFT"
+    },
     "d1558dbaed17e0e2": {
       "en": "Select any country on the map, or from the Countries tab, to open its page.",
       "where": "line 2967 (in markup)",
@@ -5314,6 +6388,22 @@
       "bucket": "markup",
       "fr": "Votre adresse est transmise à l'équipe LAUNCH et sert uniquement à vous envoyer des e-mails concernant les mises à jour de cette page. Chaque e-mail contient un lien de désabonnement.",
       "pt": "O seu endereço será enviado para a equipa LAUNCH e utilizado apenas para o envio de e-mails sobre atualizações desta página. Todos os e-mails contêm um link para cancelar a subscrição."
+    },
+    "d236faf2ef5f0041": {
+      "en": "In Phase III: granules in a sachet, once daily for 3 days with a light meal, for adults and children ≥10 kg. Final product presentation subject to approval.",
+      "where": "products.products[0].detail.access[1]",
+      "bucket": "data",
+      "fr": "Phase III : granulés en sachet, une fois par jour pendant 3 jours avec un repas léger, pour adultes et enfants ≥ 10 kg. Présentation finale du produit soumise à approbation.",
+      "pt": "Na Fase III: grânulos em saqueta, uma vez por dia durante 3 dias com uma refeição ligeira, para adultos e crianças com peso igual ou superior a 10 kg. A apresentação final do produto está sujeita a aprovação.",
+      "es": "En la Fase III: gránulos en un sobre, una vez al día durante 3 días con una comida ligera, para adultos y niños de ≥10 kg. La presentación final del producto está sujeta a aprobación."
+    },
+    "d27a59989051fa2a": {
+      "en": "Clin Pharmacol Ther: ALAQ dosing, 2025",
+      "where": "sources.sources[1].label",
+      "bucket": "data",
+      "fr": "Pharmacol Thérapie Clin : ALAQ dosage, 2025",
+      "pt": "Clin Pharmacol Ther: ALAQ dosagem, 2025",
+      "es": "Farmacología Clínica Terapéutica: ALAQ dosificación, 2025"
     },
     "d2a00ead47bd2a02": {
       "en": "Dossier submission (SRA pathway)",
@@ -5354,6 +6444,14 @@
       "pt": "Região",
       "es": "Región"
     },
+    "d3a4d93a6daa7819": {
+      "en": "EU-Medicines for all, formerly the Article 58 procedure — EMA's scientific opinion on high-priority medicines intended for markets outside the EU.",
+      "where": "products.glossary.EU-M4all",
+      "bucket": "data",
+      "fr": "Médicaments de l'UE pour tous, anciennement la procédure de l'article 58 — Avis scientifique de l'EMA sur les médicaments hautement prioritaires destinés aux marchés hors de l'UE.",
+      "pt": "Medicamentos da UE para todos, anteriormente o procedimento do artigo 58.º — Parecer científico da EMA sobre medicamentos de alta prioridade destinados a mercados fora da UE.",
+      "es": "Medicamentos para todos en la UE, anteriormente conocido como procedimiento del artículo 58: dictamen científico de la EMA sobre medicamentos de alta prioridad destinados a mercados fuera de la UE."
+    },
     "d4549923709b3ebf": {
       "en": "Renamed from Pyramax to ASPY. The brand name still appears underneath.",
       "where": "products.changelog[15].plain",
@@ -5361,6 +6459,14 @@
       "fr": "Renommé Pyramax en ASPY. Le nom de la marque apparaît toujours en dessous.",
       "pt": "O nome foi alterado de Pyramax para ASPY. A marca ainda aparece abaixo.",
       "es": "Se cambió el nombre de Pyramax a ASPY. El nombre de la marca aún aparece debajo."
+    },
+    "d45874d667810d4a": {
+      "en": "Does something look wrong or out of date? Tell us what you are seeing.",
+      "where": "line 4099",
+      "bucket": "js",
+      "fr": "Quelque chose vous semble-t-il anormal ou obsolète ? Dites-nous ce que vous voyez.",
+      "pt": "Algo parece errado ou desatualizado? Conte-nos o que está a ver.",
+      "es": "¿Hay algo que parezca incorrecto o desactualizado? Díganos qué está viendo."
     },
     "d4b1ea5708dd5329": {
       "en": "Overview",
@@ -5408,6 +6514,14 @@
       "bucket": "data",
       "fr": "Madagascar",
       "pt": "Madagáscar"
+    },
+    "d68ea3f4f0c18ab5": {
+      "en": "The medicines table now shows two milestones instead of one open-ended count: the year a medicine reached market access (recommended and prequalified by WHO), and how long it has been moving towards access in countries since then. We also explain what \"Delayed\" means, and a new About LAUNCH section explains why the dashboard follows these four medicines.",
+      "where": "products.changelog[3].plain",
+      "bucket": "data",
+      "fr": "Le tableau des médicaments affiche désormais deux étapes clés au lieu d'un seul décompte : l'année où un médicament a obtenu l'accès au marché (recommandé et préqualifié par l'OMS) et la durée écoulée depuis lors, le processus d'accès dans les différents pays. Nous expliquons également la signification de « Retardé », et une nouvelle section « À propos de LAUNCH » détaille les raisons pour lesquelles le tableau de bord suit ces quatre médicaments.",
+      "pt": "A tabela de medicamentos mostra agora dois marcos em vez de uma contagem aberta: o ano em que um medicamento obteve acesso ao mercado (recomendado e pré-qualificado pela OMS) e há quanto tempo está em processo de aprovação nos países desde então. Também explicamos o que significa \"Atrasado\", e uma nova secção \"Sobre LAUNCH\" explica porque é que o painel acompanha estes quatro medicamentos.",
+      "es": "La tabla de medicamentos ahora muestra dos hitos en lugar de un recuento abierto: el año en que un medicamento obtuvo acceso al mercado (recomendado y precalificado por la OMS) y cuánto tiempo ha estado avanzando hacia el acceso en los países desde entonces. También explicamos qué significa \"Retrasado\" y una nueva sección Acerca de LAUNCH explica por qué el panel de control realiza un seguimiento de estos cuatro medicamentos."
     },
     "d72288a5c04f5270": {
       "en": "Treatment failure",
@@ -5495,6 +6609,14 @@
       "pt": "Anunciado em 12 de novembro de 2025; teste concluído em 25 de novembro de 2025.",
       "es": "Anunciado el 12 de noviembre de 2025; ensayo clínico finalizado el 25 de noviembre de 2025."
     },
+    "d84f4ae75b2aa2b6": {
+      "en": "WHO policy table 2024",
+      "where": "products.products[3].detail.milestones[6].date",
+      "bucket": "data",
+      "fr": "Tableau des politiques de l'OMS 2024",
+      "pt": "Tabela de políticas da OMS para 2024",
+      "es": "Tabla de políticas de la OMS para 2024"
+    },
     "d889e2172a211a1d": {
       "en": "Bhutan",
       "where": "resistance.dict.country[4]",
@@ -5509,6 +6631,14 @@
       "fr": "Neuf présentations préqualifiées (PQ) auprès de trois fabricants — Alfasigma (2015, requalification janv. 2025), Guilin (2019–2020, dont une forme pédiatrique dispersible), Beijing Holley (2023) — une réelle sécurité d’approvisionnement",
       "pt": "Nove apresentações pré-qualificadas (PQ) de três fabricantes — Alfasigma (2015, requalificação jan. 2025), Guilin (2019–2020, incl. formulação pediátrica dispersível), Beijing Holley (2023) — verdadeira segurança do abastecimento",
       "es": "Nueve presentaciones de PQ'd de tres fabricantes: Alfasigma (2015, recalificación enero 2025), Guilin (2019–2020, incl. pediátrico dispersable), Beijing Holley (2023) — seguridad de suministro real"
+    },
+    "d8e2d65651b8baf5": {
+      "en": "About LAUNCH",
+      "where": "static text",
+      "bucket": "markup",
+      "fr": "À propos de LAUNCH",
+      "pt": "Sobre LAUNCH",
+      "es": "Acerca de LAUNCH"
     },
     "d9658fce74348b45": {
       "en": "Still not in routine use in ${ASOF_YEAR}.",
@@ -5548,6 +6678,14 @@
       "fr": "[data-det-tab=\"${t.dataset.detTab}\"]",
       "pt": "[data-det-tab=\"${t.dataset.detTab}\"]"
     },
+    "da889d861c2dedc2": {
+      "en": "National policy and Global Fund procurement vary substantially between countries",
+      "where": "products.products[3].stages[7].note",
+      "bucket": "data",
+      "fr": "Les politiques nationales et les acquisitions du Fonds mondial varient considérablement d'un pays à l'autre.",
+      "pt": "As políticas nacionais e as aquisições do Fundo Global variam substancialmente entre países.",
+      "es": "Las políticas nacionales y las adquisiciones del Fondo Mundial varían sustancialmente entre países."
+    },
     "da99806f945cefea": {
       "en": "WWARN / IDDO malaria data",
       "where": "sources.sources[10].label",
@@ -5571,6 +6709,14 @@
       "fr": "Réinitialiser",
       "pt": "Reiniciar",
       "es": "Reiniciar"
+    },
+    "db0887f036b7eae1": {
+      "en": "${done} of ${p.stages.length} milestones complete",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "${done} sur ${p.stages.length} étapes franchies",
+      "pt": "${done} de ${p.stages.length} marcos concluídos",
+      "es": "${done} de ${p.stages.length} hitos completados"
     },
     "db2cbd9352261117": {
       "en": "Your email is optional and used only to reply to you. With your message we send the page you are on, the version of the data it shows, and your browser, so the team can see what you saw.",
@@ -5632,6 +6778,14 @@
       "fr": "cet onglet du navigateur. Une fois la connexion établie, l'équipe LAUNCH lira chaque message, et où",
       "pt": "esta aba do navegador. Assim que estiver ligado, a equipa LAUNCH lerá todas as mensagens e onde"
     },
+    "dc6c714054f85c4c": {
+      "en": "40/320 mg dispersible tablets · box of 2 blisters of 3",
+      "where": "products.products[3].detail.volume.byPresentation[2].label",
+      "bucket": "data",
+      "fr": "Comprimés dispersibles 40/320 mg · boîte de 2 plaquettes thermoformées de 3",
+      "pt": "Comprimidos dispersíveis de 40/320 mg · caixa de 2 blisters de 3 comprimidos",
+      "es": "Comprimidos dispersables de 40/320 mg · caja de 2 blísteres de 3"
+    },
     "dc937b59892604f5": {
       "en": "None",
       "where": "illustrated-journey-dashboard.html",
@@ -5656,6 +6810,14 @@
       "pt": "Um estudo sobre o desempenho da pironaridina-artesunato no uso clínico comum em cinco países africanos.",
       "es": "Un estudio sobre el rendimiento de la pironaridina-artesunato en el uso clínico habitual en cinco países africanos."
     },
+    "dd00e3847535f817": {
+      "en": "Global Fund PQR, 2008–2026 · US$15.3m in 2025 · top buyers Uganda, Madagascar, Mozambique",
+      "where": "products.products[3].detail.volume.period",
+      "bucket": "data",
+      "fr": "Rapport trimestriel sur les investissements du Fonds mondial (PQR), 2008-2026 · 15,3 millions de dollars US en 2025 · Principaux acheteurs : Ouganda, Madagascar, Mozambique",
+      "pt": "Relatório de Qualificação Parcial (PQR) do Fundo Global, 2008–2026 · 15,3 milhões de dólares em 2025 · principais compradores: Uganda, Madagáscar, Moçambique",
+      "es": "Fondo Mundial PQR, 2008–2026 · US$15,3 millones en 2025 · principales compradores Uganda, Madagascar, Mozambique"
+    },
     "dd1f6cd25c58fd49": {
       "en": "We now call a blocked step an \"access barrier\" instead of a \"bottleneck\". Only the wording changed — no figures or dates were altered.",
       "where": "products.changelog[0].plain",
@@ -5678,6 +6840,38 @@
       "bucket": "data",
       "fr": "Guinée",
       "pt": "Guiné"
+    },
+    "dd602ffa17acd3ed": {
+      "en": "GHIT Fund: ALAQ Phase III project",
+      "where": "sources.sources[9].label",
+      "bucket": "data",
+      "fr": "Fonds GHIT : ALAQ Projet de phase III",
+      "pt": "Fundo GHIT: ALAQ Projeto Fase III",
+      "es": "Fondo GHIT: ALAQ Proyecto Fase III"
+    },
+    "dd6d6df8f2bb43e5": {
+      "en": "Tanzania: 10 registered presentations, all compliant · Nigeria: 47 registered presentations, 25 active, 22 lapsed",
+      "where": "products.products[3].detail.milestones[5].label",
+      "bucket": "data",
+      "fr": "Tanzanie : 10 présentations enregistrées, toutes conformes ; Nigéria : 47 présentations enregistrées, 25 actives, 22 expirées.",
+      "pt": "Tanzânia: 10 apresentações registadas, todas em conformidade · Nigéria: 47 apresentações registadas, 25 ativas, 22 inativas",
+      "es": "Tanzania: 10 presentaciones registradas, todas conformes · Nigeria: 47 presentaciones registradas, 25 activas, 22 caducadas"
+    },
+    "dd7fbca68de6800f": {
+      "en": "WHO malaria treatment guidelines, 2010",
+      "where": "sources.sources[33].label",
+      "bucket": "data",
+      "fr": "Directives de l'OMS pour le traitement du paludisme, 2010",
+      "pt": "Orientações da OMS para o tratamento da malária, 2010",
+      "es": "Directrices de la OMS para el tratamiento de la malaria, 2010"
+    },
+    "dd89ea655fec6254": {
+      "en": "40/320 mg tablets · blister of 6",
+      "where": "products.products[3].detail.volume.byPresentation[7].label",
+      "bucket": "data",
+      "fr": "Comprimés de 40/320 mg · plaquette thermoformée de 6",
+      "pt": "Comprimidos de 40/320 mg · blister com 6 unidades",
+      "es": "Comprimidos de 40/320 mg · blíster de 6"
     },
     "de1e0f4ea7beff01": {
       "en": "Access & supply commitments",
@@ -5748,6 +6942,14 @@
       "fr": "Méfloquine, luméfantrine",
       "pt": "Mefloquina, lumefantrina"
     },
+    "e0496d4a26afff2d": {
+      "en": "Procurement is the current access barrier — 0.9–4.5% of the value of all antimalarial medicines the Global Fund ordered each year in 2022–24, despite a WHO recommendation dating to 2010, though 2025 orders surged (PQR, reporting still incomplete)",
+      "where": "products.products[3].flag",
+      "bucket": "data",
+      "fr": "L’approvisionnement constitue actuellement l’obstacle à l’accès — 0,9 à 4,5 % de la valeur totale des médicaments antipaludiques commandés chaque année par le Fonds mondial entre 2022 et 2024, malgré une recommandation de l’OMS datant de 2010, bien que les commandes de 2025 aient fortement augmenté (PQR, rapport encore incomplet).",
+      "pt": "A aquisição é a atual barreira de acesso — representando 0,9% a 4,5% do valor total dos medicamentos antimaláricos encomendados pelo Fundo Global em cada ano entre 2022 e 2024, apesar de uma recomendação da OMS datada de 2010, embora os pedidos para 2025 tenham aumentado consideravelmente (PQR, relatório ainda incompleto).",
+      "es": "La adquisición es la principal barrera de acceso actual: entre el 0,9 % y el 4,5 % del valor total de los medicamentos antipalúdicos que el Fondo Mundial solicitó cada año entre 2022 y 2024, a pesar de una recomendación de la OMS que data de 2010, aunque los pedidos de 2025 aumentaron considerablemente (PQR, informe aún incompleto)."
+    },
     "e04d53f14ea293a2": {
       "en": "Venezuela (Bolivarian Republic of)",
       "where": "resistance.dict.country[65]",
@@ -5762,6 +6964,14 @@
       "fr": "Recevez un courriel lorsque les données de cette page sont mises à jour : nouvelles étapes importantes, chiffres corrigés et nouvelles inscriptions de pays vérifiées.",
       "pt": "Receba um e-mail quando os dados desta página forem atualizados — novos marcos, números corrigidos e registos de países recentemente verificados.",
       "es": "Reciba un correo electrónico cuando se actualicen los datos de esta página: nuevos hitos, cifras corregidas y registros de países recién verificados."
+    },
+    "e07b2aa9e830e759": {
+      "en": "African Medicines Agency — the African Union's continental medicines agency, based in Kigali, set up to harmonise regulation across the member states that have ratified its treaty and to evaluate selected priority products. National regulators still grant marketing authorisation.",
+      "where": "products.glossary.AMA",
+      "bucket": "data",
+      "fr": "L'Agence africaine des médicaments (AAM) est l'agence continentale des médicaments de l'Union africaine, basée à Kigali. Elle a été créée pour harmoniser la réglementation entre les États membres ayant ratifié le traité et pour évaluer certains produits prioritaires. Les autorités nationales continuent d'accorder les autorisations de mise sur le marché.",
+      "pt": "A Agência Africana do Medicamento — a agência continental do medicamento da União Africana, com sede em Kigali, foi criada para harmonizar a regulamentação entre os estados membros que ratificaram o tratado e para avaliar produtos prioritários seleccionados. Os organismos reguladores nacionais ainda concedem autorização de introdução no mercado.",
+      "es": "Agencia Africana de Medicamentos —la agencia continental de medicamentos de la Unión Africana, con sede en Kigali, fue creada para armonizar la regulación en todos los Estados miembros que han ratificado su tratado y para evaluar determinados productos prioritarios. Los organismos reguladores nacionales siguen otorgando la autorización de comercialización."
     },
     "e07bc9f2a0ce43ff": {
       "en": "Pipeline · new chemical class",
@@ -5786,6 +6996,22 @@
       "fr": "aujourd'hui",
       "pt": "hoje",
       "es": "hoy"
+    },
+    "e10bb3fb1a83ea3f": {
+      "en": "Treatment courses are not estimated: the Global Fund's product names for ASPY do not state how many tablets or sachets make one course, and the number depends on body weight.",
+      "where": "products.products[2].detail.volume.coursesRule",
+      "bucket": "data",
+      "fr": "La durée des traitements n'est pas estimée : les noms des produits ASPY du Fonds mondial n'indiquent pas le nombre de comprimés ou de sachets nécessaires pour un traitement, et ce nombre dépend du poids corporel.",
+      "pt": "A quantidade de tratamentos não é estimada: os nomes dos produtos ASPY do Fundo Global não indicam quantos comprimidos ou saquetas compõem um tratamento, e este número depende do peso corporal.",
+      "es": "Los tratamientos no se calculan con precisión: los nombres de los productos del Fondo Mundial para la ASPY no indican cuántas tabletas o sobres componen un tratamiento, y la cantidad depende del peso corporal."
+    },
+    "e11b1b9db7e50039": {
+      "en": "${esc(name)}: ${esc(t)}",
+      "where": "line 1923",
+      "bucket": "js",
+      "fr": "${esc(name)}: ${esc(t)}",
+      "pt": "${esc(name)}: ${esc(t)}",
+      "es": "${esc(name)}: ${esc(t)}"
     },
     "e15a18aadcac09e6": {
       "en": "Nepal",
@@ -5832,6 +7058,14 @@
       "fr": "Pakistan",
       "pt": "Paquistão"
     },
+    "e26b187d6121cf8b": {
+      "en": "Stringent Regulatory Approval (SRA)",
+      "where": "products.stages[1]",
+      "bucket": "data",
+      "fr": "Approbation réglementaire rigoureuse (SRA)",
+      "pt": "Aprovação regulamentar rigorosa (SRA)",
+      "es": "Aprobación regulatoria rigurosa (SRA)"
+    },
     "e27d089d50c2e45e": {
       "en": "Verify surge in next PQR extract",
       "where": "products.products[2].detail.milestones[6].next",
@@ -5853,6 +7087,14 @@
       "bucket": "js",
       "fr": "\" + esc(cn + \" — \" + mk.members.length + \" sites\") + \"",
       "pt": "\" + esc(cn + \" — \" + mk.members.length + \" sites\") + \""
+    },
+    "e33b8cbfcf50c540": {
+      "en": "Supply from port to health facility, health-worker training, and pharmacovigilance once the medicine is in use.",
+      "where": "products.stageInfo[7].what",
+      "bucket": "data",
+      "fr": "Approvisionnement du port à l'établissement de santé, formation du personnel de santé et pharmacovigilance une fois le médicament utilisé.",
+      "pt": "Abastecimento do porto até à unidade de saúde, formação dos profissionais de saúde e farmacovigilância após o medicamento entrar em utilização.",
+      "es": "El suministro se realiza desde el puerto hasta el centro de salud, se imparte formación al personal sanitario y se lleva a cabo la farmacovigilancia una vez que el medicamento está en uso."
     },
     "e33d155fe1cd396f": {
       "en": "First batch of updates drawn from public databases — Global Fund purchasing records, World Health Organization approval lists, European medicines records and clinical trial registries.",
@@ -5924,6 +7166,14 @@
       "pt": "Europa",
       "es": "Europa"
     },
+    "e6551b8e7e902d25": {
+      "en": "Rwanda, Uganda, Angola, Nigeria and Thailand (FD-TACT sites named by the GHIT Fund; the registry lists Rwanda so far)",
+      "where": "products.products[1].detail.research.geographies",
+      "bucket": "data",
+      "fr": "Rwanda, Ouganda, Angola, Nigéria et Thaïlande (sites FD-TACT désignés par le GHIT Fund ; le registre mentionne pour l'instant le Rwanda)",
+      "pt": "Ruanda, Uganda, Angola, Nigéria e Tailândia (locais do FD-TACT nomeados pelo Fundo GHIT; o registo lista o Ruanda até à data)",
+      "es": "Ruanda, Uganda, Angola, Nigeria y Tailandia (sitios FD-TACT nombrados por el Fondo GHIT; el registro incluye hasta ahora a Ruanda)."
+    },
     "e7103661f32b14ea": {
       "en": "Indicative price per treatment",
       "where": "line 1754 (in markup)",
@@ -5960,6 +7210,14 @@
       "bucket": "data",
       "fr": "Comores",
       "pt": "Comores"
+    },
+    "e89782c77003e904": {
+      "en": "Training on a new co-formulated product (same 6-dose, 3-day schedule as AL).",
+      "where": "products.products[1].detail.adoption[1]",
+      "bucket": "data",
+      "fr": "Formation sur un nouveau produit co-formulé (même schéma posologique de 6 doses sur 3 jours que l'AL).",
+      "pt": "Formação sobre um novo produto coformulado (mesmo esquema de 6 doses, 3 dias por semana, que o AL).",
+      "es": "Capacitación sobre un nuevo producto coformulado (mismo esquema de 6 dosis, 3 días que AL)."
     },
     "e96d77688f4f2b69": {
       "en": "Samples carrying a resistance-associated genotype, % of those genotyped — for Pfkelch13 this counts WHO-validated markers of artemisinin partial resistance only, not every mutation found",
@@ -6035,6 +7293,14 @@
       "pt": "Os seus dados serão enviados à equipa LAUNCH e utilizados apenas para lhe enviar emails sobre atualizações desta página. Todos os emails contêm um link para cancelar a subscrição.",
       "es": "Tus datos se envían al equipo de LAUNCH y se utilizan únicamente para enviarte correos electrónicos sobre las actualizaciones de esta página. Todos los correos incluyen un enlace para darte de baja."
     },
+    "ec5ba0abb717da87": {
+      "en": "Access",
+      "where": "illustrated-journey-dashboard.html",
+      "bucket": "reviewed",
+      "fr": "Accéder",
+      "pt": "Acesso",
+      "es": "Acceso"
+    },
     "ec91fdd9256cb75a": {
       "en": "optional",
       "where": "assets/report-issue.js",
@@ -6065,6 +7331,13 @@
       "bucket": "data",
       "fr": "Soudan",
       "pt": "Sudão"
+    },
+    "ed6c3fd9ee2bef1b": {
+      "en": "Co-formulated fixed-dose triple ACT in pivotal Phase III (FD-TACT, NCT05951595; started 11 Sep 2025); dose optimisation published 2025; paediatric dispersible tablet in the trial",
+      "where": "products.products[1].stages[0].note",
+      "bucket": "data",
+      "fr": "Triple dose fixe co-formulée ACT en phase III pivotale (FD-TACT, NCT05951595 ; débutée le 11 septembre 2025) ; optimisation de la dose publiée en 2025 ; comprimé dispersible pédiatrique dans l’essai",
+      "pt": "Formulação conjunta de dose fixa tripla ACT num estudo pivotal de Fase III (FD-TACT, NCT05951595; iniciado a 11 de setembro de 2025); otimização da dose publicada em 2025; comprimido dispersível pediátrico em estudo."
     },
     "ed7aff1ae9fa57c2": {
       "en": "is pre-launch — no country access yet.",
@@ -6136,6 +7409,14 @@
       "pt": "Feito, sem data registada",
       "es": "Hecho, sin fecha registrada"
     },
+    "eedc9eb665698b82": {
+      "en": "EMA, or another stringent regulator such as the US FDA",
+      "where": "products.stageInfo[1].who",
+      "bucket": "data",
+      "fr": "L'EMA, ou un autre organisme de réglementation rigoureux comme la FDA américaine,",
+      "pt": "EMA, ou outro organismo regulador rigoroso como a FDA dos EUA.",
+      "es": "La EMA u otro organismo regulador estricto como la FDA de EE. UU."
+    },
     "ef248b20da851532": {
       "en": "Border = the selected medicine is in the country's national treatment policy (solid: first-line for tested P. falciparum; dashed: a smaller patient group only). Fill = access stage, unchanged.",
       "where": "line 3807",
@@ -6157,6 +7438,13 @@
       "fr": "${esc(k)}: ${pg.length ? \"lists \" : \"does not list \"}${esc(p.name)}.",
       "pt": "${esc(k)}: ${pg.length ? \"lists \" : \"does not list \"}${esc(p.name)}.",
       "es": "${esc(k)}: ${pg.length ? \"lists \" : \"does not list \"}${esc(p.name)}."
+    },
+    "f0dab827fd003854": {
+      "en": "Met its Phase III primary endpoint in KALUMA (NCT05842954): 97.4% PCR-corrected cure at Day 29 vs 94.0% for artemether–lumefantrine (Coartem), in adults and children ≥10 kg. Company-reported; not yet peer-reviewed. Registry: 1,720 participants, 33 sites, 12 African countries, completed 25 Nov 2025.",
+      "where": "products.products[0].stages[0].note",
+      "bucket": "data",
+      "pt": "Atingiu o objetivo primário da Fase III em KALUMA (NCT05842954): 97,4% de cura corrigida para PCR no Dia 29 vs 94,0% para artemeter-lumefantrina (Coartem), em adultos e crianças ≥10 kg. Relatado pela empresa; ainda não revisto por pares. Registo: 1.720 participantes, 33 centros, 12 países africanos, concluído a 25 de novembro de 2025.",
+      "es": "Cumplió su criterio de valoración principal de fase III en KALUMA (NCT05842954): 97,4 % de curación corregida PCR en el día 29 frente al 94,0 % para artemeter-lumefantrina (Coartem), en adultos y niños ≥10 kg. Informado por la empresa; aún no revisado por pares. Registro: 1720 participantes, 33 centros, 12 países africanos, completado el 25 de noviembre de 2025."
     },
     "f0ea22a14fb2608c": {
       "en": "${esc(STAGES[b])} was reached ${yrs} yr${yrs === 1 ? \"\" : \"s\"} before ${esc(STAGES[a])} — these gates were not cleared in pathway order.",
@@ -6264,6 +7552,14 @@
       "pt": "A equipa LAUNCH lê todas as mensagens e, quando nos indica uma fonte pública fidedigna, corrigimos os dados na próxima atualização. Se deixou um endereço de e-mail, qualquer resposta nossa citará a referência abaixo.",
       "es": "El equipo de LAUNCH lee todos los mensajes y, si nos has indicado una fuente pública que sea fiable, corregimos los datos en la siguiente actualización. Si nos has proporcionado una dirección de correo electrónico, en cualquier respuesta que te enviemos citaremos la referencia que aparece a continuación."
     },
+    "f4cd1d611b797a04": {
+      "en": "Non-artemisinin combination in late-stage development. Novartis presents it as having the potential to combat antimalarial drug resistance; LAUNCH tracks it as a candidate for settings with artemisinin partial resistance and for multiple first-line therapy (MFT) strategies.",
+      "where": "products.products[0].detail.useCase",
+      "bucket": "data",
+      "fr": "Combinaison non-artémisinine en phase finale de développement. Novartis la présente comme ayant le potentiel de lutter contre la résistance aux médicaments antipaludiques ; LAUNCH la suit comme candidate pour les contextes de résistance partielle à l’artémisinine et pour de multiples stratégies de traitement de première ligne (MFT).",
+      "pt": "Combinação não artemisinina em fase final de desenvolvimento. Novartis apresenta-a como tendo potencial para combater a resistência aos medicamentos antimaláricos; LAUNCH acompanha-a como candidata para cenários com resistência parcial à artemisinina e para múltiplas estratégias de terapêutica de primeira linha (MFT).",
+      "es": "Combinación sin artemisinina en fase avanzada de desarrollo. Novartis la presenta como una opción con potencial para combatir la resistencia a los fármacos antipalúdicos; LAUNCH la analiza como candidata para entornos con resistencia parcial a la artemisinina y para múltiples estrategias de terapia de primera línea (MFT)."
+    },
     "f5045a33c56778ec": {
       "en": "Market Access",
       "where": "line 1768",
@@ -6327,6 +7623,14 @@
       "pt": "Tripla ACT para proteger os medicamentos parceiros da artemisinina — componente MFT e opção de primeira linha onde se confirma a resistência parcial à artemisinina.",
       "es": "Triple ACT para proteger los fármacos asociados a la artemisinina: componente MFT y opción de primera línea cuando se confirma la resistencia parcial a la artemisinina."
     },
+    "f7ae541e5f2c3a1b": {
+      "en": "R&D and Clinical",
+      "where": "products.stages[0]",
+      "bucket": "data",
+      "fr": "Recherche et développement et clinique",
+      "pt": "I&D e Clínica",
+      "es": "Investigación y desarrollo y clínica"
+    },
     "f8361a4ef3e957b1": {
       "en": "The national register of every medicine approved for sale in Zimbabwe.",
       "where": "sources.sources[8].plain",
@@ -6351,6 +7655,13 @@
       "pt": "Incluído na lista de tratamentos da política nacional.",
       "es": "Incluido en la lista de tratamientos de la política nacional."
     },
+    "f88973ee1f0419c4": {
+      "en": "The access pathway: eight milestones across seven stages. WHO recommendation and WHO PQ listing are parallel milestones within stage 3. Choose a stage to see what happens there and where each medicine is",
+      "where": "static @aria-label",
+      "bucket": "markup",
+      "fr": "Le parcours d'accès : huit étapes clés réparties en sept phases. La recommandation de l'OMS et l'inscription de l'OMS sur la liste PQ sont des étapes clés parallèles au sein de la phase 3. Choisissez une phase pour découvrir ce qui s'y passe et où se trouve chaque médicament.",
+      "es": "La vía de acceso: ocho hitos a lo largo de siete etapas. La recomendación de la OMS y la inclusión en la lista PQ de la OMS son hitos paralelos dentro de la etapa 3. Elija una etapa para ver qué sucede allí y dónde se encuentra cada medicamento."
+    },
     "f8b776e7f71956a4": {
       "en": "Global Fund price and quality reporting, PMI",
       "where": "products.stageInfo[6].source",
@@ -6366,6 +7677,14 @@
       "fr": "Publié en 2025",
       "pt": "Publicado em 2025",
       "es": "Publicado en 2025"
+    },
+    "f958b7c063178d66": {
+      "en": "40/320 mg dispersible tablets · blister of 3",
+      "where": "products.products[3].detail.volume.byPresentation[1].label",
+      "bucket": "data",
+      "fr": "Comprimés dispersibles 40/320 mg · plaquette thermoformée de 3",
+      "pt": "Comprimidos dispersíveis de 40/320 mg · blister com 3 unidades",
+      "es": "Comprimidos dispersables de 40/320 mg · blíster de 3"
     },
     "f9695985aa331d68": {
       "en": "First-line for confirmed (tested) cases in national policy",
@@ -6397,6 +7716,14 @@
       "fr": "Généralités — le tableau de bord dans son ensemble",
       "pt": "Geral — o painel de controlo como um todo",
       "es": "General: el panel de control en su conjunto"
+    },
+    "fb065ff0176d8d12": {
+      "en": "The same for the 40/320 mg tablet (MA094)",
+      "where": "sources.sources[29].alsoSee[0].label",
+      "bucket": "data",
+      "fr": "Il en va de même pour le comprimé 40/320 mg (MA094).",
+      "pt": "O mesmo se aplica ao comprimido de 40/320 mg (MA094).",
+      "es": "Lo mismo ocurre con el comprimido de 40/320 mg (MA094)."
     },
     "fb293d4b4d34a477": {
       "en": "R&D & clinical",
@@ -6446,6 +7773,13 @@
       "pt": "2015–2023; requalificação em 20 de janeiro de 2025.",
       "es": "2015–2023; reclasificación el 20 de enero de 2025."
     },
+    "fccdce4296b2be6e": {
+      "en": "The funder's description of the ALAQ Phase III project: partners, aims and planned route to WHO.",
+      "where": "sources.sources[9].plain",
+      "bucket": "data",
+      "fr": "Description du bailleur de fonds du projet ALAQ Phase III : partenaires, objectifs et itinéraire prévu vers l'OMS.",
+      "pt": "Descrição do financiador sobre o projeto ALAQ Fase III: parceiros, objetivos e roteiro planeado para a OMS."
+    },
     "fce63bfb9ebaba3d": {
       "en": "(prefers-reduced-motion: reduce)",
       "where": "line 2093",
@@ -6469,6 +7803,14 @@
       "pt": "Distribuído por",
       "es": "Desarrollado por"
     },
+    "fe26d51f11d441b4": {
+      "en": "MMV: Pyramax (ASPY) product page",
+      "where": "sources.sources[18].label",
+      "bucket": "data",
+      "fr": "MMV: Pyramax (ASPY) page produit",
+      "pt": "MMV: Pyramax (ASPY) página do produto",
+      "es": "MMV: Pyramax (ASPY) página del producto"
+    },
     "fe50ed105fe46709": {
       "en": "Journey",
       "where": "illustrated-journey-dashboard.html",
@@ -6476,6 +7818,14 @@
       "fr": "Voyage",
       "pt": "Jornada",
       "es": "Viaje"
+    },
+    "fe696eabbc0ae04a": {
+      "en": "On the WHO list of prequalified medicines (tablets and granules), through the EMA EU-M4all (Article 58) route.",
+      "where": "products.products[2].detail.access[0]",
+      "bucket": "data",
+      "fr": "Sur la liste de l'OMS des médicaments préqualifiés (comprimés et granulés), via la voie EMA EU-M4all (article 58).",
+      "pt": "Na lista da OMS de medicamentos pré-qualificados (comprimidos e grânulos), através da via EMA EU-M4all (Artigo 58).",
+      "es": "Incluida en la lista de medicamentos precalificados de la OMS (comprimidos y gránulos), a través del procedimiento EU-M4all de la EMA (Artículo 58)."
     },
     "fe8547e13b12ad91": {
       "en": "WHO prequalification guidance",
