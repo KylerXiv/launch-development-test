@@ -86,6 +86,20 @@ The translated strings ("expected") are untouched, so the fr/pt/es pages
 follow and `contentHash` is unchanged. Checked headless (Chrome, file URL):
 9 stage buttons, 0 tags rendered, 0 labels with "expected".
 
+**Grey line under each medicine's current stage: hidden (owner, 20 Oct
+2026).** In the medicines table's "Current stage · Status" cell, the grey
+third line (the first clause of the current stage's `date`, e.g. "Phase III
+targeted completion 2025–26", "Ghana 2022", "Since 2008", "Regulatory
+submission in preparation") is gone for all four medicines. The new switch is
+`SHOW_STAGE_NOTE = false`, beside `SHOW_BARRIERS`. Two options were put to
+the owner: remove only the grey line, or remove the status word too and leave
+the stage name alone. The owner chose the grey line only, so ALAQ's "In
+progress" and the "Not started" words stay as v1.0 set them. The date itself
+is not lost: it still shows in the journey's hover line (`peekLine`), the
+stage panel's "Recorded" row and the CSV. No data or translated strings
+changed (`contentHash` unchanged). Checked headless: 4 stage cells, each with
+its stage name and status word only.
+
 ## 2. Deferred, or left alone on purpose
 
 - `data/sources.js` line 7 and `data/products.synthetic.js` lines 11-12 still

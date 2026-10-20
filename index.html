@@ -1721,6 +1721,12 @@
   // medicines (owner's choice, 20 Oct 2026), rather than leave ALAQ's and
   // GanLum's "No publicly documented barrier identified" beside two empty cells.
   const SHOW_BARRIERS = false;
+  // The grey line under the stage name and status in the medicines table's
+  // "Current stage · Status" cell: the first clause of the stage's date or note
+  // ("Ghana 2022", "Since 2008"). Hidden for every medicine at the owner's
+  // request (20 Oct 2026); the stage name and status word stay, and the full
+  // date still shows on the journey and in the stage panel. true brings it back.
+  const SHOW_STAGE_NOTE = false;
   // Is this status's word shown for this medicine? Complete and Not started always are.
   const statusShown = (p, status) => SHOW_PROGRESS || (status !== "prog" && status !== "late") || !!PROGRESS_KEPT[p.id];
   // Illustrated stage glyphs (assets/journey-icons/icons.js), one per stage in
@@ -2424,7 +2430,7 @@
             aria-label="Show journey for ${esc(p.name)}">▾</button>
           <div class="nm"><b>${esc(p.name)}</b><small>${esc(p.inn)}</small></div>
           <div class="c-mini">${miniJourney(p)}</div>
-          <span class="c-stage"><span class="stg">${esc(STAGES[p.currentStage])}</span>${statusShown(p, p.stages[p.currentStage].status) ? `<span class="light ${p.stages[p.currentStage].status}"><i></i>${LABEL[p.stages[p.currentStage].status]}${p.stages[p.currentStage].status === "late" ? lateInfo() : ""}</span>` : ""}${firstClause(p.stages[p.currentStage].date) ? `<span class="note">${esc(firstClause(p.stages[p.currentStage].date))}</span>` : ""}</span>
+          <span class="c-stage"><span class="stg">${esc(STAGES[p.currentStage])}</span>${statusShown(p, p.stages[p.currentStage].status) ? `<span class="light ${p.stages[p.currentStage].status}"><i></i>${LABEL[p.stages[p.currentStage].status]}${p.stages[p.currentStage].status === "late" ? lateInfo() : ""}</span>` : ""}${SHOW_STAGE_NOTE && firstClause(p.stages[p.currentStage].date) ? `<span class="note">${esc(firstClause(p.stages[p.currentStage].date))}</span>` : ""}</span>
           <span class="cell c-path">${accessCell(p)}${yardBadge(p)}</span>
           ${SHOW_BARRIERS ? `<div class="c-bar${p.barrier || p.flag ? "" : " none"}">${p.barrier || p.flag ? esc(p.barrier || p.flag) : "No publicly documented barrier identified"}</div>` : ""}
         </div>
