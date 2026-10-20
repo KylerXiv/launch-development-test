@@ -181,6 +181,48 @@ function restore(masked, holes) {
 }
 
 // ---------------------------------------------------------------------------
+// Second try for what the tokens above lose.
+//
+// Google drops or garbles a \u27e6n\u27e7 token in a few strings every run \u2014 "two or
+// more effective \u27e60\u27e7" came back with the token gone, "and \u27e60\u27e7 studies" as
+// "\u27e6\ufffd\u27e7" (Oct 2026: 11 of 517 across fr/pt/es). Those strings are sent again as
+// HTML, each hole and term inside <span translate="no">, which the engine is
+// built to leave alone. The span holds the original text, so it is restored by
+// matching content, not position, and the result is still rejected unless
+// every hole comes back exactly once.
+// ---------------------------------------------------------------------------
+const escHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const unescHtml = (s) => s
+  .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(+n))
+  .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+  .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+
+const SPAN_OPEN = '<span translate="no">';
+const SPAN = /<span translate="no">([\s\S]*?)<\/span>/g;
+
+function protectHtml(text) {
+  const holes = [];
+  const take = (m) => { holes.push(m); return `\u27e6${holes.length - 1}\u27e7`; };
+  const masked = escHtml(text.replace(HOLE, take).replace(TERM, take))
+    .replace(/\u27e6(\d+)\u27e7/g, (_, i) => `${SPAN_OPEN}${escHtml(holes[+i])}</span>`);
+  return { masked, holes };
+}
+
+function restoreHtml(html, want) {
+  const got = [];
+  // the engine pads spans with spaces inside brackets: "MFT )", "( Coartem"
+  let out = html.replace(/(<\/span>) +([),.])/g, "$1$2").replace(/\( +(<span )/g, "($1").replace(SPAN, (_, inner) => {
+    const hole = unescHtml(inner);
+    got.push(hole);
+    return `\u27e6${got.length - 1}\u27e7`;
+  });
+  if (/<[a-z/][^>]*>/i.test(out)) return null;   // a tag the engine invented
+  if ([...got].sort().join("\u0000") !== [...want].sort().join("\u0000")) return null;
+  out = unescHtml(out);
+  return out.replace(/\u27e6(\d+)\u27e7/g, (_, i) => got[+i]);
+}
+
+// ---------------------------------------------------------------------------
 // Engines
 // ---------------------------------------------------------------------------
 const ENGINE = process.env.TRANSLATE_ENGINE || "google";
@@ -189,20 +231,20 @@ const isStub = (v) => typeof v === "string" && /^\[stub-[a-z]+\] /.test(v);
 // stub value left behind by a test run.
 const isEmpty = (v) => !v || (ENGINE !== "stub" && isStub(v));
 
-async function engineTranslate(texts, locale) {
+async function engineTranslate(texts, locale, format = "text") {
   if (ENGINE === "stub") return texts.map((t) => `[stub-${locale}] ${t}`);
-  if (ENGINE === "google") return googleTranslate(texts, locale);
+  if (ENGINE === "google") return googleTranslate(texts, locale, format);
   throw new Error(`TRANSLATE_ENGINE must be "google" or "stub", not "${ENGINE}"`);
 }
 
 // Google Cloud Translation v2
-async function googleTranslate(texts, locale) {
+async function googleTranslate(texts, locale, format) {
   const key = process.env.GOOGLE_API_KEY;
   if (!key) throw new Error("GOOGLE_API_KEY is not set");
   const res = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${key}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ q: texts, source: "en", target: TARGET[locale], format: "text" }),
+    body: JSON.stringify({ q: texts, source: "en", target: TARGET[locale], format }),
   });
   if (!res.ok) throw new Error(`Google ${res.status}: ${(await res.text()).slice(0, 300)}`);
   return (await res.json()).data.translations.map((t) => t.translatedText);
@@ -260,22 +302,40 @@ async function main() {
   // batch by payload size; Google takes an array of q values per call
   const BATCH = 80;
   let done = 0;
-  const rejected = [];
+  let rejected = [];
+  const save = (s, back) => {
+    const e = (mem.entries[s.key] ||= { en: s.text, where: s.where, bucket: s.bucket });
+    if (isEmpty(e[locale])) e[locale] = back;  // empty-locale-only, enforced here too
+  };
   for (let i = 0; i < todo.length; i += BATCH) {
     const slice = todo.slice(i, i + BATCH);
     const masked = slice.map((s) => protect(s.text));
     const outs = await engineTranslate(masked.map((m) => m.masked), locale);
     slice.forEach((s, j) => {
       const back = restore(outs[j], masked[j].holes);
-      if (back === null) { rejected.push(s.text); return; }   // keep English
-      const k = s.key;
-      const e = (mem.entries[k] ||= { en: s.text, where: s.where, bucket: s.bucket });
-      if (isEmpty(e[locale])) e[locale] = back;  // empty-locale-only, enforced here too
+      if (back === null) { rejected.push(s); return; }   // second try below
+      save(s, back);
     });
     done += slice.length;
     process.stdout.write(`\r  ${ENGINE} → ${locale} … ${done}/${todo.length}`);
   }
   console.log("");
+  if (rejected.length && ENGINE === "google") {
+    const retry = rejected;
+    rejected = [];
+    for (let i = 0; i < retry.length; i += BATCH) {
+      const slice = retry.slice(i, i + BATCH);
+      const masked = slice.map((s) => protectHtml(s.text));
+      const outs = await engineTranslate(masked.map((m) => m.masked), locale, "html");
+      slice.forEach((s, j) => {
+        const back = restoreHtml(outs[j], masked[j].holes);
+        if (back === null) { rejected.push(s); return; }   // keep English
+        save(s, back);
+      });
+    }
+    console.log(`  second try as HTML: ${retry.length - rejected.length} of ${retry.length} saved`);
+  }
+  rejected = rejected.map((s) => s.text);
   saveMemory(mem);
   console.log(`  wrote ${path.relative(ROOT, MEM)} — ${Object.keys(mem.entries).length} entries`);
   if (rejected.length) {
