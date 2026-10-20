@@ -99,6 +99,8 @@ function collect() {
     add("data", p.flag, `${b}.flag`);
     add("data", p.classLabel, `${b}.classLabel`);
     add("data", p.barrier, `${b}.barrier`);
+    // a partner's acknowledgement, shown in its own card (20 Oct 2026)
+    add("data", p.acknowledgement, `${b}.acknowledgement`);
     const d = p.detail || {};
     add("data", d.volumeNote, `${b}.detail.volumeNote`);
     add("data", d.useCase, `${b}.detail.useCase`);
