@@ -13,7 +13,7 @@
  *
  * Output, ready for build-public-site.sh to copy:
  *
- *   dist/locale/fr/illustrated-journey-dashboard.html
+ *   dist/locale/fr/index.html
  *   dist/locale/fr/data/{products,sources}.js
  *   dist/locale/fr/data/  every other data file the page loads, unchanged
  *   dist/locale/pt/...
@@ -53,7 +53,7 @@ const { requireFresh, problems, assemble, reviewed, escHtml, placeIn } = require
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "dist", "locale");
-const PAGE = "illustrated-journey-dashboard.html";
+const PAGE = "index.html";
 const MEM = path.join(ROOT, "i18n", "translations.json");
 const COUNTRY_NAMES = path.join(ROOT, "i18n", "country-names.json");
 // Adding a language: docs/jackson/spanish.md §4 lists every place it goes.

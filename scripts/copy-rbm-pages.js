@@ -74,7 +74,7 @@ function main(argv) {
         ...d.changed.map((r) => `  changed  ${r}   (${who(r)})`),
         ...d.missing.map((r) => `  deleted  ${r}`),
         ...d.added.map((r) => `  added    ${r}   (${who(r)})`),
-        "Move those changes into launch-development-test (the page is illustrated-journey-dashboard.html),",
+        "Move those changes into launch-development-test (the page is index.html),",
         "rebuild, check the new build has them, then run this again with --force.",
       ]);
     }

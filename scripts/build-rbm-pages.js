@@ -57,7 +57,7 @@ const { applySkin } = require("./rbm-skin");
 const { LOCALES, BUILT, MANIFEST, fingerprint, manifestOf } = require("./rbm-manifest");
 
 const ROOT = path.resolve(__dirname, "..");
-const PAGE = "illustrated-journey-dashboard.html";
+const PAGE = "index.html";
 const OUT = path.join(ROOT, "dist", "rbm");
 const args = process.argv.slice(2);
 const argOf = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };

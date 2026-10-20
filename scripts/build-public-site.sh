@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Builds the public deploy output: every public-facing HTML page (root,
-# unitaid/, synthetic/, and the fr/, pt/ and es/ editions of the illustrated
-# journey dashboard) plus the data/ and assets/ files they load.
+# Builds the public deploy output: every public-facing HTML page (root, and
+# the fr/, pt/ and es/ editions of the illustrated journey dashboard,
+# index.html) plus the data/ and assets/ files they load.
+#
+# illustrated-journey-dashboard.html is the dashboard as it was before the
+# Launch v1.0 changes, kept so its address still works. Nothing links to it.
 #
 # Deliberately excluded, and never copied here: briefs/, sourcing/, ontology/,
 # docs/, history/, powerbi/, streamlit-app/, scripts/ itself, and repo files
@@ -18,22 +21,14 @@ set -euo pipefail
 
 OUT=public-site
 rm -rf "$OUT"
-mkdir -p "$OUT/data" "$OUT/assets/journey-icons" "$OUT/unitaid/assets" "$OUT/synthetic"
+mkdir -p "$OUT/data" "$OUT/assets/journey-icons"
 
 # Root pages
 cp index.html explainer.html option-b.html pipeline.html \
    widget.html illustrated-journey-dashboard.html feed.xml "$OUT/"
 
-# unitaid/ edition
-cp unitaid/index.html unitaid/option-b.html unitaid/pipeline.html "$OUT/unitaid/"
-cp unitaid/assets/unitaid-logo.svg "$OUT/unitaid/assets/"
-
-# synthetic/ edition
-cp synthetic/index.html synthetic/option-b.html synthetic/pipeline.html \
-   synthetic/widget.html "$OUT/synthetic/"
-
 # Shared data
-cp data/products.js data/products.synthetic.js data/world-map.js \
+cp data/products.js data/world-map.js \
    data/world-map-geo.js \
    data/sources.js data/treatment-policy.js "$OUT/data/"
 

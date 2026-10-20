@@ -37,7 +37,7 @@ on:
     # in i18n/: the bot's own commit (content.en.json, translations.json)
     # must not start it again.
     paths:
-      - illustrated-journey-dashboard.html
+      - index.html
       - data/products.js
       - data/sources.js
       - scripts/assemble-content.js

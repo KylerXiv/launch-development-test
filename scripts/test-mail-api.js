@@ -121,7 +121,7 @@ const REPORT = {
   name: "Amina",
   email: "amina@moh.example",
   organisation: "Ministry of Health",
-  page: { url: "https://" + HOST + "/illustrated-journey-dashboard.html", path: "/illustrated-journey-dashboard.html", title: "LAUNCH", view: "illustrated" },
+  page: { url: "https://" + HOST + "/index.html", path: "/index.html", title: "LAUNCH", view: "illustrated" },
   data: { lastUpdated: "2026-09-20", dataStatus: "draft" },
   submittedAt: "2026-10-02T10:00:00.000Z",
   userAgent: "Mozilla/5.0 test"
@@ -236,7 +236,7 @@ group("subscribe — a new address goes straight onto the list", async () => {
   ok("  offered to whoever did not sign up, too", welcome.text.includes(`Didn't sign up, or don't want these emails? https://${HOST}/api/unsubscribe?t=${unsub}`));
   is("  and the mail app's own one-click unsubscribe", welcome.headers,
      { "List-Unsubscribe": `<https://${HOST}/api/unsubscribe?t=${unsub}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" });
-  ok("  and a link to the dashboard on this site", welcome.html.includes(`https://${HOST}/illustrated-journey-dashboard.html`));
+  ok("  and a link to the dashboard on this site", welcome.html.includes(`href="https://${HOST}/"`));
   ok("  and never the page address the visitor sent", !JSON.stringify(r.calls).includes("/x\""));
   is("  the team is told", team.to, ["team@example.org"]);
   ok("  who, and that it is not a returning subscriber", team.text.includes("Email address: reader@example.org") && team.text.includes("Subscriber: New") && team.text.includes("Mailing list: " + mail.SEGMENT_NAME));
@@ -387,7 +387,7 @@ group("partners — RBM's pages, on another site (CORS)", async () => {
 
     r = await call(subscribe, { headers: from("https://" + HOST), body: SUB, answer: [NO_CONTACT] });
     is("the LAUNCH site's own page needs no CORS header", [r.status, r.headers["access-control-allow-origin"]], [200, undefined]);
-    ok("  and its welcome links to this site's page", r.calls[2].body.html.includes(`href="https://${HOST}/illustrated-journey-dashboard.html"`));
+    ok("  and its welcome links to this site's page", r.calls[2].body.html.includes(`href="https://${HOST}/"`));
   } finally {
     mail.PARTNERS.splice(0, mail.PARTNERS.length, ...SHIPPED_PARTNERS);
   }
@@ -422,7 +422,7 @@ group("the team's emails, laid out as a form", async () => {
   ok("  a hosted logo with no site to load it from: the name stands in", bare.html.includes(">Unitaid</span>") && !bare.html.includes("<img"));
   ok("  a readable time, not an ISO stamp", /Signed up: \d{1,2} [A-Z][a-z]{2} \d{4}, \d\d:\d\d UTC/.test(team.text) && !/\d{4}-\d\d-\d\dT/.test(team.text + team.html));
   ok("  the list by name, not by id", team.text.includes("Mailing list: " + mail.SEGMENT_NAME) && !team.html.includes("seg_123"));
-  ok("  the page they signed up on is a link, because this code built it", team.html.includes(`href="https://${HOST}/illustrated-journey-dashboard.html"`));
+  ok("  the page they signed up on is a link, because this code built it", team.html.includes(`href="https://${HOST}/"`));
   ok("  the address they typed is not a link", !/href="[^"]*reader@example\.org/.test(team.html));
   ok("  and a footer", team.html.includes("Sent automatically when someone subscribes"));
 
@@ -475,7 +475,7 @@ group("feedback — the team's email", async () => {
   ok("  subject carries type, medicine and the same reference",
      c.body.subject === `[LAUNCH feedback] A data point looks wrong — Coartem Baby (${r.json.ref})`, c.body.subject);
   ok("  text body carries the message", c.body.text.includes(REPORT.message));
-  ok("  and the page it came from", c.body.text.includes("Page: https://" + HOST + "/illustrated-journey-dashboard.html"));
+  ok("  and the page it came from", c.body.text.includes("Page: https://" + HOST + "/index.html"));
   ok("  and the data version the visitor saw", c.body.text.includes("Data version: 2026-09-20 · draft"));
   is("  and is tagged for filtering in Resend", c.body.tags, [{ name: "form", value: "feedback" }]);
   const r2 = await call(feedback, { body: REPORT });

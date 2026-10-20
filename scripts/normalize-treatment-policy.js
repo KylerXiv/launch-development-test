@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // WHO national treatment-policy normalizer — turns the World Malaria Report
 // antimalarial drug policy annex (Annex 4B) into the dataset behind the
-// "Show MFT policy" switch on illustrated-journey-dashboard.html:
+// "Show MFT policy" switch on index.html:
 //   node scripts/normalize-treatment-policy.js [path-to-annex-csv]
 //
 // Where the input comes from (the one manual step — ~2 minutes, once a year

@@ -6,7 +6,7 @@
 // "Unitaid Brand Integration"). docs/unitaid-brand-rbm-notes.md has the
 // decisions and the numbers.
 //
-// Same approach as build-unitaid-theme.js: the page's own CSS is left alone and
+// Same approach as the old Unitaid brand edition: the page's own CSS is left alone and
 // a stylesheet that comes after it redefines the design tokens and restyles the
 // components, so the skin follows any change to the source page on the next
 // build. Text and layout are the page's own; only colours, type and the weight

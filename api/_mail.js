@@ -47,7 +47,7 @@ const SEGMENT_NAME = "LAUNCH dashboard updates";
 const ORG_PROPERTY = "organisation";
 
 // The page every email and every unsubscribe page links back to.
-const DASHBOARD = "/illustrated-journey-dashboard.html";
+const DASHBOARD = "/";
 
 // Other sites whose copies of the illustrated journey may post to these
 // functions: RBM's pages, built by scripts/build-rbm-pages.js with --api-url

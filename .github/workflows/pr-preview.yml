@@ -139,7 +139,7 @@ jobs:
         run: |
           MARK='<!-- proposal-preview -->'
           if [ "$STATUS" = "success" ] && [ -n "$URL" ]; then
-            PAGE=illustrated-journey-dashboard.html
+            PAGE=index.html
             BODY=$(printf '%s\n' "$MARK" \
               "### Public dashboard preview" "" \
               "This preview shows what the public dashboard will look like if this pull request is merged." "" \

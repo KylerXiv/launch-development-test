@@ -13,7 +13,7 @@ const path = require("path");
 const vm = require("vm");
 const { transform, widget, loader, messages } = require("./build-rbm-pages");
 
-const html = fs.readFileSync(path.join(__dirname, "..", "illustrated-journey-dashboard.html"), "utf8");
+const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const widgetJs = fs.readFileSync(path.join(__dirname, "..", "assets", "report-issue.js"), "utf8");
 const API = "https://api.example.org";
 let passed = 0, failed = 0;
