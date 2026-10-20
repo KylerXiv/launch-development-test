@@ -2003,9 +2003,13 @@
   // The comparison with each medicine's own dates (the years-late badge, the
   // box at the top of an open row, and the Time taken view with its Variance
   // column) is hidden at the partners' request (feedback email, 15 Oct 2026)
-  // until the benchmark method is agreed. The expected time under each stage
-  // on the pathway strip stays (owner's choice). true brings all three back.
+  // until the benchmark method is agreed. true brings all three back.
   const YARD_COMPARE = false;
+  // The expected time under each stage on the pathway strip ("2 years
+  // expected"), and its words in the stage's screen-reader label. Kept on
+  // 15 Oct 2026, hidden for every stage at the owner's request on 20 Oct 2026;
+  // the yardstick data is unchanged. true brings it back.
+  const SHOW_STAGE_EXPECTED = false;
   // How far a step ran past its expected time, as a plain signed number.
   const varianceText = n => "+" + yrsText(n);
   // Market Access is every stage before country registration; Country
@@ -2127,7 +2131,7 @@
   // "Clock starts here") were removed by request on 15 Oct 2026, pending final
   // timeline wording from the partners. .pathexp.none is kept for that.
   function pathExpHtml(i) {
-    if (!YARD) return "";
+    if (!YARD || !SHOW_STAGE_EXPECTED) return "";
     const e = YARD.expected[i];
     if (e) return `<span class="pathexp"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></svg><b>${yrsText(e.years)}</b> expected</span>`;
     return "";
@@ -2285,7 +2289,7 @@
     // aria-label stays one phrase the translation collector can find whole
     // (written inline, the nested quotes cut it apart and it stayed English).
     const phase = stacked ? "" : ` data-phase="${phaseOf(i)}"`;
-    const exp = YARD && YARD.expected[i] ? ", expected " + yrsText(YARD.expected[i].years) : "";
+    const exp = SHOW_STAGE_EXPECTED && YARD && YARD.expected[i] ? ", expected " + yrsText(YARD.expected[i].years) : "";
     return `<button class="pathnode${stacked ? " pathnode-sm" : ""}" type="button" aria-expanded="false" aria-controls="gatewrap"
       data-gate="${i}"${phase} aria-label="Stage ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ? ", " + n + " delayed" : ""}.">` +
       `<span class="pill">${stageIconImg(i, "")}<span class="nb" aria-hidden="true">${stepNo(i)}</span></span><span class="plabel">${esc(s)}</span>${pathExpHtml(i)}</button>`;

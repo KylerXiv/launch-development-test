@@ -72,6 +72,20 @@ stays specific.
 `contentHash` is unchanged at `e9fa14d1…`, because `where` is excluded from
 it by design (`assemble-content.js`, `contentHashOf`).
 
+**Expected time under each stage: hidden on `index.html` (owner, 20 Oct
+2026).** The pathway strip's "N years expected" tags (2, 1.5, 2, 2, 2, 3),
+kept on 15 Oct (`01b213a`), are gone from every stage. The words also go from
+each stage button's screen-reader label (", expected 2 years"). A new switch,
+`SHOW_STAGE_EXPECTED = false`, sits beside `YARD_COMPARE`. This follows the
+v1.0 pattern: hidden, not deleted. The other route was to remove the
+`yardstick` block from `data/products.js`. It was rejected for three reasons:
+`illustrated-journey-dashboard.html` (kept unchanged) reads the same file and
+would lose its tags too, a data edit moves `lastUpdated` and emails
+subscribers, and turning the tags back on would then mean restoring data.
+The translated strings ("expected") are untouched, so the fr/pt/es pages
+follow and `contentHash` is unchanged. Checked headless (Chrome, file URL):
+9 stage buttons, 0 tags rendered, 0 labels with "expected".
+
 ## 2. Deferred, or left alone on purpose
 
 - `data/sources.js` line 7 and `data/products.synthetic.js` lines 11-12 still
