@@ -18,6 +18,7 @@
     { "file": "illustrated-journey-dashboard.html", "src": "\"h\">Not started · ${notStarted.length}<", "en": "Not started · ${notStarted.length}" },
     { "file": "illustrated-journey-dashboard.html", "src": "group(\"Reached · year not recorded\"", "en": "Reached · year not recorded" },
     { "file": "illustrated-journey-dashboard.html", "src": "group(\"Ongoing · no date\"", "en": "Ongoing · no date" },
+    { "file": "illustrated-journey-dashboard.html", "src": "group(\"Not yet dated\"", "en": "Not yet dated" },
     { "file": "illustrated-journey-dashboard.html", "src": ".join(\" and \")", "en": "and" },
     { "file": "illustrated-journey-dashboard.html", "src": "${esc(names)} — independent approvals with no defined order between them", "en": "${esc(names)} — independent approvals with no defined order between them" },
     { "file": "illustrated-journey-dashboard.html", "src": "${esc(names)} — independent approvals, no defined order between them", "en": "${esc(names)} — independent approvals, no defined order between them" },
