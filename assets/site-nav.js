@@ -31,7 +31,7 @@
   "use strict";
 
   var PAGES = [
-    { id: "illustrated", href: "illustrated-journey-dashboard.html", name: "Illustrated journey", desc: "Follow each medicine through the seven stages to patients." },
+    { id: "illustrated", href: "index.html", name: "Illustrated journey", desc: "Follow each medicine through the seven stages to patients." },
     { id: "pipeline", href: "pipeline.html", name: "Pipeline", desc: "Where each product is, trial to launch." }
   ];
 
@@ -54,13 +54,6 @@
   // A translated copy declares its language on <html lang>; the English page says "en".
   var curLang = ((document.documentElement.lang || "en").toLowerCase().split("-")[0]);
   if (!LANGS.some(function (l) { return l.code === curLang; })) curLang = "en";
-
-  // The Unitaid and synthetic editions are generated copies in subfolders and do
-  // not include the illustrated journey page, so leave it out there rather than
-  // link to a page that is not built.
-  if (/\/(unitaid|synthetic)\//.test(location.pathname)) {
-    PAGES = PAGES.filter(function (p) { return p.id !== "illustrated"; });
-  }
 
   var CSS = [
     ".sitenav{position:relative;display:block;background:var(--surface,#fff);border-bottom:1px solid var(--line,#DCE3E7);padding-inline:var(--nav-pad,clamp(24px,4vw,64px));font:15px/1.5 -apple-system,'Segoe UI',system-ui,Roboto,'Helvetica Neue',sans-serif}",

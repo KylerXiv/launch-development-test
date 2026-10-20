@@ -286,7 +286,7 @@
     c.addEventListener("focus", show);
     c.addEventListener("mouseleave", hideTip);
     c.addEventListener("blur", hideTip);
-    c.addEventListener("click", () => location.href = "illustrated-journey-dashboard.html#" + encodeURIComponent(c.dataset.id));
+    c.addEventListener("click", () => location.href = "index.html#" + encodeURIComponent(c.dataset.id));
   });
   document.querySelectorAll(".pcard.pending").forEach(c => {
     const show = () => showTipAt(c, `<b>Planned</b>${esc(c.dataset.note)}`);

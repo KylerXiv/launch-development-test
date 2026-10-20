@@ -1889,7 +1889,7 @@
 
     $("prevHost").innerHTML = "";
     $("prevHost").appendChild(el("div", "prev-empty", "Loading the journey page…"));
-    fetch("illustrated-journey-dashboard.html", { cache: "no-store" })
+    fetch("index.html", { cache: "no-store" })
       .then(function (r) {
         if (!r.ok) throw new Error("HTTP " + r.status);
         return r.text();
@@ -1904,7 +1904,7 @@
       .catch(function (e) {
         $("prevHost").innerHTML = "";
         $("prevHost").appendChild(el("div", "prev-empty",
-          "Could not load illustrated-journey-dashboard.html — " + e.message));
+          "Could not load index.html — " + e.message));
       });
   }
 

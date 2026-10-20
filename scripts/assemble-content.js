@@ -43,7 +43,7 @@ const path = require("path");
 const { key, digest } = require("./i18n-hash");
 
 const ROOT = path.resolve(__dirname, "..");
-const PAGE = "illustrated-journey-dashboard.html";
+const PAGE = "index.html";
 const GLOBALS = {
   "data/products.js": "window.LAUNCH_DATA",
   "data/sources.js": "window.LAUNCH_SOURCES",

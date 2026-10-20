@@ -434,7 +434,7 @@
   <div class="tablewrap"><table>
     <thead><tr><th>View</th><th>Page</th><th>What it's for</th></tr></thead>
     <tbody>
-      <tr><td>Journey board</td><td class="pathfile">index.html</td><td><strong>Design Option A (default).</strong> One row per medicine, its full pathway left to right. Emphasises each product's story. Has the country map, timing chart, CSV download, glossary tooltips, print view, and the Recent updates panel.</td></tr>
+      <tr><td>Illustrated journey</td><td class="pathfile">index.html</td><td><strong>The production page.</strong> Follows each medicine through the seven stages to patients. The only view that is translated (French, Portuguese, Spanish), with the MapLibre country map and the Subscribe and Send feedback forms.</td></tr>
       <tr><td>Comparison matrix</td><td class="pathfile">option-b.html</td><td><strong>Design Option B.</strong> Stages as rows, medicines as columns — emphasises cross-product comparison at each gate. Same data, distinct visual identity.</td></tr>
       <tr><td>Pipeline poster</td><td class="pathfile">pipeline.html</td><td>The whole portfolio laid out MMV-poster style, by development phase (Preclinical → Approved &amp; scaling up), with a prevention lane. Complementary — not part of the A/B decision.</td></tr>
       <tr><td>Widget</td><td class="pathfile">widget.html</td><td>An embeddable one-row tracker for partner sites (<code>?product=aspy</code> etc.) — an iframe snippet drops a live single-medicine tracker into any web page.</td></tr>
@@ -689,8 +689,8 @@
   <h3>How a page renders</h3>
   <p>Each page is self-contained: design tokens and components in a <code>&lt;style&gt;</code> block, an HTML skeleton, and one render script that reads the data object and builds the DOM — deriving the summary stats from the data (so they can never disagree with the board), drawing the stage tracks, wiring tooltips and keyboard access, painting the country map from generated Natural Earth geometry, and positioning the timing chart with plain percent-positioned elements (no chart library). Every interpolated data value passes through an escaping function; status is always shape + color, never color alone; both light and dark themes are handled at the token level.</p>
 
-  <h3>Generated editions — regenerate, don't hand-edit</h3>
-  <p>Three builder scripts each read the original pages and write a themed or re-datasourced copy into a committed folder: <span class="pathfile">unitaid/</span> (brand-token override appended as the last stylesheet, so the skin can't drift from the source), <span class="pathfile">synthetic/</span> (points at the fictional dataset, adds an unmissable purple warning strip), and <span class="pathfile">v2/</span> (points at the proposal dataset, adds a preview strip; the whole edition is deleted once the data is signed off and merged). The iron rule for all committed build output — editions, map geometry, history snapshots, feeds, briefs, CSV exports: <strong>rerun the builder, never edit the output.</strong></p>
+  <h3>Generated files — regenerate, don't hand-edit</h3>
+  <p>The iron rule for all committed build output — map geometry, history snapshots, feeds, briefs, CSV exports: <strong>rerun the builder, never edit the output.</strong></p>
 
   <h3>The four CI workflows</h3>
   <div class="tablewrap"><table>

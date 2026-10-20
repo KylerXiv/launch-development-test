@@ -30,7 +30,8 @@ every page still works without them.
 
 | Path | Role |
 | --- | --- |
-| `index.html` | Design option A (journey board): CSS (design tokens + components), HTML skeleton, and the render script. The full-featured page (glossary, CSV, print, timing chart, country map, schema.org JSON-LD injection for crawlers — skipped when `meta.synthetic`). |
+| `index.html` | The illustrated journey, the production page (moved here from `illustrated-journey-dashboard.html` on 20 Oct 2026; see `docs/dashboard-at-index-notes.md`). The only page that is translated (`fr/`, `pt/`, `es/` built from it), built for RBM, and carries the Subscribe and Send feedback forms and the MapLibre country map. |
+| `illustrated-journey-dashboard.html` | The illustrated journey as it was before Launch v1.0 (commit `174b68e`), kept so its address still works. Deployed, but nothing links to it and nothing is built or translated from it. Do not edit it; change `index.html`. |
 | `option-b.html` | Design option B (comparison matrix): a standalone layout study for client review. Same data contract, feature subset. See §10. |
 | `pipeline.html` | Pipeline poster view (MMV-style phase columns), complementary to A/B rather than competing. Placement driven by each product's `phase` field; cards deep-link to `index.html#<id>`. Single-theme poster by design. |
 | `story.html` | Scroll-driven data story. Steps (left) drive a sticky layered visual (right) via IntersectionObserver (guarded — no IO means step 0 stays active). Every figure is derived from the data at render time — the hero product is `pyramax` falling back to the first `market` product, the headline gap is computed from its `journey`, so the narrative self-updates. Count-up respects `prefers-reduced-motion`. |
@@ -78,8 +79,6 @@ every page still works without them.
 | `powerbi/` | Power BI kit: live Power Query (M) scripts against the Pages data URL, CSV exports + generator, LAUNCH report theme, DAX measures, page-by-page build guide. Self-documented in its own README. See §11. |
 | `scripts/make-brief.js` | Generates the quarterly "what changed" brief into `briefs/` (diffs stage statuses against the closest `history/` snapshot before the window). |
 | `briefs/` | Generated what-changed briefs; `latest.md` is the stable pointer. |
-| `unitaid/` | **Generated** Unitaid brand edition (journey board, matrix, poster, story) per brandpad.io/unitaid. Never hand-edit — rerun the builder. Reads the same `../data/` files, so data pushes update it automatically; only *structural* changes to the source pages need a rebuild. |
-| `scripts/build-unitaid-theme.js` | Rebuilds `unitaid/` from the current source pages: appends a brand-token override layer (pinned across all theme states), Source Sans 3, preview strip, official logo bar (unmodified lockup from brandpad.io in unitaid/assets/), path/link fixes. |
 | `decks/` (gitignored) | Local-only stakeholder briefing decks (.pptx) — deliberately kept out of the public repository. |
 | `docs/` | This documentation set, including the remaining-tasks checklist. |
 | `UPDATING.md` | Pointer to the data-analyst guide (kept for old links). |
@@ -100,6 +99,11 @@ in [data-model.md](data-model.md). The renderer and validator must agree on
 the schema; change both together.
 
 ## 4. Rendering pipeline (`index.html`, bottom `<script>`)
+
+> **Out of date.** This section describes the journey board (design option A)
+> that was `index.html` until 20 Oct 2026. `index.html` is now the illustrated
+> journey, whose rendering is not written up here yet. See
+> `docs/dashboard-at-index-notes.md`.
 
 Order matters:
 
@@ -294,7 +298,7 @@ No test framework by design; two layers instead:
   set). The renderer colors countries from `detail.countries.list` and shows a
   warning overlay unless `countries.status === "verified"` — the map can never
   silently present unverified coverage. Self-contained by design: no tiles, no
-  CDN — **except `illustrated-journey-dashboard.html`**, which loads MapLibre
+  CDN — **except the illustrated journey (`index.html`)**, which loads MapLibre
   GL JS from a CDN for its own map rendering only (see below); the other 11 pages sharing
   `data/world-map.js` are unaffected and remain fully self-contained.
 - **Resistance overlay** (removed 1 Oct 2026, on both lines of work): the WHO
@@ -405,9 +409,8 @@ shows the dialog's failure message, with the report kept for a retry. Keep
 the reference: reporters quote it, and it is in the subject line of the
 team's copy.
 
-The `unitaid/` edition picks the form up automatically — the builder rewrites
-`src="assets/` to `src="../assets/`, and the component is themed entirely
-through the design tokens, so it inherits the brand skin with no extra rules.
+The component is themed entirely through the design tokens, so a page's own
+skin (the RBM skin, for one) applies to it with no extra rules.
 
 ## 10. Design options (temporary, during client review)
 
