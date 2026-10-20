@@ -168,9 +168,35 @@ amber ring and ›.
   amber only. Translation is unchanged (100%); the pipeline page already shows
   no red (its `SHOW_BARRIERS`).
 
-Noticed, not touched: on ASPY's timeline the "2012" under Stringent
-Regulatory Approval overlaps the WHO PQ listing icon stacked under it. That
-layout predates this branch.
+**Timeline blocks no longer overlap or get cut off (owner, 20 Oct 2026).**
+On the Actual timeline, stages less than 21% apart on the axis stack in
+tiers. The tiers used a fixed gap (`TH = 104`px), and the box reserved a fixed
+126px for the last block. Both were estimates for English, and two timelines
+broke them in all four languages:
+- **ASPY:** the SRA block (icon, three label lines, "2012") is 110px, so its
+  year ran under the WHO PQ listing icon stacked below it.
+- **GanLum:** the current-stage block, with "Not started" and the "since R&D
+  and Clinical (2025) · 1 year" line, is 165px in English and 201px in
+  French. Its last lines were cut off under "More detail"; in French the
+  whole "since" line was hidden.
+
+Fix: `fitTimeline()` measures the blocks once a timeline is visible. Each
+tier goes under the tallest block of the tier above, with a 10px gap, and the
+box grows to hold the last one, never shrinking below the old estimate.
+- **When it runs.** Rows start closed, so a `ResizeObserver` runs it on a
+  timeline's first non-zero width and again if the width changes. That covers
+  opening a row, switching back to Actual timeline, and resizing. Its own
+  height change does not change its width, so it cannot loop.
+- **Late fonts.** `document.fonts.ready` refits open timelines, for a web font
+  that arrives late (RBM's skin).
+- **Rejected: a bigger fixed `TH`.** Any fixed number is a guess at the
+  longest translation, and it adds empty space to every stacked timeline.
+
+Checked with every timeline open in en, fr, pt and es: no overlapping blocks
+and nothing past its box. The test harness measured the first page it loaded
+before the observer had run, whichever page that was; the same page loaded
+second was correct. Screenshots of the real pages loaded directly: ASPY en
+and es, GanLum en and fr. No translated text changed.
 
 ## 2. Deferred, or left alone on purpose
 
