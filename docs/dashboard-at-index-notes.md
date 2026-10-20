@@ -143,6 +143,35 @@ change the translate bot would make. The French headers now say "Stade
 actuel" where the combined header said "Étape actuelle". That is the
 existing translation of "Current stage", not a new one.
 
+**No red: a delayed step is drawn as in progress (owner, 20 Oct 2026).**
+v1.0 hid the word "Delayed" but kept its symbols. The red diamond in the
+Journey column, the red ring and "!" on the timeline, and the red bars,
+chips, pills and panel edges all still said "delayed" without the word. Now
+ASPY's National policy adoption and DHA–PPQ's Procurement, the only two
+`late` stages (no milestone is `late`), look in progress everywhere: an
+amber ring and ›.
+- **How.** A new switch, `SHOW_LATE = false`, beside the other v1.0 switches.
+  It turns every `late` stage and milestone into `prog` in the page's own copy
+  of the data before anything is drawn.
+- **Why at load.** About eight places draw from the status (CSS classes
+  `md.late`, `s-late`, `dot.late`, `m-late`, the `.tsa` run, point and now
+  marker, `gatepanel.late`, `gp-pill.late`, `pill.late`). Changing each one was
+  rejected: one missed means one red mark left. One switch catches them all.
+- **What stays.** `data/products.js` and `dashboard.json` keep `late`, so
+  turning the switch back on restores the red.
+- **Consequences.** The CSV is unchanged: the status column was already empty
+  for ASPY and DHA–PPQ under `SHOW_PROGRESS`. With `SHOW_PROGRESS` back on and
+  `SHOW_LATE` still off, the two would read "In progress"; turn both on
+  together.
+- **Checked** headless: 0 `late` classes and 0 "!" markers in the rendered
+  page, 45 in-progress ones. Screenshot of the table with ASPY's timeline open:
+  amber only. Translation is unchanged (100%); the pipeline page already shows
+  no red (its `SHOW_BARRIERS`).
+
+Noticed, not touched: on ASPY's timeline the "2012" under Stringent
+Regulatory Approval overlaps the WHO PQ listing icon stacked under it. That
+layout predates this branch.
+
 ## 2. Deferred, or left alone on purpose
 
 - `data/sources.js` line 7 and `data/products.synthetic.js` lines 11-12 still
