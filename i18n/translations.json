@@ -7226,6 +7226,14 @@
       "pt": "Formação sobre um novo produto coformulado (mesmo esquema de 6 doses, 3 dias por semana, que o AL).",
       "es": "Capacitación sobre un nuevo producto coformulado (mismo esquema de 6 dosis, 3 días que AL)."
     },
+    "e966aea776e30937": {
+      "en": "Developed by Novartis with the scientific and financial support of MMV, and within the framework of the WANECAM2 consortium, funded by the European & Developing Countries Clinical Trials Partnership Programme supported by the European Union, with co-funding from the German Aerospace Center and the UK Department of Health and Social Care.",
+      "where": "products.products[0].acknowledgement",
+      "bucket": "data",
+      "fr": "Développé par Novartis avec le soutien scientifique et financier de MMV, et dans le cadre du consortium WANECAM2, financé par le programme de partenariat pour les essais cliniques entre l'Europe et les pays en développement, soutenu par l'Union européenne, avec un cofinancement du Centre aérospatial allemand et du ministère britannique de la Santé et des Affaires sociales.",
+      "pt": "Desenvolvido pela Novartis com o apoio científico e financeiro da MMV, e no âmbito do consórcio WANECAM2, financiado pelo Programa de Parceria para Ensaios Clínicos entre Países Europeus e em Desenvolvimento, apoiado pela União Europeia, com cofinanciamento do Centro Aeroespacial Alemão e do Departamento de Saúde e Assistência Social do Reino Unido.",
+      "es": "Desarrollado por Novartis con el apoyo científico y financiero de MMV, y en el marco del consorcio WANECAM2, financiado por el Programa de Asociación para Ensayos Clínicos en Países Europeos y en Desarrollo, con el apoyo de la Unión Europea y la cofinanciación del Centro Aeroespacial Alemán y el Departamento de Salud y Asistencia Social del Reino Unido."
+    },
     "e96d77688f4f2b69": {
       "en": "Samples carrying a resistance-associated genotype, % of those genotyped — for Pfkelch13 this counts WHO-validated markers of artemisinin partial resistance only, not every mutation found",
       "where": "markers.meta.metrics.molecularMarkers.full",
