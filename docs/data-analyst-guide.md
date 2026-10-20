@@ -98,6 +98,14 @@ Every stage and milestone uses one of four statuses:
 surface, not for routine waiting. The bar you must clear: could you defend the
 red light, with its written reason, to the manufacturer and to WHO?
 
+**For the 10 Nov 2026 release, the illustrated journey hides the words "In
+progress" and "Delayed" (except ALAQ's), and every `flag` and `barrier`.** The
+partners asked for it on 20 Oct 2026, until a status taxonomy and barrier
+definitions are agreed. Keep setting these fields exactly as above: the data,
+the validator and `dashboard.json` are unchanged, the › and ! symbols still
+show, and the text returns when the page's switches are turned back on
+([v1-status-barriers-notes.md](v1-status-barriers-notes.md)).
+
 ## 3. Provenance — the three fields that make the dashboard trustworthy
 
 | Field | Meaning | Rule |

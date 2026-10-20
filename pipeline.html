@@ -196,6 +196,11 @@
   document.getElementById("meta-note").textContent =
     status === "live" ? " · Data confirmed by manufacturers for public release" : " · " + status + " data";
 
+  // Barrier text is hidden for the 10 Nov 2026 release, as on the illustrated
+  // journey (SHOW_BARRIERS there, partner feedback 20 Oct 2026): no red dot,
+  // no barrier line in the tooltip, no legend key. true brings them back.
+  const SHOW_BARRIERS = false;
+
   const PHASES = [
     { key: "preclinical", label: "Preclinical", sub: "lab & animal studies" },
     { key: "phase1", label: "Phase I", sub: "safety, dose" },
@@ -227,8 +232,8 @@
         return `<button class="pcard" style="--cat:${cat.color}" data-id="${esc(p.id)}"
           data-use="${esc(p.detail.useCase)}"
           data-next="${esc(next ? (next.next !== "—" ? next.next : next.milestone) + (next.anticipated && next.anticipated !== "—" ? " · " + next.anticipated : "") : "")}"
-          data-flag="${esc(p.flag || "")}">
-          <div class="n">${p.flag ? '<span class="flagdot" title="Active bottleneck"></span>' : ""}${esc(p.name)}</div>
+          data-flag="${esc(SHOW_BARRIERS && p.flag || "")}">
+          <div class="n">${SHOW_BARRIERS && p.flag ? '<span class="flagdot" title="Active bottleneck"></span>' : ""}${esc(p.name)}</div>
           <div class="i">${esc(p.inn)}</div>
           <div class="m">${esc(p.manufacturer)}</div>
         </button>`;
@@ -254,8 +259,8 @@
     <span class="key"><span class="sw" style="background:var(--cat-newclass)"></span> New chemical class</span>
     <span class="key"><span class="sw" style="background:var(--cat-tact)"></span> Triple ACT</span>
     <span class="key"><span class="sw" style="background:var(--cat-market)"></span> Marketed, underutilized</span>
-    <span class="key"><span class="sw" style="background:var(--cat-prevention)"></span> Prevention (planned)</span>
-    <span class="key"><span class="flagdot"></span> Active bottleneck — see the illustrated journey</span>`;
+    <span class="key"><span class="sw" style="background:var(--cat-prevention)"></span> Prevention (planned)</span>${SHOW_BARRIERS ? `
+    <span class="key"><span class="flagdot"></span> Active bottleneck — see the illustrated journey</span>` : ""}`;
 
   // tooltip + click-through
   const tip = document.getElementById("tip");
