@@ -51,13 +51,29 @@ from the new page. The owner chose to drop it. That took with it:
 `data/products.synthetic.js` itself stays. CI still validates it, and
 `test-serializer.js` and the ontology build use it as test data.
 
-**The old page stays deployed.** `illustrated-journey-dashboard.html` is
-still copied into `public-site/`, so links in emails already sent and old
-bookmarks still open a page rather than a 404. That page is now the
-pre-v1.0 one, though, and shows "Delayed" and barrier text again to anyone
-who arrives that way. If that is not wanted, add a Vercel redirect from
-`/illustrated-journey-dashboard.html` to `/`. That leaves the file untouched
-but makes it unreachable.
+**The old page stays deployed, behind a redirect (follow-up, 21 Oct 2026).**
+`illustrated-journey-dashboard.html` is still copied into `public-site/`. But
+the file is the pre-v1.0 page. Anyone arriving at its address from an email
+already sent or an old bookmark would have seen "Delayed" and barrier text
+again, which v1.0 (#124) hid at the partners' request. `vercel.json` now
+redirects that address to `/`.
+
+The French, Portuguese and Spanish pages had the same problem in another
+form. This branch builds them as `/fr/index.html` and so on, and no longer
+builds `/fr/illustrated-journey-dashboard.html`. That address answered 200 on
+the live site on 21 Oct 2026, so without a redirect it would have become a
+404. A second rule sends `/:lang(fr|pt|es)/illustrated-journey-dashboard.html`
+to `/:lang/`.
+
+- **Temporary (307), not permanent (308).** Browsers cache a permanent
+  redirect with no expiry. If the owner wants the old address back while the
+  site is still in testing, people who had already followed a 308 would keep
+  being sent to `/`. Make the redirects permanent at go-live.
+- **The file is not deleted from the build.** Removing it would have the
+  same effect for visitors. But the redirect is two lines to undo, and keeps
+  Keith's choice to leave the file in place.
+- Vercel applies `redirects` before it looks for a file, so the redirect wins
+  even though the file is still deployed. Checked on this follow-up's preview.
 
 **Email link is `/`, not `/index.html`.** `api/_mail.js` `DASHBOARD` was
 `/illustrated-journey-dashboard.html` and is now `/`, the cleaner public
@@ -260,6 +276,9 @@ Checked against the data-flow note "Three repositories, one direction"
 
 ## 4. Status
 
+- **Follow-up, 21 Oct 2026:** branch `fix/old-dashboard-redirects` on top of
+  `fba200d` adds the two redirects (`vercel.json`) and this file's redirect
+  paragraph. It is meant to merge straight after #125.
 - Branch `feat/dashboard-at-index`, four commits (move to `index.html`,
   expected time, grey line, Status column), pushed for a PR into `main`.
 - Verify block: treatment policy byte-identical. Validator: 0 errors, 1

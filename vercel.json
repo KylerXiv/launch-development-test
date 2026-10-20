@@ -1,4 +1,8 @@
 {
   "buildCommand": "bash scripts/build-public-site.sh",
-  "outputDirectory": "public-site"
+  "outputDirectory": "public-site",
+  "redirects": [
+    { "source": "/illustrated-journey-dashboard.html", "destination": "/", "permanent": false },
+    { "source": "/:lang(fr|pt|es)/illustrated-journey-dashboard.html", "destination": "/:lang/", "permanent": false }
+  ]
 }
