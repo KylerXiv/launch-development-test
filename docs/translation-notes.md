@@ -355,6 +355,15 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
   legend line "Border = the selected medicine is in the country's national
   treatment policy (solid: first…". It needs translating by hand in
   `i18n/translations.json`, or a re-run.
+- **20 Oct:** a new `GOOGLE_API_KEY` replaced the one Google no longer
+  recognised (every translate run since 15 Oct had failed with "API Key not
+  found"). The bot's rerun translated 173 / 172 / 172 waiting strings into
+  fr / pt / es; Google lost the ⟦n⟧ token in 11 of them. `translate-strings.js`
+  now sends those again as HTML, each hole and protected term inside
+  `<span translate="no">`, and keeps the result only if every hole comes back
+  exactly once. Tested locally: all 11 saved. Translation is Google only: no
+  hand-written translation is on the page (Kyler's three of 30 Sep belong to
+  English that has since changed).
 
 What follows is the status as recorded before the merge:
 
