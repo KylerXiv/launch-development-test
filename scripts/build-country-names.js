@@ -2,7 +2,7 @@
 /**
  * scripts/build-country-names.js
  *
- * Writes i18n/country-names.json: the French, Portuguese and Spanish name of
+ * Writes i18n/country-names.json: the French and Portuguese name of
  * every country and territory the dashboard draws or lists, keyed by the
  * English name exactly as the data files spell it.
  *
@@ -12,17 +12,17 @@
  * Names come from the Unicode CLDR, through Node's own ICU (Intl.DisplayNames),
  * looked up by ISO code. They are never sent to a translation engine: a country
  * name is reference data with a standard form, not prose. Portuguese is pt-PT,
- * the same variety as the /pt page; Spanish is general "es", as on /es.
+ * the same variety as the /pt page.
  *
  * Keyed by the English name, not by ISO3, because the map files give a few
  * territories their country's code (Ashmore and Cartier Islands is AUS) and use
  * short forms ("Dem. Rep. Congo") next to the WHO long forms in
  * treatment-policy.js ("Democratic Republic of the Congo"). Every spelling gets
- * its own entry, and the French, Portuguese and Spanish for all of them are
+ * its own entry, and the French and Portuguese for all of them are
  * CLDR's one standard name for the code.
  *
- * Read by scripts/build-locale-pages.js, which renames countries in its French,
- * Portuguese and Spanish copies of data/world-map-geo.js, data/world-map.js and
+ * Read by scripts/build-locale-pages.js, which renames countries in its French
+ * and Portuguese copies of data/world-map-geo.js, data/world-map.js and
  * data/treatment-policy.js. A name the table does not have stays in English
  * and the locale build lists it; --check fails on it, so a new country in the
  * data cannot go unnoticed.
@@ -33,7 +33,7 @@ const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "i18n", "country-names.json");
-const LANGS = { fr: "fr", pt: "pt-PT", es: "es" };
+const LANGS = { fr: "fr", pt: "pt-PT" };
 
 // ISO 3166-1 alpha-3 -> alpha-2, for the codes the data files use.
 const ISO2 = {
@@ -65,25 +65,23 @@ const ISO2 = {
 
 // Names CLDR has no code for, written by hand.
 const BY_HAND = {
-  "Ashmore and Cartier Is.": { fr: "Îles Ashmore-et-Cartier", pt: "Ilhas Ashmore e Cartier", es: "Islas Ashmore y Cartier" },
+  "Ashmore and Cartier Is.": { fr: "Îles Ashmore-et-Cartier", pt: "Ilhas Ashmore e Cartier" },
 };
 // CLDR's standard name is its colloquial form for a few codes ("Congo-Kinshasa",
 // "R.A.S. chinoise de Hong Kong", "Myanmar (Birmanie)"). The dashboard follows
-// the WHO documents it cites, which use the forms below. (Spanish CLDR already
-// gives these forms for CD and CG; they are listed anyway, as for the others.
-// Its "Côte d’Ivoire" is the WHO form, as in French.)
+// the WHO documents it cites, which use the forms below.
 const BY_CODE = {
-  CD: { fr: "République démocratique du Congo", pt: "República Democrática do Congo", es: "República Democrática del Congo" },
-  CG: { fr: "Congo", pt: "Congo", es: "Congo" },
-  HK: { fr: "Hong Kong", pt: "Hong Kong", es: "Hong Kong" },
-  MO: { fr: "Macao", pt: "Macau", es: "Macao" },
-  MM: { fr: "Myanmar", pt: "Mianmar", es: "Myanmar" },
+  CD: { fr: "République démocratique du Congo", pt: "República Democrática do Congo" },
+  CG: { fr: "Congo", pt: "Congo" },
+  HK: { fr: "Hong Kong", pt: "Hong Kong" },
+  MO: { fr: "Macao", pt: "Macau" },
+  MM: { fr: "Myanmar", pt: "Mianmar" },
   CI: { pt: "Costa do Marfim" },
 };
 // A qualifier the WHO annex adds to a name (Tanzania is split into mainland and
 // Zanzibar there); the CLDR name gets the same qualifier.
 const QUALIFIERS = [
-  { en: " (mainland)", fr: " (partie continentale)", pt: " (parte continental)", es: " (parte continental)" },
+  { en: " (mainland)", fr: " (partie continentale)", pt: " (parte continental)" },
 ];
 
 function readGlobal(rel, marker) {

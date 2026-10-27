@@ -1,5 +1,9 @@
 # Spanish — working notes
 
+> **Removed on 27 October 2026:** RBM's platform does not support Spanish.
+> Everything below is history. What was removed, and how:
+> [rbm-data-file.md](rbm-data-file.md).
+
 Branch `feat/spanish`, cut from `main` at `8748de7` on 8 October 2026 and
 rebased onto `58cac0a` (#77–#81: title, Sources A–Z, Subscribe fields,
 filters heading; no overlap) on 9 October. It adds

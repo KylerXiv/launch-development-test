@@ -23,7 +23,8 @@ const after = read(newFile);
 
 const isText = (v) => v && typeof v === "object" && !Array.isArray(v) && typeof v.en === "string";
 
-// A language one file has and the other does not (Spanish, added Oct 2026) is
+// A language one file has and the other does not (Spanish, added 8 and removed
+// 27 Oct 2026) is
 // one line in the summary, not one per text, and is left out of the
 // text-by-text comparison. Files from before `locales` existed had en/fr/pt.
 const langsOf = (f) => (f && Array.isArray(f.locales) ? f.locales : ["en", "fr", "pt"]);

@@ -1,9 +1,9 @@
 # Handover — translation in the proposal workflow
 
-> **Oct 2026: Spanish (`es`) added as a third translated language.** Wherever
-> this document says "French and Portuguese", `fr`/`pt` or `/fr` and `/pt`,
-> the same now holds for Spanish and `/es`: same bot, same rules. What changed
-> and why: [docs/jackson/spanish.md](jackson/spanish.md).
+> **8 to 27 Oct 2026: Spanish (`es`) was a third translated language,** with
+> the same bot and rules as French and Portuguese. It was removed on 27 Oct
+> 2026: RBM's platform does not support Spanish. What it changed:
+> [docs/jackson/spanish.md](jackson/spanish.md).
 
 *Written 30 September 2026 by Kyler (with Claude Code), for the developer who
 takes this over.*

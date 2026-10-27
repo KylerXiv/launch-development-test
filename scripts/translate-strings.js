@@ -2,8 +2,8 @@
 /**
  * scripts/translate-strings.js
  *
- * Translates the TEXT section of i18n/content.en.json into French, Portuguese
- * and Spanish using Google Cloud Translation, and saves the results in a
+ * Translates the TEXT section of i18n/content.en.json into French and
+ * Portuguese using Google Cloud Translation, and saves the results in a
  * translation memory at i18n/translations.json.
  *
  * It never reads the page or data/*.js, and never opens the VALUES section of
@@ -14,7 +14,6 @@
  *   node scripts/translate-strings.js --dry-run          # cost, no API calls
  *   node scripts/translate-strings.js --locale=fr
  *   node scripts/translate-strings.js --locale=pt
- *   node scripts/translate-strings.js --locale=es
  *
  * Two rules govern everything here:
  *
@@ -49,9 +48,8 @@ const { requireFresh } = require("./assemble-content");
 
 const ROOT = path.resolve(__dirname, "..");
 const MEM = path.join(ROOT, "i18n", "translations.json");
-// Google's target code for each locale. Spanish is general "es" (not a
-// regional variety), as is the /es page's <html lang>.
-const TARGET = { fr: "fr", pt: "pt-PT", es: "es" };
+// Google's target code for each locale (Spanish, "es", was removed on 27 Oct 2026).
+const TARGET = { fr: "fr", pt: "pt-PT" };
 
 // ---------------------------------------------------------------------------
 // Never send these, whatever bucket they turn up in.
