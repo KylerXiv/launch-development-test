@@ -5,6 +5,7 @@
     { "source": "/illustrated-journey-dashboard.html", "destination": "/", "permanent": false },
     { "source": "/:lang(fr|pt)/illustrated-journey-dashboard.html", "destination": "/:lang/", "permanent": false },
     { "source": "/es", "destination": "/", "permanent": false },
+    { "source": "/es/", "destination": "/", "permanent": false },
     { "source": "/es/:path*", "destination": "/", "permanent": false }
   ]
 }
