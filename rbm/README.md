@@ -1,45 +1,43 @@
 # LAUNCH dashboard — pages for the RBM platform
 
 The LAUNCH illustrated journey dashboard, one static page per language, for
-embedding on dashboards.endmalaria.org. The pages hold no data of their own:
-each fetches the approved dataset at runtime, so a data update never needs a
-redeploy here.
+embedding on dashboards.endmalaria.org under its /en, /fr and /pt routes. The
+dashboard's data is one file, `data/dashboard.json`, hosted beside the pages.
+When the data changes, the LAUNCH team sends a new copy of that file, which
+replaces the old one; the pages themselves do not change.
 
 ```
-en/index.html   fr/index.html   pt/index.html   es/index.html     the four pages
-{en,fr,pt,es}/data/world-map.js, world-map-geo.js  country shapes, with that language's
-                                                    country names (static)
-{en,fr,pt,es}/assets/report-issue.js                the feedback form, in that language
-assets/                                             icons and logos (shared)
+en/index.html   fr/index.html   pt/index.html     the three pages
+{en,fr,pt}/data/world-map.js, world-map-geo.js    country shapes, with that language's
+                                                  country names (static)
+{en,fr,pt}/assets/report-issue.js                 the feedback form, in that language
+assets/                                           icons and logos (shared)
+data/dashboard.json                               the dashboard's data (shared)
 ```
-
-The platform has /en, /fr and /pt routes today. The Spanish page (es/) is
-ready for a /es route if one is added; until then it can be linked directly.
 
 ## What to host
 
 Host these, side by side, exactly as they are:
 
-- `en/`, `fr/`, `pt/`, `es/`: the four pages, each with its own `data/` (map
-  shapes and country names, not the dashboard's data) and feedback form;
+- `en/`, `fr/`, `pt/`: the three pages, each with its own `data/` (map shapes
+  and country names, not the dashboard's data) and feedback form;
 - `assets/`: the icons and logos every page loads from `../assets/`. Without
-  it, the pages lose their icons.
+  it, the pages lose their icons;
+- `data/dashboard.json`: the dashboard's data, which every page loads from
+  `../data/dashboard.json` each time it opens. Without it, the pages say the
+  data could not be loaded.
 
-That is 38 files: HTML, JavaScript, SVG and PNG. The styles are inside each
-page, so there are no separate CSS files, and there is no build step or server
-code.
+That is 35 files: HTML, JavaScript, JSON, SVG and PNG. The styles are inside
+each page, so there are no separate CSS files, and there is no build step or
+server code.
 
 Not needed: `index.html`, `iframe-test.html`, `rbm-shell/`,
 and `build-manifest.json` in the LAUNCH test
 copy are for development and testing only.
 
-The dashboard's data is **not** in these files. Each page loads it from the
-public data repository (below) every time it opens, so new data appears with
-nothing to do here.
-
-Data: `https://codebyjackson.github.io/launch-data-test/v1/dashboard.json`
-(contract and change rules: the README of that repository). Map rendering uses
-MapLibre GL JS from cdnjs.cloudflare.com.
+Map rendering uses MapLibre GL JS from cdnjs.cloudflare.com. The contract for
+`dashboard.json` and its change rules are in the README of the data
+repository, `codebyjackson/launch-data-test`, which keeps every published copy.
 
 The pages wear Unitaid's brand (brandpad.io/unitaid), at Unitaid's request:
 Unitaid Navy for text and headings, Unitaid Blue for actions, Unitaid Red for
@@ -50,9 +48,10 @@ page.
 
 ## Hosting
 
-Any static host works (the files are plain HTML, JS and SVG; no build step).
-Serve the folder as it is; each page loads the shared `../assets/` and its own
-`data/` and `assets/report-issue.js` beside it.
+Any static host works (the files are plain HTML, JS, JSON and SVG; no build
+step). Serve the folder as it is; each page loads the shared `../assets/` and
+`../data/dashboard.json`, and its own `data/` and `assets/report-issue.js`
+beside it.
 
 Allow framing by the RBM platform only — for example as a response header:
 
@@ -60,14 +59,14 @@ Allow framing by the RBM platform only — for example as a response header:
 Content-Security-Policy: frame-ancestors https://dashboards.endmalaria.org
 ```
 
-The pages make five kinds of outbound request, all from the reader's browser:
-the dataset (GitHub Pages, above), MapLibre (cdnjs), the fonts
-(fonts.googleapis.com and fonts.gstatic.com), the map shapes (same host as
-the pages), and, when a reader uses Subscribe or Send feedback, the LAUNCH
-project's email service (below). A content security policy sent with these
-pages, by whatever host serves them, must allow all five. The platform's own
-policy governs only its page: it must allow framing the pages' host
-(`frame-src`), and does not apply to requests made from inside the frame.
+The pages make four kinds of outbound request, all from the reader's browser:
+the same host as the pages (the data, the map shapes and the icons), MapLibre
+(cdnjs), the fonts (fonts.googleapis.com and fonts.gstatic.com), and, when a
+reader uses Subscribe or Send feedback, the LAUNCH project's email service
+(below). A content security policy sent with these pages, by whatever host
+serves them, must allow all four. The platform's own policy governs only its
+page: it must allow framing the pages' host (`frame-src`), and does not apply
+to requests made from inside the frame.
 
 ## Embedding
 
@@ -84,8 +83,6 @@ inside the frame.
 <iframe src="https://<host>/fr/" title="Tableau de bord LAUNCH" class="w-full flex-1 min-h-0" style="border:0;min-height:480px" loading="lazy"></iframe>
 <!-- /pt -->
 <iframe src="https://<host>/pt/" title="Painel LAUNCH" class="w-full flex-1 min-h-0" style="border:0;min-height:480px" loading="lazy"></iframe>
-<!-- /es, if the platform adds it -->
-<iframe src="https://<host>/es/" title="Panel LAUNCH" class="w-full flex-1 min-h-0" style="border:0;min-height:480px" loading="lazy"></iframe>
 ```
 
 **Do not give the frame a fixed height taller than the screen** (for example
@@ -99,11 +96,12 @@ https://codebyjackson.github.io/launch-rbm-test/iframe-test.html
 
 ## What readers see when something is wrong
 
-- **The dataset cannot be fetched:** a notice that the data could not be
-  loaded, and nothing else drawn — never a half-rendered chart.
-- **The dataset's `schema_version` is not 1** (a breaking change has been
-  published under `v2/`): a notice that the dashboard is being updated, until
-  these pages are updated to read the new version.
+- **The data cannot be loaded** (for example, `data/dashboard.json` is
+  missing or in the wrong place): a notice that the data could not be loaded,
+  and nothing else drawn — never a half-rendered chart.
+- **The data file and the pages do not match** (its `schema_version` is not
+  1: after a format change, only one of the two was replaced): a notice that
+  the dashboard is being updated.
 - **Subscribe or Send feedback cannot reach the email service** (it is down,
   or the host serving these pages is not yet on its list): the form says it
   could not send just now, and keeps what the reader typed.
@@ -129,8 +127,11 @@ https://codebyjackson.github.io/launch-rbm-test/iframe-test.html
 
 ## How updates arrive
 
-**Data:** nothing to do. The pages read the newest approved `dashboard.json`
-every time they open.
+**Data:** when the data changes, the LAUNCH team sends a new
+`dashboard.json`. Put it in place of `data/dashboard.json` (same name, same
+place, nothing else changed), clear any cache or CDN copy of that file, check
+that the "Last updated" date on a page matches the date the team gave, and
+tell the team it is live. Until then, the pages show the previous data.
 
 **Pages:** no changes are planned after handover. If Unitaid asks for one, the
 LAUNCH team sends you an updated set of files to replace the old ones.
@@ -139,14 +140,23 @@ LAUNCH team sends you an updated set of files to replace the old ones.
 page as the LAUNCH site, so a change made only here never reaches the LAUNCH
 site or the translations. Ask the LAUNCH team for the change instead.
 
-**A breaking change to the data's format** is rare and announced in advance.
-The current data address stays live in the meantime.
+**A change to the data's format** is rare and announced in advance. New pages
+and a new `dashboard.json` come together, and replace the old ones at the same
+time.
 
 ### For the LAUNCH team (development stage only)
 
-`node scripts/build-rbm-pages.js` builds these pages; `--api-url` sets where
+`node scripts/build-rbm-pages.js` builds these pages, with a copy of the
+latest published `dashboard.json` from a checkout of `launch-data-test` next to
+the LAUNCH repository (`--dataset <file>` for another); `--api-url` sets where
 the two forms post, and `--api-url none` builds them switched off.
 `node scripts/copy-rbm-pages.js --to <checkout of launch-rbm-test>` copies a
 build into the test copy `codebyjackson/launch-rbm-test`; commit and push
 there by hand. The copy replaces exactly the files listed under "What to
 host".
+
+After each publish to the data repository (Publish now, or the end of an
+approval), pull `launch-data-test`, then
+`node scripts/copy-rbm-pages.js --to <checkout of launch-rbm-test> --data-only`
+replaces only `data/dashboard.json` there. That same file is the one to send
+RBM.

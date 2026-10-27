@@ -1,12 +1,16 @@
 name: Publish to RBM data repo
 
 # Builds dashboard.json (scripts/build-dataset.js) from main and publishes it to
-# the public data repo that RBM's dashboard pages fetch at runtime.
+# the public data repo, the record of every publish. RBM's dashboard pages do
+# not fetch it from there (since 27 Oct 2026): they read a copy beside them. So
+# after a publish, pull the data repo and copy the new file into the RBM test
+# repo with `node scripts/copy-rbm-pages.js --to ../launch-rbm-test --data-only`;
+# that file is also the one to send RBM. The run summary says so.
 #
 # STARTS
 #   - by itself at the end of every approval: proposal-decision.yml → publish.yml
-#     → translate.yml, which starts this with trigger=approval once French,
-#     Portuguese and Spanish are settled;
+#     → translate.yml, which starts this with trigger=approval once French and
+#     Portuguese are settled;
 #   - by hand ("Publish now"): Actions → "Publish to RBM data repo" → Run
 #     workflow, with a reason. For changes that reach main without a proposal:
 #     a revert, the yearly WHO update, a direct fix. Tick "dry run" to see what
@@ -168,6 +172,12 @@ jobs:
           git commit -q -m "$SUBJECT [publish-dataset]" -m "Built from the pipeline repo at $(git -C .. rev-parse HEAD) by $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           git push
           echo "Published: https://$(echo "$DATA_REPO" | cut -d/ -f1 | tr 'A-Z' 'a-z').github.io/$(echo "$DATA_REPO" | cut -d/ -f2)/v1/dashboard.json" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo
+            echo "**Next: the RBM pages.** They read a copy of this file beside them, so pull the data repo, then in this repo run"
+            echo '`node scripts/copy-rbm-pages.js --to ../launch-rbm-test --data-only`'
+            echo "and commit what it prints. Send RBM the same file."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Say why nothing was published
         if: steps.target.outputs.set == 'true' && (inputs.dry_run || steps.diff.outputs.changed != 'true')

@@ -17,7 +17,7 @@ still open from then is carried below.*
 | Other remotes | `keith` is `Keith-paradox/launch-development`. Do not push to it, or to `kochrisdev/launch-transparency-dashboard` |
 | Production | Vercel project `launch-development-test`: <https://launch-development-test.vercel.app/illustrated-journey-dashboard.html>, also `/fr/`, `/pt/`. Every push to `main` deploys it, the email functions in `api/` included |
 | RBM's test copies | `codebyjackson/launch-rbm-test`, **served twice**: <https://codebyjackson.github.io/launch-rbm-test/> (GitHub Pages) and <https://launch-rbm-test.vercel.app/> (Jackson's Vercel). `iframe-test.html` there is a mock of RBM's platform. Kyler has push access. Its pages are generated here; see "Updating RBM's copy" below |
-| RBM's data | `codebyjackson/launch-data-test`, written by `publish-dataset.yml`; the pages read `v1/dashboard.json` from it |
+| RBM's data | `codebyjackson/launch-data-test`, written by `publish-dataset.yml`. Since 27 Oct 2026 the pages read a copy of its `v1/dashboard.json` beside them (`data/dashboard.json` in `launch-rbm-test`), replaced after each publish with `copy-rbm-pages.js --data-only` |
 | Who can deploy | Vercel's Hobby plan refuses commits whose author has no access. Jackson's commits deploy only under a Kyler commit, such as a merge |
 | GitHub Actions | Runs, free, since the repo went public |
 | Repository secrets | `RESEND_API_KEY`, `GOOGLE_API_KEY`, `DATA_REPO_DEPLOY_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `VERCEL_DEPLOY_HOOK_URL`. Variable: `RBM_DATA_REPO`. Vercel holds its own `RESEND_API_KEY` and `UNSUBSCRIBE_SECRET` for the forms: a new Resend key goes in **both** places |
@@ -106,7 +106,7 @@ it right after the merge, unprompted.
    `git config user.email "141990926+KylerXiv@users.noreply.github.com"` in
    that clone (see the traps below).
 4. `node scripts/copy-rbm-pages.js --to <clone>` (since 9 Oct 2026; it
-   replaced copying by hand). It replaces `en/ fr/ pt/ es/ assets/` and
+   replaced copying by hand). It replaces `en/ fr/ pt/ assets/ data/` (`es/` until 27 Oct 2026) and
    `build-manifest.json`, and leaves the repo's own files alone (`index.html`,
    `iframe-test.html`, `rbm-shell/`, `.nojekyll`, the README). **If it stops
    and lists files "changed there after the last copy", someone edited RBM's

@@ -30,7 +30,7 @@ every page still works without them.
 
 | Path | Role |
 | --- | --- |
-| `index.html` | The illustrated journey, the production page (moved here from `illustrated-journey-dashboard.html` on 20 Oct 2026; see `docs/dashboard-at-index-notes.md`). The only page that is translated (`fr/`, `pt/`, `es/` built from it), built for RBM, and carries the Subscribe and Send feedback forms and the MapLibre country map. |
+| `index.html` | The illustrated journey, the production page (moved here from `illustrated-journey-dashboard.html` on 20 Oct 2026; see `docs/dashboard-at-index-notes.md`). The only page that is translated (`fr/`, `pt/` built from it), built for RBM, and carries the Subscribe and Send feedback forms and the MapLibre country map. |
 | `illustrated-journey-dashboard.html` | The illustrated journey as it was before Launch v1.0 (commit `174b68e`), kept so its address still works. Deployed, but nothing links to it and nothing is built or translated from it. Do not edit it; change `index.html`. |
 | `option-b.html` | Design option B (comparison matrix): a standalone layout study for client review. Same data contract, feature subset. See §10. |
 | `pipeline.html` | Pipeline poster view (MMV-style phase columns), complementary to A/B rather than competing. Placement driven by each product's `phase` field; cards deep-link to `index.html#<id>`. Single-theme poster by design. |
@@ -51,9 +51,9 @@ every page still works without them.
 | `scripts/build-map.js` | One-off map-geometry generator (dev-only deps documented in its header). |
 | `.github/workflows/validate.yml` | CI: validator + preview build on every push/PR. |
 | `.github/workflows/publish.yml` | On `data/products.js` changes: validates, snapshots to `history/`, rebuilds `feed.xml`, `ontology/launch-data.jsonld` and `ontology/launch-history.jsonld`, bot-commits. Path-filtered so its own commit cannot retrigger it. |
-| `.github/workflows/translate.yml` | The translate bot. After a hand-made change to the illustrated page, `data/products.js` or `sources.js` reaches `main`: rebuilds `i18n/content.en.json`, translates only new strings into French, Portuguese and Spanish, checks the three pages, bot-commits `i18n/` and redeploys. Also started by `publish.yml` after an approval, as a safety net. Approved proposals are translated before they merge, by `scripts/proposal-translate.sh` in `proposal-decision.yml`. See [translation-notes.md](translation-notes.md). |
-| `i18n/` | The translation layer (DEV-31): `content.en.json`, the English content and its `contentHash` — **generated** by `scripts/assemble-content.js`, never hand-edited — and `translations.json`, the translation memory, where `fr`/`pt`/`es` hand corrections live. `scripts/build-locale-pages.js` builds the `/fr/`, `/pt/` and `/es/` pages from them at deploy time. See [jackson/DEV-31.md](jackson/DEV-31.md). |
-| `.github/workflows/publish-dataset.yml` | **Publish to RBM data repo.** Builds `dashboard.json` (`scripts/build-dataset.js`, contract `public-data/v1/schema.json`) from `main` and pushes it, with a timestamped archive copy and a `CHANGELOG.md` entry, to the public repo named by the `RBM_DATA_REPO` variable (deploy key: `DATA_REPO_DEPLOY_KEY`). Starts by itself at the end of every approval (`translate.yml`, `after_approval`), or by hand ("Publish now", with a reason and a dry-run box). Refuses to publish over a hand change to the published file (drift check). See `docs/public-data-layer-notes.md`. |
+| `.github/workflows/translate.yml` | The translate bot. After a hand-made change to the illustrated page, `data/products.js` or `sources.js` reaches `main`: rebuilds `i18n/content.en.json`, translates only new strings into French and Portuguese, checks both pages, bot-commits `i18n/` and redeploys. Also started by `publish.yml` after an approval, as a safety net. Approved proposals are translated before they merge, by `scripts/proposal-translate.sh` in `proposal-decision.yml`. See [translation-notes.md](translation-notes.md). |
+| `i18n/` | The translation layer (DEV-31): `content.en.json`, the English content and its `contentHash` — **generated** by `scripts/assemble-content.js`, never hand-edited — and `translations.json`, the translation memory, where `fr`/`pt` hand corrections live. `scripts/build-locale-pages.js` builds the `/fr/` and `/pt/` pages from them at deploy time. See [jackson/DEV-31.md](jackson/DEV-31.md). |
+| `.github/workflows/publish-dataset.yml` | **Publish to RBM data repo.** Builds `dashboard.json` (`scripts/build-dataset.js`, contract `public-data/v1/schema.json`) from `main` and pushes it, with a timestamped archive copy and a `CHANGELOG.md` entry, to the public repo named by the `RBM_DATA_REPO` variable (deploy key: `DATA_REPO_DEPLOY_KEY`). Starts by itself at the end of every approval (`translate.yml`, `after_approval`), or by hand ("Publish now", with a reason and a dry-run box). Refuses to publish over a hand change to the published file (drift check). RBM's pages do not fetch it: they read a copy beside them, `data/dashboard.json`, replaced after each publish with `node scripts/copy-rbm-pages.js --to ../launch-rbm-test --data-only` (since 27 Oct 2026). See `docs/public-data-layer-notes.md`. |
 | `.github/workflows/notify-subscribers.yml` | **Email subscribers about updates.** Daily at 15:00 UTC: one Resend broadcast to the subscriber segment listing the changelog lines added since the last update email (`scripts/notify-subscribers.js`); nothing on a day without new lines. Manual run: `preview` (team inbox only) or `send` (everyone, now). Needs the `RESEND_API_KEY` repository secret. See [subscriber-updates-notes.md](subscriber-updates-notes.md). |
 | `.github/workflows/reminder.yml` | Monthly cron: opens the milestone-scan checklist issue. Also runnable manually (workflow_dispatch). |
 | `.github/workflows/sourcing.yml` | Scheduled source fetch: weekly trial watch (Mon), monthly Global Fund + regulatory pulls (3rd); bot-commits outputs under `sourcing/` only and opens watch issues on changes. Manually runnable with a fetcher picker. |
@@ -179,7 +179,7 @@ No test framework by design; two layers instead:
 
 - **CI** (`validate.yml`, on every push and pull request). As of 6 Oct 2026 it
   runs: the validator on both datasets; the single-file preview build; the
-  French, Portuguese and Spanish pages and their self-check; the RBM `dashboard.json`
+  French and Portuguese pages and their self-check; the RBM `dashboard.json`
   build and its tests (`test-build-dataset.js`, `test-dataset-diff.js`); the
   RBM pages and their test; and the SHACL governance shapes. The workflow file
   is the list. The proposal library has its own test,
@@ -226,11 +226,16 @@ No test framework by design; two layers instead:
 - **RBM**: decided 23 Sep 2026, RBM embeds the page in an iframe served from
   this site's own origin, and receives the data as `dashboard.json` through
   `publish-dataset.yml`. `scripts/build-rbm-pages.js` builds RBM's own copies
-  of the page. When those copies change, build them and copy them into a
+  of the page, with a copy of the latest published `dashboard.json` beside
+  them in `data/` (since 27 Oct 2026; the pages fetched it from the data
+  repository before). When those copies change, build them and copy them into a
   checkout of `codebyjackson/launch-rbm-test` by hand
   (`node scripts/build-rbm-pages.js`, then
   `node scripts/copy-rbm-pages.js --to ../launch-rbm-test`), and commit there
-  ([rbm/README.md](../rbm/README.md), "For the LAUNCH team"). The automatic
+  ([rbm/README.md](../rbm/README.md), "For the LAUNCH team"). After each
+  publish, pull the data repository and copy the data file alone
+  (`node scripts/copy-rbm-pages.js --to ../launch-rbm-test --data-only`);
+  the same file is the one sent to RBM. The automatic
   releases (`rbm-vN`) and the daily robot in `launch-rbm-test` were removed
   on 18 Oct 2026. After handover,
   Unitaid owns this repository and the data repository, and RBM receives a

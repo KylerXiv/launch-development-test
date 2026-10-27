@@ -1,35 +1,44 @@
 #!/usr/bin/env node
 // Builds the pages handed over to RBM: the illustrated journey dashboard, one
-// page per language, reading its data at runtime from the published
-// dashboard.json instead of from data/*.js. RBM embeds them (iframe) under its
-// /en, /fr and /pt routes; /es is ready for when it has one (RBM's platform had
-// no Spanish route on 22 Sep 2026, docs/source-registry-notes.md).
+// page per language, reading its data at runtime from dashboard.json instead
+// of from data/*.js. RBM embeds them (iframe) under its /en, /fr and /pt routes.
+//
+// The pages read ../data/dashboard.json, a copy of the latest file published
+// to the data repo, which RBM hosts beside them (27 Oct 2026; until then they
+// fetched it from the data repo's address). The build copies it in from a
+// checkout of the data repo; after each later publish, only that file is sent
+// to RBM, and copied into launch-rbm-test with
+// `node scripts/copy-rbm-pages.js --to ../launch-rbm-test --data-only`.
 //
 //   node scripts/build-rbm-pages.js                      # → dist/rbm/
-//   node scripts/build-rbm-pages.js --data-url <url>     # read another dashboard.json
+//   node scripts/build-rbm-pages.js --dataset <file>     # a dashboard.json other than ../launch-data-test/v1/dashboard.json
+//   node scripts/build-rbm-pages.js --dataset none       # no data/ (the pages say the data could not be loaded)
+//   node scripts/build-rbm-pages.js --data-url <url>     # the pages read another dashboard.json (a test build)
 //   node scripts/build-rbm-pages.js --api-url <origin>   # where the two forms post
 //   node scripts/build-rbm-pages.js --api-url none       # both forms off
 //   node scripts/build-rbm-pages.js --allow-stale        # as build-locale-pages.js
 //
 // Output (self-contained; host it as static files anywhere):
-//   dist/rbm/en/index.html, fr/index.html, pt/index.html, es/index.html
-//   dist/rbm/{en,fr,pt,es}/data/world-map.js, world-map-geo.js   map shapes, with that
+//   dist/rbm/en/index.html, fr/index.html, pt/index.html
+//   dist/rbm/{en,fr,pt}/data/world-map.js, world-map-geo.js   map shapes, with that
 //                               language's country names (static, never change)
-//   dist/rbm/{en,fr,pt,es}/assets/report-issue.js   the feedback form, in that language
+//   dist/rbm/{en,fr,pt}/assets/report-issue.js   the feedback form, in that language
 //   dist/rbm/assets/            icons and logos (shared)
+//   dist/rbm/data/dashboard.json  the data, shared: the latest published file
 //   dist/rbm/README.md          how to host and embed
 //   dist/rbm/build-manifest.json  what this build wrote (each file's sha256), from
-//                               which commit and with which settings. Copying the
-//                               build into launch-rbm-test is scripts/copy-rbm-pages.js,
+//                               which commit, with which settings and which
+//                               published data. Copying the build into
+//                               launch-rbm-test is scripts/copy-rbm-pages.js,
 //                               which reads it to stop a copy that would wipe hand edits.
 //
-// HOW. The English page and the French, Portuguese and Spanish pages that
+// HOW. The English page and the French and Portuguese pages that
 // build-locale-pages.js writes (interface text already translated) are taken
-// as they are, and four things change:
+// as they are, and five things change:
 //   1. the <script src> tags for products.js, sources.js and treatment-policy.js
-//      go; a small loader fetches dashboard.json, picks the page's language out
-//      of every { en, fr, pt, es } text (English where the file has no such
-//      language yet), rebuilds the three globals the page has
+//      go; a small loader fetches ../data/dashboard.json, picks the page's
+//      language out of every { en, fr, pt } text (English where the file has no
+//      such language), rebuilds the three globals the page has
 //      always read (LAUNCH_DATA, LAUNCH_SOURCES, LAUNCH_TREATMENT_POLICY), and
 //      only then runs the page's own scripts (kept, unchanged, as deferred
 //      <script type="text/x-launch-app"> blocks);
@@ -54,16 +63,20 @@ const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
 const { applySkin } = require("./rbm-skin");
-const { LOCALES, BUILT, MANIFEST, fingerprint, manifestOf } = require("./rbm-manifest");
+const { LOCALES, DATA_FILE, BUILT, MANIFEST, SCHEMA, DEFAULT_DATASET, fingerprint, manifestOf, publishedDataset } = require("./rbm-manifest");
 
 const ROOT = path.resolve(__dirname, "..");
 const PAGE = "index.html";
 const OUT = path.join(ROOT, "dist", "rbm");
 const args = process.argv.slice(2);
 const argOf = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : undefined; };
-const DEFAULT_DATA_URL = "https://codebyjackson.github.io/launch-data-test/v1/dashboard.json";
+// Relative to each page (en/index.html …): the data/ folder beside the
+// language folders, on whatever host serves them.
+const DEFAULT_DATA_URL = "../" + DATA_FILE;
 const DATA_URL = argOf("--data-url") || DEFAULT_DATA_URL;
-const SCHEMA = 1;
+// The published dashboard.json copied into data/: a checkout of the data repo
+// next to this one, another file, or none.
+const DATASET_ARG = argOf("--dataset") || DEFAULT_DATASET;
 // Where the two forms post: the origin of the LAUNCH Vercel project, whose
 // api/_mail.js must list the host these pages are served from in PARTNERS, or
 // the browser blocks every post. Production, never a PR preview (those
@@ -88,8 +101,8 @@ const PER_LANGUAGE = ["data/world-map.js", "data/world-map-geo.js", "assets/repo
 // fingerprints in it come from scripts/rbm-manifest.js, which
 // copy-rbm-pages.js shares.
 
-// Reader-facing messages. Only the English is written here: French, Portuguese
-// and Spanish come from the translation memory, like every other text on the
+// Reader-facing messages. Only the English is written here: French and
+// Portuguese come from the translation memory, like every other text on the
 // pages, through one i18n/reviewed-strings.json entry per sentence (12 Oct
 // 2026; until then they were written here by hand, outside the translate bot).
 // A sentence the memory does not hold yet stays English.
@@ -267,25 +280,41 @@ function main() {
   fs.rmSync(path.join(OUT, "assets", "report-issue.js"), { force: true });   // per language now
   fs.rmSync(path.join(OUT, "assets", "email"), { recursive: true, force: true });   // the LAUNCH emails' logo
   fs.copyFileSync(path.join(ROOT, "rbm", "README.md"), path.join(OUT, "README.md"));
+  // the data: the latest published dashboard.json, beside the pages. A file
+  // that is not the published one still goes in (a local test), but the
+  // manifest says so and copy-rbm-pages.js refuses it.
+  const pub = DATASET_ARG === "none" ? { problems: ["built with --dataset none"] } : publishedDataset(path.resolve(DATASET_ARG));
+  if (pub.ds && pub.ds.schema_version !== SCHEMA) pub.problems.push(`its schema_version is ${pub.ds.schema_version}, and these pages read ${SCHEMA}`);
+  if (pub.ds) {
+    fs.mkdirSync(path.dirname(path.join(OUT, DATA_FILE)), { recursive: true });
+    fs.copyFileSync(path.resolve(DATASET_ARG), path.join(OUT, DATA_FILE));
+  }
   // What this build wrote, and whether it is one to publish: built from
   // committed files, with the default data and API addresses, after the
-  // translate bot caught up. scripts/copy-rbm-pages.js reads it.
+  // translate bot caught up, with the latest published data.
+  // scripts/copy-rbm-pages.js reads it.
   const git = (a) => { try { return execFileSync("git", a, { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); } catch { return null; } };
   const head = git(["rev-parse", "HEAD"]);
   const dirty = git(["status", "--porcelain", "--", PAGE, "data", "assets", "i18n", "scripts", "rbm"]);
   const { problems } = require("./assemble-content");
   fs.writeFileSync(path.join(OUT, MANIFEST), JSON.stringify({
-    note: "Written by scripts/build-rbm-pages.js in KylerXiv/launch-development-test. These pages are BUILT: change that repository and rebuild, never the files here. scripts/copy-rbm-pages.js compares every file below with what is here before it copies a new build, and stops if one was changed.",
+    note: "Written by scripts/build-rbm-pages.js in KylerXiv/launch-development-test. These pages are BUILT: change that repository and rebuild, never the files here. data/dashboard.json is the latest file published to the data repo, replaced after each publish by scripts/copy-rbm-pages.js --data-only. scripts/copy-rbm-pages.js compares every file below with what is here before it copies, and stops if one was changed.",
     built_from: head,
     clean: head != null && dirty === "",
     translations_current: problems().length === 0,
     data_url: DATA_URL,
     api_url: API_URL,
     test_build: DATA_URL !== DEFAULT_DATA_URL || API_ARG !== DEFAULT_API,
+    schema: SCHEMA,
+    dataset: pub.ds ? pub.info : null,
+    dataset_problems: pub.ds ? pub.problems : [],
     files: manifestOf(OUT),
   }, null, 2) + "\n", "utf8");
-  console.log(`  assets/ (shared), README.md\n  data: ${DATA_URL}\n  forms: ${API_URL ? API_URL + "/api/{subscribe,feedback}" : "off (--api-url none)"}\n  → ${path.relative(ROOT, OUT)}/`);
+  const dataLine = pub.ds
+    ? `${DATA_FILE}: published ${pub.info.generated_at} (data repo ${String(pub.info.data_repo_commit).slice(0, 7)})${pub.problems.length ? "\n    NOT the latest published file: " + pub.problems.join("; ") : ""}`
+    : `no ${DATA_FILE}: ${pub.problems.join("; ")}`;
+  console.log(`  assets/ (shared), README.md\n  ${dataLine}\n  pages read: ${DATA_URL}\n  forms: ${API_URL ? API_URL + "/api/{subscribe,feedback}" : "off (--api-url none)"}\n  → ${path.relative(ROOT, OUT)}/`);
 }
 
-module.exports = { transform, loader, widget, messages, manifestOf, fingerprint, BUILT, MANIFEST };
+module.exports = { transform, loader, widget, messages, manifestOf, fingerprint, BUILT, MANIFEST, DEFAULT_DATA_URL };
 if (require.main === module) main();

@@ -1,8 +1,11 @@
 # RBM handover — working notes (feat/rbm-handover)
 
-> **Oct 2026:** the RBM build now also writes `es/`, every text in
-> `dashboard.json` is `{ en, fr, pt, es }`, and the loader no longer requires
-> exactly three languages. See [docs/jackson/spanish.md](jackson/spanish.md).
+> **27 Oct 2026:** the pages read `../data/dashboard.json`, a copy of the
+> latest published file hosted beside them, no longer the data URL below;
+> `scripts/copy-rbm-pages.js --data-only` replaces it after each publish.
+> Spanish (`es/`, and `es` in every text) was built from 8 to 27 Oct 2026 and
+> removed; the loader still reads any set of languages. See
+> [rbm/README.md](../rbm/README.md) and [docs/jackson/spanish.md](jackson/spanish.md).
 
 *2 Oct 2026, Jackson (Oakkar-Min) with Claude Code. Branch `feat/rbm-handover`,
 stacked on `feat/public-data-layer` (PR #32, not merged yet). Two tasks, one

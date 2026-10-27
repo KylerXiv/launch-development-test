@@ -11,7 +11,8 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
-const { transform, widget, loader, messages } = require("./build-rbm-pages");
+const { transform, widget, loader, messages, DEFAULT_DATA_URL } = require("./build-rbm-pages");
+const { LOCALES } = require("./rbm-manifest");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const widgetJs = fs.readFileSync(path.join(__dirname, "..", "assets", "report-issue.js"), "utf8");
@@ -42,6 +43,10 @@ ok(widget(widgetJs, API).includes(`var ENDPOINT = "${API}/api/feedback";`) && !w
      "with no API: Send feedback, connected on the LAUNCH site, is not connected here");
   ok(widget(widgetJs, null) === widgetJs, "with no API: the widget is copied unchanged"); }
 ok(/LANG = "fr"/.test(out) && /dashboard\.json/.test(out), "the loader reads dashboard.json in the page's language");
+// the data sits beside the pages (27 Oct 2026): never fetched from the data repo's address
+ok(DEFAULT_DATA_URL === "../data/dashboard.json" && out.includes('var DATA_URL = "../data/dashboard.json"'),
+   "the loader reads ../data/dashboard.json, the copy beside the pages");
+ok(!/fetch\("https?:\/\/[^"]*launch-data-test/.test(out) && !/DATA_URL = "https?:/.test(out), "no page fetches the data repo's address");
 const app = (out.match(/<script type="text\/x-launch-app">/g) || []).length;
 const plain = (html.match(/<script>/g) || []).length;
 ok(app === plain - 1 && app > 0, "every other inline script of the page waits for the data");
@@ -73,8 +78,9 @@ ok(threw, "a widget whose endpoint changed stops the build");
 
 // the loader, run for real on a small dataset: each page reads its own language
 // from texts with any number of languages. Until 8 Oct 2026 it accepted only
-// exactly { en, fr, pt }, so publishing Spanish would have broken every page
-// built before it (docs/jackson/spanish.md).
+// exactly { en, fr, pt }, so a file with one more language would have broken
+// every page built before it (docs/jackson/spanish.md). Spanish came and went
+// (8 to 27 Oct 2026); the archive still holds files with it.
 function load(lang, locales) {
   const t = (en) => Object.fromEntries(locales.map((l) => [l, l === "en" ? en : `${en}-${l}`]));
   const ds = { schema_version: 1, locales, last_updated: "2026-10-08", data_status: "draft",
@@ -82,32 +88,30 @@ function load(lang, locales) {
             products: [{ id: "p", note: t("N"), detail: { countries: { status: "verified" } } }],
             treatmentPolicy: { countries: { NGA: { name: t("Nigeria") } } }, sources: [{ id: "s", plain: t("P") }] } };
   const js = loader(lang, null).match(/<script>([\s\S]*)<\/script>/)[1];
+  const asked = [];
   const ctx = { document: { readyState: "complete", getElementById: () => null, querySelectorAll: () => [] },
-    fetch: () => Promise.resolve({ ok: true, json: () => Promise.resolve(ds) }) };
+    fetch: (url) => { asked.push(url); return Promise.resolve({ ok: true, json: () => Promise.resolve(ds) }); } };
   ctx.window = ctx;
   vm.runInNewContext(js, ctx);
-  return new Promise((done) => setImmediate(() => done(ctx)));
+  return new Promise((done) => setImmediate(() => done(Object.assign(ctx, { asked }))));
 }
 (async () => {
-  const FOUR = ["en", "fr", "pt", "es"], THREE = ["en", "fr", "pt"];
-  let w = await load("fr", FOUR);
+  ok(LOCALES.join() === "en,fr,pt", "the pages are English, French and Portuguese (no Spanish since 27 Oct 2026)");
+  const MORE = ["en", "fr", "pt", "es"], THREE = ["en", "fr", "pt"];
+  let w = await load("fr", MORE);
   ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A-fr" && w.LAUNCH_DATA.products[0].note === "N-fr" &&
-     w.LAUNCH_TREATMENT_POLICY.countries.NGA.name === "Nigeria-fr", "a French page reads French from a file with Spanish in it");
-  w = await load("es", FOUR);
-  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A-es" && w.LAUNCH_DATA.glossary.g === "G-es" &&
-     w.LAUNCH_SOURCES.sources[0].plain === "P-es", "the Spanish page reads Spanish");
-  w = await load("es", THREE);
-  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A" && w.LAUNCH_DATA.products[0].note === "N",
-     "the Spanish page reads English from a file published before Spanish");
+     w.LAUNCH_TREATMENT_POLICY.countries.NGA.name === "Nigeria-fr", "a French page reads French from a file with a language more");
+  ok(w.asked.length === 1 && w.asked[0] === "../data/dashboard.json", "the loader asks for ../data/dashboard.json, once");
   w = await load("pt", THREE);
-  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A-pt", "a Portuguese page still reads a file with three languages");
+  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A-pt" && w.LAUNCH_DATA.glossary.g === "G-pt" &&
+     w.LAUNCH_SOURCES.sources[0].plain === "P-pt", "a Portuguese page reads Portuguese from a file with three languages");
+  w = await load("en", THREE);
+  ok(w.LAUNCH_DATA && w.LAUNCH_DATA.stages[0] === "A" && w.LAUNCH_DATA.products[0].note === "N", "the English page reads English");
   ok(w.LAUNCH_DATA && w.LAUNCH_DATA.products[0].detail.countries.status === "verified", "objects that are not texts are kept as they are");
-  { const { html: es } = transform(html, "es", { apiUrl: API });
-    ok(/LANG = "es"/.test(es) && /could not be loaded/.test(es), "the Spanish page has its loader (messages in English until main() reads the memory)"); }
   // The messages come from the translation memory (12 Oct 2026), not from
   // text written in the script: whatever the lookup returns goes in, escaped.
-  { const m = messages((s) => "[es] " + s + " <&>");
-    ok(m.fail === "<b>[es] The dashboard data could not be loaded. &lt;&amp;&gt;</b> [es] Please try again in a few minutes. &lt;&amp;&gt;", "loader messages come from the translation lookup, HTML-escaped");
+  { const m = messages((s) => "[fr] " + s + " <&>");
+    ok(m.fail === "<b>[fr] The dashboard data could not be loaded. &lt;&amp;&gt;</b> [fr] Please try again in a few minutes. &lt;&amp;&gt;", "loader messages come from the translation lookup, HTML-escaped");
     ok(messages().schema === "<b>This dashboard is being updated.</b> Please check back shortly.", "with no lookup the messages are the English"); }
 
   console.log(`\n  build-rbm-pages: ${passed} passed, ${failed} failed\n`);

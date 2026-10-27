@@ -5,18 +5,21 @@ RBM Partnership to End Malaria and Unitaid.
 
 **Production page: the illustrated journey,
 https://launch-development-test.vercel.app/** (`index.html`),
-also in French, Portuguese and Spanish at the same path under `/fr/`,
-`/pt/` and `/es/` (for example `/fr/index.html`).
+also in French and Portuguese at the same path under `/fr/` and `/pt/`
+(for example `/fr/index.html`).
 
 This repository is the source of truth: the data, the pages, the translations,
 the email functions in `api/` and every workflow. Two other repositories
 receive its output:
 
 - **`codebyjackson/launch-data-test`**: the approved dataset
-  `v1/dashboard.json`, written only by `publish-dataset.yml`.
-- **`codebyjackson/launch-rbm-test`**: the static pages for RBM in four
-  languages, built by `scripts/build-rbm-pages.js` and copied with
-  `scripts/copy-rbm-pages.js`.
+  `v1/dashboard.json`, written only by `publish-dataset.yml`: the record of
+  every publish.
+- **`codebyjackson/launch-rbm-test`**: the static pages for RBM in three
+  languages, with a copy of the latest published `dashboard.json` beside them
+  in `data/`, built by `scripts/build-rbm-pages.js` and copied with
+  `scripts/copy-rbm-pages.js` (after each publish: `--data-only`, the data
+  file alone).
 
 Developers start with [CLAUDE.md](CLAUDE.md) and the
 [developer guide](docs/developer-guide.md).

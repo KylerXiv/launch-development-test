@@ -3,11 +3,11 @@
 **Live:** [v1/dashboard.json](https://codebyjackson.github.io/launch-data-test/v1/dashboard.json)
 · [v1/schema.json](https://codebyjackson.github.io/launch-data-test/v1/schema.json)
 · [CHANGELOG](CHANGELOG.md)
-· used by the [RBM test pages](https://codebyjackson.github.io/launch-rbm-test/)
+· copied beside the [RBM test pages](https://codebyjackson.github.io/launch-rbm-test/)
 
 The published dataset behind the LAUNCH malaria-medicines dashboard on the
 RBM Partnership to End Malaria's platform. One JSON file holds everything the
-dashboard pages show, in English, French, Portuguese and Spanish. It is approved output
+dashboard pages show, in English, French and Portuguese. It is approved output
 only: no code, no secrets, nothing unreviewed.
 
 **This repository is written by a workflow.** Every commit that changes
@@ -16,6 +16,12 @@ workflow and ends in `[publish-dataset]`. Do not edit the files under `v1/` by
 hand; see "Corrections" below.
 
 ## Endpoint
+
+The RBM dashboard pages do not fetch these addresses. A copy of
+`v1/dashboard.json` is hosted beside them, as `data/dashboard.json`, and is
+replaced with the new file after each publish (27 Oct 2026; until then the
+pages fetched it from here). The addresses stay public: this repository is the
+record of every publish, and anyone may download the data.
 
 ```
 https://codebyjackson.github.io/launch-data-test/v1/dashboard.json    current dataset
@@ -28,14 +34,14 @@ so a page on any domain, inside an iframe or not, can fetch them in the
 browser. A new publish is live about a minute after its commit (once GitHub's
 "pages build and deployment" run is green). Browsers may keep a copy for up to
 10 minutes (`Cache-Control: max-age=600`); fetch with `cache: "no-cache"`, as the
-dashboard pages do, to always get the current file.
+dashboard pages do with their own copy, to always get the current file.
 
 ```js
 const res = await fetch("https://codebyjackson.github.io/launch-data-test/v1/dashboard.json");
 const ds = await res.json();
 if (ds.schema_version !== 1) { /* show a maintenance notice, do not render */ }
 const lang = "fr";                                   // the page's own language
-const t = ds.data.stages[0];                         // every text is { en, fr, pt, es }
+const t = ds.data.stages[0];                         // every text is { en, fr, pt }
 const stageName = t[lang] || t.en;                   // English if this file lacks the language
 ```
 
@@ -48,15 +54,15 @@ const stageName = t[lang] || t.en;                   // English if this file lac
 | `approved_at`, `approved_by` | The approval it publishes (date and GitHub login), or the time and login of a manual publish. Show `approved_at` as "last updated". |
 | `approval` | `trigger` (`approval` or `manual`), the proposal `issue` and `pr` for an approval, the `reason` for a manual publish. |
 | `pipeline_commit`, `content_hash` | Exactly which pipeline commit and which English content it was built from. |
-| `locales` | `["en", "fr", "pt", "es"]`: the languages every text carries. Files published before Spanish was added have `["en", "fr", "pt"]`. |
+| `locales` | `["en", "fr", "pt"]`: the languages every text carries. Files published from 8 to 27 Oct 2026 also carry Spanish, `es`. |
 | `data_status` | `draft` = compiled from public sources, pending verification. Show a notice unless `live`. |
 | `last_updated` | When the data itself last changed. |
 | `source_coverage` | Every public source the data draws on, with its link. |
 | `data` | The dataset: `stages`, `stageColumns`, `stageInfo`, `yardstick` (optional, expected years per stage), `glossary`, `changelog`, `products`, `treatmentPolicy`, `sources`. |
 
-**Text.** Every text a reader sees is an object `{ "en": …, "fr": …, "pt": …, "es": … }`,
-one key per language in `locales`. Where no translation exists yet, `fr`, `pt`
-and `es` carry the English. Names, ids, dates, statuses and numbers stay plain
+**Text.** Every text a reader sees is an object `{ "en": …, "fr": …, "pt": … }`,
+one key per language in `locales`. Where no translation exists yet, `fr` and
+`pt` carry the English. Names, ids, dates, statuses and numbers stay plain
 values. Read a text by key, falling back to `en`; do not check for a fixed set
 of keys, since adding a language is not a breaking change (below).
 
@@ -71,7 +77,9 @@ join to the data on ISO 3166 alpha-3 codes (`iso3`).
 
 - **Adding** a field is not a breaking change. Pages must ignore fields they
   do not know. Adding a language (a new key in every text, and in `locales`)
-  counts as adding a field: Spanish was added this way.
+  counts as adding a field: Spanish was added this way on 8 Oct 2026. It was
+  removed on 27 Oct 2026, together with the only pages that read it, so
+  `schema_version` stayed 1.
 - **Renaming, removing or retyping** a listed field is breaking: it gets a new
   `schema_version` and a new path (`v2/`), and `v1/` stays live until the RBM
   pages have moved to it.
