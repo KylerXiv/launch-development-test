@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "note": "How index.html builds each i18n/ui.en.json string that has {placeholders}, so its existing French and Portuguese can be found in i18n/translations.json and converted. Translations are filed under key(English as the page writes it), and the page writes ${...} holes or joins words with +, never {name}. One entry per placeholder key. \"page\" is a string from the memory, exactly as the page writes it; \"holes\" maps each ${...} in it to what replaces it (a {placeholder}, or \"\" for a hole whose value is always empty on this page). \"parts\" is for text the page joins with +: a plain string is copied as it is into every language (placeholders, spaces, punctuation); an object { t, holes?, drop? } is a memory string, translated, with its holes replaced and a leading \"drop\" removed. scripts/build-rbm-messages.js checks that the parts rebuild the English in ui.en.json exactly, and that every hole is found in each translation. See docs/rbm-messages-notes.md.",
+  "forms": {
+    "header.lastUpdated": { "parts": [{ "t": "Last updated" }, " {date}"] },
+
+    "pathway.stageButtonLabel": { "parts": [{ "t": "Stage ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ?", "holes": { "${stepNo(i)}": "{n}", "${esc(s)}": "{stage}", "${exp}": "", "${n ?": "" } }, "."] },
+    "pathway.parallelGroupLabel": { "page": "${esc(names)} — independent approvals with no defined order between them", "holes": { "${esc(names)}": "{names}" } },
+
+    "stepPanel.label": { "parts": [{ "t": "Stage" }, " {n}: {stage}"] },
+    "stepPanel.stepOfTotal": { "page": "Stage ${stepNo(i)} of ${STAGE_COLUMNS.length}", "holes": { "${stepNo(i)}": "{n}", "${STAGE_COLUMNS.length}": "{total}" } },
+    "stepPanel.statusSummaryLabel": { "page": "Status of the ${tracked.length} medicines at this stage", "holes": { "${tracked.length}": "{count}" } },
+    "stepPanel.parallelMilestones": { "page": "${STAGES[col.stages[0]]} and ${STAGES[col.stages[1]]} are parallel milestones within stage ${stepNo(i)}.", "holes": { "${STAGES[col.stages[0]]}": "{first}", "${STAGES[col.stages[1]]}": "{second}", "${stepNo(i)}": "{n}" } },
+
+    "board.showJourney": { "page": "Show journey for ${esc(p.name)}", "holes": { "${esc(p.name)}": "{medicine}" } },
+    "board.milestonesComplete": { "page": "${done} of ${p.stages.length} milestones complete", "holes": { "${done}": "{done}", "${p.stages.length}": "{total}" } },
+    "board.accessReachedIn": { "page": "Reached in ${y}", "holes": { "${y}": "{year}" } },
+    "board.accessSoFar": { "page": "${yrsText(n)} so far", "holes": { "${yrsText(n)}": "{duration}" } },
+
+    "product.accessLine": { "page": "${esc(name)}: ${esc(t)}", "holes": { "${esc(name)}": "{phase}", "${esc(t)}": "{figure}" } },
+    "product.stageMarkerLabel": { "page": "${esc(STAGES[i])}. ${esc(peekLine(st.status, st.date, st.nextDate))}. Opens the full detail.", "holes": { "${esc(STAGES[i])}": "{stage}", "${esc(peekLine(st.status, st.date, st.nextDate))}": "{status}" } },
+    "product.parallelGroupLabel": { "page": "${esc(names)} — independent approvals, no defined order between them", "holes": { "${esc(names)}": "{names}" } },
+    "product.timeline.since": { "page": "since ${esc(from.label)} (${since}) · ${yrsText(hi - since)}", "holes": { "${esc(from.label)}": "{milestone}", "${since}": "{year}", "${yrsText(hi - since)}": "{duration}" } },
+    "product.timeline.notStarted": { "page": "Not started · ${notStarted.length}", "holes": { "${notStarted.length}": "{count}" } },
+    "product.stagePanel.verifiedOn": { "parts": [{ "t": "verified" }, " {date}"] },
+    "product.stagePanel.surveyStatus": { "parts": [{ "t": "country survey is" }, " {status}"] },
+
+    "tooltip.expected": { "parts": [{ "t": "· expected", "drop": "· " }, " {date}"] },
+    "tooltip.dataStatus": { "parts": ["{medicine} · {status} ", { "t": "data" }] },
+
+    "map.preLaunch": { "parts": ["{medicine} ", { "t": "is pre-launch — no country access yet." }] },
+    "map.noCountryData": { "parts": [{ "t": "No country-level data yet for" }, " {medicine}."] },
+    "map.noPolicy": { "page": "No national treatment policy lists ${esc(p.name)} yet.", "holes": { "${esc(p.name)}": "{medicine}" } },
+    "map.policySource": { "page": "Source: WHO ${esc(m.edition || \"World Malaria Report\")}, Annex 4B (${esc(String(m.policyYear || \"\"))} policy).", "holes": { "${esc(m.edition || \"World Malaria Report\")}": "{edition}", "${esc(String(m.policyYear || \"\"))}": "{year}" } },
+    "map.finder.count": { "parts": ["{shown} ", { "t": "of" }, " {total}"] },
+    "map.panel.factsTitle": { "page": "${esc(p.name)} · medicine facts", "holes": { "${esc(p.name)}": "{medicine}" } },
+    "map.panel.preLaunchOverview": { "page": "${esc(p.name)} is pre-launch, so there is no country-level status or policy yet.", "holes": { "${esc(p.name)}": "{medicine}" } },
+    "map.panel.preLaunchCountry": { "page": "${esc(p.name)} is pre-launch, so there is no country status or policy yet.", "holes": { "${esc(p.name)}": "{medicine}" } },
+    "map.panel.stageMixTitle": { "page": "Access stage mix · ${esc(p.name)}", "holes": { "${esc(p.name)}": "{medicine}" } },
+    "map.panel.stageMixCount": { "page": "of ${n} countries have an access stage", "holes": { "${n}": "{total}" } },
+    "map.panel.donutLabelOne": { "parts": ["{count} ", { "t": "country by patient group" }] },
+    "map.panel.donutLabelOther": { "parts": ["{count} ", { "t": "countries by patient group" }] },
+    "map.panel.notDrawn": { "page": "Also in policy but not drawn on this map: ${esc(und.join(\", \"))}.", "holes": { "${esc(und.join(\", \"))}": "{countries}" } },
+    "map.panel.inWhoPolicy": { "parts": [{ "t": "in WHO policy" }, " {year}"] },
+    "map.panel.partLists": { "parts": ["{part}: ", { "t": "lists" }, " {medicine}."] },
+    "map.panel.partDoesNotList": { "parts": ["{part}: ", { "t": "does not list" }, " {medicine}."] },
+    "map.panel.amongRegion": { "page": "${esc(mftName(iso3))} among ${ids.length} ${esc(region)} countries · ${esc(p.name)}", "holes": { "${esc(mftName(iso3))}": "{country}", "${ids.length}": "{count}", "${esc(region)}": "{region}", "${esc(p.name)}": "{medicine}" } },
+    "map.panel.sameStage": { "page": "Other countries at the same stage · ${esc(st.label)}", "holes": { "${esc(st.label)}": "{stage}" } },
+    "map.panel.moreInCountriesTab": { "page": "+${peers.length - 24} more in the Countries tab", "holes": { "${peers.length - 24}": "{count}" } },
+    "map.panel.checkedOn": { "parts": [{ "t": "Checked on" }, " {date}."] },
+
+    "feedback.productPlanned": { "parts": ["{medicine} (", { "t": "planned" }, ")"] },
+    "feedback.reference": { "parts": [{ "t": "Reference" }, " {ref}"] },
+
+    "disclaimer.countriesVerified": { "parts": [{ "t": "Country registrations have been verified for:" }, " {medicines}."] },
+    "disclaimer.countriesNotVerified": { "parts": [{ "t": "Country stages have not been verified yet for:" }, " {medicines}."] },
+
+    "common.yearsOne": { "parts": ["{n} ", { "t": "year" }] },
+    "common.yearsOther": { "parts": ["{n} ", { "t": "years" }] }
+  }
+}
