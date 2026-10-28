@@ -11,8 +11,9 @@
  *
  * Names come from the Unicode CLDR, through Node's own ICU (Intl.DisplayNames),
  * looked up by ISO code. They are never sent to a translation engine: a country
- * name is reference data with a standard form, not prose. Portuguese is pt-PT,
- * the same variety as the /pt page.
+ * name is reference data with a standard form, not prose. Portuguese is
+ * Brazilian (CLDR "pt"), the same variety as the /pt page and RBM's site (since
+ * 28 Oct 2026; European, pt-PT, before).
  *
  * Keyed by the English name, not by ISO3, because the map files give a few
  * territories their country's code (Ashmore and Cartier Islands is AUS) and use
@@ -33,7 +34,7 @@ const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "i18n", "country-names.json");
-const LANGS = { fr: "fr", pt: "pt-PT" };
+const LANGS = { fr: "fr", pt: "pt" };
 
 // ISO 3166-1 alpha-3 -> alpha-2, for the codes the data files use.
 const ISO2 = {

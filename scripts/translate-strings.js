@@ -49,7 +49,12 @@ const { requireFresh } = require("./assemble-content");
 const ROOT = path.resolve(__dirname, "..");
 const MEM = path.join(ROOT, "i18n", "translations.json");
 // Google's target code for each locale (Spanish, "es", was removed on 27 Oct 2026).
-const TARGET = { fr: "fr", pt: "pt-PT" };
+// Portuguese is Brazilian ("pt") since 28 Oct 2026: RBM's own Portuguese is
+// Brazilian (its sample message files). It was European ("pt-PT") before.
+const TARGET = { fr: "fr", pt: "pt" };
+// What the memory's values were made with, until the memory records it
+// itself (mem.targets, written on every save).
+const MADE_WITH_BEFORE = { fr: "fr", pt: "pt-PT" };
 
 // ---------------------------------------------------------------------------
 // Never send these, whatever bucket they turn up in.
@@ -111,8 +116,10 @@ function saveMemory(mem) {
   // stable key order so a rerun that changes nothing produces no diff
   const ordered = {};
   for (const k of Object.keys(mem.entries).sort()) ordered[k] = mem.entries[k];
-  mem.entries = ordered;
-  fs.writeFileSync(MEM, JSON.stringify(mem, null, 2) + "\n", "utf8");
+  // targets: the engine target each locale's values were made with
+  const { schema, targets, entries, ...rest } = mem;
+  const out = { schema, ...(targets ? { targets } : {}), ...rest, entries: ordered };
+  fs.writeFileSync(MEM, JSON.stringify(out, null, 2) + "\n", "utf8");
 }
 
 // ---------------------------------------------------------------------------
@@ -272,8 +279,25 @@ async function main() {
   const kept = all.filter((s) => !denied(s.text));
   const skipped = all.length - kept.length;
 
-  // what is actually missing for this locale — the empty-locale-only rule
   const locales = locale ? [locale] : Object.keys(TARGET);
+
+  // A locale whose values were made with another target (Portuguese: European
+  // until 28 Oct 2026, Brazilian since) is translated again, once, the one
+  // exception to the empty-locale-only rule. Its values are cleared in every
+  // entry, so everything in use is "to translate" and nothing out of use can
+  // come back in the old variety; mem.targets then records the new target. A
+  // string the engine rejects stays empty (English) and is retried by the next
+  // run, like any other empty slot. Nothing is written before the run ends.
+  mem.targets = { ...MADE_WITH_BEFORE, ...(mem.targets || {}) };
+  const retarget = {};
+  for (const loc of locales) {
+    if (mem.targets[loc] === TARGET[loc]) continue;
+    retarget[loc] = mem.targets[loc];
+    for (const e of Object.values(mem.entries)) delete e[loc];
+    mem.targets[loc] = TARGET[loc];
+  }
+
+  // what is actually missing for this locale — the empty-locale-only rule
   const report = {};
   for (const loc of locales) {
     const todo = kept.filter((s) => {
@@ -294,6 +318,7 @@ async function main() {
     const chars = t.reduce((n, s) => n + s.text.length, 0);
     const have = kept.length - t.length;
     console.log(`  ${loc}: ${have} already in memory · ${t.length} to translate · ${chars.toLocaleString()} characters`);
+    if (retarget[loc]) console.log(`  ${loc}: the memory was made with "${retarget[loc]}", the target is now "${TARGET[loc]}": translating it all again`);
   }
   console.log("");
 

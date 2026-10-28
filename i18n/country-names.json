@@ -11,7 +11,7 @@
   "Åland": {
    "iso3": "ALA",
    "fr": "Îles Åland",
-   "pt": "Alanda"
+   "pt": "Ilhas Aland"
   },
   "Albania": {
    "iso3": "ALB",
@@ -56,7 +56,7 @@
   "Armenia": {
    "iso3": "ARM",
    "fr": "Arménie",
-   "pt": "Arménia"
+   "pt": "Armênia"
   },
   "Aruba": {
    "iso3": "ABW",
@@ -86,17 +86,17 @@
   "Bahamas": {
    "iso3": "BHS",
    "fr": "Bahamas",
-   "pt": "Baamas"
+   "pt": "Bahamas"
   },
   "Bahrain": {
    "iso3": "BHR",
    "fr": "Bahreïn",
-   "pt": "Barém"
+   "pt": "Barein"
   },
   "Bangladesh": {
    "iso3": "BGD",
    "fr": "Bangladesh",
-   "pt": "Bangladeche"
+   "pt": "Bangladesh"
   },
   "Barbados": {
    "iso3": "BRB",
@@ -121,7 +121,7 @@
   "Benin": {
    "iso3": "BEN",
    "fr": "Bénin",
-   "pt": "Benim"
+   "pt": "Benin"
   },
   "Bermuda": {
    "iso3": "BMU",
@@ -211,7 +211,7 @@
   "Cayman Is.": {
    "iso3": "CYM",
    "fr": "Îles Caïmans",
-   "pt": "Ilhas Caimão"
+   "pt": "Ilhas Cayman"
   },
   "Central African Rep.": {
    "iso3": "CAF",
@@ -281,7 +281,7 @@
   "Curaçao": {
    "iso3": "CUW",
    "fr": "Curaçao",
-   "pt": "Curaçau"
+   "pt": "Curaçao"
   },
   "Cyprus": {
    "iso3": "CYP",
@@ -291,7 +291,7 @@
   "Czechia": {
    "iso3": "CZE",
    "fr": "Tchéquie",
-   "pt": "Chéquia"
+   "pt": "Tchéquia"
   },
   "Dem. Rep. Congo": {
    "iso3": "COD",
@@ -316,12 +316,12 @@
   "Djibouti": {
    "iso3": "DJI",
    "fr": "Djibouti",
-   "pt": "Jibuti"
+   "pt": "Djibuti"
   },
   "Dominica": {
    "iso3": "DMA",
    "fr": "Dominique",
-   "pt": "Domínica"
+   "pt": "Dominica"
   },
   "Dominican Rep.": {
    "iso3": "DOM",
@@ -346,7 +346,7 @@
   "El Salvador": {
    "iso3": "SLV",
    "fr": "Salvador",
-   "pt": "Salvador"
+   "pt": "El Salvador"
   },
   "Eq. Guinea": {
    "iso3": "GNQ",
@@ -366,7 +366,7 @@
   "Estonia": {
    "iso3": "EST",
    "fr": "Estonie",
-   "pt": "Estónia"
+   "pt": "Estônia"
   },
   "eSwatini": {
    "iso3": "SWZ",
@@ -391,7 +391,7 @@
   "Falkland Is.": {
    "iso3": "FLK",
    "fr": "Îles Malouines",
-   "pt": "Ilhas Falkland"
+   "pt": "Ilhas Malvinas"
   },
   "Fiji": {
    "iso3": "FJI",
@@ -411,7 +411,7 @@
   "Fr. S. Antarctic Lands": {
    "iso3": "ATF",
    "fr": "Terres australes françaises",
-   "pt": "Territórios Austrais Franceses"
+   "pt": "Territórios Franceses do Sul"
   },
   "France": {
    "iso3": "FRA",
@@ -456,7 +456,7 @@
   "Greenland": {
    "iso3": "GRL",
    "fr": "Groenland",
-   "pt": "Gronelândia"
+   "pt": "Groenlândia"
   },
   "Grenada": {
    "iso3": "GRD",
@@ -466,7 +466,7 @@
   "Guam": {
    "iso3": "GUM",
    "fr": "Guam",
-   "pt": "Guame"
+   "pt": "Guam"
   },
   "Guatemala": {
    "iso3": "GTM",
@@ -476,7 +476,7 @@
   "Guernsey": {
    "iso3": "GGY",
    "fr": "Guernesey",
-   "pt": "Guernesey"
+   "pt": "Guernsey"
   },
   "Guinea": {
    "iso3": "GIN",
@@ -536,12 +536,12 @@
   "Iran": {
    "iso3": "IRN",
    "fr": "Iran",
-   "pt": "Irão"
+   "pt": "Irã"
   },
   "Iran (Islamic Republic of)": {
    "iso3": "IRN",
    "fr": "Iran",
-   "pt": "Irão"
+   "pt": "Irã"
   },
   "Iraq": {
    "iso3": "IRQ",
@@ -596,17 +596,17 @@
   "Kenya": {
    "iso3": "KEN",
    "fr": "Kenya",
-   "pt": "Quénia"
+   "pt": "Quênia"
   },
   "Kiribati": {
    "iso3": "KIR",
    "fr": "Kiribati",
-   "pt": "Quiribáti"
+   "pt": "Quiribati"
   },
   "Kuwait": {
    "iso3": "KWT",
    "fr": "Koweït",
-   "pt": "Koweit"
+   "pt": "Kuwait"
   },
   "Kyrgyzstan": {
    "iso3": "KGZ",
@@ -626,7 +626,7 @@
   "Latvia": {
    "iso3": "LVA",
    "fr": "Lettonie",
-   "pt": "Letónia"
+   "pt": "Letônia"
   },
   "Lebanon": {
    "iso3": "LBN",
@@ -651,7 +651,7 @@
   "Liechtenstein": {
    "iso3": "LIE",
    "fr": "Liechtenstein",
-   "pt": "Listenstaine"
+   "pt": "Liechtenstein"
   },
   "Lithuania": {
    "iso3": "LTU",
@@ -671,17 +671,17 @@
   "Macedonia": {
    "iso3": "MKD",
    "fr": "Macédoine du Nord",
-   "pt": "Macedónia do Norte"
+   "pt": "Macedônia do Norte"
   },
   "Madagascar": {
    "iso3": "MDG",
    "fr": "Madagascar",
-   "pt": "Madagáscar"
+   "pt": "Madagascar"
   },
   "Malawi": {
    "iso3": "MWI",
    "fr": "Malawi",
-   "pt": "Maláui"
+   "pt": "Malaui"
   },
   "Malaysia": {
    "iso3": "MYS",
@@ -716,7 +716,7 @@
   "Mauritius": {
    "iso3": "MUS",
    "fr": "Maurice",
-   "pt": "Maurícia"
+   "pt": "Maurício"
   },
   "Mexico": {
    "iso3": "MEX",
@@ -736,7 +736,7 @@
   "Monaco": {
    "iso3": "MCO",
    "fr": "Monaco",
-   "pt": "Mónaco"
+   "pt": "Mônaco"
   },
   "Mongolia": {
    "iso3": "MNG",
@@ -751,7 +751,7 @@
   "Montserrat": {
    "iso3": "MSR",
    "fr": "Montserrat",
-   "pt": "Monserrate"
+   "pt": "Montserrat"
   },
   "Morocco": {
    "iso3": "MAR",
@@ -796,7 +796,7 @@
   "New Caledonia": {
    "iso3": "NCL",
    "fr": "Nouvelle-Calédonie",
-   "pt": "Nova Caledónia"
+   "pt": "Nova Caledônia"
   },
   "New Zealand": {
    "iso3": "NZL",
@@ -821,7 +821,7 @@
   "Niue": {
    "iso3": "NIU",
    "fr": "Niue",
-   "pt": "Niuê"
+   "pt": "Niue"
   },
   "Norfolk Island": {
    "iso3": "NFK",
@@ -856,7 +856,7 @@
   "Palestine": {
    "iso3": "PSE",
    "fr": "Territoires palestiniens",
-   "pt": "Territórios palestinianos"
+   "pt": "Territórios palestinos"
   },
   "Panama": {
    "iso3": "PAN",
@@ -891,7 +891,7 @@
   "Poland": {
    "iso3": "POL",
    "fr": "Pologne",
-   "pt": "Polónia"
+   "pt": "Polônia"
   },
   "Portugal": {
    "iso3": "PRT",
@@ -916,7 +916,7 @@
   "Romania": {
    "iso3": "ROU",
    "fr": "Roumanie",
-   "pt": "Roménia"
+   "pt": "Romênia"
   },
   "Russia": {
    "iso3": "RUS",
@@ -956,7 +956,7 @@
   "San Marino": {
    "iso3": "SMR",
    "fr": "Saint-Marin",
-   "pt": "São Marinho"
+   "pt": "San Marino"
   },
   "Sao Tome and Principe": {
    "iso3": "STP",
@@ -1001,7 +1001,7 @@
   "Sint Maarten": {
    "iso3": "SXM",
    "fr": "Saint-Martin (partie néerlandaise)",
-   "pt": "São Martinho (Sint Maarten)"
+   "pt": "Sint Maarten"
   },
   "Slovakia": {
    "iso3": "SVK",
@@ -1011,7 +1011,7 @@
   "Slovenia": {
    "iso3": "SVN",
    "fr": "Slovénie",
-   "pt": "Eslovénia"
+   "pt": "Eslovênia"
   },
   "Solomon Is.": {
    "iso3": "SLB",
@@ -1051,7 +1051,7 @@
   "Sri Lanka": {
    "iso3": "LKA",
    "fr": "Sri Lanka",
-   "pt": "Sri Lanca"
+   "pt": "Sri Lanka"
   },
   "St-Barthélemy": {
    "iso3": "BLM",
@@ -1061,12 +1061,12 @@
   "St-Martin": {
    "iso3": "MAF",
    "fr": "Saint-Martin",
-   "pt": "São Martinho (Saint-Martin)"
+   "pt": "São Martinho"
   },
   "St. Kitts and Nevis": {
    "iso3": "KNA",
    "fr": "Saint-Christophe-et-Niévès",
-   "pt": "São Cristóvão e Neves"
+   "pt": "São Cristóvão e Névis"
   },
   "St. Pierre and Miquelon": {
    "iso3": "SPM",
@@ -1111,7 +1111,7 @@
   "Tajikistan": {
    "iso3": "TJK",
    "fr": "Tadjikistan",
-   "pt": "Tajiquistão"
+   "pt": "Tadjiquistão"
   },
   "Tanzania": {
    "iso3": "TZA",
@@ -1141,7 +1141,7 @@
   "Trinidad and Tobago": {
    "iso3": "TTO",
    "fr": "Trinité-et-Tobago",
-   "pt": "Trindade e Tobago"
+   "pt": "Trinidad e Tobago"
   },
   "Tunisia": {
    "iso3": "TUN",
@@ -1156,7 +1156,7 @@
   "Turkmenistan": {
    "iso3": "TKM",
    "fr": "Turkménistan",
-   "pt": "Turquemenistão"
+   "pt": "Turcomenistão"
   },
   "Turks and Caicos Is.": {
    "iso3": "TCA",
@@ -1166,7 +1166,7 @@
   "U.S. Virgin Is.": {
    "iso3": "VIR",
    "fr": "Îles Vierges des États-Unis",
-   "pt": "Ilhas Virgens dos EUA"
+   "pt": "Ilhas Virgens Americanas"
   },
   "Uganda": {
    "iso3": "UGA",
@@ -1206,7 +1206,7 @@
   "Uzbekistan": {
    "iso3": "UZB",
    "fr": "Ouzbékistan",
-   "pt": "Usbequistão"
+   "pt": "Uzbequistão"
   },
   "Vanuatu": {
    "iso3": "VUT",
@@ -1231,17 +1231,17 @@
   "Viet Nam": {
    "iso3": "VNM",
    "fr": "Viêt Nam",
-   "pt": "Vietname"
+   "pt": "Vietnã"
   },
   "Vietnam": {
    "iso3": "VNM",
    "fr": "Viêt Nam",
-   "pt": "Vietname"
+   "pt": "Vietnã"
   },
   "W. Sahara": {
    "iso3": "ESH",
    "fr": "Sahara occidental",
-   "pt": "Sara Ocidental"
+   "pt": "Saara Ocidental"
   },
   "Wallis and Futuna Is.": {
    "iso3": "WLF",
@@ -1251,7 +1251,7 @@
   "Yemen": {
    "iso3": "YEM",
    "fr": "Yémen",
-   "pt": "Iémen"
+   "pt": "Iêmen"
   },
   "Zambia": {
    "iso3": "ZMB",
@@ -1261,7 +1261,7 @@
   "Zimbabwe": {
    "iso3": "ZWE",
    "fr": "Zimbabwe",
-   "pt": "Zimbabué"
+   "pt": "Zimbábue"
   }
  }
 }
