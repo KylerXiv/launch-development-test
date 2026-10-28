@@ -43,15 +43,20 @@ Agreed with the owner on 27–28 Oct:
 
 | Repo | Branch | State |
 | --- | --- | --- |
-| `codebyjackson/launch-rbm-test` | `feat/react-port` | Pushed 28 Oct, **not merged**, no PR. 20 commits on `main` `7c1bf11`, head `01b93f1`. `main` and its GitHub Pages copy unchanged |
-| `KylerXiv/launch-development-test` (this repo) | `feat/rbm-messages` | Pushed 28 Oct, **not merged**, no PR. From `main` `89b2011`: the interface text, its build and copy scripts, this §0 |
-| `KylerXiv/launch-development-test` (this repo) | `i18n/translate-seven-words` | **PR #129**, open, for the owner to merge: the 7 words `/fr` and `/pt` show in English, so the bot translates them. Worktree `~/Downloads/launch-development-translate-7` |
+| `codebyjackson/launch-rbm-test` | `feat/react-port` | Pushed 28 Oct, **not merged**, no PR. 21 commits on `main` `7c1bf11`, head `53f8c18`. **Do not merge `main` into it** while the static pages are in it: its golden tests read them (`react-port-notes.md`, Deferred, first item) |
+| `codebyjackson/launch-rbm-test` | `main` | `f39b88d` (PR #31, 28 Oct): the static pages rebuilt from this repo's `e9aff92`, the 7 words translated on `/fr` and `/pt`; checked live on GitHub Pages and `launch-rbm-test.vercel.app` |
+| `KylerXiv/launch-development-test` (this repo) | `feat/rbm-messages` | Pushed 28 Oct, **not merged**, no PR. From `main` `89b2011`, with `main` merged in at `e9aff92` (`65b969e`): the interface text, its build and copy scripts, this §0 |
+| `KylerXiv/launch-development-test` (this repo) | `main` | PR #129 merged 28 Oct (`0902567`): the 7 words in `reviewed-strings.json`; the bot translated them (`e9aff92`) |
 
 Local folders on Kyler's Mac: `~/Downloads/launch-rbm-test` (clone, Kyler's
 identity set), `~/Downloads/launch-development-rbm-messages` (a worktree of
 this repo on `feat/rbm-messages`). Seven `~/Downloads/launch-rbm-test-*`
 worktrees were for parallel work; every branch in them is merged into
-`feat/react-port`, so they can be removed. The main checkout,
+`feat/react-port`, so they can be removed. Also from 28 Oct, removable when
+done with: `~/Downloads/launch-development-translate-7` (PR #129's merged
+branch, now detached at `e9aff92`), `~/Downloads/launch-rbm-test-update`
+(PR #31's merged branch); `~/Downloads/launch-data-test` is a clone of the
+data repo, which `build-rbm-pages.js` reads by default. The main checkout,
 `~/Downloads/launch-development`, is untouched on `feedback/v1-status-barriers`.
 
 ### What `feat/react-port` holds
@@ -105,8 +110,9 @@ includes `test-build-rbm-messages.js` (51 passed) and
 ### Changing interface text
 
 Edit `i18n/ui.en.json` here (313 keys by component area), then
-`node scripts/build-rbm-messages.js --allow-stale` (7 strings per language are
-still untranslated; without the flag it stops on them) and
+`node scripts/build-rbm-messages.js` (all 313 translated since 28 Oct; it
+stops on a string with no translation, and `--allow-stale` ships it in
+English) and
 `node scripts/copy-rbm-messages.js`, then commit in `launch-rbm-test`. The copy
 refuses to overwrite a message file edited there by hand
 (`messages/manifest.json` holds each file's sha256). Wiring `ui.en.json` into
@@ -121,18 +127,18 @@ done yet: it changes the approval hash and needs one test proposal end to end.
    the example app (its `<body>` margin; decision 52). Method and results:
    `react-port-notes.md`, "The side-by-side check". Smoke test 87 of 87 in
    en, fr and pt. Left from it: a real iPhone and Safari.
-2. **Mostly done 28 Oct** (`ae16ee6` here, `01b93f1` in launch-rbm-test): the
-   37 keys are in `i18n/ui.en.json`; the build writes French ’ throughout (the
-   owner's choice over copying the page's mix); `lib/held-text.ts` is gone.
-   **Left:** the 7 untranslated words. PR #129 (to `main`) adds them to
-   `reviewed-strings.json`. After the owner merges it and the bot has
-   translated them: take `main` into this branch, build without
-   `--allow-stale`, copy, add the 7 to the port's `CHANGED` in
-   `tests/text-parity.test.ts` (its frozen tables hold today's English), and
-   rebuild and push the RBM pages so `/fr` and `/pt` there show them too.
+2. **Done 28 Oct.** The 37 keys are in `i18n/ui.en.json` (`ae16ee6`); the
+   build writes French ’ throughout (the owner's choice over copying the
+   page's mix); `lib/held-text.ts` is gone (`01b93f1` in launch-rbm-test).
+   The 7 untranslated words went through PR #129 and the bot (`e9aff92`);
+   this branch took `main` in (`65b969e`) and builds 313 of 313; the port
+   lists them in `CHANGED` (`53f8c18`); RBM's static pages show them (PR #31,
+   `f39b88d`). For the translation reviewer: "Packs" (Google left it
+   "Packs" in French, "Pacotes" in Portuguese).
 3. A README in `launch-rbm-test` for RBM: install, settings, the files to host
    (serve `.mjs` as JavaScript), where the data comes from, how text changes
-   arrive.
+   arrive, and that the page must load Source Sans 3. **Another developer
+   takes this** (owner, 28 Oct).
 4. After RBM runs it on its staging server: remove the static pages from
    `launch-rbm-test` (`en/`, `fr/`, `pt/`, `rbm-shell/`, `iframe-test.html`,
    `build-manifest.json`, `data/`) and retire `build-rbm-pages.js` and its

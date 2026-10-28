@@ -339,16 +339,25 @@ Rejected: leaving them in `lib/held-text.ts` until after 10 Nov. They are
 the same strings, already translated, and holding them in the port keeps two
 places where a wording can change.
 
-## Coverage, 28 Oct 2026
+## Coverage, 28 Oct 2026, after PR #129
 
 | | found | missing |
 |---|---|---|
-| fr | 306 of 313 (98%) | 7 |
-| pt | 306 of 313 (98%) | 7 |
+| fr | 313 of 313 (100%) | 0 |
+| pt | 313 of 313 (100%) | 0 |
 
-The same 7 as on 27 Oct (below). They are in PR #129 against `main`
-(`i18n/reviewed-strings.json`), so the translate bot translates them once it
-is merged; then this branch takes `main` in and builds with none missing.
+PR #129 (merged 06:51 UTC, `0902567`) put the 7 words of 27 Oct (below) in
+`i18n/reviewed-strings.json`; the translate bot's run 40646366848 translated
+them (`e9aff92`: fr and pt "7 to translate", 0 failed, the locale pages 100%,
+0 left in English), and this branch took `main` in (`65b969e`, no conflict:
+the two sides changed different files). The build now runs without
+`--allow-stale`. Google's words: Presentation → Présentation / Apresentação,
+Transactions → Transactions / Transações, Packs → Packs / Pacotes, not
+estimated → non estimé / não estimado, country / countries → pays / pays,
+país / países, data → données / dados. For the reviewer: "Packs" (fr
+"Boîtes" and pt "Embalagens" are the usual words for medicine packs).
+
+Before PR #129, the same day: 306 of 313 (98%) in both, the same 7 missing.
 
 ## Coverage, 27 Oct 2026
 
@@ -366,7 +375,8 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
 
 ## Found in passing, left alone
 
-- **Those 7 strings are English on `/fr` and `/pt` today**, and the locale
+- **Fixed 28 Oct (PR #129, Coverage above).** Those 7 strings were English
+  on `/fr` and `/pt`, and the locale
   build cannot tell. `build-locale-pages.js` reports "fr: 761 translated · 0
   left in English · 100% coverage" while `dist/locale/fr/index.html` has
   `Presentation</th>` and `>Packs<`. It counts only strings that were
@@ -431,14 +441,10 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
    first copy writes `messages/manifest.json` alone (`--check`, Status).
 3. **Reshape to RBM's own JSON structure once they send it.** That includes the
    interpolation syntax: next-intl reads ICU `{name}`, i18next's default is
-   `{{name}}`. It also covers ICU plurals (decision 4) and whether their reader
-   needs French's 52 straight apostrophes escaped.
-4. Translate the 7 missing strings, through `reviewed-strings.json` (Found in
-   passing, first item), not by hand in the output. **In progress:** PR #129
-   against `main` (branch `i18n/translate-seven-words`, 28 Oct), waiting for
-   the owner's merge; the bot translates after it. Then: take `main` into this
-   branch, build without `--allow-stale`, copy, and rebuild and push the RBM
-   pages.
+   `{{name}}`. It also covers ICU plurals (decision 4). French has no straight
+   apostrophe left to escape since decision 9; English has 6.
+4. ~~Translate the 7 missing strings, through `reviewed-strings.json`.~~ Done
+   28 Oct: PR #129 and the bot (Coverage, 28 Oct).
 5. The translation-quality list above, for a French and a Portuguese reviewer,
    now with `pathway.stageButtonDelayed`'s singular (decision 10) and the 7
    Google translations from PR #129.
@@ -450,6 +456,13 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
 
 ## Status
 
+- **28 Oct 2026, after PR #129:** `main` merged in (`65b969e`, no conflict);
+  `node scripts/build-rbm-messages.js` (no flag) passes, fr and pt 313 of
+  313; copied into launch-rbm-test, whose manifest now lists nothing
+  untranslated (`feat/react-port` `53f8c18`, the 7 in its parity test's
+  `CHANGED`). RBM's static pages rebuilt from `e9aff92` (launch-rbm-test
+  PR #31, `f39b88d`; live on GitHub Pages and Vercel). This file and the
+  handoff's §0.
 - **28 Oct 2026, the held texts** (item 2 of the handoff's §0 list):
   decisions 9 and 10. `i18n/ui.en.json` (313 keys), `i18n/ui.page-forms.json`
   (58 forms), `scripts/build-rbm-messages.js` (`typeset()`, exported),
