@@ -43,7 +43,7 @@ Agreed with the owner on 27–28 Oct:
 
 | Repo | Branch | State |
 | --- | --- | --- |
-| `codebyjackson/launch-rbm-test` | `feat/react-port` | Pushed 28 Oct, **not merged**, no PR. 18 commits on `main` `7c1bf11`, head `06cfd97`. `main` and its GitHub Pages copy unchanged |
+| `codebyjackson/launch-rbm-test` | `feat/react-port` | Pushed 28 Oct, **not merged**, no PR. 19 commits on `main` `7c1bf11`, head `675dd78`. `main` and its GitHub Pages copy unchanged |
 | `KylerXiv/launch-development-test` (this repo) | `feat/rbm-messages` | Pushed 28 Oct, **not merged**, no PR. From `main` `89b2011`: the interface text, its build and copy scripts, this §0 |
 
 Local folders on Kyler's Mac: `~/Downloads/launch-rbm-test` (clone, Kyler's
@@ -112,8 +112,12 @@ done yet: it changes the approval hash and needs one test proposal end to end.
 
 ### Still to do before 10 November
 
-1. Side-by-side check against today's pages in en, fr and pt, and at phone
-   widths (`/pt` and narrow screens are not yet driven by the smoke test).
+1. **Done 28 Oct** (`675dd78`): side-by-side check against today's pages in
+   en, fr and pt at 1440 to 360px, same `dashboard.json` in both. Same text,
+   same heights, header, pathway and board pixel-identical, after one fix in
+   the example app (its `<body>` margin; decision 52). Method and results:
+   `react-port-notes.md`, "The side-by-side check". Smoke test 87 of 87 in
+   en, fr and pt. Left from it: a real iPhone and Safari.
 2. Here: add the 37 missing keys to `i18n/ui.en.json`; make the message build
    write French ’ as the pages do; translate the 7 untranslated strings. Then
    `lib/held-text.ts` goes.
