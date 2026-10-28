@@ -314,7 +314,7 @@ launch-rbm-test): `common.status.delayed`; `pathway.stageButtonExpected`,
 new area, `yardstick` (22), the expected-against-actual comparison. Most
 belong to parts switched off for 10 Nov, which is why the first pass (by
 decision 1, what a v1.0 visitor sees) left them out; the port renders them
-when those parts are switched on. 29 are the page's exact English and are
+when those parts are switched on. 25 are the page's exact English and are
 found by `key(English)`. 12 have placeholders and got page forms: the joins
 `", " + "expected" + " {years}"`, `", {n} " + "delayed"` and
 `"{years} " + "expected"`; the memory strings `routine use by ${due}`,
