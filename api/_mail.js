@@ -62,7 +62,14 @@ const DASHBOARD = "/";
 const PARTNERS = [
   // the test copy, codebyjackson/launch-rbm-test, on GitHub Pages. Its Vercel
   // deployment (launch-rbm-test.vercel.app) was retired on 13 Oct 2026.
-  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/", name: "RBM test copy (GitHub Pages)" }
+  { origin: "https://codebyjackson.github.io", dashboard: "https://codebyjackson.github.io/launch-rbm-test/en/", name: "RBM test copy (GitHub Pages)" },
+  // A developer's own computer running the React version (launch-rbm-test,
+  // branch feat/react-port) with `npm run dev` on its default port, so the two
+  // forms can be tested end to end before RBM's own host is known (28 Oct
+  // 2026). Only a page served at exactly this address, on the machine of
+  // whoever opens it, sends this Origin; the one http entry. Remove it once the
+  // React version has been tested on RBM's host.
+  { origin: "http://localhost:3000", dashboard: "http://localhost:3000/en", name: "Local test of the React version" }
 ];
 
 // The same test both forms already run in the browser, so an address the page

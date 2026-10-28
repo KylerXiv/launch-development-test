@@ -140,8 +140,14 @@ missing.
    "could not send". **Every host that serves a copy needs its own entry**,
    test and staging deployments included: on 7 Oct a second copy of the test
    repo, deployed to Vercel, failed for everyone who used it (§2.13). Today
-   `PARTNERS` holds the test copy twice: `https://codebyjackson.github.io`
-   (GitHub Pages) and `https://launch-rbm-test.vercel.app` (Vercel). To check
+   `PARTNERS` holds the test copy on GitHub Pages
+   (`https://codebyjackson.github.io`; its Vercel entry was removed when that
+   copy was retired on 13 Oct) and, since 28 Oct, `http://localhost:3000`: a
+   developer's own computer running the React version (`launch-rbm-test`
+   `feat/react-port`, `npm run dev`), so its two forms can be tested end to
+   end before RBM's host is known. It is the one `http` entry, allowed by name
+   in `test-mail-api.js`'s shape check (`http://localhost:<port>` only); remove
+   it once the React version has been tested on RBM's host. To check
    a host from a terminal, without sending anything:
 
    ```bash

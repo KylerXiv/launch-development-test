@@ -201,8 +201,10 @@ group("the addresses as committed", async () => {
   ok("  and its address passes the email check", !from || mail.EMAIL_RE.test(from[1]));
   ok("ADDRESSES.segment is empty or a Resend segment id", SHIPPED.segment === "" ||
      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(SHIPPED.segment), SHIPPED.segment);
-  ok("every PARTNERS origin is https://host, with no path and no trailing slash",
-     SHIPPED_PARTNERS.every(p => /^https:\/\/[a-z0-9.-]+(:\d{1,5})?$/i.test(p.origin)), JSON.stringify(SHIPPED_PARTNERS));
+  // https only, apart from a developer's own computer: exactly
+  // http://localhost:<port>, never another http host
+  ok("every PARTNERS origin is https://host (or http://localhost:port), with no path and no trailing slash",
+     SHIPPED_PARTNERS.every(p => /^https:\/\/[a-z0-9.-]+(:\d{1,5})?$/i.test(p.origin) || /^http:\/\/localhost:\d{1,5}$/.test(p.origin)), JSON.stringify(SHIPPED_PARTNERS));
   ok("  and its dashboard is a page on that same origin",
      SHIPPED_PARTNERS.every(p => typeof p.dashboard === "string" && p.dashboard.startsWith(p.origin + "/")), JSON.stringify(SHIPPED_PARTNERS));
 });
