@@ -45,6 +45,9 @@ for (const l of LOCALES) {
   ok(!off.length, "every key has the same {placeholders} in every language" + (off.length ? ": " + off.slice(0, 5).join(", ") : "")); }
 { const holes = LOCALES.flatMap((l) => Object.entries(flat[l]).filter(([, v]) => /\$\{/.test(v)).map(([k]) => `${l}:${k}`));
   ok(!holes.length, "no ${...} hole from the page is left in any file" + (holes.length ? ": " + holes.join(", ") : "")); }
+// French typography (decision 9): only an English fallback may keep a straight '
+{ const straight = Object.entries(flat.fr).filter(([k, v]) => v.includes("'") && !r.missing.fr.some((m) => m.key === k)).map(([k]) => k);
+  ok(!straight.length, "fr.json has no straight apostrophe in a translation (’ throughout)" + (straight.length ? ": " + straight.slice(0, 5).join(", ") : "")); }
 // Spanish: no file, no key, nothing in the memory the build reads from
 ok(!LOCALES.includes("es") && !Object.prototype.hasOwnProperty.call(r.messages, "es"), "no Spanish file is built");
 ok(!fs.existsSync(path.join(OUT, "es.json")), "no es.json left in dist/rbm-messages/");
@@ -110,10 +113,18 @@ const got = (res, l, k) => Object.fromEntries(res.messages[l])[k];
   ok(ghost.errors.some((e) => /"t" is not a key/.test(e)), "a page form for a key that does not exist is an error");
   const bad = one({ Bad: "x", a: { b: "" } }, {}, {});
   ok(bad.errors.length === 2, "a key that is not camelCase, and an empty value, are errors"); }
-{ // ICU: an apostrophe next to a brace would print the placeholder literally
+{ // ICU: an apostrophe next to a brace would print the placeholder literally.
+  // French is typeset first (decision 9), and ’ is not ICU's quoting character.
   const t = one({ s: "of {stage}" }, { s: { page: "of ${s}", holes: { "${s}": "{stage}" } } },
-    mem(["of ${s}", "de l'${s}", "da ${s}"]));
-  ok(t.missing.fr.length === 1 && /ICU quoting/.test(t.missing.fr[0].why) && !t.missing.pt.length, "a translation an ICU reader would misread (l'{stage}) counts as missing"); }
+    mem(["of ${s}", "de l'${s}", "d'${s}"]));
+  ok(t.missing.pt.length === 1 && /ICU quoting/.test(t.missing.pt[0].why), "a translation an ICU reader would misread (d'{stage}) counts as missing");
+  ok(!t.missing.fr.length && got(t, "fr", "s") === "de l’{stage}", "French l'{stage} ships as l’{stage}, which an ICU reader reads as it is"); }
+{ // French typography (decision 9): every straight apostrophe becomes ’, in
+  // translations only
+  const t = one({ a: "It's time", b: "LAUNCH's data" }, {}, mem(["It's time", "C'est l'heure", "É d'ouro"]));
+  ok(got(t, "fr", "a") === "C’est l’heure", "French takes the typographic apostrophe ’ for every straight one");
+  ok(got(t, "pt", "a") === "É d'ouro" && got(t, "en", "a") === "It's time", "Portuguese and English keep their apostrophes as they are");
+  ok(got(t, "fr", "b") === "LAUNCH's data" && t.missing.fr.length === 1, "an English fallback in the French file stays English, apostrophe included"); }
 
 // ---------------------------------------------------------------------------
 // 3. main(): what it writes, and when it refuses

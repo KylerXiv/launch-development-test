@@ -18,10 +18,10 @@ approval hash) is a later, separately reviewed step and is **not** done here.
 
 | File | What |
 |---|---|
-| `i18n/ui.en.json` | **new.** 276 keys → English, nested by page area. A `_note` at the top says what it is. |
-| `i18n/ui.page-forms.json` | **new.** For each of the 46 keys with `{placeholders}`, how `index.html` builds that text, so its existing translation can be found. |
-| `scripts/build-rbm-messages.js` | **new.** Writes `dist/rbm-messages/{en,fr,pt}.json` (nested). `--check` writes nothing; `--allow-stale` ships a missing string in English. |
-| `scripts/test-build-rbm-messages.js` | **new.** 46 checks (43 when `dist/rbm-messages/` is not built: three compare the built files with the sources). |
+| `i18n/ui.en.json` | **new.** 313 keys → English, nested by page area (276 until 28 Oct; then the 37 the React port held back, decision 10). A `_note` at the top says what it is. |
+| `i18n/ui.page-forms.json` | **new.** For each of the 58 keys with `{placeholders}`, how `index.html` builds that text, so its existing translation can be found. |
+| `scripts/build-rbm-messages.js` | **new.** Writes `dist/rbm-messages/{en,fr,pt}.json` (nested). `--check` writes nothing; `--allow-stale` ships a missing string in English. French gets ’ (decision 9). |
+| `scripts/test-build-rbm-messages.js` | **new.** 51 checks (48 when `dist/rbm-messages/` is not built: three compare the built files with the sources). |
 | `scripts/copy-rbm-messages.js` | **new** (28 Oct). Copies the three files into `launch-rbm-test/messages/` and leaves `messages/manifest.json` there; refuses to overwrite hand edits. Decision 8. |
 | `scripts/test-copy-rbm-messages.js` | **new** (28 Oct). 35 checks, in a temporary folder. |
 | `CLAUDE.md` | **changed** (28 Oct). Both message tests added to the verify block. |
@@ -33,11 +33,11 @@ approval hash) is a later, separately reviewed step and is **not** done here.
 
 - **Keys** are camelCase segments, dot-separated, nested as JSON objects
   (`map.panel.backToCountries`). Top-level areas match the planned components:
-  `header` 5, `banner` 3, `subscribe` 17, `pathway` 3, `stepPanel` 8, `board`
-  13, `product` 49, `tooltip` 5, `map` 86 (its own 17, `regions` 7, `groups` 6,
+  `header` 5, `banner` 3, `subscribe` 17, `pathway` 6, `stepPanel` 12, `board`
+  17, `product` 52, `yardstick` 22, `tooltip` 5, `map` 86 (its own 17, `regions` 7, `groups` 6,
   `tabs` 2, `filters` 10, `legend` 3, `finder` 7, `table` 3, `panel` 31),
   `download` 13, `feedback` 34, `disclaimer` 7, `about` 7, `sources` 5,
-  `errors` 6, `common` 15.
+  `errors` 6, `common` 16.
 - **A string a component needs lives in that component's area.** `common` holds
   only the small vocabulary several areas share: Close, "and", "Source:",
   `{n} year(s)`, the three status words, the two phase names, the access levels.
@@ -184,7 +184,8 @@ values with a straight apostrophe. The build fails on the one apostrophe use an
 ICU reader misreads (next to a brace, as in `l'{stage}`, or doubled); there are
 none. Rejected: turning `'` into `’` as `build-locale-pages.js` does inside
 JavaScript literals. JSON does not need it, and it would make these files
-differ from the memory.
+differ from the memory. **Superseded for French apostrophes by decision 9
+(28 Oct)**; everything else is still copied as the memory holds it.
 
 **7. Languages come from `scripts/rbm-manifest.js` `LOCALES`** (`en, fr, pt`),
 the same list the RBM pages use, not a second copy. A leftover `es.json` in
@@ -278,6 +279,77 @@ rejected:
   so it is not read as a language. A loader that globbed `messages/*.json`
   would read it.
 
+**9. French takes the typographic apostrophe ’ throughout** (28 Oct, the
+owner's choice). `build-rbm-messages.js` `typeset()` turns every `'` in a
+French translation into `’` (U+2019), before the placeholder and ICU checks,
+so they check what ships. English and an English fallback are untouched:
+they are the pages' own text and the lookup key. Why a rule was needed:
+today's French page mixes the two by where a text lives, because
+`build-locale-pages.js` turns `'` into `’` only inside JavaScript literals.
+Of the 52 French values with an apostrophe, 36 show `’` on the page (all
+from its script; 35 keys, plus "Étape d’accès", which the page writes both
+ways) and 17 show `'` (14 static markup, 2 script strings the locale build
+does not convert, 1 data text). The React port held the 36 in
+`lib/held-text.ts` to show no change. Result: 62 French values with `’`, none
+with `'`. Rejected:
+- **Copying the page's mix** (`’` where the memory's bucket is `js` or
+  `reviewed`): matches today for 50 of 52, but the rule is an accident of the
+  old build, and "Étape d’accès" still differs in one place, since one key
+  cannot be written both ways.
+- **Straight `'` throughout** (decision 6 as it was): no build change, but
+  36 texts change from `’` to `'` against today's page, and `'` is ICU's
+  quoting character, which the next reader of these files may trip on
+  (deferred 3).
+Visible effect in the React port: 17 French texts gain `’` where today's
+page has `'` (the description, the disclaimer and About paragraphs, the map's
+title, note and region filter, the sources intro, the sources error, the
+resistance link, and the map legend's "Étape d’accès").
+
+**10. The 37 texts the React port held back now have keys** (28 Oct), under
+the paths the port already reads (`lib/held-text.ts` `NOT_IN_MESSAGES`, in
+launch-rbm-test): `common.status.delayed`; `pathway.stageButtonExpected`,
+`stageButtonDelayed`, `expectedTag`; `stepPanel.statusCounts.*` (4);
+`board.columns.mainBarrier`, `board.delayedDefinition`, `delayedHint`,
+`noBarrier`; `product.viewTimeTaken`, `dotTitle`, `timeline.delayed`; and a
+new area, `yardstick` (22), the expected-against-actual comparison. Most
+belong to parts switched off for 10 Nov, which is why the first pass (by
+decision 1, what a v1.0 visitor sees) left them out; the port renders them
+when those parts are switched on. 29 are the page's exact English and are
+found by `key(English)`. 12 have placeholders and got page forms: the joins
+`", " + "expected" + " {years}"`, `", {n} " + "delayed"` and
+`"{years} " + "expected"`; the memory strings `routine use by ${due}`,
+`since ${y.start}` (alone, and with `", "` + "not yet in routine use"),
+`Expected in routine use by …`, `Still not in routine use in
+${ASOF_YEAR}.`; the two timeline notes (label + `" {stages}."`); and
+`{status}: {definition}` and `{stage}: {status}`, which are punctuation only
+and copied as they are into every language, as the page does. Checked
+against the held texts: 144 of 147 values equal (37 × 3, plus the 35 kept
+French ones). The three that are not:
+- `pathway.stageButtonDelayed`, fr and pt: the page leaves ", 2 delayed" in
+  English (its `" delayed"` literal is not translated by the locale build);
+  the build now gives ", {n} retardé" / ", {n} atrasado", from the memory's
+  "delayed". Singular, so wrong for two or more: for the reviewer, and a
+  case for ICU plurals (deferred 3). A screen-reader label, rendered only
+  when a stage has late medicines; with `SHOW_LATE` off (the port's
+  `lib/stages.ts` `DISPLAY`, as on the page since 20 Oct) `applyShowLate()`
+  makes every late stage "in progress" before the strip counts, so it is not
+  rendered for 10 Nov (checked in the port's `PathwayStrip.tsx`).
+- `map.accessStage` in the legend: "Étape d’accès" (decision 9).
+Rejected: leaving them in `lib/held-text.ts` until after 10 Nov. They are
+the same strings, already translated, and holding them in the port keeps two
+places where a wording can change.
+
+## Coverage, 28 Oct 2026
+
+| | found | missing |
+|---|---|---|
+| fr | 306 of 313 (98%) | 7 |
+| pt | 306 of 313 (98%) | 7 |
+
+The same 7 as on 27 Oct (below). They are in PR #129 against `main`
+(`i18n/reviewed-strings.json`), so the translate bot translates them once it
+is merged; then this branch takes `main` in and builds with none missing.
+
 ## Coverage, 27 Oct 2026
 
 | | found | missing |
@@ -362,8 +434,14 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
    `{{name}}`. It also covers ICU plurals (decision 4) and whether their reader
    needs French's 52 straight apostrophes escaped.
 4. Translate the 7 missing strings, through `reviewed-strings.json` (Found in
-   passing, first item), not by hand in the output.
-5. The translation-quality list above, for a French and a Portuguese reviewer.
+   passing, first item), not by hand in the output. **In progress:** PR #129
+   against `main` (branch `i18n/translate-seven-words`, 28 Oct), waiting for
+   the owner's merge; the bot translates after it. Then: take `main` into this
+   branch, build without `--allow-stale`, copy, and rebuild and push the RBM
+   pages.
+5. The translation-quality list above, for a French and a Portuguese reviewer,
+   now with `pathway.stageButtonDelayed`'s singular (decision 10) and the 7
+   Google translations from PR #129.
 6. `test-build-rbm-messages.js` and `test-copy-rbm-messages.js` are not in CI
    (they are in the `CLAUDE.md` verify block). `.github/` was out of scope for
    this branch; add them to `validate.yml` with the wiring.
@@ -372,6 +450,14 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
 
 ## Status
 
+- **28 Oct 2026, the held texts** (item 2 of the handoff's §0 list):
+  decisions 9 and 10. `i18n/ui.en.json` (313 keys), `i18n/ui.page-forms.json`
+  (58 forms), `scripts/build-rbm-messages.js` (`typeset()`, exported),
+  `scripts/test-build-rbm-messages.js` (51 passed, 0 failed; the old ICU
+  check on French rewritten for Portuguese, since French `l'{stage}` now
+  ships as `l’{stage}`; with `typeset()` switched off, 4 checks fail by name),
+  `CLAUDE.md` (the count), this file. `test-copy-rbm-messages.js` 35 passed.
+  Build with `--allow-stale`: fr and pt 306 of 313, the same 7 missing.
 - Branch `feat/rbm-messages` in the worktree
   `../launch-development-rbm-messages`, from `origin/main` `89b2011`: the
   message build (`280ad5d`), the copy step (`18f6a6d`), and the handoff's new

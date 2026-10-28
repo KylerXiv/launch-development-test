@@ -41,7 +41,7 @@ node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 
 node scripts/make-preview.js                  # smoke test
 node scripts/test-build-dataset.js            # RBM dashboard.json: expect 0 failed
 node scripts/build-country-names.js --check   # /fr, /pt country names: expect "covers all"
-node scripts/test-build-rbm-messages.js       # React interface text: expect 0 failed (46 passed; 43 if dist/rbm-messages/ is not built)
+node scripts/test-build-rbm-messages.js       # React interface text: expect 0 failed (51 passed; 48 if dist/rbm-messages/ is not built)
 node scripts/test-copy-rbm-messages.js        # copy into launch-rbm-test/messages/: expect 35 passed, 0 failed
 ```
 

@@ -22,7 +22,7 @@
 //     with +). Its translation is looked up under that form, and each ${...}
 //     hole in it is turned into the {placeholder} ui.en.json uses.
 // Every translated string must keep exactly the English's placeholders, or it
-// counts as missing.
+// counts as missing. French gets the typographic apostrophe ’ (typeset()).
 //
 // A string with no translation (or one that cannot be converted): the build
 // fails and lists them, unless --allow-stale, which writes the English in its
@@ -95,6 +95,15 @@ function icuProblems(s) {
   if (/\$\{/.test(s)) p.push("a ${...} hole left in");
   return p;
 }
+
+// French takes the typographic apostrophe ’ (U+2019) for every straight one
+// (decision 9). Today's pages mix the two by where a text happens to live:
+// build-locale-pages.js turns ' into ’ only inside JavaScript literals, so 36
+// texts have ’ and 17 have '. These files are one text per key, so they take
+// one style; ’ is also never ICU's quoting character. Applied to translations
+// only: English, and an English fallback, are the pages' own text.
+const TYPESET = { fr: (s) => s.replace(/'/g, "’") };
+const typeset = (loc, s) => (TYPESET[loc] ? TYPESET[loc](s) : s);
 
 // ---------------------------------------------------------------------------
 // page forms
@@ -195,6 +204,7 @@ function build({ ui, forms, memory, contentKeys = null }) {
         out += r.text;
       }
       if (!why) {
+        out = typeset(loc, out);
         const got = placeholders(out).join(), want = ph.join();
         const icu = icuProblems(out);
         if (got !== want) why = `the ${loc} has {${placeholders(out).join("}, {")}}, the English {${ph.join("}, {")}}: "${out}"`;
@@ -282,5 +292,5 @@ function main(args = [], inputs = load(), outDir = OUT) {
   return 0;
 }
 
-module.exports = { build, load, main, flatten, nest, placeholders, icuProblems, serialise, LOCALES, OUT, UI, FORMS };
+module.exports = { build, load, main, flatten, nest, placeholders, icuProblems, typeset, serialise, LOCALES, OUT, UI, FORMS };
 if (require.main === module) process.exitCode = main(process.argv.slice(2));

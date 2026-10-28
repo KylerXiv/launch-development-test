@@ -5,7 +5,10 @@
     "header.lastUpdated": { "parts": [{ "t": "Last updated" }, " {date}"] },
 
     "pathway.stageButtonLabel": { "parts": [{ "t": "Stage ${stepNo(i)}, ${esc(s)}${exp}. Shows what happens here and where each medicine is${n ?", "holes": { "${stepNo(i)}": "{n}", "${esc(s)}": "{stage}", "${exp}": "", "${n ?": "" } }, "."] },
+    "pathway.stageButtonExpected": { "parts": [", ", { "t": "expected" }, " {years}"] },
+    "pathway.stageButtonDelayed": { "parts": [", {n} ", { "t": "delayed" }] },
     "pathway.parallelGroupLabel": { "page": "${esc(names)} — independent approvals with no defined order between them", "holes": { "${esc(names)}": "{names}" } },
+    "pathway.expectedTag": { "parts": ["{years} ", { "t": "expected" }] },
 
     "stepPanel.label": { "parts": [{ "t": "Stage" }, " {n}: {stage}"] },
     "stepPanel.stepOfTotal": { "page": "Stage ${stepNo(i)} of ${STAGE_COLUMNS.length}", "holes": { "${stepNo(i)}": "{n}", "${STAGE_COLUMNS.length}": "{total}" } },
@@ -16,14 +19,24 @@
     "board.milestonesComplete": { "page": "${done} of ${p.stages.length} milestones complete", "holes": { "${done}": "{done}", "${p.stages.length}": "{total}" } },
     "board.accessReachedIn": { "page": "Reached in ${y}", "holes": { "${y}": "{year}" } },
     "board.accessSoFar": { "page": "${yrsText(n)} so far", "holes": { "${yrsText(n)}": "{duration}" } },
+    "board.delayedHint": { "parts": ["{status}: {definition}"] },
 
     "product.accessLine": { "page": "${esc(name)}: ${esc(t)}", "holes": { "${esc(name)}": "{phase}", "${esc(t)}": "{figure}" } },
     "product.stageMarkerLabel": { "page": "${esc(STAGES[i])}. ${esc(peekLine(st.status, st.date, st.nextDate))}. Opens the full detail.", "holes": { "${esc(STAGES[i])}": "{stage}", "${esc(peekLine(st.status, st.date, st.nextDate))}": "{status}" } },
+    "product.dotTitle": { "parts": ["{stage}: {status}"] },
     "product.parallelGroupLabel": { "page": "${esc(names)} — independent approvals, no defined order between them", "holes": { "${esc(names)}": "{names}" } },
     "product.timeline.since": { "page": "since ${esc(from.label)} (${since}) · ${yrsText(hi - since)}", "holes": { "${esc(from.label)}": "{milestone}", "${since}": "{year}", "${yrsText(hi - since)}": "{duration}" } },
     "product.timeline.notStarted": { "page": "Not started · ${notStarted.length}", "holes": { "${notStarted.length}": "{count}" } },
     "product.stagePanel.verifiedOn": { "parts": [{ "t": "verified" }, " {date}"] },
     "product.stagePanel.surveyStatus": { "parts": [{ "t": "country survey is" }, " {status}"] },
+
+    "yardstick.routineUseBy": { "page": "routine use by ${due}", "holes": { "${due}": "{year}" } },
+    "yardstick.since": { "page": "since ${y.start}", "holes": { "${y.start}": "{year}" } },
+    "yardstick.sinceNotRoutine": { "parts": [{ "t": "since ${y.start}", "holes": { "${y.start}": "{year}" } }, ", ", { "t": "not yet in routine use" }] },
+    "yardstick.expectedRoutineUse": { "page": "Expected in routine use by ${due}, ${y.whole.exp} years after its first milestone in ${y.start}.", "holes": { "${due}": "{due}", "${y.whole.exp}": "{n}", "${y.start}": "{start}" } },
+    "yardstick.stillNotRoutine": { "page": "Still not in routine use in ${ASOF_YEAR}.", "holes": { "${ASOF_YEAR}": "{year}" } },
+    "yardstick.notePublished": { "parts": [{ "t": "Expected times from a published timeline:" }, " {stages}."] },
+    "yardstick.noteEstimate": { "parts": [{ "t": "Expected times from LAUNCH's working estimates, still to be agreed:" }, " {stages}."] },
 
     "tooltip.expected": { "parts": [{ "t": "· expected", "drop": "· " }, " {date}"] },
     "tooltip.dataStatus": { "parts": ["{medicine} · {status} ", { "t": "data" }] },
