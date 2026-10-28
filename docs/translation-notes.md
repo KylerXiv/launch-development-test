@@ -364,6 +364,23 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
   exactly once. Tested locally: all 11 saved. Translation is Google only: no
   hand-written translation is on the page (Kyler's three of 30 Sep belong to
   English that has since changed).
+- **28 Oct:** seven words that `/fr` and `/pt` showed in English are now in
+  `i18n/reviewed-strings.json` (nine snippets): the procurement table's
+  "Presentation", "Transactions", "Packs" (headings and the phone labels) and
+  "not estimated", the map donut's "country" / "countries", and the "data"
+  after a medicine's status in the map's keyboard-list tooltip. They are
+  single or lower-case words, which the `js` patterns reject, so
+  `build-locale-pages.js` reported 100% coverage while leaving them English
+  (it counts only collected strings). Found by the RBM message build on
+  `feat/rbm-messages` (`docs/rbm-messages-notes.md`, "Found in passing"),
+  which lists them by key. `content.en.json`: 663 → 670 strings, contentHash
+  `dd6acd7003be…`; `translate-strings.js --dry-run`: 7 to translate per
+  language, 62 characters. Google translates them without context, so they
+  go on the reviewer list with the other single words. The tooltip will read
+  "ASPY · verified données": its status is a raw data key ("verified"),
+  printed untranslated on every page (the same notes, "Found in passing").
+  After the bot runs, the RBM pages need a rebuild and a push to
+  `launch-rbm-test` to show them there.
 
 What follows is the status as recorded before the merge:
 
