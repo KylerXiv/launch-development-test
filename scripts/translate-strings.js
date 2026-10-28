@@ -127,8 +127,13 @@ function saveMemory(mem) {
 // alone, then restored. If a token does not survive the round trip the
 // translation is REJECTED and the English is kept — a missing placeholder is
 // a broken page, which is worse than an untranslated string.
+//
+// The React version's messages (the "ui" bucket, i18n/ui.en.json, since
+// 28 Oct 2026) carry ICU placeholders instead: "Stage {n} of {total}". They
+// are holes too, protected the same way; the ${...} form is tried first so
+// its inner braces are never taken for one.
 // ---------------------------------------------------------------------------
-const HOLE = /\$\{(?:[^{}]|\{[^{}]*\})*\}/g;
+const HOLE = /\$\{(?:[^{}]|\{[^{}]*\})*\}|\{[A-Za-z][A-Za-z0-9]*\}/g;
 
 // ---------------------------------------------------------------------------
 // Protected terms — the glossary Google's API-key endpoint does not give us.

@@ -13,7 +13,7 @@ const path = require("path");
 const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 const { key } = require("./i18n-hash");
-const { main: buildMain } = require("./build-rbm-messages");
+const { main: buildMain, NAMESPACE } = require("./build-rbm-messages");
 const { main, MANIFEST, PACKAGE } = require("./copy-rbm-messages");
 
 let passed = 0, failed = 0;
@@ -72,10 +72,10 @@ ok(makeBuild(STALE) === 0, "setup: the build writes the three files with --allow
   const r = copy(["--force"]);
   ok(r.code === 1 && /has no pt\.json/.test(r.out) && snapshot(repo) === before, "a missing dist file is refused, naming it, even with --force");
   makeBuild(STALE);
-  const fr = JSON.parse(read(path.join(dist, "fr.json"))); delete fr.a.c; fr.a.d = "x";
+  const fr = JSON.parse(read(path.join(dist, "fr.json"))); delete fr[NAMESPACE].a.c; fr[NAMESPACE].a.d = "x";
   fs.writeFileSync(path.join(dist, "fr.json"), JSON.stringify(fr, null, 2) + "\n");
   const r2 = copy(["--force"]);
-  ok(r2.code === 1 && /do not have the same keys/.test(r2.out) && /fr\.json lacks 1: a\.c/.test(r2.out) && /fr\.json has 1 not in en\.json: a\.d/.test(r2.out) && snapshot(repo) === before,
+  ok(r2.code === 1 && /do not have the same keys/.test(r2.out) && /fr\.json lacks 1: launchDashboard\.a\.c/.test(r2.out) && /fr\.json has 1 not in en\.json: launchDashboard\.a\.d/.test(r2.out) && snapshot(repo) === before,
      "dist files with different key sets are refused, naming the keys, even with --force");
   makeBuild(STALE);
   fs.writeFileSync(path.join(dist, "fr.json"), read(path.join(dist, "fr.json")).replace("Fermer", "Fermer!"));
@@ -131,7 +131,7 @@ ok(makeBuild(STALE) === 0, "setup: the build writes the three files with --allow
      "--check names the files and manifest fields a new build would change, and writes nothing");
   const r = copy([], FULL);
   const m = manifest();
-  ok(r.code === 0 && JSON.parse(read(path.join(M, "fr.json"))).a.c === "Paquets" && m.allow_stale === false && !m.untranslated.fr.length,
+  ok(r.code === 0 && JSON.parse(read(path.join(M, "fr.json")))[NAMESPACE].a.c === "Paquets" && m.allow_stale === false && !m.untranslated.fr.length,
      "a fully translated build replaces the files; the manifest records no --allow-stale and no untranslated key");
   commit("copy 2"); }
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // Builds the interface-text files for the React version of the dashboard that
 // RBM's Next.js app loads through its i18n.ts: one JSON file per language,
-// nested by key path.
+// nested by key path, everything under one name, "launchDashboard" (NAMESPACE),
+// so our keys sit beside RBM's own without colliding and RBM's page can hand
+// the dashboard its part in one piece.
 //
 //   node scripts/build-rbm-messages.js                 # → dist/rbm-messages/{en,fr,pt}.json
 //   node scripts/build-rbm-messages.js --check         # the same checks, writes nothing
@@ -11,27 +13,28 @@
 // feedback form, the failure messages. Data texts (products, sources, stages,
 // glossary, country names) come translated inside dashboard.json.
 //
-// HOW. The English is i18n/ui.en.json: named keys, {name} placeholders. French
-// and Portuguese come from the translation memory, i18n/translations.json,
-// whose entries are filed under key(English as the page writes it)
-// (scripts/i18n-hash.js):
-//   - a key without placeholders holds the page's exact English, so its
-//     translation is memory[key(English)];
-//   - a key with placeholders has its page form in i18n/ui.page-forms.json
-//     ("Stage ${stepNo(i)} of ${STAGE_COLUMNS.length}", or words the page joins
-//     with +). Its translation is looked up under that form, and each ${...}
-//     hole in it is turned into the {placeholder} ui.en.json uses.
-// Every translated string must keep exactly the English's placeholders, or it
-// counts as missing. French gets the typographic apostrophe ’ (typeset()).
+// HOW. The English is i18n/ui.en.json: named keys, {name} placeholders. It is
+// a bucket of i18n/content.en.json ("ui", scripts/assemble-content.js), so the
+// translate bot translates a new or reworded message like any other text, and
+// every message's French and Portuguese is memory[key(its English)] in
+// i18n/translations.json (scripts/i18n-hash.js). Every translated string must
+// keep exactly the English's placeholders, or it counts as missing. French
+// gets the typographic apostrophe ’ (typeset()).
 //
-// A string with no translation (or one that cannot be converted): the build
-// fails and lists them, unless --allow-stale, which writes the English in its
-// place and says so. A string the memory holds only as a stub
-// (TRANSLATE_ENGINE=stub) counts as missing.
+// THE OLD PAGE. While index.html runs too, a message must say what the page
+// says, or the two sites drift apart. So every message must be on the page:
+// a plain one word for word (its key is in content.en.json's page buckets);
+// one with {placeholders} through its page form in i18n/ui.page-forms.json
+// ("Stage ${stepNo(i)} of ${STAGE_COLUMNS.length}", or words the page joins
+// with +), which must rebuild its English exactly, from strings the page
+// still has. A message only the React version has is marked { "uiOnly": true }
+// there. Anything else stops the build: reword the page and ui.en.json
+// together.
 //
-// Not wired into scripts/assemble-content.js yet, so ui.en.json is not part of
-// the approval hash and the translate bot does not see its new strings:
-// docs/rbm-messages-notes.md.
+// A string with no translation: the build fails and lists them, unless
+// --allow-stale, which writes the English in its place and says so (CI, on a
+// pull request the bot has not translated yet). A string the memory holds
+// only as a stub (TRANSLATE_ENGINE=stub) counts as missing.
 //
 // Requires Node 18+. No dependencies.
 "use strict";
@@ -46,6 +49,10 @@ const FORMS = path.join(ROOT, "i18n", "ui.page-forms.json");
 const MEM = path.join(ROOT, "i18n", "translations.json");
 const CONTENT = path.join(ROOT, "i18n", "content.en.json");
 const OUT = path.join(ROOT, "dist", "rbm-messages");
+// The one top-level key of every file: RBM's page passes messages[NAMESPACE]
+// to the dashboard. Renaming it is this line (and the React version's
+// lib/messages.ts).
+const NAMESPACE = "launchDashboard";
 const rel = (f) => path.relative(ROOT, f).split(path.sep).join("/");
 const readJson = (f) => JSON.parse(fs.readFileSync(f, "utf8"));
 
@@ -106,20 +113,21 @@ const TYPESET = { fr: (s) => s.replace(/'/g, "’") };
 const typeset = (loc, s) => (TYPESET[loc] ? TYPESET[loc](s) : s);
 
 // ---------------------------------------------------------------------------
-// page forms
+// page forms: how the old page writes a message with {placeholders}
 // ---------------------------------------------------------------------------
 // One form as a list of parts: a string is copied as it is; { t, holes, drop }
-// is a memory string.
+// is a string the page has.
 function partsOf(form) {
   if (Array.isArray(form.parts)) return form.parts;
   if (typeof form.page === "string") return [{ t: form.page, holes: form.holes || {}, drop: form.drop }];
   return null;
 }
 
-// One memory string with its holes filled and its leading `drop` removed. The
-// same function makes the English (from the form) and each translation, so the
-// two are converted by one rule. Fails if a hole is not there exactly as often
-// as in the English page form, or the drop is not where it should be.
+// One page string with its holes filled and its leading `drop` removed: how
+// the form rebuilds the message's English. (Until 28 Oct 2026 it converted
+// the page's translations too; they are now in the memory under the
+// message's own English, decision 11.) Fails if a hole is not there exactly
+// as often as in the page text, or the drop is not where it should be.
 function fill(text, part, englishText) {
   let s = String(text);
   if (part.drop) {
@@ -142,10 +150,11 @@ function fill(text, part, englishText) {
 const STUB = /^\[stub-[a-z]+\] /;
 
 // Everything in memory: returns the messages per language (flat), what is
-// missing, how each placeholder key was found, and any error that is not a
-// translation gap (a broken ui.en.json or page-forms file). Reads nothing
-// itself, so the tests can feed it what they like.
-function build({ ui, forms, memory, contentKeys = null }) {
+// missing, and any error that is not a translation gap (a broken ui.en.json
+// or page-forms file, or a message the old page no longer says). Reads
+// nothing itself, so the tests can feed it what they like. `pageKeys` is the
+// keys of content.en.json's page buckets (not "ui"); null skips the page check.
+function build({ ui, forms, memory, pageKeys = null }) {
   const errors = [];
   const flat = flatten(ui);
   errors.push(...flat.errors);
@@ -158,64 +167,59 @@ function build({ ui, forms, memory, contentKeys = null }) {
   const missing = Object.fromEntries(LOCALES.map((l) => [l, []]));
   const stubs = Object.fromEntries(LOCALES.map((l) => [l, 0]));
   const placeholderKeys = [];
-  const converted = Object.fromEntries(LOCALES.map((l) => [l, 0]));
-  const notInContent = new Set();
+  const uiOnly = [];
+  const onPage = (t) => !pageKeys || pageKeys.has(key(t));
 
   for (const [k, en] of flat) {
     for (const p of icuProblems(en)) errors.push(`${k}: the English has ${p}`);
     const ph = placeholders(en);
-    const form = formOf[k];
-    let parts;
-    if (form) {
-      parts = partsOf(form);
-      if (!parts) { errors.push(`${k}: its page form has neither "page" nor "parts"`); continue; }
-    } else if (ph.length) {
-      errors.push(`${k}: has {${ph.join("}, {")}} but no page form in ${rel(FORMS)}, so its translation cannot be found`);
-      continue;
-    } else {
-      parts = [{ t: en }];
-    }
     if (ph.length) placeholderKeys.push(k);
 
-    // the form must rebuild this key's English exactly, by the same rule the
-    // translations go through
-    let rebuilt = "", broken = false;
-    for (const part of parts) {
-      if (typeof part === "string") { rebuilt += part; continue; }
-      const r = fill(part.t, part, part.t);
-      if (r.error) { errors.push(`${k}: its page form ${r.error}`); broken = true; break; }
-      rebuilt += r.text;
+    // the old page must say the same
+    const form = formOf[k];
+    if (form && form.uiOnly === true) {
+      uiOnly.push(k);
+    } else if (form) {
+      const parts = partsOf(form);
+      if (!parts) { errors.push(`${k}: its page form has neither "page" nor "parts" (nor "uiOnly": true)`); continue; }
+      // the form must rebuild this key's English exactly, from strings the page still has
+      let rebuilt = "", broken = false;
+      for (const part of parts) {
+        if (typeof part === "string") { rebuilt += part; continue; }
+        const r = fill(part.t, part, part.t);
+        if (r.error) { errors.push(`${k}: its page form ${r.error}`); broken = true; break; }
+        if (!onPage(part.t)) { errors.push(`${k}: the page no longer has "${part.t}" (its page form): reword ${rel(UI)} and ${rel(FORMS)} with the page`); broken = true; break; }
+        rebuilt += r.text;
+      }
+      if (broken) continue;
+      if (rebuilt !== en) { errors.push(`${k}: its page form gives "${rebuilt}", ${rel(UI)} says "${en}"`); continue; }
+    } else if (ph.length) {
+      errors.push(`${k}: has {${ph.join("}, {")}} but no page form in ${rel(FORMS)}: add how the page writes it, or "uiOnly": true`);
+      continue;
+    } else if (!onPage(en)) {
+      errors.push(`${k}: the page does not say "${en}": reword ${rel(UI)} with the page, or mark it "uiOnly": true in ${rel(FORMS)}`);
+      continue;
     }
-    if (broken) continue;
-    if (rebuilt !== en) { errors.push(`${k}: its page form gives "${rebuilt}", ${rel(UI)} says "${en}"`); continue; }
-    if (contentKeys) parts.forEach((part) => { if (typeof part !== "string" && !contentKeys.has(key(part.t))) notInContent.add(part.t); });
 
     messages.en.push([k, en]);
     for (const loc of LOCALES.slice(1)) {
-      let out = "", why = null;
-      for (const part of parts) {
-        if (typeof part === "string") { out += part; continue; }
-        const e = memory[key(part.t)];
-        const v = e && e[loc];
-        if (!v) { why = `no ${loc} translation of "${part.t}"`; break; }
-        if (STUB.test(v)) { stubs[loc]++; why = `only a stub ${loc} value for "${part.t}"`; break; }
-        const r = fill(v, part, part.t);
-        if (r.error) { why = `the ${loc} of "${part.t}" ${r.error}`; break; }
-        out += r.text;
-      }
-      if (!why) {
-        out = typeset(loc, out);
+      const e = memory[key(en)];
+      const v = e && e[loc];
+      let why = null, out = v;
+      if (!v) why = `no ${loc} translation yet`;
+      else if (STUB.test(v)) { stubs[loc]++; why = `only a stub ${loc} value`; }
+      else {
+        out = typeset(loc, v);
         const got = placeholders(out).join(), want = ph.join();
         const icu = icuProblems(out);
         if (got !== want) why = `the ${loc} has {${placeholders(out).join("}, {")}}, the English {${ph.join("}, {")}}: "${out}"`;
         else if (icu.length) why = `the ${loc} has ${icu.join("; ")}: "${out}"`;
       }
       if (why) { missing[loc].push({ key: k, en, why }); messages[loc].push([k, en]); continue; }
-      if (ph.length) converted[loc]++;
       messages[loc].push([k, out]);
     }
   }
-  return { keys: flat.map(([k]) => k), messages, missing, stubs, placeholderKeys, converted, notInContent: [...notInContent], errors };
+  return { keys: flat.map(([k]) => k), messages, missing, stubs, placeholderKeys, uiOnly, errors };
 }
 
 // The repository's own files.
@@ -225,12 +229,13 @@ function load() {
     ui: readJson(UI),
     forms: fs.existsSync(FORMS) ? readJson(FORMS) : { forms: {} },
     memory: readJson(MEM).entries || {},
-    contentKeys: content ? new Set((content.text || []).map((e) => e.key)) : null,
+    pageKeys: content ? new Set((content.text || []).filter((e) => e.bucket !== "ui").map((e) => e.key)) : null,
   };
 }
 
-// The file each language gets: nested, two-space indent, LF, newline at the end.
-const serialise = (pairs) => JSON.stringify(nest(pairs), null, 2) + "\n";
+// The file each language gets: everything under NAMESPACE, nested, two-space
+// indent, LF, newline at the end.
+const serialise = (pairs) => JSON.stringify({ [NAMESPACE]: nest(pairs) }, null, 2) + "\n";
 
 // ---------------------------------------------------------------------------
 // Returns the exit code. The tests pass their own inputs and folder.
@@ -250,16 +255,11 @@ function main(args = [], inputs = load(), outDir = OUT) {
   const areas = {};
   r.keys.forEach((k) => { const a = k.split(".")[0]; areas[a] = (areas[a] || 0) + 1; });
   console.log(`\n  ${rel(UI)}: ${r.keys.length} keys (${Object.entries(areas).map(([a, n]) => `${a} ${n}`).join(", ")})`);
-  console.log(`  ${r.placeholderKeys.length} with {placeholders}, found through ${rel(FORMS)}`);
+  console.log(`  ${r.placeholderKeys.length} with {placeholders} · ${r.keys.length - r.uiOnly.length} checked against the page · ${r.uiOnly.length} only in the React version`);
   for (const loc of LOCALES.slice(1)) {
     const miss = r.missing[loc].length;
     const pct = Math.round(((r.keys.length - miss) / r.keys.length) * 100);
-    const phMiss = r.missing[loc].filter((m) => placeholders(m.en).length).length;
-    console.log(`  ${loc}: ${r.keys.length - miss} translated · ${miss} missing · ${pct}% · placeholder keys converted ${r.converted[loc]} of ${r.placeholderKeys.length}${phMiss ? ` (${phMiss} missing)` : ""}${r.stubs[loc] ? ` · ${r.stubs[loc]} stub value(s) counted as missing` : ""}`);
-  }
-  if (r.notInContent.length) {
-    console.log(`  ${r.notInContent.length} of the English strings looked up are not in i18n/content.en.json, so the translate bot does not translate them yet:`);
-    r.notInContent.forEach((t) => console.log(`    "${t}"`));
+    console.log(`  ${loc}: ${r.keys.length - miss} translated · ${miss} missing · ${pct}%${r.stubs[loc] ? ` · ${r.stubs[loc]} stub value(s) counted as missing` : ""}`);
   }
 
   const anyMissing = LOCALES.some((l) => r.missing[l].length);
@@ -268,8 +268,8 @@ function main(args = [], inputs = load(), outDir = OUT) {
     for (const loc of LOCALES.slice(1)) r.missing[loc].forEach((m) => console.log(`    [${loc}] ${m.key}: ${m.why}`));
   }
   if (anyMissing && !allowStale) {
-    console.error("\n  BUILD FAILED — strings with no translation (above). Translate them into i18n/translations.json,");
-    console.error("  or build with --allow-stale to ship them in English. Nothing written.\n");
+    console.error("\n  BUILD FAILED — strings with no translation (above). The translate bot translates them once");
+    console.error("  i18n/ui.en.json is on main; or build with --allow-stale to ship them in English. Nothing written.\n");
     return 1;
   }
 
@@ -292,5 +292,5 @@ function main(args = [], inputs = load(), outDir = OUT) {
   return 0;
 }
 
-module.exports = { build, load, main, flatten, nest, placeholders, icuProblems, typeset, serialise, LOCALES, OUT, UI, FORMS };
+module.exports = { build, load, main, flatten, nest, placeholders, icuProblems, typeset, serialise, LOCALES, OUT, UI, FORMS, NAMESPACE };
 if (require.main === module) process.exitCode = main(process.argv.slice(2));

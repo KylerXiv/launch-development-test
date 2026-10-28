@@ -12,7 +12,8 @@ form, the failure and "being updated" messages).
 Decision D9, taken before this branch: the English lives in this repository as
 `i18n/ui.en.json`, with named keys, so it stays under the existing
 translate-and-approve pipeline. Wiring it into `assemble-content.js` (the
-approval hash) is a later, separately reviewed step and is **not** done here.
+approval hash) was a later, separately reviewed step: **done 28 Oct 2026**,
+decisions 11 to 13, for the owner's one-file-per-language structure.
 
 ## What is on the branch
 
@@ -339,6 +340,53 @@ Rejected: leaving them in `lib/held-text.ts` until after 10 Nov. They are
 the same strings, already translated, and holding them in the port keeps two
 places where a wording can change.
 
+**11. `ui.en.json` is a bucket of `content.en.json`, and every message's
+translation is filed under its own English** (28 Oct, the wiring, Deferred 1).
+`assemble-content.js` collects it as a fifth bucket, `ui` (294 distinct
+strings from 313 keys; `where` is `i18n/ui.en.json:<key>`), so it is in the
+approval hash and `translate.yml` (now also started by a push to
+`ui.en.json`) translates a new or reworded message like any other text.
+`build-locale-pages.js` skips the bucket: the old page gets nothing from it
+(`dist/locale/` rebuilt byte-identical before and after). The 58 messages with
+`{placeholders}` had no memory entry under their own English, so the first
+bot run would have sent them to Google (dry run: 58 per language, 2,026
+characters). They were seeded once into `i18n/translations.json` from the
+converted translations this branch already shipped (decision 3), with
+`bucket: "ui"`: 58 entries added, none changed; the dry run then has nothing
+to send. French is stored as it ships, with ’ (typeset() is idempotent).
+`build()` now reads every message as `memory[key(its English)]`; the
+conversion of page translations is gone. The output is the same as before,
+string for string, in all three languages (compared with launch-rbm-test
+`messages/`, built from `65b969e`). `translate-strings.js` protects
+`{name}` placeholders as it protects `${...}` holes (none of the 670 page
+strings' masks change). Rejected: keeping the conversion as the translation
+route (two ways to get one translation, and a new message would never be
+translated, since the bot does not know page forms); sending the 58 to Google
+(billed again, and the reviewed wording lost).
+
+**12. While the old page runs, every message must say what the page says**
+(28 Oct, the owner's choice: the old page keeps running for now). The page
+forms are no longer a translation route; they are the check. A plain message's
+English must be in `content.en.json`'s page buckets (not `ui`); a message with
+`{placeholders}` must have a page form that rebuilds its English from strings
+the page still has. Anything else stops the build, naming the key: reword
+`ui.en.json` (and its form) together with the page. A message only the React
+version has is marked `{ "uiOnly": true }` in `ui.page-forms.json`; none is
+today (313 of 313 checked against the page). In CI too (`validate.yml`,
+`--check --allow-stale`: missing translations pass on a pull request, a
+message the page does not say fails). Rejected: a warning only (the drift
+would ship); checking plain keys only (the 58 with placeholders are the ones
+reworded most).
+
+**13. Every file holds one key, `launchDashboard`** (`NAMESPACE`, 28 Oct, the
+owner's choice). RBM merges our messages into its own `en.json`, `fr.json`,
+`pt.json`, which very likely have `header`, `common` and `errors` too; under
+one name nothing collides, and RBM's page hands the dashboard
+`messages.launchDashboard` in one piece. `copy-rbm-messages.js` compares key
+paths, so it needed no change (its tests reach into the files and now go
+through `NAMESPACE`). If RBM asks for another name, it is that constant and
+the React version's `lib/messages.ts`.
+
 ## Coverage, 28 Oct 2026, after PR #129
 
 | | found | missing |
@@ -424,37 +472,46 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
 
 ## Deferred
 
-1. **Wire `ui.en.json` into `assemble-content.js`** as a fifth bucket (`ui`),
-   so it enters the approval hash and the translate bot translates new keys.
-   Separately reviewed, by decision D9. To settle then:
-   - the 46 placeholder strings become new memory entries under their `{name}`
-     English. Seed them from this converter's output so the engine is not
-     called and billed for them, and so the conversion step can then go;
-   - the engine's placeholder protection (`translate-strings.js` protects
-     `${...}`) must protect `{name}` too;
-   - **no check yet that `ui.en.json` still matches the page.** Reword a
-     button in `index.html` and its key keeps the old English. A drift check:
-     every plain key's English and every page form must be in
-     `content.en.json` (today all are, except the 7 above).
+1. ~~Wire `ui.en.json` into `assemble-content.js`.~~ Done 28 Oct: decisions
+   11 (bucket, seed, direct lookup, `{name}` protection) and 12 (the check
+   against the page). When the old page is retired, drop decision 12's check
+   and `ui.page-forms.json` with it.
 2. ~~Copy the files into `launch-rbm-test`.~~ Done 28 Oct:
    `scripts/copy-rbm-messages.js` (decision 8). Not yet run for real: the
    first copy writes `messages/manifest.json` alone (`--check`, Status).
-3. **Reshape to RBM's own JSON structure once they send it.** That includes the
-   interpolation syntax: next-intl reads ICU `{name}`, i18next's default is
-   `{{name}}`. It also covers ICU plurals (decision 4). French has no straight
+3. **Reshape to RBM's own JSON structure once they send it.** RBM uses
+   next-intl (`^3.15.2`, said 28 Oct), which reads ICU `{name}`: next-intl
+   3.15.2 read all 313 messages in all three files exactly as written (tested
+   28 Oct). The one name is done (decision 13). Left: ICU plurals if RBM wants
+   them (decision 4), and their language codes. French has no straight
    apostrophe left to escape since decision 9; English has 6.
 4. ~~Translate the 7 missing strings, through `reviewed-strings.json`.~~ Done
    28 Oct: PR #129 and the bot (Coverage, 28 Oct).
 5. The translation-quality list above, for a French and a Portuguese reviewer,
    now with `pathway.stageButtonDelayed`'s singular (decision 10) and the 7
    Google translations from PR #129.
-6. `test-build-rbm-messages.js` and `test-copy-rbm-messages.js` are not in CI
-   (they are in the `CLAUDE.md` verify block). `.github/` was out of scope for
-   this branch; add them to `validate.yml` with the wiring.
-7. `docs/developer-guide.md` does not mention these files yet, nor
-   `copy-rbm-messages.js`.
+6. ~~The two message tests are not in CI.~~ Done 28 Oct: `validate.yml`,
+   "React interface text builds" (both tests, and the build with
+   `--check --allow-stale`).
+7. ~~`docs/developer-guide.md` does not mention these files.~~ Done 28 Oct:
+   one paragraph in its RBM entry.
 
 ## Status
+
+- **28 Oct 2026, the wiring** (decisions 11 to 13): `main` merged in
+  (`577489a`, no conflict). Files: `scripts/assemble-content.js` (the `ui`
+  bucket), `scripts/build-locale-pages.js` (skips it),
+  `scripts/translate-strings.js` (`{name}` protected),
+  `scripts/build-rbm-messages.js` (direct lookup, page check, `NAMESPACE`),
+  both message tests, `i18n/content.en.json` (rebuilt: 964 strings,
+  contentHash `e200dc0c1ab4`), `i18n/translations.json` (58 entries added,
+  nothing changed), `.github/workflows/translate.yml` (`ui.en.json` starts
+  it), `.github/workflows/validate.yml` (the message step), `CLAUDE.md` (the
+  count), this file. `test-build-rbm-messages.js` 55 passed, 0 failed (52
+  without `dist/rbm-messages/`); `test-copy-rbm-messages.js` 35 passed;
+  `build-rbm-messages.js` fr and pt 313 of 313, 313 checked against the page;
+  `translate-strings.js --dry-run` 0 to send; `assemble-content.js --check`
+  up to date. Local, not pushed.
 
 - **28 Oct 2026, after PR #129:** `main` merged in (`65b969e`, no conflict);
   `node scripts/build-rbm-messages.js` (no flag) passes, fr and pt 313 of

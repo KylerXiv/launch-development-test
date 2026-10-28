@@ -30,6 +30,10 @@
  *   reviewed  exact snippets listed in i18n/reviewed-strings.json, for what the
  *           js patterns cannot find safely, and for the shared widgets
  *           (assets/report-issue.js, assets/site-nav.js) the page loads.
+ *   ui      the interface text of the React version, i18n/ui.en.json (since
+ *           28 Oct 2026): translated like the rest, never substituted into
+ *           the page. scripts/build-rbm-messages.js makes RBM's message files
+ *           from it. Most of it is also on the page, under the same key.
  *
  * --check re-hashes the source and fails (exit 1) if content.en.json is stale,
  * was edited by hand, or if any key in i18n/translations.json no longer matches
@@ -61,7 +65,7 @@ function readDataFile(rel) {
 // of { text, where, quote? }. Reads only; the rules below are unchanged from the
 // original extract-strings.js.
 function collect() {
-  const out = { data: [], markup: [], js: [], reviewed: [] };
+  const out = { data: [], markup: [], js: [], reviewed: [], ui: [] };
   const seen = new Set();
   const add = (bucket, text, where, quote) => {
     const t = String(text == null ? "" : text).trim();
@@ -283,6 +287,23 @@ function collect() {
   // Each entry names its exact snippet, so the builder replaces only that.
   for (const r of reviewed()) add("reviewed", r.en, r.file);
 
+  // ---------------------------------------------------------------------------
+  // 5. ui — i18n/ui.en.json, the React version's interface text
+  // ---------------------------------------------------------------------------
+  // Every message, by its key path; keys starting with "_" are notes. A text
+  // that is also on the page gets the same key (key(English)), so the bot
+  // translates it once for both.
+  if (fs.existsSync(UI)) {
+    const walk = (o, at) => {
+      for (const [k, v] of Object.entries(o)) {
+        if (k.startsWith("_")) continue;
+        if (v && typeof v === "object") walk(v, at ? `${at}.${k}` : k);
+        else add("ui", v, `${rel(UI)}:${at ? `${at}.${k}` : k}`);
+      }
+    };
+    walk(JSON.parse(fs.readFileSync(UI, "utf8")), "");
+  }
+
   return out;
 }
 
@@ -324,8 +345,9 @@ function reviewed() {
 // ---------------------------------------------------------------------------
 const CONTENT = path.join(ROOT, "i18n", "content.en.json");
 const MEM = path.join(ROOT, "i18n", "translations.json");
+const UI = path.join(ROOT, "i18n", "ui.en.json");
 const SCHEMA = "launch-content/1";
-const BUCKETS = ["data", "markup", "js", "reviewed"];
+const BUCKETS = ["data", "markup", "js", "reviewed", "ui"];
 const rel = (f) => path.relative(ROOT, f).split(path.sep).join("/");
 
 function assemble() {
@@ -343,7 +365,7 @@ function assemble() {
     const data = readDataFile(f);
     values[f] = { sha256: digest(data), data };
   }
-  const counts = { data: found.data.length, markup: found.markup.length, js: found.js.length, reviewed: found.reviewed.length, total: text.length };
+  const counts = { data: found.data.length, markup: found.markup.length, js: found.js.length, reviewed: found.reviewed.length, ui: found.ui.length, total: text.length };
   return { schema: SCHEMA, contentHash: contentHashOf(text, values), counts, text, values };
 }
 

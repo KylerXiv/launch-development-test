@@ -5,15 +5,16 @@
 // Builds the three files in memory from the repository's own i18n/ files and
 // checks what RBM's i18n.ts depends on: every key in every language, no empty
 // value, the same {placeholders} in every language, en.json exactly
-// i18n/ui.en.json, and nothing left of Spanish. Then small made-up inputs
-// prove the conversion rules, and main() runs in a temporary folder to prove
-// what it writes and when it refuses. Writes nothing in the repository.
+// i18n/ui.en.json, every message on the old page or marked uiOnly, all under
+// "launchDashboard", and nothing left of Spanish. Then small made-up inputs
+// prove the rules, and main() runs in a temporary folder to prove what it
+// writes and when it refuses. Writes nothing in the repository.
 "use strict";
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { key } = require("./i18n-hash");
-const { build, load, main, flatten, placeholders, serialise, LOCALES, OUT } = require("./build-rbm-messages");
+const { build, load, main, flatten, placeholders, serialise, LOCALES, OUT, NAMESPACE } = require("./build-rbm-messages");
 
 let passed = 0, failed = 0;
 const ok = (c, name) => { if (c) passed++; else { failed++; console.log("  FAIL " + name); } };
@@ -26,9 +27,13 @@ const pathsOf = (o, pre = "") => Object.entries(o).flatMap(([k, v]) => (v && typ
 // ---------------------------------------------------------------------------
 const inputs = load();
 const r = build(inputs);
-ok(r.errors.length === 0, "ui.en.json and ui.page-forms.json are consistent" + (r.errors.length ? ": " + r.errors.slice(0, 3).join(" | ") : ""));
+ok(r.errors.length === 0, "ui.en.json and ui.page-forms.json are consistent, and the page says every message" + (r.errors.length ? ": " + r.errors.slice(0, 3).join(" | ") : ""));
+ok(inputs.pageKeys && inputs.pageKeys.size > 0, "the page check ran: content.en.json's page buckets were read");
 // the three files exactly as they would be written, read back
-const files = Object.fromEntries(LOCALES.map((l) => [l, JSON.parse(serialise(r.messages[l]))]));
+const written = Object.fromEntries(LOCALES.map((l) => [l, JSON.parse(serialise(r.messages[l]))]));
+ok(NAMESPACE === "launchDashboard" && LOCALES.every((l) => Object.keys(written[l]).join() === NAMESPACE),
+   "every file holds one key, launchDashboard, with all the messages under it");
+const files = Object.fromEntries(LOCALES.map((l) => [l, written[l][NAMESPACE]]));
 const flat = Object.fromEntries(LOCALES.map((l) => [l, Object.fromEntries(pathsOf(files[l]))]));
 const uiFlat = flatten(inputs.ui);
 
@@ -52,12 +57,17 @@ for (const l of LOCALES) {
 ok(!LOCALES.includes("es") && !Object.prototype.hasOwnProperty.call(r.messages, "es"), "no Spanish file is built");
 ok(!fs.existsSync(path.join(OUT, "es.json")), "no es.json left in dist/rbm-messages/");
 ok(!Object.values(inputs.memory).some((e) => Object.prototype.hasOwnProperty.call(e, "es")), "the translation memory carries no Spanish for the build to pick up");
-// every placeholder key has its page form, and the counts add up
+// every placeholder key has its page form (or is marked uiOnly)
 ok(r.placeholderKeys.length === uiFlat.filter(([, v]) => placeholders(v).length).length &&
-   r.placeholderKeys.every((k) => inputs.forms.forms[k]), "every key with {placeholders} has its page form");
+   r.placeholderKeys.every((k) => inputs.forms.forms[k]), "every key with {placeholders} has its page form, or uiOnly");
+// the translations are in the memory under each message's own English
+// (decision 11): the bot translates ui.en.json as one of content.en.json's buckets
+{ const content = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "i18n", "content.en.json"), "utf8"));
+  const ui = new Set(content.text.filter((e) => e.bucket === "ui").map((e) => e.en));
+  ok(uiFlat.every(([, v]) => ui.has(v)), "every message is in content.en.json's ui bucket, so the translate bot sees it");
+  const noMem = uiFlat.filter(([, v]) => !inputs.memory[key(v)]).map(([k]) => k);
+  ok(!noMem.length, "every message has a memory entry under its own English" + (noMem.length ? ": " + noMem.slice(0, 5).join(", ") : "")); }
 for (const l of LOCALES.slice(1)) {
-  const phMissing = r.missing[l].filter((m) => placeholders(m.en).length).length;
-  ok(r.converted[l] + phMissing === r.placeholderKeys.length, `${l}: each placeholder key is either converted or reported missing`);
   ok(r.missing[l].every((m) => flat[l][m.key] === m.en), `${l}: a missing string is the English, and is reported`);
 }
 // files already built must match a build from the current sources
@@ -70,43 +80,43 @@ for (const l of LOCALES) {
 // 2. the rules, on made-up inputs
 // ---------------------------------------------------------------------------
 const mem = (...rows) => Object.fromEntries(rows.map(([en, fr, pt]) => [key(en), { en, fr, pt }]));
-const one = (ui, forms, memory) => build({ ui, forms: { forms }, memory });
+// pageKeys: what the old page says (null: no page check)
+const one = (ui, forms, memory, page = null) => build({ ui, forms: { forms }, memory, pageKeys: page && new Set(page.map(key)) });
 const got = (res, l, k) => Object.fromEntries(res.messages[l])[k];
 
 { // a plain key: found by key(English)
   const t = one({ a: { b: "Close" } }, {}, mem(["Close", "Fermer", "Fechar"]));
   ok(got(t, "fr", "a.b") === "Fermer" && got(t, "pt", "a.b") === "Fechar" && !t.missing.fr.length, "a key without placeholders is found by key(English)"); }
-{ // a page form with holes: looked up under the page's text, holes become {names}
+{ // a key with placeholders: found by key(its own English), as the bot files it
   const t = one({ s: "Stage {n} of {total}" },
     { s: { page: "Stage ${i} of ${len}", holes: { "${i}": "{n}", "${len}": "{total}" } } },
-    mem(["Stage ${i} of ${len}", "Étape ${i} sur ${len}", "Etapa ${i} de ${len}"]));
-  ok(got(t, "fr", "s") === "Étape {n} sur {total}" && got(t, "pt", "s") === "Etapa {n} de {total}" && t.converted.fr === 1, "a page form's ${...} holes become {placeholders}, in the translation's own word order"); }
-{ // a hole whose value is always empty, and text appended after the memory string
-  const t = one({ s: "Stage {n}, {stage}." },
-    { s: { parts: [{ t: "Stage ${i}, ${s}${exp}${n ?", holes: { "${i}": "{n}", "${s}": "{stage}", "${exp}": "", "${n ?": "" } }, "."] } },
-    mem(["Stage ${i}, ${s}${exp}${n ?", "Étape ${i}, ${s}${exp}${n ?", "Fase ${i}, ${s}${exp}${n ?"]));
-  ok(got(t, "fr", "s") === "Étape {n}, {stage}.", "a hole mapped to \"\" is dropped, and a literal part is appended as it is"); }
-{ // words joined with +, and a leading separator dropped
-  const t = one({ a: "Last updated {date}", b: "expected {date}" },
-    { a: { parts: [{ t: "Last updated" }, " {date}"] }, b: { parts: [{ t: "· expected", drop: "· " }, " {date}"] } },
-    mem(["Last updated", "Dernière mise à jour", "Última atualização"], ["· expected", "· attendu", "· esperado"]));
-  ok(got(t, "fr", "a") === "Dernière mise à jour {date}" && got(t, "pt", "b") === "esperado {date}", "parts join a translated fragment with its placeholder; drop removes the page's own separator"); }
-{ // a translation that lost a hole is not shipped broken
-  const t = one({ s: "Show journey for {medicine}" },
-    { s: { page: "Show journey for ${name}", holes: { "${name}": "{medicine}" } } },
-    mem(["Show journey for ${name}", "Afficher le parcours", "Mostrar ${name} ${name}"]));
-  ok(got(t, "fr", "s") === "Show journey for {medicine}" && /\$\{name\} 0 time/.test(t.missing.fr[0].why), "a translation that lost a hole counts as missing, and stays English");
-  ok(t.missing.pt.length === 1 && /2 time/.test(t.missing.pt[0].why), "a translation with a hole twice counts as missing"); }
-{ // a separator the translation does not start with
-  const t = one({ b: "expected {date}" }, { b: { parts: [{ t: "· expected", drop: "· " }, " {date}"] } }, mem(["· expected", "attendu", "· esperado"]));
-  ok(t.missing.fr.length === 1 && t.missing.pt.length === 0, "a translation without the separator to drop counts as missing"); }
+    mem(["Stage {n} of {total}", "Étape {n} sur {total}", "Etapa {n} de {total}"]), ["Stage ${i} of ${len}"]);
+  ok(got(t, "fr", "s") === "Étape {n} sur {total}" && got(t, "pt", "s") === "Etapa {n} de {total}" && !t.errors.length,
+     "a key with {placeholders} is found by key(its own English), not through the page's text"); }
+{ // a translation that lost or doubled a placeholder is not shipped broken
+  const t = one({ s: "Show journey for {medicine}" }, { s: { uiOnly: true } },
+    mem(["Show journey for {medicine}", "Afficher le parcours", "Mostrar {medicine} {other}"]));
+  ok(got(t, "fr", "s") === "Show journey for {medicine}" && /the fr has \{\}/.test(t.missing.fr[0].why), "a translation that lost a placeholder counts as missing, and stays English");
+  ok(t.missing.pt.length === 1 && /\{medicine\}, \{other\}/.test(t.missing.pt[0].why), "a translation with another placeholder counts as missing"); }
 { // missing, and stub values from a test run
   const t = one({ a: "Packs", b: "Close" }, {}, mem(["Close", "[stub-fr] Close", "Fechar"]));
   ok(t.missing.fr.map((m) => m.key).join() === "a,b" && t.missing.pt.map((m) => m.key).join() === "a" && t.stubs.fr === 1,
      "a string with no translation, or only a stub value, counts as missing"); }
+{ // the old page must say the same (while it runs, docs/rbm-messages-notes.md decision 12)
+  const page = ["Close", "Last updated", "Stage ${i} of ${len}"];
+  const said = one({ a: "Close", b: "Last updated {date}" }, { b: { parts: [{ t: "Last updated" }, " {date}"] } }, {}, page);
+  ok(!said.errors.length, "a message the page says, word for word or through its page form, passes");
+  const reworded = one({ a: "Close the panel" }, {}, {}, page);
+  ok(reworded.errors.length === 1 && /the page does not say "Close the panel"/.test(reworded.errors[0]), "a plain message the page does not say is an error");
+  const formGone = one({ s: "Step {n} of {total}" }, { s: { page: "Step ${i} of ${len}", holes: { "${i}": "{n}", "${len}": "{total}" } } }, {}, page);
+  ok(formGone.errors.length === 1 && /no longer has "Step \$\{i\} of \$\{len\}"/.test(formGone.errors[0]), "a page form whose text the page no longer has is an error");
+  const only = one({ a: "Open in RBM's menu", s: "Shown {n}" }, { a: { uiOnly: true }, s: { uiOnly: true } }, {}, page);
+  ok(!only.errors.length && only.uiOnly.join() === "a,s", "a message marked uiOnly is not checked against the page");
+  const noCheck = one({ a: "Anything" }, {}, {});
+  ok(!noCheck.errors.length, "without content.en.json the page check is skipped"); }
 { // the forms file must describe the English, and every placeholder key needs one
   const noForm = one({ s: "Reached in {year}" }, {}, {});
-  ok(noForm.errors.length === 1 && /no page form/.test(noForm.errors[0]), "a key with {placeholders} and no page form is an error, not a gap");
+  ok(noForm.errors.length === 1 && /no page form/.test(noForm.errors[0]) && /uiOnly/.test(noForm.errors[0]), "a key with {placeholders} and no page form (nor uiOnly) is an error, not a gap");
   const wrong = one({ s: "Reached in {year}" }, { s: { page: "Reached by ${y}", holes: { "${y}": "{year}" } } }, {});
   ok(wrong.errors.length === 1 && /gives "Reached by \{year\}"/.test(wrong.errors[0]), "a page form that does not rebuild the English is an error");
   const ghost = one({ s: "Close" }, { t: { page: "x" } }, {});
@@ -115,8 +125,7 @@ const got = (res, l, k) => Object.fromEntries(res.messages[l])[k];
   ok(bad.errors.length === 2, "a key that is not camelCase, and an empty value, are errors"); }
 { // ICU: an apostrophe next to a brace would print the placeholder literally.
   // French is typeset first (decision 9), and ’ is not ICU's quoting character.
-  const t = one({ s: "of {stage}" }, { s: { page: "of ${s}", holes: { "${s}": "{stage}" } } },
-    mem(["of ${s}", "de l'${s}", "d'${s}"]));
+  const t = one({ s: "of {stage}" }, { s: { uiOnly: true } }, mem(["of {stage}", "de l'{stage}", "d'{stage}"]));
   ok(t.missing.pt.length === 1 && /ICU quoting/.test(t.missing.pt[0].why), "a translation an ICU reader would misread (d'{stage}) counts as missing");
   ok(!t.missing.fr.length && got(t, "fr", "s") === "de l’{stage}", "French l'{stage} ships as l’{stage}, which an ICU reader reads as it is"); }
 { // French typography (decision 9): every straight apostrophe becomes ’, in
@@ -142,12 +151,12 @@ ok(run.code === 0 && !fs.existsSync(out), "--check writes nothing");
 fs.mkdirSync(out, { recursive: true });
 fs.writeFileSync(path.join(out, "es.json"), "{}\n");
 run = quiet(() => main(["--allow-stale"], small, out));
-const fr = JSON.parse(fs.readFileSync(path.join(out, "fr.json"), "utf8"));
+const fr = JSON.parse(fs.readFileSync(path.join(out, "fr.json"), "utf8"))[NAMESPACE];
 ok(run.code === 0 && fr.a.b === "Fermer" && fr.a.c === "Packs" && /English used/.test(run.out), "--allow-stale writes the English in its place and says so");
 ok(!fs.existsSync(path.join(out, "es.json")) && /removed .*es\.json/.test(run.out), "an es.json left from before is removed");
 ok(fs.readdirSync(out).sort().join() === "en.json,fr.json,pt.json", "the folder holds exactly en.json, fr.json and pt.json");
 run = quiet(() => main([], full, out));
-ok(run.code === 0 && JSON.parse(fs.readFileSync(path.join(out, "pt.json"), "utf8")).a.b === "Fechar", "with everything translated the build passes without --allow-stale");
+ok(run.code === 0 && JSON.parse(fs.readFileSync(path.join(out, "pt.json"), "utf8"))[NAMESPACE].a.b === "Fechar", "with everything translated the build passes without --allow-stale");
 run = quiet(() => main(["--check"], full, out));
 ok(run.code === 0 && /en\.json up to date, fr\.json up to date, pt\.json up to date/.test(run.out), "--check says when the written files are up to date");
 run = quiet(() => main([], { ...full, ui: { s: "Reached in {year}" } }, path.join(tmp, "none")));
