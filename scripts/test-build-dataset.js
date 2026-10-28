@@ -8,7 +8,7 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { build, validate, mergeText, coverage } = require("./build-dataset");
+const { build, validate, mergeText, coverage, forLocale, langSchema, langFile } = require("./build-dataset");
 const locale = require("./build-locale-pages");
 
 const ROOT = path.resolve(__dirname, "..");
@@ -91,6 +91,59 @@ const r = mergeText(en, { en, fr: { a: "Bonjour", b: { c: "Monde" } }, pt: { a: 
 ok(r.merged.a.fr === "Bonjour" && r.merged.a.pt === "Olá" && !("es" in r.merged.a), "listed fields get en/fr/pt");
 ok(r.merged.b.c === "World", "unlisted fields stay strings");
 ok(r.untracked.length === 1 && /b\.c/.test(r.untracked[0]), "a translated field missing from the list is reported", JSON.stringify(r.untracked));
+
+// ---- one file per language (dashboard.<locale>.json) ---------------------------
+const lSchema = langSchema(schema);
+ok(lSchema.$id.endsWith("/v1/schema.lang.json") && lSchema.required.includes("locale") && !lSchema.required.includes("locales") &&
+   !("locales" in lSchema.properties) && lSchema.$defs.text.type === "string", "schema.lang.json: texts are strings, locales is locale");
+ok(JSON.stringify(Object.keys(lSchema.properties)) === JSON.stringify(Object.keys(schema.properties).map((k) => (k === "locales" ? "locale" : k))),
+   "schema.lang.json keeps every other field of schema.json, in order");
+ok(langFile("/tmp/x/dashboard.json", "fr") === "/tmp/x/dashboard.fr.json", "the language files sit beside dashboard.json");
+
+// Walks the combined file and one language file side by side: where the
+// combined has a text, the language file has its string; everywhere else the
+// two are the same shape and value.
+const sameButText = (comb, one, loc, at = "") => {
+  if (isText(comb)) return typeof one === "string" && one === (comb[loc] || comb.en) ? null : `${at}: ${JSON.stringify(one)}`;
+  if (Array.isArray(comb)) {
+    if (!Array.isArray(one) || one.length !== comb.length) return `${at}: not the same list`;
+    for (let i = 0; i < comb.length; i++) { const e = sameButText(comb[i], one[i], loc, `${at}[${i}]`); if (e) return e; }
+    return null;
+  }
+  if (comb && typeof comb === "object") {
+    if (!one || typeof one !== "object" || JSON.stringify(Object.keys(one)) !== JSON.stringify(Object.keys(comb))) return `${at}: not the same keys`;
+    for (const k of Object.keys(comb)) { const e = sameButText(comb[k], one[k], loc, `${at}.${k}`); if (e) return e; }
+    return null;
+  }
+  return comb === one ? null : `${at}: ${JSON.stringify(one)} is not ${JSON.stringify(comb)}`;
+};
+const hasTextObject = (v) => isText(v) || (v && typeof v === "object" && Object.values(v).some(hasTextObject));
+for (const loc of d.locales) {
+  const f = forLocale(d, loc);
+  const e = validate(lSchema, f);
+  ok(!e.length, `dashboard.${loc}.json matches schema.lang.json`, e.slice(0, 3).join("; "));
+  ok(f.locale === loc && !("locales" in f), `dashboard.${loc}.json says it is ${loc}`);
+  ok(!hasTextObject(f), `dashboard.${loc}.json holds no { en, fr, pt } text`);
+  ok(sameButText(d.data, f.data, loc) === null, `dashboard.${loc}.json data is the combined data in ${loc}`, sameButText(d.data, f.data, loc));
+  ok(sameButText(d.source_coverage, f.source_coverage, loc) === null, `dashboard.${loc}.json source_coverage in ${loc}`);
+  ok(["schema_version", "generated_at", "approved_at", "approved_by", "approval", "pipeline_commit", "content_hash", "data_status", "last_updated"]
+     .every((k) => JSON.stringify(f[k]) === JSON.stringify(d[k])), `dashboard.${loc}.json has the combined file's envelope`);
+}
+const fr = forLocale(d, "fr");
+ok(fr.data.stages.every((s, i) => s === frStages[i]), "dashboard.fr.json stage names are exactly those of the /fr page");
+ok(JSON.stringify(fr.data) !== JSON.stringify(forLocale(d, "en").data), "dashboard.fr.json differs from dashboard.en.json");
+ok(forLocale({ locales: ["en", "fr"], data: { t: { en: "Yes", fr: "" }, n: { en: "x", other: 1 } } }, "fr").data.t === "Yes",
+   "an empty translation falls back to the English");
+ok(JSON.stringify(forLocale({ locales: ["en", "fr"], data: { n: { en: "x", other: 1 } } }, "fr").data.n) === '{"en":"x","other":1}',
+   "an object with other keys is data, not a text, and is left alone");
+
+// schema.lang.json catches what it should
+let y = forLocale(d, "pt"); y.data.stages[0] = d.data.stages[0];
+ok(validate(lSchema, y).some((e) => /stages\[0\]/.test(e)), "a { en, fr, pt } text left in a language file is caught");
+y = forLocale(d, "pt"); delete y.locale;
+ok(validate(lSchema, y).some((e) => /locale: missing/.test(e)), "a language file without locale is caught");
+y = forLocale(d, "pt"); y.locale = "es";
+ok(validate(lSchema, y).some((e) => /locale/.test(e)), "a language that is not published is caught");
 
 console.log(`\n  build-dataset: ${passed} passed, ${failed} failed\n`);
 process.exit(failed ? 1 : 0);

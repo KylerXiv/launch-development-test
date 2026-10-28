@@ -7,6 +7,13 @@ name: Publish to RBM data repo
 # repo with `node scripts/copy-rbm-pages.js --to ../launch-rbm-test --data-only`;
 # that file is also the one to send RBM. The run summary says so.
 #
+# ONE FILE PER LANGUAGE (28 Oct 2026). The same commit also publishes
+# v1/dashboard.en.json, .fr.json and .pt.json and their contract
+# v1/schema.lang.json: the same data with every text in one language, which
+# the React version on RBM's Next.js site reads straight from the data repo.
+# The archive keeps the combined file only: it holds all three languages.
+# docs/data-per-language-notes.md.
+#
 # STARTS
 #   - by itself at the end of every approval: proposal-decision.yml → publish.yml
 #     → translate.yml, which starts this with trigger=approval once French and
@@ -83,7 +90,7 @@ jobs:
             exit 1
           fi
 
-      - name: Build dashboard.json and check it
+      - name: Build dashboard.json and the language files, and check them
         env:
           PUBLISH_TRIGGER: ${{ inputs.trigger }}
           PUBLISHED_BY: ${{ github.actor }}
@@ -110,26 +117,43 @@ jobs:
           path: data-repo
           fetch-depth: 0
 
-      # The last commit that touched the published file must be one of ours.
+      # The last commit that touched a published file must be one of ours.
       # Anything else (a hand revert, an edit) means main and the data repo may
       # disagree, and publishing now could undo that change without anyone
-      # noticing.
+      # noticing. The language files count too: a hand edit to one of them is
+      # the same problem.
       - name: Drift check
         if: steps.target.outputs.set == 'true'
         working-directory: data-repo
         run: |
-          LAST=$(git log -1 --format='%H%x09%s' -- v1/dashboard.json || true)
+          FILES="v1/dashboard.json v1/dashboard.en.json v1/dashboard.fr.json v1/dashboard.pt.json v1/schema.lang.json"
+          LAST=$(git log -1 --format='%H%x09%s' -- $FILES || true)
           if [ -z "$LAST" ]; then
-            echo "First publish: no v1/dashboard.json yet."
+            echo "First publish: none of $FILES yet."
             exit 0
           fi
           case "$LAST" in
-            *"[publish-dataset]"*) echo "OK: v1/dashboard.json was last written by this workflow." ;;
+            *"[publish-dataset]"*) echo "OK: the published files were last written by this workflow." ;;
             *)
               SHA=$(printf '%s' "$LAST" | cut -f1 | cut -c1-7)
-              echo "::error::The data repo's v1/dashboard.json was changed outside this workflow (commit $SHA). Make main match that change (for an emergency revert: revert the same change on main), then publish again."
+              echo "::error::A published file in the data repo (one of $FILES) was changed outside this workflow (commit $SHA). Make main match that change (for an emergency revert: revert the same change on main), then publish again."
               exit 1 ;;
           esac
+
+      # dataset-diff.js compares the data only, so a run whose data is already
+      # published would publish nothing, and the language files would never
+      # appear. Publish anyway while any of them is missing (once, the first run
+      # after this change).
+      - name: Are the language files published?
+        id: lang
+        if: steps.target.outputs.set == 'true'
+        working-directory: data-repo
+        run: |
+          MISSING=false
+          for f in v1/dashboard.en.json v1/dashboard.fr.json v1/dashboard.pt.json v1/schema.lang.json; do
+            [ -f "$f" ] || { echo "Not published yet: $f"; MISSING=true; }
+          done
+          echo "missing=$MISSING" >> "$GITHUB_OUTPUT"
 
       - name: What changes for RBM
         id: diff
@@ -144,16 +168,23 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish
-        if: steps.target.outputs.set == 'true' && !inputs.dry_run && steps.diff.outputs.changed == 'true'
+        if: steps.target.outputs.set == 'true' && !inputs.dry_run && (steps.diff.outputs.changed == 'true' || steps.lang.outputs.missing == 'true')
         working-directory: data-repo
         env:
           WHO: ${{ github.actor }}
+          LANG_FILES_MISSING: ${{ steps.lang.outputs.missing }}
         run: |
           STAMP=$(node -p 'require(process.env.RUNNER_TEMP + "/dashboard.json").generated_at.replace(/:/g, "-").replace(/\.\d+Z$/, "Z")')
+          if [ "$LANG_FILES_MISSING" = "true" ]; then
+            printf '\n%s\n' 'First publish of one file per language: `v1/dashboard.en.json`, `v1/dashboard.fr.json`, `v1/dashboard.pt.json`, with their contract `v1/schema.lang.json`.' >> "$RUNNER_TEMP/changes.md"
+          fi
           mkdir -p v1/archive
           cp "$RUNNER_TEMP/dashboard.json" v1/dashboard.json
           cp "$RUNNER_TEMP/dashboard.json" "v1/archive/$STAMP.json"
           cp ../public-data/v1/schema.json v1/schema.json
+          # one file per language, from the same build (same generated_at)
+          for loc in en fr pt; do cp "$RUNNER_TEMP/dashboard.$loc.json" "v1/dashboard.$loc.json"; done
+          cp "$RUNNER_TEMP/schema.lang.json" v1/schema.lang.json
           # newest entry first, under the file's own three-line header
           [ -f CHANGELOG.md ] || printf '%s\n\n%s\n' "# Changelog" 'Every publish of `v1/dashboard.json`, newest first. Written by the publish workflow.' > CHANGELOG.md
           {
@@ -171,7 +202,8 @@ jobs:
           git add v1 CHANGELOG.md
           git commit -q -m "$SUBJECT [publish-dataset]" -m "Built from the pipeline repo at $(git -C .. rev-parse HEAD) by $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           git push
-          echo "Published: https://$(echo "$DATA_REPO" | cut -d/ -f1 | tr 'A-Z' 'a-z').github.io/$(echo "$DATA_REPO" | cut -d/ -f2)/v1/dashboard.json" >> "$GITHUB_STEP_SUMMARY"
+          BASE="https://$(echo "$DATA_REPO" | cut -d/ -f1 | tr 'A-Z' 'a-z').github.io/$(echo "$DATA_REPO" | cut -d/ -f2)/v1"
+          echo "Published: $BASE/dashboard.json, and one file per language: $BASE/dashboard.en.json, $BASE/dashboard.fr.json, $BASE/dashboard.pt.json" >> "$GITHUB_STEP_SUMMARY"
           {
             echo
             echo "**Next: the RBM pages.** They read a copy of this file beside them, so pull the data repo, then in this repo run"
@@ -180,7 +212,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Say why nothing was published
-        if: steps.target.outputs.set == 'true' && (inputs.dry_run || steps.diff.outputs.changed != 'true')
+        if: steps.target.outputs.set == 'true' && (inputs.dry_run || (steps.diff.outputs.changed != 'true' && steps.lang.outputs.missing != 'true'))
         env:
           DRY: ${{ inputs.dry_run }}
         run: |

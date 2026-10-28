@@ -1,17 +1,22 @@
 # LAUNCH dashboard data
 
 **Live:** [v1/dashboard.json](https://codebyjackson.github.io/launch-data-test/v1/dashboard.json)
+· one file per language: [en](https://codebyjackson.github.io/launch-data-test/v1/dashboard.en.json),
+[fr](https://codebyjackson.github.io/launch-data-test/v1/dashboard.fr.json),
+[pt](https://codebyjackson.github.io/launch-data-test/v1/dashboard.pt.json)
 · [v1/schema.json](https://codebyjackson.github.io/launch-data-test/v1/schema.json)
+· [v1/schema.lang.json](https://codebyjackson.github.io/launch-data-test/v1/schema.lang.json)
 · [CHANGELOG](CHANGELOG.md)
 · copied beside the [RBM test pages](https://codebyjackson.github.io/launch-rbm-test/)
 
 The published dataset behind the LAUNCH malaria-medicines dashboard on the
 RBM Partnership to End Malaria's platform. One JSON file holds everything the
-dashboard pages show, in English, French and Portuguese. It is approved output
-only: no code, no secrets, nothing unreviewed.
+dashboard pages show, in English, French and Portuguese, and the same data is
+also published as one file per language. It is approved output only: no code,
+no secrets, nothing unreviewed.
 
-**This repository is written by a workflow.** Every commit that changes
-`v1/dashboard.json` comes from the LAUNCH pipeline's "Publish to RBM data repo"
+**This repository is written by a workflow.** Every commit that changes a file
+under `v1/` comes from the LAUNCH pipeline's "Publish to RBM data repo"
 workflow and ends in `[publish-dataset]`. Do not edit the files under `v1/` by
 hand; see "Corrections" below.
 
@@ -24,10 +29,17 @@ pages fetched it from here). The addresses stay public: this repository is the
 record of every publish, and anyone may download the data.
 
 ```
-https://codebyjackson.github.io/launch-data-test/v1/dashboard.json    current dataset
+https://codebyjackson.github.io/launch-data-test/v1/dashboard.json       current dataset, all languages
+https://codebyjackson.github.io/launch-data-test/v1/dashboard.<lang>.json  the same, one language: en, fr or pt
 https://codebyjackson.github.io/launch-data-test/v1/archive/<time>.json  every earlier publish, unchanged
-https://codebyjackson.github.io/launch-data-test/v1/schema.json        the contract (JSON Schema)
+https://codebyjackson.github.io/launch-data-test/v1/schema.json          the contract (JSON Schema)
+https://codebyjackson.github.io/launch-data-test/v1/schema.lang.json     the contract of a language file
 ```
+
+The React version of the dashboard, for RBM's Next.js site, does fetch from
+here: one language file, on the server, every 10 minutes, so a publish reaches
+it with nobody involved. The combined `dashboard.json` stays for the static
+pages until the React version replaces them.
 
 GitHub Pages serves these with open CORS (`Access-Control-Allow-Origin: *`),
 so a page on any domain, inside an iframe or not, can fetch them in the
@@ -66,6 +78,22 @@ one key per language in `locales`. Where no translation exists yet, `fr` and
 values. Read a text by key, falling back to `en`; do not check for a fixed set
 of keys, since adding a language is not a breaking change (below).
 
+**One file per language** (since 28 Oct 2026). `dashboard.en.json`,
+`dashboard.fr.json` and `dashboard.pt.json` are built and published together
+with `dashboard.json`, from the same data, so `generated_at` and
+`content_hash` match across the four. They have the same fields, with two
+differences: every text is a plain string in that file's language (the English
+where no translation exists yet), and `locales` is `locale`, the file's
+language. Contract: `schema.lang.json`.
+
+```js
+const lang = "fr";                                   // the page's own language
+const res = await fetch(`https://codebyjackson.github.io/launch-data-test/v1/dashboard.${lang}.json`);
+const ds = await res.json();
+if (ds.schema_version !== 1 || ds.locale !== lang) { /* show a maintenance notice, do not render */ }
+const stageName = ds.data.stages[0];                 // already French
+```
+
 **Country access.** `products[].detail.countries` carries `status` and `note`.
 Unless `status` is `verified`, show the note as a warning with the map, as the
 LAUNCH dashboard does.
@@ -79,7 +107,8 @@ join to the data on ISO 3166 alpha-3 codes (`iso3`).
   do not know. Adding a language (a new key in every text, and in `locales`)
   counts as adding a field: Spanish was added this way on 8 Oct 2026. It was
   removed on 27 Oct 2026, together with the only pages that read it, so
-  `schema_version` stayed 1.
+  `schema_version` stayed 1. A new language also gets its own
+  `dashboard.<lang>.json`.
 - **Renaming, removing or retyping** a listed field is breaking: it gets a new
   `schema_version` and a new path (`v2/`), and `v1/` stays live until the RBM
   pages have moved to it.

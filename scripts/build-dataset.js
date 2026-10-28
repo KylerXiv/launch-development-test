@@ -6,6 +6,14 @@
 //   node scripts/build-dataset.js --out <file>
 //   node scripts/build-dataset.js --allow-stale        # CI dry build only (see below)
 //
+// ONE FILE PER LANGUAGE (28 Oct 2026). Beside dashboard.json it also writes
+// dashboard.en.json, dashboard.fr.json and dashboard.pt.json, and their
+// contract schema.lang.json. Each holds the same data with every text as a
+// plain string in its own language, for the React version on RBM's Next.js
+// site, which loads one file per language (next-intl). dashboard.json stays
+// as it is for the static pages until the React version replaces them.
+// docs/data-per-language-notes.md.
+//
 // Reads data/products.js, data/sources.js, data/treatment-policy.js,
 // i18n/translations.json (through build-locale-pages.js) and data/decisions.js.
 // Writes nothing in the repo except under dist/ (gitignored). Publishing it is
@@ -245,6 +253,54 @@ function build() {
   return { dataset, untracked };
 }
 
+// ---- one file per language -------------------------------------------------
+// The dataset in one language: every text ({ en, fr, pt }, exactly the keys in
+// `locales`) becomes its `loc` string, or the English where that is empty;
+// `locales` becomes `locale`. The same rule as the React version's localize()
+// (launch-rbm-test lib/dataset.ts), whose tests prove a language file gives
+// the page exactly what the combined file does. The envelope is unchanged, so
+// the four files of one build share generated_at and content_hash.
+function forLocale(dataset, loc) {
+  const locs = dataset.locales;
+  const isText = (v) => v !== null && typeof v === "object" && !Array.isArray(v) &&
+    typeof v.en === "string" && Object.keys(v).every((k) => locs.includes(k));
+  const pick = (v) => {
+    if (Array.isArray(v)) return v.map(pick);
+    if (isText(v)) return v[loc] || v.en;
+    if (v !== null && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, pick(x)]));
+    return v;
+  };
+  const out = {};
+  for (const [k, v] of Object.entries(dataset)) {
+    if (k === "locales") out.locale = loc;
+    else out[k] = k === "source_coverage" || k === "data" ? pick(v) : v;
+  }
+  return out;
+}
+
+// The contract of a language file, worked out from schema.json rather than
+// kept as a second hand-written file that could drift from it: every
+// $defs/text becomes a string, and `locales` becomes `locale`.
+function langSchema(schema) {
+  const s = JSON.parse(JSON.stringify(schema));
+  const langs = schema.properties.locales.items.enum;
+  s.$id = schema.$id.replace(/schema\.json$/, "schema.lang.json");
+  s.title = `${schema.title}, one language`;
+  s.description = "One language of dashboard.json: dashboard.<locale>.json, for a site that loads one file per language. " +
+    "The same fields as schema.json, except that every text is a plain string in this file's language (the English " +
+    "where no translation exists yet) and `locales` is `locale`. Built from the same data at the same time as " +
+    "dashboard.json, so generated_at and content_hash match. Generated from schema.json by scripts/build-dataset.js.";
+  s.required = schema.required.map((k) => (k === "locales" ? "locale" : k));
+  s.properties = Object.fromEntries(Object.entries(schema.properties).map(([k, v]) => (k === "locales"
+    ? ["locale", { enum: langs, description: "This file's language." }]
+    : [k, v])));
+  s.$defs.text = { type: "string", description: "A text a reader sees, in this file's language: the English where no translation exists yet." };
+  return s;
+}
+
+// dashboard.json → dashboard.fr.json, beside it
+const langFile = (out, loc) => out.replace(/\.json$/, `.${loc}.json`);
+
 // Counts the text fields and how many still read the same as the English.
 function coverage(dataset) {
   const out = { text: 0 };
@@ -268,6 +324,9 @@ function main() {
   const schema = JSON.parse(fs.readFileSync(SCHEMA_FILE, "utf8"));
   const errors = validate(schema, dataset);
   untracked.forEach((u) => errors.push(`translated but not published as text (add it to TEXT_PATHS): ${u}`));
+  const lSchema = langSchema(schema);
+  const perLocale = dataset.locales.map((loc) => [loc, forLocale(dataset, loc)]);
+  for (const [loc, file] of perLocale) validate(lSchema, file).forEach((e) => errors.push(`dashboard.${loc}.json: ${e}`));
   if (errors.length) {
     console.error(`\n  dashboard.json NOT written — ${errors.length} problem(s):`);
     errors.slice(0, 40).forEach((e) => console.error("    " + e));
@@ -277,14 +336,21 @@ function main() {
   const body = JSON.stringify(dataset, null, 2) + "\n";
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, body, "utf8");
+  const sizes = perLocale.map(([loc, file]) => {
+    const b = JSON.stringify(file, null, 2) + "\n";
+    fs.writeFileSync(langFile(OUT, loc), b, "utf8");
+    return `${loc} ${Math.round(b.length / 1024)} KB`;
+  });
+  fs.writeFileSync(path.join(path.dirname(OUT), "schema.lang.json"), JSON.stringify(lSchema, null, 2) + "\n", "utf8");
   const c = coverage(dataset);
   const pct = (n) => (c.text ? Math.round((n / c.text) * 100) : 0);
   console.log(`\n  dashboard.json  ${path.relative(ROOT, OUT)}  (${Math.round(body.length / 1024)} KB)`);
   console.log(`  ${dataset.data.products.length} products · ${dataset.data.sources.length} public sources · ${c.text} text fields`);
   console.log(`  translated: ${locale.LOCALES.map((l) => `${l} ${c[l]} (${pct(c[l])}%)`).join(" · ")} — the rest carry the English`);
   console.log(`  ${dataset.approval.trigger === "approval" ? `approval #${dataset.approval.issue}` : "manual"} by ${dataset.approved_by} · ${dataset.approved_at}`);
+  console.log(`  one file per language: ${sizes.join(" · ")}, with schema.lang.json`);
   console.log(`  schema v${dataset.schema_version}: valid\n`);
 }
 
-module.exports = { build, validate, mergeText, TEXT_PATHS, coverage };
+module.exports = { build, validate, mergeText, TEXT_PATHS, coverage, forLocale, langSchema, langFile };
 if (require.main === module) main();
