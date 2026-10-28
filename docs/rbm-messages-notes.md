@@ -378,7 +378,7 @@ message the page does not say fails). Rejected: a warning only (the drift
 would ship); checking plain keys only (the 58 with placeholders are the ones
 reworded most).
 
-**13. Every file holds one key, `launchDashboard`** (`NAMESPACE`, 28 Oct, the
+**13. Every file holds one key, `launchDashboard`** (renamed `Unitaid` the same day, decision 14) (`NAMESPACE`, 28 Oct, the
 owner's choice). RBM merges our messages into its own `en.json`, `fr.json`,
 `pt.json`, which very likely have `header`, `common` and `errors` too; under
 one name nothing collides, and RBM's page hands the dashboard
@@ -386,6 +386,27 @@ one name nothing collides, and RBM's page hands the dashboard
 paths, so it needed no change (its tests reach into the files and now go
 through `NAMESPACE`). If RBM asks for another name, it is that constant and
 the React version's `lib/messages.ts`.
+
+**14. RBM's structure: our messages under `Unitaid`, and RBM's own keys for
+the module beside them** (28 Oct, from RBM's sample `en.json`, `fr.json`,
+`pt.json`: one namespace per module, merged into the dashboard at
+integration). `NAMESPACE` is `Unitaid`, the name RBM gave the module. Each
+file also carries what RBM's site reads for it (`shellKeys()`):
+`Sidebar.unitaid` and `Sidebar.unitaid_tooltip` (its menu entry, outside the
+namespace, with RBM's key names), and `Unitaid.title` and `Unitaid.metadata`
+(`title`, `description`, `keywords`), first under the namespace as in the
+sample. The owner chose to make them from messages we already have, so none
+needs a translation of its own: the sidebar label and `title` are
+`header.title`, the tooltip and `metadata.description` are
+`header.description`, `metadata.title` is the header's title with
+`| RBM Partnership to End Malaria` in English (as RBM's own sample title is
+English in all three files), and `keywords` is one English list in every
+language (as RBM's sample keeps its own). A message named `title` or
+`metadata` at the top of `ui.en.json` is refused. Rejected: new messages in
+`ui.en.json` for them (new text for Google and the reviewers, and the
+translated title would not match the header's); a translated keyword list.
+Not copied from the sample: its `knowMore` and `components` keys, which look
+like another module's text shown as an example; asked of RBM.
 
 ## Coverage, 28 Oct 2026, after PR #129
 
