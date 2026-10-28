@@ -54,9 +54,10 @@ This file is updated in the same commit as each change it describes.
 7. **The drift check covers all five files** (`dashboard.json`, the three
    language files, `schema.lang.json`): a hand edit to a language file is the
    same problem as one to the combined file.
-8. **The data repo's README is `public-data/README.md`**, kept identical by
-   hand as before; launch-data-test `docs/language-files` carries the same
-   text.
+8. **The data repo's README and ATTRIBUTION are `public-data/README.md` and
+   `public-data/ATTRIBUTION.md`**, kept identical by hand as before;
+   launch-data-test `docs/language-files` carries the same text (ATTRIBUTION:
+   the language files cite their sources as the combined file does).
 
 Sizes, local build of 28 Oct (pretty-printed, as published):
 `dashboard.json` 257 KB; `dashboard.en.json` 118 KB, `.fr.json` 128 KB,
@@ -94,6 +95,7 @@ Sizes, local build of 28 Oct (pretty-printed, as published):
 
 - 28 Oct 2026: local, not pushed. Files: `scripts/build-dataset.js`,
   `scripts/test-build-dataset.js`, `.github/workflows/publish-dataset.yml`,
-  `public-data/README.md`, `docs/developer-guide.md`, this file.
+  `public-data/README.md`, `public-data/ATTRIBUTION.md`,
+  `docs/developer-guide.md`, this file.
 - After merge, "Publish now" (with a reason) puts the files online; the React
   branch is checked against them then.

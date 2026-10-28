@@ -1,7 +1,8 @@
 # Sources and attribution
 
 The dataset is compiled from public sources. Each figure in `v1/dashboard.json`
-cites its source, and `source_coverage` lists every source with its link.
+(and in its one-language copies, `v1/dashboard.<lang>.json`) cites its source,
+and `source_coverage` lists every source with its link.
 The main ones and their terms:
 
 | Source | Used for | Terms |
