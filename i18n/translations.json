@@ -1394,6 +1394,13 @@
       "fr": "Le registre national de tous les médicaments autorisés à la vente en Zambie.",
       "pt": "O registo nacional de todos os medicamentos aprovados para venda na Zâmbia."
     },
+    "3581b54566f17b42": {
+      "en": "not estimated",
+      "where": "index.html",
+      "bucket": "reviewed",
+      "fr": "non estimé",
+      "pt": "não estimado"
+    },
     "35e121b15a0ef956": {
       "en": "Noted, but not sent: email alerts are not switched on yet. Nothing left your browser.",
       "where": "line 3614",
@@ -1541,6 +1548,13 @@
       "fr": "Quelque chose vous semble incorrect, obsolète ou difficile à comprendre ? Signalez-le à l’équipe LAUNCH.",
       "pt": "Algo parece errado, desatualizado ou difícil de acompanhar? Informe a equipa LAUNCH o que está a ver."
     },
+    "3a6eb0790f39ac87": {
+      "en": "data",
+      "where": "index.html",
+      "bucket": "reviewed",
+      "fr": "données",
+      "pt": "dados"
+    },
     "3a716a16ee596314": {
       "en": "Pivotal Phase III (FD-TACT)",
       "where": "products.products[1].detail.milestones[1].milestone",
@@ -1666,6 +1680,20 @@
       "bucket": "data",
       "fr": "Ne pas conserver au froid (à conserver à une température inférieure à 30 °C). Prendre une fois par jour pendant 3 jours, avec ou sans nourriture. Déconseillé aux personnes atteintes d'une maladie du foie.",
       "pt": "Não necessita de refrigeração (conservar abaixo dos 30°C). Uma vez por dia, durante 3 dias, com ou sem alimentos. Não indicado para pessoas com doença hepática."
+    },
+    "3e5136fd4b11c0dd": {
+      "en": "Transactions",
+      "where": "index.html",
+      "bucket": "reviewed",
+      "fr": "Transactions",
+      "pt": "Transações"
+    },
+    "3e784fc40cfb2164": {
+      "en": "Packs",
+      "where": "index.html",
+      "bucket": "reviewed",
+      "fr": "Packs",
+      "pt": "Pacotes"
     },
     "3e9fd3995c3bb348": {
       "en": "Co-developed by Shin Poong and MMV.",
@@ -2639,6 +2667,13 @@
       "bucket": "data",
       "fr": "Le compte rendu officiel de l'essai de phase III de GanLum : taille, sites et date de fin.",
       "pt": "Registo oficial do ensaio clínico de Fase III do GanLum: tamanho da amostra, locais de recolha de dados e data de fim."
+    },
+    "5d5ee15775006a81": {
+      "en": "Presentation",
+      "where": "index.html",
+      "bucket": "reviewed",
+      "fr": "Présentation",
+      "pt": "Apresentação"
     },
     "5d910c4915fd86e6": {
       "en": "Supply chain readiness and health-worker training.",
@@ -4788,6 +4823,13 @@
       "fr": "Roulant (VNM 2013, TZA 2022, NGA 2024, RWA 2024, ZMB 2025)",
       "pt": "Rolamento (VNM 2013, TZA 2022, NGA 2024, RWA 2024, ZMB 2025)"
     },
+    "aff64e4fd520bd18": {
+      "en": "country",
+      "where": "index.html",
+      "bucket": "reviewed",
+      "fr": "pays",
+      "pt": "país"
+    },
     "b0eafdef30da146a": {
       "en": "Acknowledgement",
       "where": "illustrated-journey-dashboard.html",
@@ -6404,6 +6446,13 @@
       "bucket": "markup",
       "fr": "Communications des fabricants",
       "pt": "Comunicações do fabricante"
+    },
+    "e45d4cbade71ec65": {
+      "en": "countries",
+      "where": "index.html",
+      "bucket": "reviewed",
+      "fr": "pays",
+      "pt": "países"
     },
     "e4e239c437499d24": {
       "en": "Tanzania: TMDA register",
