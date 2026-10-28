@@ -373,11 +373,11 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
 ## Status
 
 - Branch `feat/rbm-messages` in the worktree
-  `../launch-development-rbm-messages`, from `origin/main` `89b2011`.
-  **1 commit (`280ad5d`, the message build), not pushed, no CI run.** The
-  copy step (28 Oct) is **uncommitted** on top of it: `scripts/copy-rbm-messages.js`
-  and `scripts/test-copy-rbm-messages.js` new, `CLAUDE.md` and this file
-  changed.
+  `../launch-development-rbm-messages`, from `origin/main` `89b2011`: the
+  message build (`280ad5d`), the copy step (`18f6a6d`), and the handoff's new
+  §0 for the React port (28 Oct). **Pushed 28 Oct 2026, not merged, no PR**:
+  the owner keeps working on the branch until it is stable. The push runs
+  `validate.yml` (it runs on every push).
 - `node scripts/test-build-rbm-messages.js`: 46 passed, 0 failed.
 - `node scripts/test-copy-rbm-messages.js`: 35 passed, 0 failed. Each
   refusal was also broken on purpose in a scratch copy of the scripts (force
