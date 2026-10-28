@@ -43,8 +43,9 @@ Agreed with the owner on 27–28 Oct:
 
 | Repo | Branch | State |
 | --- | --- | --- |
-| `codebyjackson/launch-rbm-test` | `feat/react-port` | Pushed 28 Oct, **not merged**, no PR. 19 commits on `main` `7c1bf11`, head `675dd78`. `main` and its GitHub Pages copy unchanged |
+| `codebyjackson/launch-rbm-test` | `feat/react-port` | Pushed 28 Oct, **not merged**, no PR. 20 commits on `main` `7c1bf11`, head `01b93f1`. `main` and its GitHub Pages copy unchanged |
 | `KylerXiv/launch-development-test` (this repo) | `feat/rbm-messages` | Pushed 28 Oct, **not merged**, no PR. From `main` `89b2011`: the interface text, its build and copy scripts, this §0 |
+| `KylerXiv/launch-development-test` (this repo) | `i18n/translate-seven-words` | **PR #129**, open, for the owner to merge: the 7 words `/fr` and `/pt` show in English, so the bot translates them. Worktree `~/Downloads/launch-development-translate-7` |
 
 Local folders on Kyler's Mac: `~/Downloads/launch-rbm-test` (clone, Kyler's
 identity set), `~/Downloads/launch-development-rbm-messages` (a worktree of
@@ -55,7 +56,7 @@ worktrees were for parallel work; every branch in them is merged into
 
 ### What `feat/react-port` holds
 
-The decisions (51, with the rejected alternatives and numbers), deferred items
+The decisions (53, with the rejected alternatives and numbers), deferred items
 and status are in its `docs/react-port-notes.md`; read that before changing it.
 
 - **Versions:** Next.js **16.4.3** (16.0.0–16.4.0 have two critical
@@ -67,10 +68,12 @@ and status are in its `docs/react-port-notes.md`; read that before changing it.
   one client `components/Dashboard.tsx` that RBM drops into its page; today's
   CSS and the Unitaid skin fenced under `.launch-dashboard`; MapLibre from npm
   with its worker served from `public/`; nothing loads from another host.
-- **Text:** `messages/{en,fr,pt}.json`, copied from this repo (below). 327
-  values per language proved equal to today's pages; held in
-  `lib/held-text.ts` until fixed here: 36 French apostrophes (the page has ’,
-  the build writes ') and 37 texts with no key in `i18n/ui.en.json` yet.
+- **Text:** `messages/{en,fr,pt}.json`, copied from this repo (below), with
+  nothing held in the app since 28 Oct (`lib/held-text.ts` deleted, decision
+  53 there). 327 values per language proved equal to today's pages, apart
+  from two changes the owner chose: French ’ throughout (decision 9 here; 16
+  values, where today's page has ') and the per-step delayed count, which
+  today's `/fr` and `/pt` leave in English (decision 10 here).
 - **Proof against today's page:** golden tests run the page's own functions
   (frozen from `7c1bf11`) beside the port: format/stages 82,911, pathway
   36,438, board 20,931, frame 1,856, map 896,415 comparisons; markup parity
@@ -83,7 +86,7 @@ wants it, though 22.9 works through `vitest.config.mts`):
 
 ```bash
 npm ci
-npx vitest run                    # expect 274 passed
+npx vitest run                    # expect 271 passed
 npx tsc --noEmit                  # expect no output
 npm audit --omit=dev              # expect 0 vulnerabilities
 NEXT_PUBLIC_LAUNCH_FORMS_URL=https://forms.example.org npx next build
@@ -96,12 +99,12 @@ hints, `?product=`, both forms open, the map draws). The forms address is read
 at build time: without it Subscribe is not rendered and that check fails.
 
 In this repo on `feat/rbm-messages`: the CLAUDE.md verify block, which now
-includes `test-build-rbm-messages.js` (46 passed) and
+includes `test-build-rbm-messages.js` (51 passed) and
 `test-copy-rbm-messages.js` (35 passed).
 
 ### Changing interface text
 
-Edit `i18n/ui.en.json` here (276 keys by component area), then
+Edit `i18n/ui.en.json` here (313 keys by component area), then
 `node scripts/build-rbm-messages.js --allow-stale` (7 strings per language are
 still untranslated; without the flag it stops on them) and
 `node scripts/copy-rbm-messages.js`, then commit in `launch-rbm-test`. The copy
@@ -118,9 +121,15 @@ done yet: it changes the approval hash and needs one test proposal end to end.
    the example app (its `<body>` margin; decision 52). Method and results:
    `react-port-notes.md`, "The side-by-side check". Smoke test 87 of 87 in
    en, fr and pt. Left from it: a real iPhone and Safari.
-2. Here: add the 37 missing keys to `i18n/ui.en.json`; make the message build
-   write French ’ as the pages do; translate the 7 untranslated strings. Then
-   `lib/held-text.ts` goes.
+2. **Mostly done 28 Oct** (`ae16ee6` here, `01b93f1` in launch-rbm-test): the
+   37 keys are in `i18n/ui.en.json`; the build writes French ’ throughout (the
+   owner's choice over copying the page's mix); `lib/held-text.ts` is gone.
+   **Left:** the 7 untranslated words. PR #129 (to `main`) adds them to
+   `reviewed-strings.json`. After the owner merges it and the bot has
+   translated them: take `main` into this branch, build without
+   `--allow-stale`, copy, add the 7 to the port's `CHANGED` in
+   `tests/text-parity.test.ts` (its frozen tables hold today's English), and
+   rebuild and push the RBM pages so `/fr` and `/pt` there show them too.
 3. A README in `launch-rbm-test` for RBM: install, settings, the files to host
    (serve `.mjs` as JavaScript), where the data comes from, how text changes
    arrive.
