@@ -249,7 +249,7 @@ No test framework by design; two layers instead:
   Next.js site, 28 Oct 2026) takes its interface text from
   `i18n/ui.en.json`, one of `content.en.json`'s buckets (`ui`), so the
   translate bot translates it. `node scripts/build-rbm-messages.js` writes
-  `dist/rbm-messages/{en,fr,pt}.json`, everything under `launchDashboard`,
+  `dist/rbm-messages/{en,fr,pt}.json`, everything under `Unitaid` (with RBM's `Sidebar` keys beside it),
   and stops if a message no longer says what this page says (reword both, or
   mark a React-only message `uiOnly` in `i18n/ui.page-forms.json`); then
   `node scripts/copy-rbm-messages.js --to ../launch-rbm-test` and commit

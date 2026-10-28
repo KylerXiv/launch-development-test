@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Builds the interface-text files for the React version of the dashboard that
 // RBM's Next.js app loads through its i18n.ts: one JSON file per language,
-// nested by key path, everything under one name, "launchDashboard" (NAMESPACE),
-// so our keys sit beside RBM's own without colliding and RBM's page can hand
-// the dashboard its part in one piece.
+// nested by key path, everything under one name, "Unitaid" (NAMESPACE, the
+// name RBM gave our module on 28 Oct 2026), so our keys sit beside RBM's own
+// without colliding and RBM's page can hand the dashboard its part in one
+// piece. Each file also carries the few keys RBM's site itself reads for the
+// module (shellKeys(): its sidebar entry, the page's title and metadata).
 //
 //   node scripts/build-rbm-messages.js                 # → dist/rbm-messages/{en,fr,pt}.json
 //   node scripts/build-rbm-messages.js --check         # the same checks, writes nothing
@@ -49,10 +51,35 @@ const FORMS = path.join(ROOT, "i18n", "ui.page-forms.json");
 const MEM = path.join(ROOT, "i18n", "translations.json");
 const CONTENT = path.join(ROOT, "i18n", "content.en.json");
 const OUT = path.join(ROOT, "dist", "rbm-messages");
-// The one top-level key of every file: RBM's page passes messages[NAMESPACE]
-// to the dashboard. Renaming it is this line (and the React version's
-// lib/messages.ts).
-const NAMESPACE = "launchDashboard";
+// The top-level key of every file that holds our messages: RBM's page passes
+// messages[NAMESPACE] to the dashboard. RBM named it (sample files, 28 Oct
+// 2026). Renaming it is this line (and the React version's lib/messages.ts).
+const NAMESPACE = "Unitaid";
+
+// What RBM's site reads for the module besides our messages, from its sample
+// files (28 Oct 2026): Sidebar.unitaid and Sidebar.unitaid_tooltip (its menu
+// entry, outside the namespace, with RBM's key names), and inside it the
+// page's title and metadata. They are made from messages we already have, so
+// they never need a translation of their own: the header's title and
+// description, RBM's own name kept in English in the title, and the keywords
+// in English in every language, as RBM's sample keeps its own.
+const RBM_SITE = "RBM Partnership to End Malaria";
+const KEYWORDS = "LAUNCH, Unitaid, Malaria, Antimalarial medicines, Market access, Product launch, Dashboard, RBM Partnership to End Malaria";
+// m: one language's messages, { "header.title": "…" }. A key whose source is
+// missing is left out (small test inputs have no header).
+function shellKeys(m) {
+  const title = m["header.title"], description = m["header.description"];
+  const keep = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => typeof v === "string"));
+  return {
+    sidebar: keep({ unitaid: title, unitaid_tooltip: description }),
+    page: {
+      ...keep({ title }),
+      ...(title ? { metadata: keep({ title: `${title} | ${RBM_SITE}`, description, keywords: KEYWORDS }) } : {}),
+    },
+  };
+}
+// keys our own messages may not use, since shellKeys() writes them
+const SHELL_TOP = ["title", "metadata"];
 const rel = (f) => path.relative(ROOT, f).split(path.sep).join("/");
 const readJson = (f) => JSON.parse(fs.readFileSync(f, "utf8"));
 
@@ -160,6 +187,7 @@ function build({ ui, forms, memory, pageKeys = null }) {
   errors.push(...flat.errors);
   const formOf = (forms && forms.forms) || {};
   const uiKeys = new Set(flat.map(([k]) => k));
+  for (const k of SHELL_TOP) if (uiKeys.has(k) || [...uiKeys].some((u) => u.startsWith(k + "."))) errors.push(`${k}: a top-level key shellKeys() writes; give the message another name`);
   for (const k of Object.keys(formOf)) if (!uiKeys.has(k)) errors.push(`${rel(FORMS)}: "${k}" is not a key in ${rel(UI)}`);
   if (LOCALES[0] !== "en") errors.push(`LOCALES must start with "en", got ${LOCALES.join(",")}`);
 
@@ -233,9 +261,15 @@ function load() {
   };
 }
 
-// The file each language gets: everything under NAMESPACE, nested, two-space
-// indent, LF, newline at the end.
-const serialise = (pairs) => JSON.stringify({ [NAMESPACE]: nest(pairs) }, null, 2) + "\n";
+// The file each language gets: RBM's Sidebar keys, then everything under
+// NAMESPACE (the page's title and metadata first, as in RBM's sample), nested,
+// two-space indent, LF, newline at the end.
+const serialise = (pairs) => {
+  const shell = shellKeys(Object.fromEntries(pairs));
+  const file = { Sidebar: shell.sidebar, [NAMESPACE]: { ...shell.page, ...nest(pairs) } };
+  if (!Object.keys(file.Sidebar).length) delete file.Sidebar;
+  return JSON.stringify(file, null, 2) + "\n";
+};
 
 // ---------------------------------------------------------------------------
 // Returns the exit code. The tests pass their own inputs and folder.
@@ -292,5 +326,5 @@ function main(args = [], inputs = load(), outDir = OUT) {
   return 0;
 }
 
-module.exports = { build, load, main, flatten, nest, placeholders, icuProblems, typeset, serialise, LOCALES, OUT, UI, FORMS, NAMESPACE };
+module.exports = { build, load, main, flatten, nest, placeholders, icuProblems, typeset, serialise, shellKeys, LOCALES, OUT, UI, FORMS, NAMESPACE, RBM_SITE, KEYWORDS };
 if (require.main === module) process.exitCode = main(process.argv.slice(2));

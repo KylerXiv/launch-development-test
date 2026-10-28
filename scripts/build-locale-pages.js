@@ -58,7 +58,8 @@ const COUNTRY_NAMES = path.join(ROOT, "i18n", "country-names.json");
 // Adding a language: docs/jackson/spanish.md §4 lists every place it goes
 // (Spanish was added on 8 Oct 2026 and removed on 27 Oct 2026).
 const LOCALES = ["fr", "pt"];
-const HTML_LANG = { fr: "fr", pt: "pt-PT" };
+// pt-BR since 28 Oct 2026 (Brazilian, as RBM's site): dates and numbers follow it
+const HTML_LANG = { fr: "fr", pt: "pt-BR" };
 // Shared widgets the page loads from assets/. Their locale copies get the
 // reviewed-strings substitution (i18n/reviewed-strings.json).
 const ASSET_SCRIPTS = ["assets/report-issue.js", "assets/site-nav.js"];

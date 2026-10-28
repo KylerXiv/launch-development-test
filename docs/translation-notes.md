@@ -332,7 +332,8 @@ From a trial merge of `ee1181e` into `main` at `b8c8d05`, in a scratch clone
 - **`content.en.json` carries `sources.js` whole**, `findings` and `relevance`
   included, in `values`. The repository is private; DEV-32's `build-dataset.js`
   must drop them before anything is published from `values`.
-- **Portuguese locale code**, `pt-PT` or `pt-BR`: still open (DEV-31 §6).
+- ~~**Portuguese locale code**, `pt-PT` or `pt-BR`: still open (DEV-31 §6).~~
+  Settled 28 Oct 2026: Brazilian. See "Brazilian Portuguese" below.
 - **No language switcher** links `/`, `/fr/` and `/pt/`; the pages exist but
   nothing on the English page points to them.
 - The two translation-memory faults in item 2, and the `publish.yml` failures
@@ -395,3 +396,44 @@ What follows is the status as recorded before the merge:
   to date; `build-locale-pages.js` all checks passed (fr 527 / pt 532
   translated, 41 left in English each, 93%); `build-public-site.sh` exits 0.
   No NUL bytes in any changed file.
+
+## Brazilian Portuguese (28 Oct 2026)
+
+RBM's own Portuguese is Brazilian (its sample message files: "Fatos-chave",
+"econômicas"), and the dashboard now runs inside RBM's site, so the owner
+chose Brazilian Portuguese for everything: the engine target, the country
+names, and the page's language tag, which sets how dates and numbers read.
+
+| | Before | Now |
+|---|---|---|
+| `translate-strings.js` `TARGET.pt` | `pt-PT` | `pt` (Google's Brazilian Portuguese) |
+| `build-country-names.js` `LANGS.pt` | `pt-PT` | `pt` (CLDR's Brazilian): 52 of 252 names change, e.g. Arménia → Armênia, Quénia → Quênia, Irão → Irã |
+| `build-locale-pages.js` `HTML_LANG.pt` | `pt-PT` | `pt-BR`: "19/10/2026" → "19 de out. de 2026", "14 500 000,5" → "14.500.000,5" |
+
+**Translating again.** The memory fills empty slots only, so a new target alone
+would change nothing. `translations.json` now records the target its values
+were made with (`targets`; a memory without it was made with `fr` and
+`pt-PT`). When `TARGET` differs, the next run clears that locale in every entry
+and translates everything in use again: 964 strings (709 distinct),
+52,559 characters, inside Google's free monthly allowance. Entries out of use
+lose their old value, so an old-variety text cannot come back later. A string
+the engine rejects stays empty (English) and is retried by the next run. A
+change to `translate-strings.js` now starts `translate.yml`, so merging the
+switch starts the retranslation. Checked with `TRANSLATE_ENGINE=stub` in a
+scratch checkout: `targets` became `pt`, every string in use got a new value,
+none out of use kept one, French was untouched, and a second run had nothing
+to do.
+
+Nothing was lost: no Portuguese value had been corrected by hand (the memory
+has no reviewed field, and every value came from the engine). The three wrong
+words a reviewer flagged on 28 Oct ("Gasoduto", "Perto", "Plomb", the last
+French) are not corrected here; the Portuguese two may change with the
+retranslation, and the review still applies.
+
+After the bot's run: "Publish now", so the published data
+(`dashboard.json`, `dashboard.pt.json`) is Brazilian too; then the RBM
+static pages and the React version's message files are rebuilt from it.
+
+Left as it was: a comment in `index.html` still gives "pt-PT" and "2/10/2026"
+as the Portuguese example. Editing it would change the page's script, which
+the content collector reads, for a comment.

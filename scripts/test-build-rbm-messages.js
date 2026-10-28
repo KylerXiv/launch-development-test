@@ -6,7 +6,7 @@
 // checks what RBM's i18n.ts depends on: every key in every language, no empty
 // value, the same {placeholders} in every language, en.json exactly
 // i18n/ui.en.json, every message on the old page or marked uiOnly, all under
-// "launchDashboard", and nothing left of Spanish. Then small made-up inputs
+// "Unitaid" beside RBM's Sidebar keys, and nothing left of Spanish. Then small made-up inputs
 // prove the rules, and main() runs in a temporary folder to prove what it
 // writes and when it refuses. Writes nothing in the repository.
 "use strict";
@@ -14,7 +14,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { key } = require("./i18n-hash");
-const { build, load, main, flatten, placeholders, serialise, LOCALES, OUT, NAMESPACE } = require("./build-rbm-messages");
+const { build, load, main, flatten, placeholders, serialise, LOCALES, OUT, NAMESPACE, RBM_SITE, KEYWORDS } = require("./build-rbm-messages");
 
 let passed = 0, failed = 0;
 const ok = (c, name) => { if (c) passed++; else { failed++; console.log("  FAIL " + name); } };
@@ -31,9 +31,23 @@ ok(r.errors.length === 0, "ui.en.json and ui.page-forms.json are consistent, and
 ok(inputs.pageKeys && inputs.pageKeys.size > 0, "the page check ran: content.en.json's page buckets were read");
 // the three files exactly as they would be written, read back
 const written = Object.fromEntries(LOCALES.map((l) => [l, JSON.parse(serialise(r.messages[l]))]));
-ok(NAMESPACE === "launchDashboard" && LOCALES.every((l) => Object.keys(written[l]).join() === NAMESPACE),
-   "every file holds one key, launchDashboard, with all the messages under it");
-const files = Object.fromEntries(LOCALES.map((l) => [l, written[l][NAMESPACE]]));
+ok(NAMESPACE === "Unitaid" && LOCALES.every((l) => Object.keys(written[l]).join() === "Sidebar,Unitaid"),
+   "every file holds RBM's Sidebar keys and Unitaid, with all the messages under it");
+// RBM's own keys for the module (its sample files): made from the header, never translated on their own
+for (const l of LOCALES) {
+  const w = written[l], h = w[NAMESPACE].header;
+  ok(Object.keys(w.Sidebar).join() === "unitaid,unitaid_tooltip" && w.Sidebar.unitaid === h.title && w.Sidebar.unitaid_tooltip === h.description,
+     `${l}: Sidebar.unitaid and unitaid_tooltip are the header's title and description`);
+  ok(Object.keys(w[NAMESPACE]).slice(0, 2).join() === "title,metadata" && w[NAMESPACE].title === h.title,
+     `${l}: Unitaid.title and metadata come first, the title is the header's`);
+  ok(JSON.stringify(w[NAMESPACE].metadata) === JSON.stringify({ title: `${h.title} | ${RBM_SITE}`, description: h.description, keywords: KEYWORDS }),
+     `${l}: metadata is the header's title with RBM's name in English, its description, and the English keywords`);
+}
+// our own messages, without the keys shellKeys() adds
+const files = Object.fromEntries(LOCALES.map((l) => {
+  const { title, metadata, ...own } = written[l][NAMESPACE];
+  return [l, own];
+}));
 const flat = Object.fromEntries(LOCALES.map((l) => [l, Object.fromEntries(pathsOf(files[l]))]));
 const uiFlat = flatten(inputs.ui);
 
@@ -122,7 +136,9 @@ const got = (res, l, k) => Object.fromEntries(res.messages[l])[k];
   const ghost = one({ s: "Close" }, { t: { page: "x" } }, {});
   ok(ghost.errors.some((e) => /"t" is not a key/.test(e)), "a page form for a key that does not exist is an error");
   const bad = one({ Bad: "x", a: { b: "" } }, {}, {});
-  ok(bad.errors.length === 2, "a key that is not camelCase, and an empty value, are errors"); }
+  ok(bad.errors.length === 2, "a key that is not camelCase, and an empty value, are errors");
+  const taken = one({ title: "x", metadata: { keywords: "y" } }, {}, {});
+  ok(taken.errors.filter((e) => /shellKeys\(\) writes/.test(e)).length === 2, "a message named title or metadata is an error: those keys are RBM's page title and metadata"); }
 { // ICU: an apostrophe next to a brace would print the placeholder literally.
   // French is typeset first (decision 9), and ’ is not ICU's quoting character.
   const t = one({ s: "of {stage}" }, { s: { uiOnly: true } }, mem(["of {stage}", "de l'{stage}", "d'{stage}"]));

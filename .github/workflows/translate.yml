@@ -44,6 +44,8 @@ on:
       - scripts/assemble-content.js
       - i18n/reviewed-strings.json
       - i18n/ui.en.json
+      # a change of engine target (TARGET) translates that locale again
+      - scripts/translate-strings.js
       - assets/report-issue.js
       - assets/site-nav.js
       - scripts/build-rbm-pages.js

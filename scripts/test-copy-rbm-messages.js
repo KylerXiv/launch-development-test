@@ -75,7 +75,7 @@ ok(makeBuild(STALE) === 0, "setup: the build writes the three files with --allow
   const fr = JSON.parse(read(path.join(dist, "fr.json"))); delete fr[NAMESPACE].a.c; fr[NAMESPACE].a.d = "x";
   fs.writeFileSync(path.join(dist, "fr.json"), JSON.stringify(fr, null, 2) + "\n");
   const r2 = copy(["--force"]);
-  ok(r2.code === 1 && /do not have the same keys/.test(r2.out) && /fr\.json lacks 1: launchDashboard\.a\.c/.test(r2.out) && /fr\.json has 1 not in en\.json: launchDashboard\.a\.d/.test(r2.out) && snapshot(repo) === before,
+  ok(r2.code === 1 && /do not have the same keys/.test(r2.out) && /fr\.json lacks 1: Unitaid\.a\.c/.test(r2.out) && /fr\.json has 1 not in en\.json: Unitaid\.a\.d/.test(r2.out) && snapshot(repo) === before,
      "dist files with different key sets are refused, naming the keys, even with --force");
   makeBuild(STALE);
   fs.writeFileSync(path.join(dist, "fr.json"), read(path.join(dist, "fr.json")).replace("Fermer", "Fermer!"));
