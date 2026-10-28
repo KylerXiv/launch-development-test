@@ -42,6 +42,16 @@ jobs:
           node scripts/test-build-rbm-pages.js
           node scripts/test-copy-rbm-pages.js
           node scripts/build-rbm-pages.js --allow-stale
+      # The React version's interface text (i18n/ui.en.json → RBM's message
+      # files): every message still says what the page says, the files keep
+      # their keys and placeholders, and the copy into launch-rbm-test stops
+      # rather than wipe hand edits. --allow-stale: on a pull request the bot
+      # has not translated new text yet; a broken ui.en.json still fails.
+      - name: React interface text builds
+        run: |
+          node scripts/test-build-rbm-messages.js
+          node scripts/test-copy-rbm-messages.js
+          node scripts/build-rbm-messages.js --check --allow-stale
       # The daily update email to subscribers: what counts as new, what the
       # email says, and that a re-run never sends twice. No network, no key.
       - name: Subscriber update email

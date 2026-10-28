@@ -33,8 +33,9 @@ on:
     # Every file assemble-content.js collects text from. The last four were
     # missing until 12 Oct 2026, so new text in the feedback form, the site
     # menu, the reviewed list or the RBM loader alone waited in English for
-    # some other change to start the bot. Only reviewed-strings.json is named
-    # in i18n/: the bot's own commit (content.en.json, translations.json)
+    # some other change to start the bot. Only reviewed-strings.json and
+    # ui.en.json (the React version's interface text, since 28 Oct 2026) are
+    # named in i18n/: the bot's own commit (content.en.json, translations.json)
     # must not start it again.
     paths:
       - index.html
@@ -42,6 +43,7 @@ on:
       - data/sources.js
       - scripts/assemble-content.js
       - i18n/reviewed-strings.json
+      - i18n/ui.en.json
       - assets/report-issue.js
       - assets/site-nav.js
       - scripts/build-rbm-pages.js

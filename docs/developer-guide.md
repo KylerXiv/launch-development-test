@@ -245,6 +245,16 @@ No test framework by design; two layers instead:
   [Handoff_Kyler.md](Handoff_Kyler/Handoff_Kyler.md). The `feed.xml` URL
   still points at the old GitHub Pages site: update `SITE` in
   `scripts/make-feed.js` when the final domain is known.
+  **The React version** (launch-rbm-test `feat/react-port`, for RBM's
+  Next.js site, 28 Oct 2026) takes its interface text from
+  `i18n/ui.en.json`, one of `content.en.json`'s buckets (`ui`), so the
+  translate bot translates it. `node scripts/build-rbm-messages.js` writes
+  `dist/rbm-messages/{en,fr,pt}.json`, everything under `launchDashboard`,
+  and stops if a message no longer says what this page says (reword both, or
+  mark a React-only message `uiOnly` in `i18n/ui.page-forms.json`); then
+  `node scripts/copy-rbm-messages.js --to ../launch-rbm-test` and commit
+  there. Its data is the one-language files `publish-dataset.yml` publishes.
+  See [rbm-messages-notes.md](rbm-messages-notes.md).
 - No secrets exist anywhere in the repo or its history; the confirmation
   register lives outside the repo by policy.
 - **The two forms (Subscribe, and Send feedback on the illustrated journey)

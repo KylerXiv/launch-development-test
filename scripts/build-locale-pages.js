@@ -109,6 +109,8 @@ if (!verifyOnly) {
     text = requireFresh().text;
   }
   for (const e of text) {
+    // the React version's text (i18n/ui.en.json): translated, never put in the page
+    if (e.bucket === "ui") continue;
     if (e.bucket === "reviewed") { REVIEWED_KEY_OF.set(normalise(e.en), e.key); continue; }
     KEY_OF.set(normalise(e.en), e.key);
     if (e.bucket === "markup" || e.bucket === "js") PAGE_KEY_OF.set(normalise(e.en), e.key);

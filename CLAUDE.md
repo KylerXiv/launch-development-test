@@ -41,7 +41,14 @@ node scripts/validate-data.js data/products.synthetic.js   # expect 0 errors, 0 
 node scripts/make-preview.js                  # smoke test
 node scripts/test-build-dataset.js            # RBM dashboard.json: expect 0 failed
 node scripts/build-country-names.js --check   # /fr, /pt country names: expect "covers all"
+node scripts/test-build-rbm-messages.js       # React interface text: expect 0 failed (55 passed; 52 if dist/rbm-messages/ is not built)
+node scripts/test-copy-rbm-messages.js        # copy into launch-rbm-test/messages/: expect 35 passed, 0 failed
 ```
+
+`test-build-rbm-messages.js` has three checks that run only when
+`dist/rbm-messages/` exists (they compare the built files with the sources), so
+its pass count depends on whether you built; the failure count must be 0
+either way.
 
 The 1 warning is `treatment policy:` (French Guiana lists a dashboard product
 but is not drawn on the basemap). Anything else means something moved. (It

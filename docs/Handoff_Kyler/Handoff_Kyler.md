@@ -1,12 +1,178 @@
 # Handoff — RBM staging dashboard
 
-> **Read §0 first.** It is the state of the project on 8 October 2026. Everything
-> after it is the history of September's work, kept for its decisions. Where the
-> two disagree, §0 is current.
+> **Read §0 first.** It is the state of the project on 28 October 2026: the
+> React + Next.js port for RBM. §0.1 is the state on 8 October and still holds
+> for the pipeline, the forms and the data, except where §0 says otherwise.
+> Everything after that is the history of September's work, kept for its
+> decisions. Where they disagree, §0 is current.
 
-## 0. Current state — 8 October 2026
+## 0. Current state — 28 October 2026: RBM on React + Next.js
 
-*Start here in a new session. It replaces the 6 October version: everything
+*Start here in a new session. §0.1 below is the 8 October state; it still
+holds for the pipeline, the forms and the data except where this section says
+otherwise.*
+
+### What happened, 27–28 October
+
+UNOPS (RBM's host) asked on 27 Oct for the dashboard as React + Next.js, the
+data through an API with no developer involved, one JSON file per language for
+their `i18n.ts`, MapLibre from npm, and why the forms run on Vercel. Tamarind
+does the conversion; **delivery 10 Nov 2026**. The plan is
+`~/Downloads/rbm-nextjs-plan.md` on Kyler's Mac (not in a repo).
+
+Agreed with the owner on 27–28 Oct:
+
+- **Only what RBM receives changes.** `launch-rbm-test` becomes a Next.js
+  project; this repo's workflows and `launch-data-test` do not change.
+- **Data through the API.** RBM's server fetches the published
+  `v1/dashboard.json` every 10 minutes. PR #127's "copy the file beside the
+  pages and send it to RBM" came from a misunderstanding between the two teams;
+  the React port does not use it. (The static test copy on `launch-rbm-test`
+  `main` still reads `data/dashboard.json`; switching it back is a separate,
+  small change, not done.)
+- **Spanish is gone** (PR #127, #128): en, fr, pt only.
+- **RBM holds no key.** The forms' server and the Resend keys stay on the
+  Unitaid side; RBM's app holds only the forms' address. Where that server
+  runs (Cloudflare on a Unitaid account recommended, Unitaid's own server, or
+  RBM as last fallback) and removing Vercel completely are the **email part,
+  deferred** by the owner. Both Resend keys need Full access (a Sending-access
+  key cannot write the subscriber list; checked against Resend's docs).
+- **Do not merge either branch yet.** The owner works on them until stable.
+
+### Where things are
+
+| Repo | Branch | State |
+| --- | --- | --- |
+| `codebyjackson/launch-rbm-test` | `feat/react-port` | Pushed 28 Oct, **not merged**, no PR. 21 commits on `main` `7c1bf11`, head `53f8c18`. **Do not merge `main` into it** while the static pages are in it: its golden tests read them (`react-port-notes.md`, Deferred, first item) |
+| `codebyjackson/launch-rbm-test` | `main` | `f39b88d` (PR #31, 28 Oct): the static pages rebuilt from this repo's `e9aff92`, the 7 words translated on `/fr` and `/pt`; checked live on GitHub Pages and `launch-rbm-test.vercel.app` |
+| `KylerXiv/launch-development-test` (this repo) | `feat/rbm-messages` | Pushed 28 Oct, **not merged**, no PR. From `main` `89b2011`, with `main` merged in at `e9aff92` (`65b969e`): the interface text, its build and copy scripts, this §0 |
+| `KylerXiv/launch-development-test` (this repo) | `main` | PR #129 merged 28 Oct (`0902567`): the 7 words in `reviewed-strings.json`; the bot translated them (`e9aff92`) |
+
+Local folders on Kyler's Mac: `~/Downloads/launch-rbm-test` (clone, Kyler's
+identity set), `~/Downloads/launch-development-rbm-messages` (a worktree of
+this repo on `feat/rbm-messages`). Seven `~/Downloads/launch-rbm-test-*`
+worktrees were for parallel work; every branch in them is merged into
+`feat/react-port`, so they can be removed. Also from 28 Oct, removable when
+done with: `~/Downloads/launch-development-translate-7` (PR #129's merged
+branch, now detached at `e9aff92`), `~/Downloads/launch-rbm-test-update`
+(PR #31's merged branch); `~/Downloads/launch-data-test` is a clone of the
+data repo, which `build-rbm-pages.js` reads by default. The main checkout,
+`~/Downloads/launch-development`, is untouched on `feedback/v1-status-barriers`.
+
+### What `feat/react-port` holds
+
+The decisions (53, with the rejected alternatives and numbers), deferred items
+and status are in its `docs/react-port-notes.md`; read that before changing it.
+
+- **Versions:** Next.js **16.4.3** (16.0.0–16.4.0 have two critical
+  remote-code-execution advisories: tell RBM their own Next.js must be 16.4.1+
+  if on 16.x), React 19.3.0, TypeScript 6.0.3, **maplibre-gl 6.14.0**
+  (≤ 6.4.0 has a critical XSS advisory), vitest 5.0.4. `npm audit`: 0.
+- **Shape:** `lib/data.ts` reads the dataset on the server; `lib/` holds the
+  page's logic as pure functions; `components/{frame,pathway,board,map}/` and
+  one client `components/Dashboard.tsx` that RBM drops into its page; today's
+  CSS and the Unitaid skin fenced under `.launch-dashboard`; MapLibre from npm
+  with its worker served from `public/`; nothing loads from another host.
+- **Text:** `messages/{en,fr,pt}.json`, copied from this repo (below), with
+  nothing held in the app since 28 Oct (`lib/held-text.ts` deleted, decision
+  53 there). 327 values per language proved equal to today's pages, apart
+  from two changes the owner chose: French ’ throughout (decision 9 here; 16
+  values, where today's page has ') and the per-step delayed count, which
+  today's `/fr` and `/pt` leave in English (decision 10 here).
+- **Proof against today's page:** golden tests run the page's own functions
+  (frozen from `7c1bf11`) beside the port: format/stages 82,911, pathway
+  36,438, board 20,931, frame 1,856, map 896,415 comparisons; markup parity
+  tests on top; all equal in en, fr and pt.
+
+### Checking it is still stable
+
+In `launch-rbm-test` on `feat/react-port` (Node 22.12+ recommended; vitest 5
+wants it, though 22.9 works through `vitest.config.mts`):
+
+```bash
+npm ci
+npx vitest run                    # expect 271 passed
+npx tsc --noEmit                  # expect no output
+npm audit --omit=dev              # expect 0 vulnerabilities
+NEXT_PUBLIC_LAUNCH_FORMS_URL=https://forms.example.org npx next build
+npx next start -p 3124 &
+SMOKE_LOCALES=en,fr,pt node scripts/smoke.mjs   # expect 87 of 87; then stop the server
+```
+
+`scripts/smoke.mjs` drives headless Chrome over CDP (clicks, Escape order,
+hints, `?product=`, both forms open, the map draws). The forms address is read
+at build time: without it Subscribe is not rendered and that check fails.
+
+In this repo on `feat/rbm-messages`: the CLAUDE.md verify block, which now
+includes `test-build-rbm-messages.js` (51 passed) and
+`test-copy-rbm-messages.js` (35 passed).
+
+### Changing interface text
+
+Edit `i18n/ui.en.json` here (313 keys by component area), then
+`node scripts/build-rbm-messages.js` (all 313 translated since 28 Oct; it
+stops on a string with no translation, and `--allow-stale` ships it in
+English) and
+`node scripts/copy-rbm-messages.js`, then commit in `launch-rbm-test`. The copy
+refuses to overwrite a message file edited there by hand
+(`messages/manifest.json` holds each file's sha256). Wiring `ui.en.json` into
+`assemble-content.js`, so the text goes through translate-and-approve, is not
+done yet: it changes the approval hash and needs one test proposal end to end.
+
+### Still to do before 10 November
+
+1. **Done 28 Oct** (`675dd78`): side-by-side check against today's pages in
+   en, fr and pt at 1440 to 360px, same `dashboard.json` in both. Same text,
+   same heights, header, pathway and board pixel-identical, after one fix in
+   the example app (its `<body>` margin; decision 52). Method and results:
+   `react-port-notes.md`, "The side-by-side check". Smoke test 87 of 87 in
+   en, fr and pt. Left from it: a real iPhone and Safari.
+2. **Done 28 Oct.** The 37 keys are in `i18n/ui.en.json` (`ae16ee6`); the
+   build writes French ’ throughout (the owner's choice over copying the
+   page's mix); `lib/held-text.ts` is gone (`01b93f1` in launch-rbm-test).
+   The 7 untranslated words went through PR #129 and the bot (`e9aff92`);
+   this branch took `main` in (`65b969e`) and builds 313 of 313; the port
+   lists them in `CHANGED` (`53f8c18`); RBM's static pages show them (PR #31,
+   `f39b88d`). For the translation reviewer: "Packs" (Google left it
+   "Packs" in French, "Pacotes" in Portuguese).
+3. A README in `launch-rbm-test` for RBM: install, settings, the files to host
+   (serve `.mjs` as JavaScript), where the data comes from, how text changes
+   arrive, and that the page must load Source Sans 3. **Another developer
+   takes this** (owner, 28 Oct).
+4. After RBM runs it on its staging server: remove the static pages from
+   `launch-rbm-test` (`en/`, `fr/`, `pt/`, `rbm-shell/`, `iframe-test.html`,
+   `build-manifest.json`, `data/`) and retire `build-rbm-pages.js` and its
+   copy scripts here.
+
+### Waiting on others
+
+- **RBM/UNOPS:** Next.js and React versions, router, TypeScript, styling
+  system; the library behind `i18n.ts` (`{name}` or `{{name}}`) and the JSON
+  structure; the production and staging origins (they go in `PARTNERS` in
+  `api/_mail.js`, or every form post from their site is refused); what
+  "10 Nov" means (code delivered, staging, or live); confirm their server
+  can reach the data address, serves `.mjs` as JavaScript, and that WebGL2
+  (needed by MapLibre 6) is acceptable.
+- **Unitaid:** the forms' host, the owner of the Resend account, and the
+  subdomains (`updates.`, `forms.`, and `data.` for a stable data address).
+
+### Found on the way, left alone
+
+- Mistranslations live on /fr and /pt today, carried over unchanged: French
+  "Scène" for Stage, "Plomb" for Lead, the MÉDECINE / VOYAGE / ACCÉDER table
+  headings; Portuguese "Perto" for Close, "Concluir" for Complete; Brazilian
+  forms in pt-PT. Full list for a bilingual reviewer in
+  `docs/rbm-messages-notes.md`.
+- Old page quirks kept by the port and listed in `react-port-notes.md`:
+  `fmtFig` reads a decimal comma as thousands, "0 années", "1 years",
+  Australia listed as "Ashmore and Cartier Is.", an untracked country's page
+  titled with its code, the keyboard country list unreachable by Tab.
+- At some widths MapLibre 6 greys out the zoom-out button where it could not
+  zoom out anyway.
+
+## 0.1 Earlier state — 8 October 2026 (still current for the pipeline, the forms and the data)
+
+*The state on 8 October. It replaced the 6 October version: everything
 still open from then is carried below.*
 
 ### Where things are

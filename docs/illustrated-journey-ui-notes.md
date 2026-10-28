@@ -1732,7 +1732,7 @@ page. No script matches the old texts: the only `<title>` rewriters
 editions.
 
 **After merge:** wait for `translate.yml`, then rebuild RBM's copies and push
-them, per the handoff (§0, "Updating RBM's copy").
+them, per the handoff (§0.1, "Updating RBM's copy").
 
 ### 3.38 The title is "Malaria Product Launch Dashboard" (8 Oct 2026)
 
