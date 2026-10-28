@@ -21,7 +21,10 @@ approval hash) is a later, separately reviewed step and is **not** done here.
 | `i18n/ui.en.json` | **new.** 276 keys → English, nested by page area. A `_note` at the top says what it is. |
 | `i18n/ui.page-forms.json` | **new.** For each of the 46 keys with `{placeholders}`, how `index.html` builds that text, so its existing translation can be found. |
 | `scripts/build-rbm-messages.js` | **new.** Writes `dist/rbm-messages/{en,fr,pt}.json` (nested). `--check` writes nothing; `--allow-stale` ships a missing string in English. |
-| `scripts/test-build-rbm-messages.js` | **new.** 46 checks. |
+| `scripts/test-build-rbm-messages.js` | **new.** 46 checks (43 when `dist/rbm-messages/` is not built: three compare the built files with the sources). |
+| `scripts/copy-rbm-messages.js` | **new** (28 Oct). Copies the three files into `launch-rbm-test/messages/` and leaves `messages/manifest.json` there; refuses to overwrite hand edits. Decision 8. |
+| `scripts/test-copy-rbm-messages.js` | **new** (28 Oct). 35 checks, in a temporary folder. |
+| `CLAUDE.md` | **changed** (28 Oct). Both message tests added to the verify block. |
 | `docs/rbm-messages-notes.md` | **new.** This file. |
 
 `dist/` is git-ignored, so the three output files are built, not committed.
@@ -188,6 +191,93 @@ the same list the RBM pages use, not a second copy. A leftover `es.json` in
 `dist/rbm-messages/` is removed on each build. The memory carries no `es`
 values (PR #127).
 
+**8. The copy into `launch-rbm-test` is its own script, with a manifest in the
+target, and it adopts a hand copy only if it is identical** (28 Oct 2026).
+`scripts/copy-rbm-messages.js` copies `dist/rbm-messages/{en,fr,pt}.json` into
+`<target>/messages/` (default `../launch-rbm-test`, `--to` to change it,
+`--from` for a build kept elsewhere) and writes `messages/manifest.json`: the
+sha256 of each file, `built_from` (this repository's commit), `clean`,
+`allow_stale` and `untranslated` (the keys per language still in English).
+The next copy compares the files there with it. The parts, each with what was
+rejected:
+
+- **A separate script, not a `--messages` step in `copy-rbm-pages.js`** (the
+  two options Deferred 2 offered). The two copies go to different places: the
+  pages to the static branch's root, the messages to the React port
+  (`feat/react-port`). `copy-rbm-pages.js` also requires a clean target tree
+  and `build-rbm-pages.js`'s manifest, and neither fits here. It reuses
+  `fingerprint()` and `LOCALES` from `rbm-manifest.js`, so the hashes and the
+  language list are the pages' own.
+- **The build stays as it is; the copier rebuilds in memory.**
+  `build-rbm-messages.js` writes no record of `--allow-stale` or of what is
+  missing, so the copier runs `build()` on the current sources and compares
+  the result with the files in `dist/`. If they are equal, the untranslated
+  keys are known exactly, and `allow_stale` is true when any language has
+  some, because the build writes English for a missing string only with
+  `--allow-stale`. With nothing missing the flag changes nothing, so it is
+  recorded `false`. Rejected: a build manifest written by
+  `build-rbm-messages.js` (as `build-rbm-pages.js` does). It would change a
+  reviewed script, and on its own it would not prove `dist/` is still what
+  the sources build.
+- **A `dist/` that is not what the current sources build is refused**, with
+  no switch ("rebuild"). Otherwise the manifest would name a commit and a list
+  of untranslated keys that do not describe the files. Rejected: recording
+  `allow_stale: "unknown"`. A rebuild takes 0.2 s (`--check --allow-stale`,
+  timed 28 Oct).
+- **No manifest in the target (the files were copied there by hand on 27 Oct):
+  each file already there must be identical to the one this copy writes**,
+  line endings aside. A file that differs stops the copy, named, unless
+  `--force`; a file that is not there is simply written. With no record of
+  the last copy, identity is the only proof that nothing is lost. On
+  28 Oct the three files in `launch-rbm-test/messages/` had the same sha256 as
+  `dist/rbm-messages/` (built from `280ad5d`), so the first real copy writes
+  `manifest.json` alone. Rejected: a `--first-copy` flag as in
+  `copy-rbm-pages.js`. It accepts whatever is there without comparing, and the
+  comparison is possible here. Rejected: always refusing without a manifest.
+  That would demand `--force` for files proven identical.
+- **What counts as a hand edit:** a file the last manifest lists that now has
+  another hash or was deleted, a language file the manifest does not list that
+  differs from the build, and an unreadable `manifest.json`. `--force`
+  overrides these, and only these, and lists what it replaces on stderr. It
+  never overrides a wrong target or a missing, inconsistent or stale `dist/`.
+  Rejected: letting an edit that already equals the new build through
+  silently. The rule asked for is "differs from the recorded hash", and
+  `--force` covers that rare case.
+- **The target marker is `package.json` named `launch-dashboard-rbm`.** The
+  static-pages branch (`main`) of `launch-rbm-test` has no `package.json`
+  (checked 28 Oct), so a copy there is refused, which is right: only the
+  React port reads `messages/`.
+- **No clean-tree requirement on the target**, unlike `copy-rbm-pages.js`.
+  The React port is under active development there, and the copy touches only
+  `messages/`. An uncommitted edit to a message file is still caught by its
+  hash (tested). Rejected: requiring `git status` to be empty, which would
+  block the copy on any unrelated work in progress.
+- **Uncommitted build inputs are recorded and warned about, not refused.**
+  If `i18n/ui.en.json`, `ui.page-forms.json`, `translations.json` or the build
+  scripts have uncommitted changes, the manifest says `"clean": false` and
+  lists them, and the copy prints a warning. That lets someone try a wording
+  change in the React app before committing it. Rejected (for now): refusing,
+  as `copy-rbm-pages.js` does for a build from uncommitted files. If copies
+  should only ever be of committed builds, flip this to a refusal.
+- **No timestamp in the manifest**, so an unchanged re-copy is byte-identical
+  and `git status` stays empty. An unchanged file is not rewritten.
+- `--check` runs every check and lists, per file, `new`, `unchanged` or
+  `replaced`, and which manifest fields would change. It exits 1 where the copy
+  would stop. An unknown argument is refused, so a mistyped `--chek` cannot run
+  a real copy. Git calls in the target use `--no-optional-locks`, so even
+  `git status` does not rewrite the index of a checkout someone is working in.
+- A language file the last copy wrote that the build no longer has is
+  removed (the `es/` lesson from the pages, 27 Oct). Everything else in
+  `messages/`, including `README.md`, is left alone. Because the manifest's
+  file names become paths the copy may remove, a manifest naming anything but
+  a plain `xx.json` (say `../package.json`) is treated as not written by this
+  script, a hand edit. Without that check, `--force` deleted the test repo's
+  `package.json` (tested by removing it).
+- `manifest.json` sits beside the language files. RBM's app imports each
+  language by name (`lib/messages.ts`: `import en from "@/messages/en.json"`),
+  so it is not read as a language. A loader that globbed `messages/*.json`
+  would read it.
+
 ## Coverage, 27 Oct 2026
 
 | | found | missing |
@@ -236,6 +326,15 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
     "Enviando…"), although the pages declare `pt-PT`.
 - **`prettyDate()` in `index.html` is dead code** (defined, never called), with
   its own English month names.
+- **`launch-rbm-test/messages/README.md` names four of the seven untranslated
+  keys wrongly** (seen 28 Oct, `feat/react-port`). It lists
+  `download.presentation`, `download.transactions`, `download.packs` and
+  `download.notEstimated`; the build's keys are
+  `product.procurement.presentation`, `…transactions`, `…packs` and
+  `…notEstimated`. The other three are right. Its "Current copy" paragraph
+  also repeats what `manifest.json` now records, and goes stale with the next
+  copy. Suggested fix there: point that paragraph at `manifest.json`. Not
+  changed from here: another agent works in that repository.
 - **`i18n/translations.json` holds 1,013 entries; `content.en.json` uses 663.**
   The rest belong to removed features (the resistance overlay, the old
   "Step …" wording). Harmless, since lookups are exact, but the memory is never
@@ -255,8 +354,9 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
      button in `index.html` and its key keeps the old English. A drift check:
      every plain key's English and every page form must be in
      `content.en.json` (today all are, except the 7 above).
-2. **Copy the files into `launch-rbm-test`** (by hand, or a `--messages` step
-   in `scripts/copy-rbm-pages.js`).
+2. ~~Copy the files into `launch-rbm-test`.~~ Done 28 Oct:
+   `scripts/copy-rbm-messages.js` (decision 8). Not yet run for real: the
+   first copy writes `messages/manifest.json` alone (`--check`, Status).
 3. **Reshape to RBM's own JSON structure once they send it.** That includes the
    interpolation syntax: next-intl reads ICU `{name}`, i18next's default is
    `{{name}}`. It also covers ICU plurals (decision 4) and whether their reader
@@ -264,17 +364,37 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
 4. Translate the 7 missing strings, through `reviewed-strings.json` (Found in
    passing, first item), not by hand in the output.
 5. The translation-quality list above, for a French and a Portuguese reviewer.
-6. `test-build-rbm-messages.js` is not in CI. `.github/` was out of scope for
-   this branch; add it to `validate.yml` with the wiring.
-7. `docs/developer-guide.md` does not mention these files yet.
+6. `test-build-rbm-messages.js` and `test-copy-rbm-messages.js` are not in CI
+   (they are in the `CLAUDE.md` verify block). `.github/` was out of scope for
+   this branch; add them to `validate.yml` with the wiring.
+7. `docs/developer-guide.md` does not mention these files yet, nor
+   `copy-rbm-messages.js`.
 
 ## Status
 
 - Branch `feat/rbm-messages` in the worktree
   `../launch-development-rbm-messages`, from `origin/main` `89b2011`.
-  **Uncommitted, not pushed, no CI run.** Files: the five new files above;
-  nothing existing was changed.
+  **1 commit (`280ad5d`, the message build), not pushed, no CI run.** The
+  copy step (28 Oct) is **uncommitted** on top of it: `scripts/copy-rbm-messages.js`
+  and `scripts/test-copy-rbm-messages.js` new, `CLAUDE.md` and this file
+  changed.
 - `node scripts/test-build-rbm-messages.js`: 46 passed, 0 failed.
+- `node scripts/test-copy-rbm-messages.js`: 35 passed, 0 failed. Each
+  refusal was also broken on purpose in a scratch copy of the scripts (force
+  always on, no stale-build check, a missing manifest always adopted,
+  `--check` writing, no key-set check, no file-name check on the manifest);
+  each break made named checks fail.
+- `node scripts/copy-rbm-messages.js --check` against the real
+  `../launch-rbm-test` (`feat/react-port`), 28 Oct: exit 0, "built from
+  launch-development-test 280ad5d; still English: fr 7, pt 7", `en.json`,
+  `fr.json`, `pt.json` unchanged, `manifest.json` new. Its `messages/`, its
+  `git status` and its `.git/index` time were the same before and after. A
+  real copy into a scratch replica of that folder wrote `manifest.json` alone,
+  with the same three sha256 values; a second copy changed nothing.
+- Verify block, 28 Oct 2026, with the copy step: the same results as on
+  27 Oct below (normalize byte-identical; 0 errors, 1 warning `treatment
+  policy:` GUF; synthetic 0 / 0; `preview.html` 393 KB; `test-build-dataset.js`
+  30 passed, 0 failed; covers all 252), plus the two message tests above.
 - `node scripts/build-rbm-messages.js`: fails as designed, listing the 7
   missing strings per language. `--allow-stale` writes the three files.
 - Verify block, 27 Oct 2026: `normalize-treatment-policy.js` regenerated
@@ -284,4 +404,6 @@ therefore fails today, and `--allow-stale` builds with those 7 in English.
   `build-country-names.js --check` covers all 252. Also
   `assemble-content.js --check` up to date (contentHash `da61980a827c`) and
   `test-build-rbm-pages.js` 36 passed, 0 failed.
-- No NUL bytes in any new file (counted in Python).
+- No NUL bytes in any new file (counted in Python). 28 Oct: none in the two
+  new scripts, `CLAUDE.md` or this file. All four are LF, as the rest of this
+  worktree is (`git ls-files --eol`: `i/lf w/lf`).
